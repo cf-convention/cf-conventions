@@ -1,0 +1,112 @@
+
+==  Labels and Alternative Coordinates 
+
+
+
+
+[[labels]]
+=== Labels
+
+
+
+
+
+Character strings can be used to provide a name or label for each
+element of an axis. This is particularly useful for discrete axes
+(section 4.5). For instance, if a data variable contains time series of
+observational data from a number of observing stations, it may be
+convenient to provide the names of the stations as labels for the
+elements of the station dimension (<<time-series-data>>).
+      <<Example H.1.1>> illustrates another application for labels.
+      
+
+Character strings labelling the elements of an axis are regarded as
+string-valued auxiliary coordinate variables. The **`coordinates`** attribute
+      of the data variable names the variable that contains the string
+      array. An application processing the variables listed in the **`coordinates`**
+      attribute can recognize a string-valued auxiliary coordinate variable
+      because it contains an array of character data. The inner dimension (last
+      dimension in CDL terms) is the maximum length of each string, and the
+      other dimensions are axis dimensions. If a character variable has only
+      one dimension (the maximum length of the string), it is regarded as a
+      string-valued scalar coordinate variable, analogous to a numeric scalar
+      coordinate variable (see <<scalar-coordinate-variables>>)
+    
+
+.
+====
+
+----
+
+----
+
+
+====
+
+
+
+
+[[geographic-regions]]
+==== Geographic Regions
+
+When data is representative of geographic regions which can be identified by names but which have complex boundaries that cannot practically be specified using longitude and latitude boundary coordinates, a labeled axis should be used to identify the regions. We recommend that the names be chosen from the list of link:$$http://cf-pcmdi.llnl.gov/documents/cf-standard-names/standardized-region-names$$[standardized region names] whenever possible. To indicate that the label values are standardized the variable that contains the labels must be given the **`standard_name`** attribute with the value region .
+
+.Northward heat transport in Atlantic Ocean
+====
+
+----
+Suppose we have data representing northward heat transport across a set of zonal slices in the Atlantic Ocean. Note that the standard names to describe this quantity do not include location information. That is provided by the latitude coordinate and the labeled axis:
+dimensions:
+  times = 20 ;
+  lat = 5
+  lbl = 1 ;
+  strlen = 64 ;
+variables:
+  float n_heat_transport(time,lat,lbl);
+    n_heat_transport:units="W";
+    n_heat_transport:coordinates="geo_region";
+    n_heat_transport:standard_name="northward_ocean_heat_transport";
+  double time(time) ;
+    time:long_name = "time" ;
+    time:units = "days since 1990-1-1 0:0:0" ;
+  float lat(lat) ;
+    lat:long_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  char geo_region(lbl,strlen) ;
+    geo_region:standard_name="region"
+data:
+  geo_region = "atlantic_ocean" ;
+  lat = 10., 20., 30., 40., 50. ;
+	
+----
+
+
+====
+
+
+
+
+[[alternative-coordinates]]
+=== Alternative Coordinates
+
+In some situations a dimension may have alternative sets of coordinates values. Since there can only be one coordinate variable for the dimension (the variable with the same name as the dimension), any alternative sets of values have to be stored in auxiliary coordinate variables. For such alternative coordinate variables, there are no mandatory attributes, but they may have any of the attributes allowed for coordinate variables.
+
+.Model level numbers
+====
+
+----
+Levels on a vertical axis may be described by both the physical coordinate and the ordinal model level number.
+float xwind(sigma,lat);
+  xwind:coordinates="model_level";
+float sigma(sigma); // physical height coordinate
+  sigma:long_name="sigma";
+  sigma:positive="down";
+int model_level(sigma); // model level number at each height
+  model_level:long_name="model level number";
+  model_level:positive="up";
+      
+----
+
+
+====
+
