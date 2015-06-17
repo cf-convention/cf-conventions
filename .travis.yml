@@ -1,0 +1,29 @@
+language: ruby
+rvm:
+    - 2.1.2
+
+install:
+    - gem install asciidoctor
+    - asciidoctor --version
+
+before_script:
+    - git config --global user.email $GIT_EMAIL
+    - git config --global user.name $GIT_NAME
+
+script:
+    - mkdir build
+    - asciidoctor cf-conventions.adoc -D build
+
+after_success:
+    - git clone https://${GH_TOKEN}@github.com/cf-metadata/cf-metadata.github.io.git pages
+    - cp build/cf-conventions.html pages/index.html
+    - cd pages
+    - git add index.html
+    - git commit -m 'Auto-generated from cf-metadata/cf-conventions'
+    - git push origin master
+
+env:
+    global:
+        - secure: G5e6vmXHnOeh+RCIY90l8E+vgnEflAqsUMgOaIk+iDRhQl7vPTDoaiBJyYF5ltq45P5Lg6R6h/fkhwcvNH0/1gGZoRyxHmypFv1Dxboei+t128ECYxKMfheJ5+xoBG/ApB8kmZbooBhENdlgNWf5fRYqqwdt8eCjIYbw1gFIjEwVQ7ud8EuG8YIxYQuo64y0qCXXQpqZq4AUWKU287ySf66uF9qLCTnnI9Cq+7XXi8QZB6r9RaWwhx3KpWfY4umtYVec/CZ41EL0VbxAAuJTYUY0aLOEm9Pdbg5CsD1s6PxQUheu9G6x+4RdJFldzly+bXSOzoatTpSiFD0VgReIyhOOHbzaJB7p2AUJaTMgDwvffYs1DAmYy0yoGBjgg5mukyYB13rlbQWGYSZ4zbc5aSrF/JxKaVRiDDZtV+YzkfctzyZULTi+LWk29X5wp/h+tvYLl94r6IzKY7UN1aHvMepUzsx3MSp+5jbD0J6Dj9gFK8SLMkhQ4EA0pd/0CwiqB8O4ZQrBiKdHa852IA4r0MG2Q7g0ZaaC3cZwOD0gC96pepnQolvVEFMdKILJr47LxBYTPJj+phln2Moe6AlgckcgiBZFtm18i7oeAwz3LvKHxObK3zpmssXgzUhpFfeZPI6ruZ4y9RrClXRtIXHQhn+HG0/Ae9zM01vaXOQrVjk=
+        - secure: mvsFDLK8kzpuvg2tzHwFjVuI/Np/FpXE3VNd5Yfs5pDklyjy1b1wEfDj8TSBIDPD4D++ipF5fQClTw4tW1g4JkNFvKtlNvgZDPj9BvV48ASr7kAWf4WY7nmekM/2dHMKbOStaDJHIp2fPoI09pqlcjJ/qtdFpy9nuY2ErsSq+QVgBC7MWx47kDlRjtug9c5MDeEOfazZOF8Dt23BtL3eYr3GrwFOGnQHCzDzBSOw+S8l9jJD6zj3J9BqHstUuuY6UkY47hIehfdQzDni2iar/ULqLKktkwna2MgZEgNdZIZ7sFhdm5aowM85u5s0jbLJDqdzy/mh6NjQ1svQQZGZnOv5WoFOa4LiUWaPRNV07+kVY8Fp7MueENWtjDknccrHu2LePKuC/hbzN91xD3cjqBrJH1mA6ZPFe0iBBl2cNqsGUK/9ZqUEgRxlXQCJWJ/zVA8L6J0NlgRw7Npu/FpLFa1NuRDfecwVXnAWp8tNEjB1WgnzsgL5jRzXaQ3DJyLA382quFXzO8I2ugShSn6So+UFcpX3D6mNsbhq7SljB7+2NLAr9qMLnyCPBkjHC83K8cGb+nVo2ytNwajVXWkC0DdrwAl/aoJkNarYTQlSsnXfZg7lkNgrjAAoOXRNJ5eJqhaXtxvr6gbZGS+4yopbzQrSwK+LIpNYNpaklbozAR4=
+        - secure: nvMM1neiA0QNX5SulMry1QzfKtwgM8iUfY5A9VLfSxduiuAZibZKs9n1BP1ZN/JjPhzyYzJmD5QkYn6CY5XLKSwNkwijFqINwnR5LSpTwcttda4yQRe92TRGsSbECqfKXycU8j9qHfTVt2w8cumto9dwC/ILjYFuBYyHNrNKJfO5bK7+Dr2NGlu2o5rFntMhuldHpJQuje29me69bzblHM4WtRndHvT1Ckk7HDBdirnuENeSo0b5myEmKpk+ZeYtZOXxtO9yiE5avP0pnT2I97OjkitMdUOObzR839GqxTKq9OT8RcS0fx+aqAI2NXqqzcTvV6K8vQgvktPM5z/7+n8otfSOHQcgJFnuh5C2UYiVhU51SzWTSrq9quSfLqL0nxX641ncKveV6y7hsSw9y3XnToFiBRdo80EInnI+ROo/6FWfQRyegIKIFiObswt3+0KTbjCMeZ8tfP3sov/81tDK2Qp2zpsuFXJExhZ3zXgZdB4/2fAnTT1IangBylAGrs16hIO6+njgz1GwzjFSXtQDoAM2OKDjuYAl7nZ6vM7kyp3ik4FJQpqVCpY+fyZ83kzP5TDGK1J/0FtFSOElWlK5BMIh/osHreIAy7dMFrgYVV6cARl9/c3COvBdcs1JJQywnLD2YynDVH6t+954w63yxCPbQDIz+a5g1Y+wDjk=
