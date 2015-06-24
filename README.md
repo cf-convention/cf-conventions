@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/cf-metadata/cf-conventions.png)](http://travis-ci.org/cf-metadata/cf-conventions)
+
 This is an *unofficial* work-in-progress to show how the CF metadata conventions
 could be managed via GitHub, Travis-CI, and asciidoctor. The output from this
 process can be seen at: http://cf-metadata.github.io/
