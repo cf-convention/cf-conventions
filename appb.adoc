@@ -7,41 +7,29 @@
 The CF standard name table is an XML document (i.e., its format adheres to the XML 1.0 [<<xml,XML>>] recommendation). The XML suite of protocols provides a reasonable balance between human and machine readability. It also provides extensive support for internationalization. See the W3C [<<w3c,W3C>>] home page for more information.
 
 The document begins with a header that identifies it as an XML file: 
+
+----
+<?xml version="1.0"?>
 ----
 
-	 	
-  <?xml version="1.0"?>
-			 
-	
+Next is the **`standard_name_table`** itself, which is bracketed by the tags **`&lt;standard_name_table&gt;`** and **`&lt;/standard_name_table&gt;`** .
+
+----
+<standard_name_table 
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+ xsi:noNamespaceSchemaLocation="CFStandardNameTable.xsd">
 ----
 
- Next is the **`standard_name_table`** itself, which is bracketed by the tags **`&lt;standard_name_table&gt;`** and **`&lt;/standard_name_table&gt;`** . 
+The content (delimited by the `&lt;standard_name_table&gt;` tags) consists of, in order, 
+
 ----
-
-	 	
-  <standard_name_table 
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-     xsi:noNamespaceSchemaLocation="CFStandardNameTable.xsd">
-			 
-	 
-----
-
- 
-
-The content (delimited by the &lt;standard_name_table&gt; tags) consists of, in order, 
-----
-
-	 	
   <institution>Name of institution here ... </institution>
   <contact>E-mail address of contact person ... </contact>
-			 
-	 
 ----
 
- followed by a sequence of **`entry`** elements which may optionally be followed by a sequence of **`alias`** elements. The **`entry`** and **`alias`** elements take the following forms: 
-----
+followed by a sequence of **`entry`** elements which may optionally be followed by a sequence of **`alias`** elements. The **`entry`** and **`alias`** elements take the following forms:
 
-	 	
+----
   <entry id="an_id">
       Define the variable whose standard_name attribute has the value "an_id".  
   </entry>
@@ -49,60 +37,39 @@ The content (delimited by the &lt;standard_name_table&gt; tags) consists of, in 
       Provide alias for a variable whose standard_name attribute has the
         value "another_id".
   </alias>
-			 
-	 
 ----
 
- 
-
-The value of the **`id`** attribute appearing in the **`entry`** and **`alias`** tags is a case sensitive string, containing no whitespace, which uniquely identifies the entry relative to the table. __$$This is the value used for a variable's **`standard_name`** attribute.$$__ 
+The value of the **`id`** attribute appearing in the **`entry`** and **`alias`** tags is a case sensitive string, containing no whitespace, which uniquely identifies the entry relative to the table. _This is the value used for a variable's `standard_name` attribute._
 
 The purpose of the **`entry`** elements are to provide definitions for the **`id`** strings. Each **`entry`** element contains the following elements: 
-----
 
-			
+----
   <entry id="an_id">
     <canonical_units>Representative units for the variable ... </canonical_units>
     <description>Description of the variable ... </description>
   </entry>
-			
-		
 ----
 
-  **`Entry`** elements may optionally also contain the following elements: 
-----
+`Entry` elements may optionally also contain the following elements:
 
-			
+----
   <grib>GRIB parameter code</grib>
   <amip>AMIP identifier string</amip>
-
-			
-		
 ----
-
- 
 
 Not all variables have equivalent AMIP or GRIB codes. ECMWF GRIB codes start with **`E`** , NCEP codes with **`N`** . Standard codes (in the range 1-127) are not prefaced. When a variable has more than one equivalent GRIB code, the alternatives are given as a blank-separated list.
 
 The **`alias`** elements do not contain definitions. Rather they contain the value of the **`id`** attribute of an **`entry`** element that contains the sought after definition. The purpose of the **`alias`** elements are to provide a means for maintaining the table in a backwards compatible fashion. For example, if more than one **`id`** string was found to correspond to identical definitions, then the redundant definitions can be converted into aliases. It is not intended that the **`alias`** elements be used to accommodate the use of local naming conventions in the **`standard_name`** attribute strings. Each **`alias`** element contains a single element: 
-----
 
-			
+----
   <alias id="an_id">
     <entry_id>Identifier of the defining entry ... </entry_id>
   </alias>
-			
-		
 ----
-
- 
 
 .A name table containing three entries
 ====
-
 ----
- 
-					
   <?xml version="1.0"?>
   <standard_name_table>
     <institution>Program for Climate Model Diagnosis and Intercomparison</institution>
@@ -129,18 +96,10 @@ The **`alias`** elements do not contain definitions. Rather they contain the val
       <entry_id>air_pressure_at_sea_level</entry_id>
     </alias>
   </standard_name_table>
-					
-				 
 ----
-
-
-====
-
- 
-
 The definition of a variable with the **`standard_name`** attribute **`surface_air_pressure`** is found directly since the element with **`id="surface_air_pressure"`** is an **`entry`** element which contains the definition.
 
 The definition of a variable with the **`standard_name`** attribute mean_sea_level_pressure is found indirectly by first finding the element with the **`id="mean_sea_level_pressure"`** , and then, since this is an alias element, by searching for the element with **`id="air_pressure_at_sea_level"`** as indicated by the value of the **`entry_id`** tag.
+====
 
 It is possible that new tags may be added in the future. Any applications that parse the standard table should be written so that unrecognized tags are gracefully ignored.
-
