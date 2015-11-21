@@ -6,7 +6,7 @@ There are two methods for reducing dataset size: packing and compression. By pac
 
 
 
-[[packed-data]]
+[[packed-data, Section 8.1, "Packed Data"]]
 === Packed Data
 
 At the current time the netCDF interface does not provide for packing data. However a simple packing may be achieved through the use of the optional NUG defined attributes **`scale_factor`** and **`add_offset`** . After the data values of a variable have been read, they are to be multiplied by the **`scale_factor`** , and have **`add_offset`** added to them. If both attributes are present, the data are scaled before the offset is added. When scaled data are written, the application should first subtract the offset and then divide by the scale factor. The units of a variable should be representative of the unpacked data.
@@ -18,7 +18,7 @@ When data to be packed contains missing values the attributes that indicate miss
 
 
 
-[[compression-by-gathering]]
+[[compression-by-gathering, Section 8.2, "Compression by Gathering"]]
 === Compression by Gathering
 
 To save space in the netCDF file, it may be desirable to eliminate points from data arrays that are invariably missing. Such a compression can operate over one or more adjacent axes, and is accomplished with reference to a list of the points to be stored. The list is constructed by considering a mask array that only includes the axes to be compressed, and then mapping this array onto one dimension without reordering. The list is the set of indices in this one-dimensional mask of the required points. In the compressed array, the axes to be compressed are all replaced by a single axis, whose dimension is the number of wanted points. The wanted points appear along this dimension in the same order they appear in the uncompressed array, with the unwanted points skipped over. Compression and uncompression are executed by looping over the list.
