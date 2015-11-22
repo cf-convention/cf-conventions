@@ -9,6 +9,7 @@
 To represent data at scattered locations and times with no implied relationship among of coordinate positions, both data and coordinates must share the same (sample) instance dimension.   Because each feature contains only a single data element, there is no need for a separate element dimension.  The representation of point features is a special, degenerate case of the standard four representations.  The **`coordinates`** attribute is used on the data variables to unambiguously identify the relevant space and time auxiliary coordinate variables.
 
 [[example-h.1, Example H.1, "Point data"]]
+[caption="Example H.1. "]
 .Point data.
 ====
 ----
@@ -67,6 +68,7 @@ All the representations described in section 9.3 can be used for time series. Th
 If the time series instances have the same number of elements and the time values are identical for all instances, you may use the orthogonal multidimensional array representation. This has either a one-dimensional coordinate variable, time(time), provided the time values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, time(o), where o is the element dimension. In the former case, listing the time variable in the **`coordinates`** attributes of the data variables is optional.
 
 [[example-h.2]]
+[caption="Example H.2. "]
 .Timeseries with common element times in a time coordinate variable using the orthogonal multidimensional array representation.
 ====
 ----
@@ -110,6 +112,7 @@ In this example, **`humidity(i,o)`** is element o of time series i, and associat
 Much of the simplicity of the orthogonal multidimensional representation can be preserved even in cases where individual time series have different time coordinate values.  All time series must be allocated the amount of staorage needed by the longest, so the use of this representation will trade off simplicity against storage space in some cases.  
 
 [[example-h.3]]
+[caption="Example H.3. "]
 .Timeseries of station data in the incomplete multidimensional array representation.    
 ====
 ----
@@ -170,6 +173,7 @@ In this example, the humidity(i,o) and temp(i,o) data for element o of time seri
 When the intention of a data variable is to contain only a single time series, the preferred encoding is a special case of the multidimensional array representation.
 
 [[example-h.4]]
+[caption="Example H.4. "]
 .A single timeseries.
 ====
 ----
@@ -220,6 +224,7 @@ While an idealized time series is defined at a single, stable point location, th
 
 
 [[example-h.5]]
+[caption="Example H.5. "]
 .A single timeseries with time-varying deviations from a nominal point spatial location
 ====
 ----
@@ -282,6 +287,7 @@ While an idealized time series is defined at a single, stable point location, th
 When the time series have different lengths and the data values for entire time series are available to be written in a single operation,  the contiguous ragged array representation is efficient.
 
 [[example-h.6]]
+[caption="Example H.6. "]
 .Timeseries of station data in the contiguous ragged array representation.
 ====
 ----
@@ -355,6 +361,7 @@ The variable, **`row_size`** , is the count variable containing the length of ea
 When time series with different lengths are written incrementally, the indexed ragged array representation is efficient.
 
 [[example-h.7]]
+[caption="Example H.7. "]
 .Timeseries of station data in the indexed ragged array representation. 
 ====
 ----
@@ -419,6 +426,7 @@ A series of connected observations along a vertical line, like an atmospheric or
 If the profile instances have the same number of elements and the vertical coordinate values are identical for all instances, you may use the orthogonal multidimensional array representation. This has either a one-dimensional coordinate variable, z(z), provided the vertical coordinate values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, alt(o), where o is the element dimension. In the former case, listing the vertical coordinate variable in the **coordinates** attributes of the data variables is optional.
 
 [[example-h.8, Example H.8, "Atmospheric sounding profiles for a common set of vertical coordinates stored in the orthogonal multidimensional array representation."]]
+[caption="Example H.8. "]
 .Atmospheric sounding profiles for a common set of vertical coordinates stored in the orthogonal multidimensional array representation.
 ====
 ----
@@ -484,6 +492,7 @@ If there are the same number of levels in each profile, but they do not have the
 When a single profile is stored in a file, there is no need for the profile dimension; the data arrays are one-dimensional. This is a special case of the orthogonal multidimensional array representation (9.3.1).
 
 [[example-h.9]]
+[caption="Example H.9. "]
 .Data from a single atmospheric sounding profile.
 ====
 ----
@@ -544,6 +553,7 @@ The pressure(o), temperature(o), and humidity(o) data is associated with the coo
 When the number of vertical levels for each profile varies, and one can control the order of writing, one can use the contiguous ragged array representation. The canonical use case for this is when rewriting raw data, and you expect that the common read pattern will be to read all the data from each profile.
 
 [[example-h.10]]
+[caption="Example H.10. "]
 .Atmospheric sounding profiles for a common set of vertical coordinates stored in the contiguous ragged array representation.
 ====
 ----
@@ -609,6 +619,7 @@ The count variable (row_size) contains the number of elements for each profile, 
 When the number of vertical levels for each profile varies, and one cannot write them contiguously, one can use the indexed ragged array representation. The canonical use case is when writing real-time data streams that contain reports from many profiles, arriving randomly. If the sample dimension is the unlimited dimension, this allows data to be appended to the file.
 
 [[example-h.11]]
+[caption="Example H.11. "]
 .Atmospheric sounding profiles for a common set of vertical coordinates stored in the indexed ragged array representation.
 ====
 ----
@@ -678,6 +689,7 @@ Data may be taken along discrete paths through space, each path constituting a c
 When storing multiple trajectories in the same file, and the number of elements in each trajectory is the same, one can use the multidimensional array representation. This representation also allows one to have a variable number of elements in different trajectories, at the cost of some wasted space. In that case, any unused elements of the data and auxiliary coordinate variables must contain missing data values (section 9.6).  
 
 [[example-h.12]]
+[caption="Example H.12. "]
 .Trajectories recording atmospheric composition in the incomplete multidimensional array representation.
 ====
 ----
@@ -738,6 +750,7 @@ If the trajectories all have the same set of times, the time auxiliary coordinat
 When a single trajectory is stored in the data variable, there is no need for the trajectory dimension and the arrays are one-dimensional. This is a special case of the multidimensional array representation.
 
 [[example-h.13]]
+[caption="Example H.13. "]
 .A single trajectory recording atmospheric composition.
 ====
 ----
@@ -793,6 +806,7 @@ Note that structurally this looks like unconnected point data as in example 9.5.
 When the number of elements for each trajectory varies, and one can control the order of writing, one can use the contiguous ragged array representation. The canonical use case for this is when rewriting raw data, and you expect that the common read pattern will be to read all the data from each trajectory.
 
 [[example-h.14]]
+[caption="Example H.14. "]
 .Trajectories recording atmospheric composition in the contiguous ragged array representation.
 ====
 ----
@@ -852,6 +866,7 @@ The count variable (row_size) contains the number of elements for each trajector
 When the number of elements at each trajectory vary, and the elements cannot be written in order, one can use the indexed ragged array representation. The canonical use case is when writing real-time data streams that contain reports from many trajectories. The data can be written as it arrives; if the flatsample dimension is the unlimited dimension, this allows data to be appended to the file.
 
 [[example-h.15]]
+[caption="Example H.15. "]
 .Trajectories recording atmospheric composition in the indexed ragged array representation. 
 ====
 ----
@@ -922,6 +937,7 @@ TimeSeriesProfiles are more complicated than timeSeries because there are two el
 When storing time series of profiles at multiple stations in the same data variable, if there are the same number of time points for all timeSeries, and the same number of vertical levels for every profile, one can use the multidimensional array representation:
 
 [[example-h.16]]
+[caption="Example H.16. "]
 .Time series of atmospheric sounding profiles from a set of locations stored in a multidimensional array representation.
 ====
 ----
@@ -989,6 +1005,7 @@ If there is only a single set of levels and a single set of times, the multidime
 ====
 
 [[example-h.17]]
+[caption="Example H.17. "]
 .Time series of atmospheric sounding profiles from a set of locations stored in an orthogonal multidimensional array representation. 
 ====
 ----
@@ -1027,6 +1044,7 @@ At the cost of some wasted space, the multidimensional array representation also
 If there is only one station in the data variable, there is no need for the station dimension:
 
 [[example-h.18]]
+[caption="Example H.18. "]
 .Time series of atmospheric sounding profiles from a single location stored in a multidimensional array representation. 
 ====
 ----
@@ -1092,6 +1110,7 @@ The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of pro
 When the number of profiles and levels for each station varies, one can use a ragged array representation. Each of the two element dimensions (time and vertical) could in principle be stored either contiguous or indexed, but this convention supports only one of the four possible choices. This uses the contiguous ragged array representation for each profile (9.5.43.3), and the indexed ragged array representation to organise the profiles into time series (9.3.54). The canonical use case is when writing real-time data streams that contain profiles from many stations, arriving randomly, with the data for each entire profile written all at once.
 
 [[example-h.19]]
+[caption="Example H.19. "]
 .Time series of atmospheric sounding profiles from a set of locations stored in a ragged array representation.
 ====
 ----
@@ -1177,6 +1196,7 @@ When profiles are taken along a trajectory, one gets a collection of profiles ca
 If there are the same number of profiles for all trajectories, and the same number of vertical levels for every profile, one can use the multidimensional representation:
 
 [[example-h.20]]
+[caption="Example H.20. "]
 .Time series of atmospheric sounding profiles along a set of trajectories stored in a multidimensional array representation.
 ====
 ----
@@ -1246,6 +1266,7 @@ At the cost of some wasted space, the multidimensional array representation also
 If there is only one trajectory in the data variable, there is no need for the trajectory dimension:
 
 [[example-h.21]]
+[caption="Example H.21. "]
 .Time series of atmospheric sounding profiles along a trajectory stored in a multidimensional array representation.
 ====
 ----
@@ -1308,6 +1329,7 @@ The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of pro
 When the number of profiles and levels for each trajectory varies, one can use a ragged array representation. Each of the two element dimensions (along a projectory, within a profile) could in principle be stored either contiguous or indexed, but this convention supports only one of the four possible choices. This uses the contiguous ragged array representation for each profile (9.3.3), and the indexed ragged array representation to organise the profiles into time series (9.3.4). The canonical use case is when writing real-time data streams that contain profiles from many trajectories, arriving randomly, with the data for each entire profile written all at once.
 
 [[example-h.22]]
+[caption="Example H.22. "]
 .Time series of atmospheric sounding profiles along a set of trajectories stored in a ragged array representation. 
 ====
 ----
