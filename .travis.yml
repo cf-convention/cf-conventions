@@ -5,6 +5,8 @@ rvm:
 install:
     - gem install asciidoctor
     - asciidoctor --version
+    - gem install --pre asciidoctor-pdf
+    - asciidoctor-pdf --version
 
 before_script:
     - git config --global user.email $GIT_EMAIL
@@ -13,12 +15,15 @@ before_script:
 script:
     - mkdir build
     - asciidoctor cf-conventions.adoc -D build
+    - asciidoctor-pdf -d book cf-conventions.adoc -D build
 
 after_success:
     - git clone https://${GH_TOKEN}@github.com/cf-metadata/cf-metadata.github.io.git pages >/dev/null 2>&1
     - cp build/cf-conventions.html pages/index.html
+    - cp build/cf-conventions.pdf pages/
     - cd pages
     - git add index.html
+    - git add cf-conventions.pdf
     - git commit -m 'Auto-generated from cf-metadata/cf-conventions'
     - git push origin master >/dev/null 2>&1
 
