@@ -7,14 +7,20 @@ A variable's spatiotemporal dimensions are used to locate data values in time an
 
 All of a variable's dimensions that are latitude, longitude, vertical, or time dimensions (see <<terminology>>) must have corresponding coordinate variables, i.e., one-dimensional variables with the same name as the dimension (see examples in <<coordinate-types>>). This is the only method of associating dimensions with coordinates that is supported by <<COARDS>>.
 
-All of a variable's spatiotemporal dimensions that are not latitude, longitude, vertical, or time dimensions are required to be associated with the relevant latitude, longitude, vertical, or time coordinates via the new **`coordinates`** attribute of the variable. The value of the **`coordinates`** attribute is __a blank separated list of the names of auxiliary coordinate variables__. There is no restriction on the order in which the auxiliary coordinate variables appear in the **`coordinates`** attribute string.   
-    The dimensions of an auxiliary coordinate variable must be a subset of the
-    dimensions of the variable with which the coordinate is associated, with
-    two exceptions. First, string-valued coordinates (<<labels>>)
-    have a dimension for maximum string length. Second, in the ragged array
-    representations of data (<<discrete-sampling-geometries>>),
-    special methods are needed to connect the data and coordinates
-     
+All of a variable's spatiotemporal dimensions that are not latitude,
+longitude, vertical, or time dimensions are required to be associated
+with the relevant latitude, longitude, vertical, or time coordinates via
+the new **`coordinates`** attribute of the variable. The value of the
+**`coordinates`** attribute is __a blank separated list of the names of
+auxiliary coordinate variables__. There is no restriction on the order
+in which the auxiliary coordinate variables appear in the
+**`coordinates`** attribute string.   The dimensions of an auxiliary
+coordinate variable must be a subset of the dimensions of the variable
+with which the coordinate is associated, with two exceptions. First,
+string-valued coordinates (<<labels>>) have a dimension for maximum
+string length. Second, in the ragged array representations of data
+(<<discrete-sampling-geometries>>), special methods are needed to
+connect the data and coordinates
 
 We recommend that the name of a multidimensional coordinate variable should not match the name of any of its dimensions because that precludes supplying a coordinate variable for the dimension. This practice also avoids potential bugs in applications that determine coordinate variables by only checking for a name match between a dimension and a variable and not checking that the variable is one dimensional.
 
@@ -182,10 +188,10 @@ _This section has been superseded by the treatment of time series as a type of d
 
 When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the **`coordinates`** attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, the attribute **`grid_mapping`** may be used to supply this description. This attribute is attached to data variables so that variables with different mappings may be present in a single file. The attribute takes a string value which is the name of another variable in the file that provides the description of the mapping via a collection of attached attributes. This variable is called __a grid mapping variable__ and is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is **`grid_mapping_name`** which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of **`grid_mapping_name`**. The valid values of **`grid_mapping_name`** along with the attributes that provide specific map parameter values are described in <<appendix-grid-mappings>>.
 
-When the coordinate variables for a horizontal grid are longitude
-and latitude, a grid mapping variable with **`grid_mapping_name`**
-        of **`latitude_longitude`** may be used to specify the 
-        ellipsoid and prime meridian. 
+When the coordinate variables for a horizontal grid are longitude and
+latitude, a grid mapping variable with **`grid_mapping_name`** of
+**`latitude_longitude`** may be used to specify the ellipsoid and prime
+meridian.
 
 In order to make use of a grid mapping to directly calculate latitude and longitude values it is necessary to associate the coordinate variables with the independent variables of the mapping. This is done by assigning a **`standard_name`** to the coordinate variable. The appropriate values of the **`standard_name`** depend on the grid mapping and are given in <<appendix-grid-mappings>>.
 
