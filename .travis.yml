@@ -18,14 +18,32 @@ script:
     - asciidoctor-pdf -d book cf-conventions.adoc -D build
 
 after_success:
-    - git clone https://${GH_TOKEN}@github.com/cf-metadata/cf-metadata.github.io.git pages >/dev/null 2>&1
-    - cp build/cf-conventions.html pages/index.html
-    - cp build/cf-conventions.pdf pages/
-    - cd pages
-    - git add index.html
-    - git add cf-conventions.pdf
-    - git commit -m 'Auto-generated from cf-metadata/cf-conventions'
-    - git push origin master >/dev/null 2>&1
+    # Always update the "gh-pages" branch, but tag build goes into
+    # tag directory and normal build goes into the root directory.
+    - git fetch origin gh-pages:gh-pages
+    - git checkout gh-pages
+    - if [[ $TRAVIS_TAG ]]; then
+        TARGET_DIR=$TRAVIS_TAG;
+      else
+        TARGET_DIR='.';
+      fi
+    - mkdir -p $TRAVIS_TAG
+    - cp build/cf-conventions.html $TARGET_DIR/
+    - cp build/cf-conventions.pdf $TARGET_DIR/
+    - git add $TARGET_DIR/cf-conventions.html
+    - git add $TARGET_DIR/cf-conventions.pdf
+    - if [[ $TRAVIS_TAG ]]; then
+        sed s/Latest/$TRAVIS_TAG/ index.html > $TARGET_DIR/index.html;
+        git add $TARGET_DIR/index.html;
+      fi
+    - git commit -m "Auto-generated from $TRAVIS_REPO_SLUG"
+    - git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages >/dev/null 2>&1
+
+branches:
+    only:
+        - master
+        # Build tags such as "v1.6"
+        - /^v\d+\.\d+/
 
 env:
     global:
