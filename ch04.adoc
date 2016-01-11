@@ -327,3 +327,34 @@ Due to problems caused by the discontinuity in the default mixed Gregorian/Julia
 
 The spatiotemporal coordinates described in sections 4.1-4.4 are continuous variables, and other geophysical quantities may likewise serve as continuous coordinate variables, for instance density, temperature or radiation wavelength. By contrast, for some purposes there is a need for an axis of a data variable which indicates either an ordered list or an unordered collection, and does not correspond to any continuous coordinate variable. Consequently such an axis may be called {ldquo}discrete{rdquo}. A discrete axis has a dimension but might not have a coordinate variable. Instead, there might be one or more auxiliary coordinate variables with this dimension (see preamble to section 5). Following sections define various applications of discrete axes, for instance section 6.1.1 {ldquo}Geographical regions{rdquo}, section 7.3.3 {ldquo}Statistics applying to portions of cells{rdquo}, section 9.3 {ldquo}Representation of collections of features in data variables{rdquo}.
 
+
+[[ensemble-coordinate]]
+=== Ensemble Coordinate
+
+Variables representing an ensemble or collection of realizations shall have an attribute **`axis`** with a value **`E`**. These variables are discrete, as described in section 4.5; they do not represent continuous quantities.
+
+Ensemble variables have a number of optional standardised attributes available for use. Further bespoke attributes to describe the ensemble in project specific ways are always allowed.
+
+==== Identifying Members
+
+A data variable representing an ensemble will commonly have an ensemble coordinate with the standard name **`realization`**; this is not mandatory. The realization standard name is used to provide a unique identifying number to each ensemble member within the ensemble.
+
+An ensemble coordinate providing a string label for each ensemble member within the ensemble may also be included. The standard name **`ensemble_member_label`** is used in this case.  An **`ensemble_member_label`** coordinate shall have unique values and missing values are not allowed.
+
+==== Ensemble Control Member
+
+An ensemble coordinate with the standard name **`realization`** or **`ensemble_member_label`** may include an attribute named **`ensemble_control_member`**.
+
+This value provides a definition that one member of the ensemble is the control member and identifies this member. This control member shall have the identified value within the ensemble coordinate's data.
+
+The absence of this attribute shall be interpreted as a negative statement, explicitly stating that there is no control member identified within the ensemble.
+
+==== Single or Multiple Model Ensemble
+
+An ensemble coordinate may be identified as being from one model or multiple models by providing further variables identified as coordinates or auxiliary coordinates by the data variable. All of these coordinates shall have an attribute **`axis`** with a value **`E`**.
+
+The standard name's **`source`** and **`institution`** are used to identify the multiplicity of models which the ensemble is taken from, one other or both may be present.
+
+Such coordinates may be scalar coordinate variables or they may be attached to the same dimension(s) as other ensemble coordinates referenced by a data variable. Scalar coordinates are commonly used to define a single model ensemble; in this case, this is informationally equivalent to auxiliary coordinates with identical values.
+
+The absence of such **`source`** and **`institution`** coordinates shall not be interpreted as a positive or negative statement. No inference on the multiplicity of models which the ensemble is taken from shall be inferred from the absence of such coordinates.
