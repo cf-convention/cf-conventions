@@ -1,0 +1,287 @@
+<h1 class="documentFirstHeading">CF Conformance Requirements and Recommendations 1.6</h1>
+<div class="plain">
+  <p>&nbsp;</p>
+  <ul><li>The following is a list of requirements and recommendations for a CF
+    conforming netCDF file.  They are organized by the section of the CF
+    document that they pertain to.</li></ul>
+  <ul><li>This document is intended to be a concise summary of the <a href="/cf-conventions/v1.6.0/cf-conventions.html">CF conventions 1.6</a> document.  If there are any
+    discrepencies between the two, the conventions document is the ultimate
+    authority.
+    </li></ul>
+    <ul><li>This document will updated as required to correct mistakes or add new
+      material required for completeness or clarity.</li></ul>
+    <p>&nbsp;</p>
+    <h4>2.1 Filename</h4>
+    <strong>Requirements:</strong>
+    <ul><li>Filename must have ".nc" suffix.</li></ul>
+    <h4><br /></h4>
+    <h4>2.2 Data Types</h4>
+    <strong>Requirements:</strong>
+    <ul><li>CF attributes that take string values must be 1D character arrays.</li></ul>
+    <h4><br /></h4>
+    <h4>2.3 Naming Conventions</h4>
+    <strong>Requirements:</strong>&nbsp;
+    <ul><li>Variable, dimension and attribute names must begin with a letter and
+      be composed of letters, digits, and underscores.</li></ul>
+    <strong>Recommendations:</strong>
+    <ul><li>No two variable names should be identical when case is ignored.</li></ul>
+    <h4><br /></h4>
+    <h4>2.4 Dimensions</h4>
+    <strong>Requirements:</strong>&nbsp;
+    <ul><li>The dimensions of a variable must all have different names.</li></ul>
+    <strong>Recommendations:</strong>
+    <ul><li>If any or all of the dimensions of a variable have the interpretations
+      (as given by their units or axis attribute) of time (T), height or depth
+      (Z), latitude (Y), or longitude (X) then those dimensions should appear in
+      the relative order T, then Z, then Y, then X in the CDL definition
+      corresponding to the file.</li><li>In files that are meant to conform to the COARDS subset of CF, any
+      dimensions of a variable other than space and time dimensions should be
+      added "to the left" of the space and time dimensions as represented in CDL.</li></ul>
+    <h4><br /></h4>
+    <h4>2.5.1 Missing Data</h4>
+    <strong>Requirements:</strong>&nbsp;
+    <ul><li>The <kbd class="att">valid_range</kbd> attribute must not be present if
+      the <kbd class="att">valid_min</kbd> and/or <kbd class="att">valid_max</kbd> attributes are present.</li><li>The <kbd class="att">_FillValue</kbd> attribute must be
+      the same type as its associated variable.</li><li>The <kbd class="att">missing_value</kbd> attribute must be
+      the same type as its associated variable.</li></ul>
+    <strong>Recommendations:</strong>&nbsp;
+    <ul><li>The value of the <kbd class="att">_FillValue</kbd> attribute should not
+      be within a specified valid range.</li><li>If both <kbd class="att">missing_value</kbd> and <kbd class="att">_FillValue</kbd> be
+      used, they should have the same value.</li></ul>
+    <h4><br /></h4>
+    <h4>2.6.1 Identification of Conventions</h4>
+    <strong>Requirements:</strong>&nbsp;
+    <ul><li>Files that conform to the CF version 1.5 conventions must indicate
+      this by setting the global <kbd class="att">Conventions</kbd> attribute to
+      the string value "CF-1.5".</li></ul>
+    <h4><br /></h4>
+    <h4>2.6.2 Description of File Contents</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The <kbd class="att">title</kbd>, <kbd class="att">history</kbd>, <kbd class="att">institution</kbd>, <kbd class="att">source</kbd>, <kbd class="att">references</kbd>, and <kbd class="att">comment</kbd> attributes
+      are all type string.</li></ul>
+    <strong>Recommendations:<br /></strong>
+    <ul><li>The <kbd class="att">title</kbd> and <kbd class="att">history</kbd>
+      attributes are only defined as global attributes.  If they are used as per
+      variable attributes a CF compliant application should treat them exactly as
+      it would treat any other unrecognized attribute.</li></ul>
+    <h4><br /></h4>
+    <h4>3 Description of the Data</h4>
+    <strong>Recommendations:<br /></strong>
+    <ul><li>All variables should use either the <kbd class="att">long_name</kbd> or
+      the <kbd class="att">standard_name</kbd> attributes to describe their
+      contents.  Exceptions are boundary and climatology variables.</li></ul>
+    <h4><br /></h4>
+    <h4>3.1 Units</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The <kbd class="att">units</kbd> attribute is required for all
+      variables that represent dimensional quantities (except for boundary
+      variables defined in section <a href="http://www.cgd.ucar.edu/cms/eaton/cf-metadata/CF-current.html#bnds">7.1</a> and
+      climatology variables defined in section <a href="http://www.cgd.ucar.edu/cms/eaton/cf-metadata/CF-current.html#climatology">7.4</a>).</li><li>The type of the <kbd class="att">units</kbd> attribute is a string that
+      must be recognizable by the udunits package.  Exceptions are the units
+      <kbd>level</kbd>, <kbd>layer</kbd>, and <kbd>sigma_level</kbd>.</li><li>The <kbd class="att">units</kbd> of a variable that specifies a <kbd class="att">standard_name</kbd> must be consistent with the units given in
+      the standard name table.  The units must also be consistent with a
+      specified <kbd class="att">cell_methods</kbd> attribute, if one is present.</li></ul>
+    <strong>Recommendations:<br /></strong>
+    <ul><li>The units <kbd class="att">level</kbd>, <kbd class="att">layer</kbd>, and
+      <kbd class="att">sigma_level</kbd> are deprecated.</li></ul>
+    <h4><br /></h4>
+    <h4>3.3 Standard Name</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The <kbd class="att">standard_name</kbd>
+      attribute takes a string value comprised of a standard   name optionally followed by one or more blanks and a standard name   modifier.</li><li>The legal values for the standard name are contained in the standard name   table.</li><li>The legal values for the standard name modifier are contained in Appendix C,   Standard Name Modifiers.</li></ul>
+    <h4><br /></h4>
+    <h4>3.5 Flags</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The <kbd class="att">flag_values</kbd> attribute must have the same type as the variable to which it is attached.</li><li>
+      <p>If the <kbd class="att">flag_values</kbd> attribute is present then the <kbd class="att">flag_meanings</kbd> attribute must be specified.</p>
+      </li><li>
+      <p>The type of the <kbd class="att">flag_meanings</kbd> attribute is a string whose value is a blank separated list of words or phrases,&nbsp; each consisting of characters from the alphanumeric
+      set and the following five: '_', '-', '.', '+', '@'.</p>
+      </li><li>
+      <p>The number of <kbd class="att">flag_values</kbd> attribute values must equal the number of words or phrases appearing in the <kbd class="att">flag_meanings</kbd> string.</p>
+      </li><li>The number of <kbd class="att">flag_masks</kbd> attribute values must equal the number of words or phrases appearing in the <kbd class="att">flag_meanings</kbd> string.</li><li>Variables with a <kbd class="att">flag_masks</kbd> attribute must have a type that is
+      compatible with bit field expression (char, byte, short and int), not
+      floating-point (float, real, double), and the <kbd class="att">flag_masks</kbd> attribute must
+      have the same type.</li><li>The <kbd class="att">flag_masks</kbd> attribute values must be non-zero.</li><li>The <kbd class="att">flag_values</kbd> attribute values must be mutually exclusive among the
+      set of <kbd class="att">flag_values</kbd> attribute values defined for that variable.</li></ul>
+    <strong>Recommendations:</strong>
+    <ul><li>When <kbd class="att">flag_masks</kbd> and <kbd class="att">flag_values</kbd> are both defined, the Boolean AND of
+      each entry in <kbd class="att">flag_values</kbd> with its corresponding entry in <kbd class="att">flag_masks</kbd>
+      should equal the <kbd class="att">flag_values</kbd> entry, ie, the mask selects all the bits
+      required to express the value.</li></ul>
+    <h4><br /></h4>
+    <h4>4 Coordinate Types</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The <kbd class="att">axis</kbd> attribute may only be attached to a
+      coordinate variable.</li><li>The only legal values of <kbd class="att">axis</kbd> are <kbd>X</kbd>,
+      <kbd>Y</kbd>, <kbd>Z</kbd>, and <kbd>T</kbd> (case insensitive).</li><li>The <kbd class="att">axis</kbd> attribute must be consistent with the
+      coordinate type deduced from <kbd class="att">units</kbd> and <kbd class="att">positive</kbd>.</li><li>The <kbd class="att">axis</kbd> attribute is not allowed for auxiliary coordinate variables.</li><li>A data variable must not have more than one coordinate variable with a
+      particular value of the <kbd class="att">axis</kbd> attribute.</li></ul>
+    <h4><br /></h4>
+    <h4>4.3 Vertical (height or depth) Coordinate</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The only legal values for the <kbd class="att">positive</kbd> attribute
+      are <kbd class="att">up</kbd> or <kbd class="att">down</kbd> (case insensitive).</li></ul>
+    <h4><br /></h4>
+    <h4>4.3.2 Dimensionless Vertical Coordinates</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The <kbd class="att">formula_terms</kbd> attribute is only allowed on a
+      coordinate variable which has a <kbd class="att">standard_name</kbd> listed
+      in Appendix C.</li><li>The type of the <kbd class="att">formula_terms</kbd> attribute is a
+      string whose value is list of blank separated word pairs in the form
+      <kbd class="att">term: var</kbd>.  The legal values <kbd class="att">term</kbd> are contained
+      in Appendix C for each valid <kbd class="att">standard_name</kbd>.  The
+      values of <kbd class="att">var</kbd> must be variables that exist in the file.</li></ul>
+    <h4><br /></h4>
+    <h4>4.4 Time Coordinate</h4>
+    <strong>Requirements:<br /></strong>
+    <ul><li>The time units of a time coordinate variable must contain a reference
+      time.</li><li>The reference time of a time coordinate variable must be a legal time
+      in the specified calendar.
+      </li></ul>
+      <strong>
+        
+        Recommendations:</strong>&nbsp;
+      <ul><li>The use of a reference time in the year 0 to indicate climatological
+        time is deprecated.  This restriction only applies to the real-world
+        calendar as used by the udunits package.</li><li>Units of <kbd class="att">year</kbd> and <kbd class="att">month</kbd> and any equivalent units should be used with caution.</li></ul>
+      <h4><br /></h4>
+      <h4>4.4.1 Calendar</h4>
+      <strong>Requirements:<br /></strong>
+      <ul><li>The attributes <kbd class="att">calendar</kbd>, <kbd class="att">month_lengths</kbd>, <kbd class="att">leap_year</kbd>, and <kbd class="att">leap_month</kbd> may only be attached to time coordinate
+        variables.</li><li>The standardized values of the <kbd class="att">calendar</kbd> attribute
+        are <kbd>gregorian</kbd>, <kbd>standard</kbd>, <kbd>proleptic_gregorian</kbd>,
+        <kbd>noleap</kbd>, <kbd>365_day</kbd>, <kbd>all_leap</kbd>, <kbd>366_day</kbd>,
+        <kbd>360_day</kbd>, <kbd>julian</kbd>, and <kbd>none</kbd> (case
+        insensitive).  If the <kbd class="att">calendar</kbd> attribute is given a
+        non-standard value, then the attribute <kbd class="att">month_lengths</kbd>
+        is required, along with <kbd class="att">leap_year</kbd> and <kbd class="att">leap_month</kbd> as appropriate.</li><li>The type of the <kbd class="att">month_lengths</kbd> attribute must be an
+        integer array of size 12.</li><li>The values of the <kbd class="att">leap_month</kbd> attribute must
+        be in the range 1-12.</li><li>The values of the <kbd class="att">leap_year</kbd> and <kbd class="att">leap_month</kbd> attributes are integer scalars.</li></ul>
+      <strong>Recommendations:</strong>&nbsp;
+      <ul><li>The attribute <kbd class="att">leap_month</kbd> should not appear
+        unless the attribute <kbd class="att">leap_year</kbd> is present.</li><li>The time coordinate should not cross the date 1582-10-15 when the
+        default mixed Gregorian/Julian calendar is in use.</li></ul>
+      <h4><br /></h4>
+      <h4>5 Coordinate Systems</h4>
+      <strong>Requirements:</strong>&nbsp;
+      <ul><li>All of a variable's dimensions that are latitude, longitude, vertical,
+        or time dimensions must have corresponding coordinate variables.</li><li>A coordinate variable must have values that are strictly monotonic
+        (increasing or decreasing).</li><li>A coordinate variable must not have the <kbd class="att">_FillValue</kbd> or <kbd class="att">missing_value</kbd>
+        attributes.</li><li>The type of the <kbd class="att">coordinates</kbd> attribute is a
+        string whose value is a blank separated list of variable names.  All
+        specified variable names must exist in the file.</li><li>The dimensions of each auxiliary coordinate must be a subset of the
+        dimensions of the variable they are attached to, with two exceptions. First, a label
+        variable which will have a trailing dimension for the maximum string
+        length. Second a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) uses special, more indirect, methods to connect the data and coordinates.<br /></li></ul>
+      <strong>Recommendations:<br /></strong>
+      <ul><li>The name of a multidimensional coordinate variable should not match the
+        name of any of its dimensions.</li><li>All horizontal coordinate variables (in the Unidata sense) should have an <kbd class="att">axis</kbd> attribute.</li></ul>
+      <h4><br /></h4>
+      <h4>5.6 Grid Mappings and Projections</h4>
+      <h4>Requirements:</h4>
+      <ul><li>The type of the <kbd class="att">grid_mapping</kbd> at<span class="visualHighlight"></span>tribute is a string whose value is a single   variable name.</li><li>The specified variable name (known as a grid mapping variable) must exist   in the file.</li><li>The grid mapping variable must have the <kbd class="att">grid_mapping_name</kbd> attribute. The   legal values for the <kbd class="att">grid_mapping_name</kbd> attribute are contained in   Appendix F.</li><li>The data types of the attributes of the grid mapping variable must be specified in Table 1 of Appendix F.<br /></li></ul>
+      <strong>Recommendations:</strong>
+      <ul><li>The grid mapping variable should have 0 dimensions.</li></ul>
+      <p>&nbsp;</p>
+      <h4>6.1 Labels</h4>
+      <strong>Requirements:<br /></strong>
+      <ul><li>A variable of character type that is named by a <kbd class="att">coordinates</kbd> attribute is a label variable.  This variable
+        must have one or two dimensions.  The trailing (CDL order) or sole dimension is for the maximum string length. If there are two dimensions, leading dimension (CDL order) must match one
+        of those of the data variable.</li></ul>
+      <h4><br /></h4>
+      <h4>7.1 Cell Boundaries</h4>
+      <strong>Requirements:</strong>
+      <ul><li>The type of the <kbd class="att">bounds</kbd> attribute is a string
+        whose value is a single variable name.  The specified variable must
+        exist in the file.</li><li>A boundary variable must have the same dimensions as its associated
+        variable, plus have a trailing dimension (CDL order) for the maximum number
+        of vertices in a cell.</li><li>A boundary variable must be a numeric data type.</li><li>If a boundary variable has <kbd class="att">units</kbd> or <kbd class="att">standard_name</kbd> attributes, they must agree with those of
+        its associated variable.</li></ul>
+      <strong>Recommendations:<br /></strong>
+      <ul><li>The points specified by a coordinate or auxiliary coordinate variable
+        should lie within, or on the boundary, of the cells specified by the
+        associated boundary variable.</li><li>Boundary variables should not have the <kbd class="att">_FillValue</kbd> or <kbd class="att">missing_value</kbd>
+        attributes.</li></ul>
+      <h4><br /></h4>
+      <h4>7.2 Cell Measures</h4>
+      <strong>Requirements:</strong>
+      <ul><li>The type of the <kbd class="att">cell_measures</kbd> attribute is a string
+        whose value is list of blank separated word pairs in the form
+        <kbd>measure: var</kbd>.  The valid values for <kbd>measure</kbd> are
+        <kbd>area</kbd> or <kbd>volume</kbd>.  The <kbd>var</kbd> token specifies a
+        variable that must exist in the file.  The dimensions of the variable
+        specified by <kbd>var</kbd> must be the same as, or be a subset of, the
+        dimensions of the variable to which they are related.</li><li>A measure variable must have units that are consistent with the measure
+        type, i.e., square meters for area measures and cubic meters for volume
+        measures.</li></ul>
+      <h4><br /></h4>
+      <h4>7.3 Cell Methods</h4>
+      <strong>Requirements:</strong>&nbsp;
+      <ul><li>The type of the <kbd class="att">cell_methods</kbd> attribute is a
+        string whose value is one or more blank separated word lists, each with the
+        form
+<pre>dim1: [dim2: [dim3: ...]] method [where type1 [over type2]] [within|over days|years] [(comment)]</pre>
+        where brackets indicate optional words. The valid values for <kbd>dim1 [dim2
+          [dim3 ...] ]</kbd> are the names of dimensions of the data variable, names of
+        scalar coordinate variables of the data variable, valid standard names,
+        or the word area. The valid values of <kbd>method</kbd> are contained in Appendix
+        E. The valid values for <kbd>type1</kbd> are the name of a string-valued auxiliary
+        or scalar coordinate variable with a <kbd class="att">standard_name</kbd> of 
+        <kbd class="att">area_type</kbd>, or any
+        string value allowed for a variable of standard_name of area_type. If
+        <kbd>type2</kbd> is a string-valued auxiliary coordinate variable, it is not
+        allowed to have a leading dimension (the number of strings) of more
+        than one. When the method refers to a climatological time axis, the
+        suffixes for within and over may be appended.</li>
+        
+        <li>A given dimension name may only occur once in a <kbd class="att">cell_methods</kbd> string.  An exception is a climatological
+        time dimension.</li><li>The comment, if present, must take the form
+<pre>([<kbd>interval:</kbd> <em>value unit</em> [<kbd>interval:</kbd> ...] comment:] <em>remainder</em>)</pre>
+        The <em>remainder</em> text is not standardized. If no <kbd>interval</kbd>
+        clauses are present, the entire comment is therefore not
+        standardized. There may be zero interval clauses, one interval clause, or
+        exactly as many interval clauses as there are <kbd>dim</kbd>s to which the
+        method applies.  The <em>value</em> must be a valid number and the
+        <em>unit</em> a string that is recognizable by the udunits package.</li></ul>
+      <strong>Recommendations:<br /></strong>
+      <ul><li>If a data variable has any dimensions or scalar coordinate variables
+        referring to horizontal, vertical or time dimensions, it should have a
+        <kbd class="att">cell_methods</kbd> attribute with an entry for each of these spatiotemporal
+        dimensions or scalar coordinate variables. (The horizontal dimensions
+        may be covered by an area entry.)</li><li>Except for entries whose cell method is <kbd class="att">point</kbd>, all numeric coordinate
+        variables and scalar coordinate variables named by <kbd class="att">cell_methods</kbd> should
+        have <kbd class="att">bounds</kbd> or <kbd class="att">climatology</kbd> attributes.</li></ul>
+      <p>&nbsp;</p>
+      <h4>7.4 Climatological Statistics</h4>
+      <strong>Requirements:</strong>&nbsp;
+      <ul><li>The <kbd class="att">climatology</kbd> attribute may only be attached
+        to a time coordinate variable.</li><li>The type of the <kbd class="att">climatology</kbd> attribute is a string
+        whose value is a single variable name.  The specified variable must
+        exist in the file.</li><li>A climatology variable must have the same dimension as its associated
+        time coordinate variable, and have a trailing dimension (CDL order) of size
+        2.</li><li>A climatology variable must be a numeric data type.</li><li>If a climatology variable has <kbd class="att">units</kbd>, <kbd class="att">standard_name</kbd>, or <kbd class="att">calendar</kbd>
+        attributes, they must agree with those of its associated variable.</li><li>A climatology variable must not have <kbd class="att">_FillValue</kbd>
+        or <kbd class="att">missing_value</kbd> attributes.
+        </li></ul>
+        <h4><br /></h4>
+        <h4>8.1 Packed Data</h4>
+        <strong>Requirements:</strong>&nbsp;
+        <ul><li>The <kbd class="att">scale_factor</kbd> and <kbd class="att">add_offset</kbd>
+          attributes must be the same numeric data type.</li><li>If <kbd class="att">scale_factor</kbd> and <kbd class="att">add_offset</kbd> are a different type than the variable, then
+          they must be either type float or type double.</li><li>If <kbd class="att">scale_factor</kbd> and <kbd class="att">add_offset</kbd> are a different type than the variable, then
+          the variable must be type byte, short or int.</li></ul>
+        <strong>Recommendations:<br /></strong>
+        <ul><li>If <kbd class="att">scale_factor</kbd> and <kbd class="att">add_offset</kbd>
+          are type float, the variable should not be of type int.</li></ul>
+        <h4><br /></h4>
+        <h4>8.2 Compression by Gathering</h4>
+        <strong>Requirements:</strong>&nbsp;
+        <ul><li>The <kbd class="att">compress</kbd> attribute may only be attached to a
+          coordinate variable with an integer data type.</li><li>The type of the <kbd class="att">compress</kbd> attribute is a string
+          whose value is a blank separated list of dimension names.  The specified
+          dimensions must exist in the file.</li><li>The values of the associated coordinate variable must be in the range
+          starting with 0 and going up to the product of the compressed dimension
+          sizes minus 1 (CDL index conventions).</li></ul>
+        <p>&nbsp;</p>
+      </div>
