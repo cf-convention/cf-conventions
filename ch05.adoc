@@ -393,6 +393,73 @@ variables:
 
 
 
+[[use-of-the-crs-well-known-text-format, Section 5.6.1, "Use of the CRS Well-known Text Format"]]
+==== Use of the CRS Well-known Text Format
+
+An optional grid mapping attribute called **`crs_wkt`** may be used to specify multiple coordinate system properties in so-called __well-known text__ format (usually abbreviated to CRS WKT or OGC WKT). The CRS WKT format is widely recognised and used within the geoscience software community. As such it represents a versatile mechanism for encoding information about a variety of coordinate reference system parameters in a highly compact notational form.
+
+The **`crs_wkt`** attribute should comprise a text string that conforms to the WKT syntax as specified in reference <<OGC_CTS>>. If desired the text string may contain embedded newline characters to aid human readability. However, any such characters are purely cosmetic and do not alter the meaning of the attribute value. It is envisaged that the value of the **`crs_wkt`** attribute typically will be a single line of text, one intended primarily for machine processing. Other than the requirement to be a valid WKT string, the CF convention does not prescribe the content of the **`crs_wkt`** attribute since it will necessarily be context-dependent.
+
+The **`crs_wkt`** attribute is intended to act as a _supplement_ to other single-property CF grid mapping attributes (as described in Appendix F); it is not intended to replace those attributes. If data producers omit the single-property grid mapping attributes in favour of the compound **`crs_wkt`** attribute, software which cannot interpret **`crs_wkt`** will be unable to use the grid_mapping information. Therefore the CRS should be described as thoroughly as possible with the single-property attributes as well as by **`crs_wkt`**.
+
+There will be occasions when a given CRS property value is duplicated in both a single-property grid mapping attribute and the **`crs_wkt`** attribute. In such cases the onus is on data producers to ensure that the property values are consistent. However, in those situations where two values of a given property are different, then the value specified by the single-property attribute shall take precedence. For example, if the semi-major axis length of the ellipsoid is defined by the grid mapping attribute **`semi_major_axis`** and also by the **`crs_wkt`** attribute (via the WKT **`SPHEROID[...]`** element) then the former, being the more specific attribute, takes precedence. Naturally if the two values are equal then no ambiguity arises.
+
+Likewise, in those cases where the value of a CRS WKT element should be used consistently across the CF-netCDF community (names of projections and projection parameters, for example) then, the values shown in http://cf-pcmdi.llnl.gov/trac/wiki/Cf2CrsWkt[1] should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is considered to represent the definitive authority as regards CRS property names and values.
+
+Example 5.11 illustrates how the coordinate system properties specified via the crs grid mapping variable in Example 5.10 might be expressed using a **`crs_wkt`** attribute (it also represents a slightly modified version of the WKT example shown in section 7.4 of <<OGC_CTS>>). For brevity only the grid mapping variable is included in this example; all other elements are as per the earlier example. Names of projection PARAMETERs follow the spellings used in the EPSG geodetic parameter registry. Example 5.11 illustrates how certain WKT elements - all of which are optional - can be used to specify CRS properties not covered by existing CF grid mapping attributes, including:
+
+ * use of the TOWGS84 element to specify horizontal datum transformation parameters (to WGS 1984 datum)
+
+ * use of the VERT_DATUM element to specify vertical datum information
+
+ * use of additional PARAMETER elements (albeit not essential ones in this example) to define the location of the false origin of the projection
+
+ * use of AUTHORITY elements to specify object identifier codes assigned by an external authority, OGP/EPSG in this instance
+
+[[british-national-grid-newlyn-datum-in-crs-wkt-format]]
+[caption="Example 5.11. "]
+.British National Grid + Newlyn Datum in CRS WKT format
+====
+
+ ...
+  int crs ;
+    crs:grid_mapping_name = "transverse_mercator" ;
+    crs:crs_wkt = "COMPD_CS ["OSGB 1936 / British National Grid + ODN",
+      PROJCS ["OSGB 1936 / British National Grid",
+        GEOGCS ["OSGB 1936",
+          DATUM ["OSGB 1936",
+            SPHEROID ["Airy 1830", 6377563.396, 299.3249646],
+            TOWGS84[375, -111, 431, 0, 0, 0, 0]
+          ],
+          PRIMEM ["Greenwich", 0],
+          UNIT ["degree", 0.0174532925199433]
+        ],
+        PROJECTION ["Transverse Mercator"],
+        PARAMETER ["False easting", 400000],
+        PARAMETER ["False northing", -100000],
+        PARAMETER ["Longitude of natural origin", -2.0],
+        PARAMETER ["Latitude of natural origin", 49.0],
+        PARAMETER ["Longitude of false origin", -7.556],
+        PARAMETER ["Latitude of false origin", 49.766],
+        PARAMETER ["Scale factor at natural origin", 0.9996012717],
+        UNIT ["metre", 1.0],
+        AUTHORITY ["EPSG", "27700"]
+      ],
+      VERT_CS ["Newlyn",
+        VERT_DATUM ["Ordnance Datum Newlyn", 2005],
+        UNIT ["metre", 1.0]",
+        AXIS ["Gravity-related height", UP],
+        AUTHORITY ["EPSG", "5701"]
+      ]]" ;
+  ...
+====
+
+Note: To enhance readability the WKT value has been split across multiple lines and embedded quotation marks (") left unescaped - in real netCDF files such characters would need to be escaped. The WKT specification in <<OGC_CTS>> appears to silent be as regards which character(s) may be used to delimit text-valued properties; however, since all the examples in that specification use quotation marks, the use of that particular delimiting character is mandated by the CF convention.
+
+
+
+
+
 [[scalar-coordinate-variables, Section 5.7, "Scalar Coordinate Variables"]]
 === Scalar Coordinate Variables
 
