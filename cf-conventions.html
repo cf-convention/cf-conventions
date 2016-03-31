@@ -3780,7 +3780,7 @@ data:
 <p>All CF attributes are listed here except for those that are used to describe grid mappings. See Appendix F for the grid mapping attributes.</p>
 </div>
 <div class="paragraph">
-<p>The "Type" values are <strong>S</strong> for string, <strong>N</strong> for numeric, and <strong>D</strong> for the type of the data variable. The "Use" values are <strong>G</strong> for global, <strong>C</strong> for variables containing coordinate data, and <strong>D</strong> for variables containing non-coordinate data. "Links" indicates the location of the attribute"s original definition (first link) and sections where the attribute is discussed in this document (additional links as necessary).</p>
+<p>The "Type" values are <strong>S</strong> for string, <strong>N</strong> for numeric, and <strong>D</strong> for the type of the data variable. The "Use" values are <strong>G</strong> for global, <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for variables containing non-coordinate data, and <strong>-</strong> for variables with a special purpose. "Links" indicates the location of the attribute"s original definition (first link) and sections where the attribute is discussed in this document (additional links as necessary).</p>
 </div>
 <table id="table-attributes" class="tableblock frame-all grid-all spread">
 <caption class="title">Table A.1. Attributes</caption>
@@ -3852,7 +3852,7 @@ data:
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>cf_role</code></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#coordinates-metadata">Section 9.5, "Coordinates and metadata"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies the roles of variables that identify features in discrete sampling geometries</p></td>
@@ -3901,7 +3901,7 @@ data:
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>featureType</code></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">G</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#featureType">Section 9.4, "The featureType  attribute"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the type of discrete sampling geometry to which the data in the file belongs, and implies that all data variables in the file contain collections of features of that type.</p></td>
@@ -3950,8 +3950,8 @@ data:
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>instance_dimension</code></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#representations-features">Section 9.3, "Representations of collections of features in data variables"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">An attribute which identifies an index variable and names the instance dimension to which it applies. The index variable indicates that the indexed ragged array representation is being used for a collection of features.</p></td>
 </tr>
@@ -4013,8 +4013,8 @@ data:
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>sample_dimension</code></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#representations-features">Section 9.3, "Representations of collections of features in data variables"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">An attribute which identifies a count variable and names the sample dimension to which it applies. The count variable indicates that the contiguous ragged array representation is being used for a collection of features.</p></td>
 </tr>
@@ -5751,6 +5751,14 @@ deprecation of "missing_value" from <a href="#attribute-appendix">Appendix A, At
 </ol>
 </div>
 <div class="olist arabic">
+<div class="title">29 February 2016</div>
+<ol class="arabic">
+<li>
+<p><a href="http://cf-trac.llnl.gov/trac/ticket/103">Ticket 103</a> updated Type and Use values for some attributes in <a href="#attribute-appendix">Appendix A, Attributes</a> and added "special purpose" value. In <a href="#appendix-examples-discrete-geometries">Annotated Examples of Discrete Geometries</a>, updated coordinate values for the variables in some examples to correct omissions.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic">
 <div class="title">30 March 2016</div>
 <ol class="arabic">
 <li>
@@ -5849,7 +5857,8 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
    variables:
      float humidity(station,time) ;
        humidity:standard_name = "specific humidity" ;
-       humidity:coordinates = "lat lon alt" ;
+       humidity:coordinates = "lat lon alt station_name" ;
+       humidity:_FillValue = -999.9;
      double time(time) ;
        time:standard_name = "time";
        time:long_name = "time of measurement" ;
@@ -5927,12 +5936,12 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
           time:missing_value = -999.9;
       float humidity(station, obs) ;
           humidity:standard_name = “specific_humidity” ;
-          humidity:coordinates = "time lat lon alt" ;
+          humidity:coordinates = "time lat lon alt station_name" ;
           humidity:_FillValue = -999.9;
       float temp(station, obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
-          temp:coordinates = "time lat lon alt" ;
+          temp:coordinates = "time lat lon alt station_name" ;
           temp:_FillValue = -999.9;
 
    attributes:
@@ -5985,12 +5994,12 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
           time:missing_value = -999.9;
       float humidity(time) ;
           humidity:standard_name = “specific_humidity” ;
-          humidity:coordinates = "time lat lon alt" ;
+          humidity:coordinates = "time lat lon alt station_name" ;
           humidity:_FillValue = -999.9;
       float temp(time) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
-          temp:coordinates = "time lat lon alt" ;
+          temp:coordinates = "time lat lon alt station_name" ;
           temp:_FillValue = -999.9;
 
    attributes:
@@ -6047,12 +6056,12 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
           time:missing_value = -999.9;
       float humidity(time) ;
           humidity:standard_name = “specific_humidity” ;
-          humidity:coordinates = "time lat lon alt precise_lon precise_lat" ;
+          humidity:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
           humidity:_FillValue = -999.9;
       float temp(time) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
-          temp:coordinates = "time lat lon alt precise_lon precise_lat " ;
+          temp:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
           temp:_FillValue = -999.9;
 
    attributes:
@@ -6106,12 +6115,12 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
           time:units = "days since 1970-01-01 00:00:00" ;
       float humidity(obs) ;
           humidity:standard_name = “specific_humidity” ;
-          humidity:coordinates = "time lat lon alt" ;
+          humidity:coordinates = "time lat lon alt station_name" ;
           humidity:_FillValue = -999.9;
       float temp(obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
-          temp:coordinates = "time lat lon alt" ;
+          temp:coordinates = "time lat lon alt station_name" ;
           temp:_FillValue = -999.9;
 
    attributes:
@@ -6185,12 +6194,12 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
           time:units = "days since 1970-01-01 00:00:00" ;
       float humidity(obs) ;
           humidity:standard_name = “specific_humidity” ;
-          humidity:coordinates = "time lat lon alt" ;
+          humidity:coordinates = "time lat lon alt station_name" ;
           humidity:_FillValue = -999.9;
       float temp(obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
-          temp:coordinates = "time lat lon alt" ;
+          temp:coordinates = "time lat lon alt station_name" ;
           temp:_FillValue = -999.9;
 
    attributes:
@@ -6253,19 +6262,19 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
-          pressure:coordinates = "time lon lat altz" ;
+          pressure:coordinates = "time lon lat z" ;
 
       float temperature(profile, z) ;
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
-          temperature:coordinates = "time lon lat altz" ;
+          temperature:coordinates = "time lon lat z" ;
 
       float humidity(profile, z) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
           humidity:units = "%" ;
-          humidity:coordinates = "time lon lat altz" ;
+          humidity:coordinates = "time lon lat z" ;
 
    attributes:
       :featureType = "profile";</pre>
@@ -7340,7 +7349,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-03-30 12:26:45 UTC
+Last updated 2016-03-31 16:19:11 UTC
 </div>
 </div>
 </body>
