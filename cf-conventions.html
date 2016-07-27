@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.4">
-<meta name="author" content="Brian Eaton, Jonathan Gregory, Bob Drach, Karl Taylor, Steve Hankin, John Caron, Rich Signell, Phil Bentley, Greg Rappa, Heinke Höck, Alison Pamment, Martin Juckes, Martin Raspaud">
+<meta name="author" content="Brian Eaton, Jonathan Gregory, Bob Drach, Karl Taylor, Steve Hankin, Jon Blower, John Caron, Rich Signell, Phil Bentley, Greg Rappa, Heinke Höck, Alison Pamment, Martin Juckes, Martin Raspaud">
 <title>NetCDF Climate and Forecast (CF) Metadata Conventions</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -427,14 +427,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author3" class="author">Bob Drach</span><br>
 <span id="author4" class="author">Karl Taylor</span><br>
 <span id="author5" class="author">Steve Hankin</span><br>
-<span id="author6" class="author">John Caron</span><br>
-<span id="author7" class="author">Rich Signell</span><br>
-<span id="author8" class="author">Phil Bentley</span><br>
-<span id="author9" class="author">Greg Rappa</span><br>
-<span id="author10" class="author">Heinke Höck</span><br>
-<span id="author11" class="author">Alison Pamment</span><br>
-<span id="author12" class="author">Martin Juckes</span><br>
-<span id="author13" class="author">Martin Raspaud</span><br>
+<span id="author6" class="author">Jon Blower</span><br>
+<span id="author7" class="author">John Caron</span><br>
+<span id="author8" class="author">Rich Signell</span><br>
+<span id="author9" class="author">Phil Bentley</span><br>
+<span id="author10" class="author">Greg Rappa</span><br>
+<span id="author11" class="author">Heinke Höck</span><br>
+<span id="author12" class="author">Alison Pamment</span><br>
+<span id="author13" class="author">Martin Juckes</span><br>
+<span id="author14" class="author">Martin Raspaud</span><br>
 <span id="revdate">Version 1.7 (DRAFT)</span>
 </div>
 </div>
@@ -463,7 +464,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#dimensions">2.4. Dimensions</a></li>
 <li><a href="#variables">2.5. Variables</a>
 <ul class="sectlevel3">
-<li><a href="#missing-data">2.5.1. Missing Data</a></li>
+<li><a href="#missing-data">2.5.1. Missing data, valid and actual range of data</a></li>
 </ul>
 </li>
 <li><a href="#_attributes">2.6. Attributes</a>
@@ -758,6 +759,9 @@ H.22. <a href="#example-h.22">Time series of atmospheric sounding profiles along
 <div class="ulist">
 <div class="title">Additional Authors</div>
 <ul>
+<li>
+<p>Jon Blower, University of Reading</p>
+</li>
 <li>
 <p>John Caron, UCAR</p>
 </li>
@@ -1062,7 +1066,7 @@ use CDL syntax.</p>
 <p>NetCDF variables that contain coordinate data are referred to as <em>coordinate variables</em>, <em>auxiliary coordinate variables</em>, <em>scalar coordinate variables</em>, or <em>multidimensional coordinate variables</em>.</p>
 </div>
 <div class="sect3">
-<h4 id="missing-data"><a class="anchor" href="#missing-data"></a>2.5.1. Missing Data</h4>
+<h4 id="missing-data"><a class="anchor" href="#missing-data"></a>2.5.1. Missing data, valid and actual range of data</h4>
 <div class="paragraph">
 <p>The NUG conventions
 (<a href="http://www.unidata.ucar.edu/netcdf/docs/netcdf.html#Attribute-Conventions">NUG
@@ -1086,7 +1090,7 @@ appendix C</a>).</p>
 </div>
 <div class="paragraph">
 <p>The missing values of a variable with <strong><code>scale_factor</code></strong> and/or
-<strong><code>add_offset</code></strong> attributes (see section <a href="#packed-data">Section 8.1, "Packed Data"</a>) are
+<strong><code>add_offset</code></strong> attributes (see <a href="#packed-data">Section 8.1, "Packed Data"</a>) are
 interpreted relative to the variable&#8217;s external values (a.k.a. the
 packed values, the raw values, the values stored in the netCDF file),
 not the values that result after the scale and offset are applied.
@@ -1100,6 +1104,17 @@ invalid operation. For example, the default <strong><code>_FillValue</code></str
 close to the maximum representable value of IEEE single precision
 floats, and multiplying it by 100 produces an "Infinity" (using single
 precision arithmetic).</p>
+</div>
+<div class="paragraph">
+<p>This convention defines a two-element vector attribute <strong><code>actual_range</code></strong> for
+variables containing numeric data. If the variable is packed using the
+<strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes (see <a href="#packed-data">Section 8.1, "Packed Data"</a>), the
+elements of the <strong><code>actual_range</code></strong> should have the type intended for the
+unpacked data. The elements of <strong><code>actual_range</code></strong> must be exactly equal to the
+minimum and the maximum data values which occur in the variable (when unpacked
+if packing is used), and both must be within the <strong><code>valid_range</code></strong> if
+specified. If the data is all missing or invalid, the <strong><code>actual_range</code></strong>
+attribute cannot be used.</p>
 </div>
 </div>
 </div>
@@ -3196,7 +3211,7 @@ data:  // time coordinates translated to date/time format
 <p>This standard is more restrictive than the NUG with respect to the use of the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes; ambiguities and precision problems related to data type conversions are resolved by these restrictions. If the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes are of the same data type as the associated variable, the unpacked data is assumed to be of the same data type as the packed data. However, if the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes are of a different data type from the variable (containing the packed data) then the unpacked data should match the type of these attributes, which must both be of type <strong><code>float</code></strong> or both be of type <strong><code>double</code></strong> . An additional restriction in this case is that the variable containing the packed data must be of type <strong><code>byte</code></strong> , <strong><code>short</code></strong> or <strong><code>int</code></strong> . It is not advised to unpack an <strong><code>int</code></strong> into a <strong><code>float</code></strong> as there is a potential precision loss.</p>
 </div>
 <div class="paragraph">
-<p>When data to be packed contains missing values the attributes that indicate missing values ( <strong><code>_FillValue</code></strong> , <strong><code>valid_min</code></strong> , <strong><code>valid_max</code></strong> , <strong><code>valid_range</code></strong> ) must be of the same data type as the packed data. See <a href="#missing-data">Section 2.5.1, "Missing Data"</a> for a discussion of how applications should treat variables that have attributes indicating both missing values and transformations defined by a scale and/or offset.</p>
+<p>When data to be packed contains missing values the attributes that indicate missing values ( <strong><code>_FillValue</code></strong> , <strong><code>valid_min</code></strong> , <strong><code>valid_max</code></strong> , <strong><code>valid_range</code></strong> ) must be of the same data type as the packed data. See <a href="#missing-data">Section 2.5.1, "Missing data, valid and actual range of data"</a> for a discussion of how applications should treat variables that have attributes indicating both missing values and transformations defined by a scale and/or offset.</p>
 </div>
 </div>
 <div class="sect2">
@@ -3806,6 +3821,13 @@ data:
 </thead>
 <tbody>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>actual_range</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#missing-data">Section 2.5.1, "Missing data, valid and actual range of data"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The smallest and the largest valid non-missing values occurring in the variable.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>add_offset</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">D</p></td>
@@ -3991,7 +4013,7 @@ data:
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>missing_value</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">D</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#missing-data">Section 2.5.1, "Missing Data"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#missing-data">Section 2.5.1, "Missing data, valid and actual range of data"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A value or values used to represent missing or undefined data.  Not allowed for coordinate data except in the case of auxiliary coordinate variables in discrete sampling geometries.</p></td>
 </tr>
 <tr>
@@ -5774,6 +5796,15 @@ affiliation organisations for Jonathan Gregory and Phil Bentley.</p>
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">27 July 2016</div>
+<ol class="arabic">
+<li>
+<p><a href="http://cf-trac.llnl.gov/trac/ticket/31">Ticket 31</a>,
+add new attribute <strong><code>actual_range</code></strong>.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -7356,7 +7387,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-05-20 12:50:40 UTC
+Last updated 2016-07-27 15:16:27 UTC
 </div>
 </div>
 </body>
