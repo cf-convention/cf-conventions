@@ -59,6 +59,32 @@ __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates
 __Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/azimuthal_equidistant.html$$[http://www.remotesensing.org/geotiff/proj_list/azimuthal_equidistant.html].
 
 
+=== Geostationary projection
+
+----
+
+grid_mapping_name = geostationary
+        
+----
+
+__Map parameters:__::
+* **`latitude_of_projection_origin`**
+* **`longitude_of_projection_origin`**
+* **`perspective_point_height`**
+* **`false_easting`**
+* **`false_northing`**
+* **`sweep_angle_axis`**
+* **`fixed_angle_axis`**
+
+__Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively. In the case of this projection, the projection coordinates in this projection are directly related to the scanning angle of the satellite instrument, and their units are radians.
+
+__Notes:__:: The algorithm for computing the mapping may be found at link:$$http://www.eumetsat.int/idcplg?IdcService=GET_FILE&dDocName=PDF_CGMS_03&RevisionSelectionMethod=LatestReleased. This document assumes the point of observation is directly over the equator, and that the **` sweep_angle_axis `** is y.
+Notes on using the PROJ.4 software packages for computing the mapping may be found at  link:$$http://trac.osgeo.org/proj/wiki/proj%3Dgeos and  link:$$http://remotesensing.org/geotiff/proj_list/geos.html .
+The **`perspective_point_height`** is the distance to the surface of the ellipsoid. Adding the earth major axis gives the distance from the centre of the earth.
+The **` sweep_angle_axis `** attribute indicates which axis the instrument sweeps. The value = "y" corresponds to the spin-stabilized Meteosat satellites, the value = "x" to the GOES-R satellite.
+The **` fixed_angle_axis`** attribute indicates which axis the instrument is fixed. The values are opposite to **` sweep_angle_axis `**. Only one of those two attributes are mandatory. 
+
+
 [[lambert-azimuthal-equal-area]]
 === Lambert azimuthal equal area
 
@@ -155,6 +181,27 @@ __Notes:__:: Notes on using the PROJ.4 software packages for computing the mappi
           
 +
 More information on formulas available in <<OGP-EPSG_GN7_2>>.
+
+
+=== Oblique_Mercator
+
+----
+
+grid_mapping_name = Oblique_Mercator
+        
+----
+
+__Map parameters:__::
+* **`azimuth_of_central_line`**
+* **`latitude_of_projection_origin`**
+* **`longitude_of_projection_origin`**
+* **`scale_factor_at_projection_origin`**
+* **`false_easting`**
+* **`false_northing`**
+
+__Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
+
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/oblique_mercator.html$$[http://www.remotesensing.org/geotiff/proj_list/ oblique_mercator.html]. The Rotated Mercator projection is an Oblique Mercator projection with azimuth = +90.
 
 
 === Orthographic
@@ -297,6 +344,11 @@ for numeric.
 [options="header",cols="6,1,16",caption="Table F.1. "]
 |===============
 | Attribute | Type | Description
+
+| **`azimuth_of_central_line`** | N
+| Specifies a horizontal angle measured in degrees clockwise from North. Used by certain
+ projections (e.g., Oblique Mercator) to define the orientation of the map projection relative 
+to a reference direction.
 
 | **`crs_wkt`** | S
 | This optional attribute may be used to specify multiple coordinate system properties
