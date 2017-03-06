@@ -10,34 +10,35 @@ This chapter provides representations for **discrete sampling geometries** , suc
 
 === Features and feature types
 
-Each type of discrete sampling geometry (point, time series, profile or trajectory) is defined by the relationships among its spatiotemporal coordinates.  We refer to the type of discrete sampling geometry as its **featureType** .  The term {ldquo} **feature** {rdquo} refers herein to a single instance of the **discrete sampling geometry** (such as a single time series).  The representation of such features in a CF dataset was supported previous to the introduction of this chapter using a particular convention, which is still supported (that described by section 9.3.1).  This chapter describes further conventions which offer advantages of efficiency and clarity for storing a collection of features in a single file.  When using these new conventions, __the features contained within a collection must always be of the same type; and all the collections in a CF file must be of the same feature type__ . (Future versions of CF may allow mixing of multiple feature types within a file.)  Table 9.1 presents the feature types covered by this chapter. Details and examples of storage of each of these feature types are provided in Appendix H, as indicated in the table.
+Each type of discrete sampling geometry (point, time series, profile or trajectory) is defined by the relationships among its spatiotemporal coordinates.  We refer to the type of discrete sampling geometry as its **featureType** .  The term {ldquo} **feature** {rdquo} refers herein to a single instance of the **discrete sampling geometry** (such as a single time series).  The representation of such features in a CF dataset was supported previous to the introduction of this chapter using a particular convention, which is still supported (that described by section 9.3.1).  This chapter describes further conventions which offer advantages of efficiency and clarity for storing a collection of features in a single file.  When using these new conventions, __the features contained within a collection must always be of the same type; and all the collections in a CF file must be of the same feature type__ . (Future versions of CF may allow mixing of multiple feature types within a file.)  Table 9.1 presents the feature types covered by this chapter.
 
 
 
 [cols="4"]
 |===============
-| featureType 2+| Description of a single feature with this discrete sampling geometry|Links
+| featureType 2+| Description of a single feature with this discrete sampling geometry | Link
 
-| h| Form of a data variable containing values defined on a collection of these features h| Mandatory space-time coordinates for a collection of these features|in which the cells indicate and provide links to the relevant sections H.1-H.6
+| h| Form of a data variable containing values defined on a collection of these features h| Mandatory space-time coordinates for a collection of these features h|
 
 | **point** 2+| a single data point (having no implied coordinate relationship to other points)
-| |       data(i) | x(i) y(i)  t(i)
+||        data(i) | x(i) y(i)  t(i) | point link
 
 | **timeSeries** 2+| a series of data points at the same spatial location with monotonically increasing times
-| |      data(i,o) | x(i) y(i) t(i,o)
+||       data(i,o) | x(i) y(i) t(i,o) | timeSeries link
 
 | **trajectory** 2+| a series of data points along a path through space with monotonically increasing times
-| |        data(i,o)    | x(i,o) y(i,o) t(i,o)
+||         data(i,o)    | x(i,o) y(i,o) t(i,o) | trajectory link
 
 | **profile** 2+| an ordered set of data points along a vertical line at a fixed horizontal position and fixed time
-| |        data(i,o)    | x(i) y(i) z(i,o) t(i)
+||         data(i,o)    | x(i) y(i) z(i,o) t(i) | profile link
 
 | **timeSeriesProfile** 2+| a series of profile features at the same horizontal position with monotonically increasing times
-| |        data(i,p,o)      | x(i) y(i) z(i,p,o) t(i,p)
+||         data(i,p,o)      | x(i) y(i) z(i,p,o) t(i,p) | timeSeriesProfile link
 
 | **trajectoryProfile** 2+| a series of profile features located at points ordered along a trajectory
-| |        data(i,p,o)          | x(i,p) y(i,p) z(i,p,o) t(i,p)
+||         data(i,p,o)          | x(i,p) y(i,p) z(i,p,o) t(i,p) | trajectoryProfile link
 |===============
+
 
 
 
@@ -510,7 +511,8 @@ If there is a vertical coordinate variable or auxiliary coordinate variable, it 
 
 === Missing Data
 
-In data for discrete sampling geometries written according to the rules of this section, wherever there are unused elements in data storage, the data variable and all its auxiliary coordinate variables (spatial and time) must contain missing values. This situation may arise for the incomplete multidimensional array representation, and in any representation if the instance dimension is set to a larger size than the number of features currently stored. Data variables should (as usual) also contain missing values to indicate when there is no valid data available for the element, although the coordinates are valid.
+Auxiliary coordinate variables (spatial and time) must contain missing values to indicate a void in data storage in the file but must not have missing data for any other reason. This situation may arise for unused elements in the incomplete multidimensional array representation, and in any representation if the instance dimension is set to a larger size than the number of features currently stored.   It is not permitted for auxiliary coordinate variables to have missing values for elements where there is non-missing data. Where __any__ auxiliary coordinate variable contains a missing value, __all__ other coordinate, auxiliary coordinate and data values corresponding to that element should __also__ contain missing values. Data variables should (as usual) also contain missing values to indicate when there is no valid data available for the element, although the coordinates are valid.
+
 
 
 Similarly, for indices where the instance variable identified by **`cf_role`** contains a missing value indicator, all other instance variable should also contain missing values.
