@@ -186,12 +186,17 @@ _This section has been superseded by the treatment of time series as a type of d
 [[grid-mappings-and-projections, Section 5.6, "Horizontal Coordinate Reference Systems, Grid Mappings, and Projections"]]
 === Horizontal Coordinate Reference Systems, Grid Mappings, and Projections
 
-When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the **`coordinates`** attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, the attribute **`grid_mapping`** may be used to supply this description. This attribute is attached to data variables so that variables with different mappings may be present in a single file. The attribute takes a string value which is the name of another variable in the file that provides the description of the mapping via a collection of attached attributes. This variable is called __a grid mapping variable__ and is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is **`grid_mapping_name`** which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of **`grid_mapping_name`**. The valid values of **`grid_mapping_name`** along with the attributes that provide specific map parameter values are described in <<appendix-grid-mappings>>.
+When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the **`coordinates `** attribute. A grid mapping variable is required if, in addition, it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, or to describe the figure of the Earth used to define the latitude and longitude coordinates, or to describe another coordinate reference system definition used by some coordinates or auxiliary coordinates. Such a grid mapping variable provides the description of the mapping via a collection of attached attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is **`grid_mapping_name`**, which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of **`grid_mapping_name`**. The valid values of **`grid_mapping_name`** along with the attributes that provide specific map parameter values are described in <<appendix-grid-mappings>>.
+The grid mapping variables are associated with the data and coordinate variables by the grid_mapping attribute. This attribute is attached to data variables so that variables with different mappings may be present in a single file. The attribute takes a string value with two possible formats. In the first format, it is a single word, which names a grid mapping variable. In the second format, it is a blank-separated list of words "grid_mapping_variable: coordinate_variable [coordinate_variable ...] [grid_mapping_variable: ...]", which identifies one or more grid mapping variables, and with each grid mapping associates one or more coordinate_variables i.e. coordinate variables or auxiliary coordinate variables.
+Using the simple form, where the grid_mapping attribute is only the name of a grid_mapping variable, 2D latitude and longitude coordinates for a projected coordinate reference system use the same geographic coordinate reference system (ellipsoid and prime meridian) as the projection is projected from.
 
-When the coordinate variables for a horizontal grid are longitude and
-latitude, a grid mapping variable with **`grid_mapping_name`** of
-**`latitude_longitude`** may be used to specify the ellipsoid and prime
-meridian.
+The `grid_mapping` variable may identify datums (such as the reference
+ellipsoid, the geoid or the prime meridian) for horizontal or vertical
+coordinates.  Therefore a grid mapping variable may be needed when the
+coordinate variables for a horizontal grid are longitude and latitude.  The
+`grid_mapping_name` of `latitude_longitude` should be used in this case.
+
+The expanded form of the grid_mapping attribute is required if one wants to store coordinate information for more than one coordinate reference system. In this case each coordinate or auxiliary coordinate is defined explicitly with respect to no more than one grid_mapping variable. This syntax may be used to explicitly link coordinates and grid mapping variables where only one coordinate reference system is used. In this case, all coordinates and auxiliary coordinates of the data variable not named in the grid_mapping attribute are unrelated to any grid_mapping variable. All coordinate names listed in the grid_mapping attribute must be coordinate variables or auxiliary coordinates of the data variable.
 
 In order to make use of a grid mapping to directly calculate latitude and longitude values it is necessary to associate the coordinate variables with the independent variables of the mapping. This is done by assigning a **`standard_name`** to the coordinate variable. The appropriate values of the **`standard_name`** depend on the grid mapping and are given in <<appendix-grid-mappings>>.
 
@@ -347,6 +352,8 @@ variables:
 
 ====
 
+      
+----
 
 [[british-national-grid]]
 [caption="Example 5.10. "]
@@ -356,37 +363,57 @@ variables:
 ----
 
 dimensions:
-  lat = 648 ;
-  lon = 648 ;
-  y = 18 ;
-  x = 36 ;
+    z = 100;
+    y = 100000 ;
+    x = 100000 ;
 variables:
   double x(x) ;
-    x:standard_name = "projection_x_coordinate" ;
-    x:units = "m" ;
+     x:standard_name = "projection_x_coordinate" ;
+     x:long_nam e = “Easting”
+     x:units = "m" ;
   double y(y) ;
-    y:standard_name = "projection_y_coordinate" ;
-    y:units = "m" ;
+       y:standard_name = "projection_y_coordinate" ;
+       y:long_name = “Northing”
+       y:units = "m" ;
+   double z(z );
+       z:standard_name = “height_above_reference_ellipsoid”;
+      z:long_name = “height_above_osgb_newlyn_datum_masl”;
+     z:units = “m”;
+   
   double lat(y, x) ;
+       lat:standard_name = “latitude”;
+       lat:units = “degrees_north”;
   double lon(y, x) ;
-  float temp(y, x) ;
-    temp:long_name = "temperature" ;
+       Ion:standard_name = “longitude”     
+       Ion:units = “degrees_east”
+  float temp(z, y, x) ;
+    temp:standard_name = "sir_temperature" ;
     temp:units = "K" ;
     temp:coordinates = "lat lon" ;
-    temp:grid_mapping = "crs" ;
-  int crs ;
-    crs:grid_mapping_name = "transverse_mercator";
-    crs:semi_major_axis = 6377563.396 ;
-    crs:semi_minor_axis = 6356256.910 ;
-    crs:inverse_flattening = 299.3249646 ;
-    crs:latitude_of_projection_origin = 49.0 ;
-    crs:longitude_of_projection_origin = -2.0 ;
-    crs:false_easting = 400000.0 ;
-    crs:false_northing = -100000.0 ;
-    crs:scale_factor_at_projection_origin = 0.9996012717 ;
-      
-----
+    temp:grid_mapping = "crsOSGB" : x y crsWGS84:  lat Ion”;
+float pres(z, y, x);
+   temp:standard_name = “air_pressure”;
+   temp:units = ”Pa”;
+   temp:coordinates = “lat Ion”;
+   temp:grid_mapping = “crsOSGB: x y crsWGS84: lat Ion”;
+int crsOSGB;
 
+  int crsOSGB ;
+        crsOSGB:grid_mapping_name = "transverse_mercator";
+        crsOSGB:semi_major_axis = 6377563.396 ;
+        crsOSGB:inverse_flattening = 299.3249646;
+        crsOSGB:longitude_of_prime_meridian = 0.0;
+        crsOSGB:latitude_of_projection_origin = 49.0;
+        crsOSGB:longitude_central_meridian = -2.0;
+    crsOSGB:scale_factor_at_central_meridian = 0.9996012717;
+    crsOSGB:false_easting = 400000.0;
+    crsOSGB:false_northing = -100000.0;
+    crsOSGB:unit = “metre”;
+int crsWGS84;
+    crsWGS84;grid_maping_name = “latitude_longitude”;
+    crsWGS84;longitude_of_prime_meridian = 0.0;
+    crsWGS84;semi_major_axis = 6378137.0;
+    crsWGS84;inverse_flattening = 298.257223563;
 
 ====
 
@@ -463,12 +490,14 @@ Note: To enhance readability the WKT value has been split across multiple lines 
 [[scalar-coordinate-variables, Section 5.7, "Scalar Coordinate Variables"]]
 === Scalar Coordinate Variables
 
-When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable. Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the **`coordinates`** attribute.
 
-Under COARDS the method of providing a single valued coordinate was to add a dimension of size one to the variable, and supply the corresponding coordinate variable. The new scalar coordinate variable is a convenience feature which avoids adding size one dimensions to variables. Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable. Note however that use of this feature with a latitude, longitude, vertical, or time coordinate will inhibit COARDS conforming applications from recognizing them.
+When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable (i.e. a data variable which has no netCDF dimensions). Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the **`coordinates`** attribute.
+
+The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1).
 
 Once a name is used for a scalar coordinate variable it can not be used for a 1D coordinate variable. For this reason we strongly recommend against using a name for a scalar coordinate variable that matches the name of any dimension in the file.
 
+If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (this might be the case, for instance, for time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
 
 [[multiple-forecasts-from-single-analysis,Example 5.11, "Multiple forecasts from a single analysis"]]
 [caption="Example 5.11. "]
