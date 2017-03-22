@@ -59,7 +59,10 @@ The NUG conventions
 (link:$$http://www.unidata.ucar.edu/netcdf/docs/netcdf.html#Attribute-Conventions$$[NUG
 appendix B]) provide the **`_FillValue`**, **`missing_value`**,
 **`valid_min`**, **`valid_max`**, and **`valid_range`** attributes to indicate
-missing data.
+missing data. Missing data is allowed in data variables and auxiliary coordinate variables. 
+Generic applications should treat the data as missing where any auxiliary coordinate variables 
+have missing values; special-purpose applications might be able to make use of the data. 
+Missing data is not allowed in coordinate variables.
 
 The NUG conventions for missing data changed significantly between version 2.3 and version 2.4. Since version 2.4 the NUG defines missing data as all values outside of the **`valid_range`**, and specifies how the **`valid_range`** should be defined from the **`_FillValue`** (which has library specified default values) if it hasn't been explicitly specified. If only one missing value is needed for a variable then we recommend  that this value be specified using the **`_FillValue`** attribute. Doing this guarantees that the missing value will be recognized by generic applications that follow either the before or after version 2.4 conventions.
 
@@ -140,6 +143,11 @@ The NUG defines **`title`** and **`history`** to be global attributes. We wish t
 **`references`**:: Published or web-based references that describe the data or methods used to produce it.
 
 **`comment`**:: Miscellaneous information about the data or methods used to produce it.
+
+
+[[external-variables, Section 2.6.3, "External variables"]]
+==== External Variables
+The global **`external_variables`** attribute is a blank-separated list of the names of variables which are named by attributes in the file but which are not present in the file. These variables are to be found in other files (called "external files") but CF does not provide conventions for identifying the files concerned. The only CF standard attribute which is allowed to refer to external variables is**`cell_measures`**.
 
 
 
