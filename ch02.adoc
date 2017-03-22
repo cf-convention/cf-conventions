@@ -59,7 +59,10 @@ The NUG conventions
 (link:$$http://www.unidata.ucar.edu/netcdf/docs/netcdf.html#Attribute-Conventions$$[NUG
 appendix B]) provide the **`_FillValue`**, **`missing_value`**,
 **`valid_min`**, **`valid_max`**, and **`valid_range`** attributes to indicate
-missing data.
+missing data. Missing data is allowed in data variables and auxiliary coordinate variables. 
+Generic applications should treat the data as missing where any auxiliary coordinate variables 
+have missing values; special-purpose applications might be able to make use of the data. 
+Missing data is not allowed in coordinate variables.
 
 The NUG conventions for missing data changed significantly between version 2.3 and version 2.4. Since version 2.4 the NUG defines missing data as all values outside of the **`valid_range`**, and specifies how the **`valid_range`** should be defined from the **`_FillValue`** (which has library specified default values) if it hasn't been explicitly specified. If only one missing value is needed for a variable then we recommend  that this value be specified using the **`_FillValue`** attribute. Doing this guarantees that the missing value will be recognized by generic applications that follow either the before or after version 2.4 conventions.
 
@@ -111,15 +114,30 @@ This standard describes many attributes (some mandatory, others optional), but a
 
 We recommend that netCDF files that follow these conventions indicate
 this by setting the NUG defined global attribute **`Conventions`** to
-the string value "**`CF-1.6`**". The string is interpreted as a
-directory name relative to a directory that is a repository of documents
-describing sets of discipline-specific conventions. The conventions
-directory name is currently interpreted relative to the directory
+the string value "**`CF-1.6`**". The Conventions attribute may be a single 
+text string containing a list of convention names separated by blank space 
+or commas, one of which shall be the full CF string as described above.
+The string is interpreted as a directory name relative to a directory that 
+is a repository of documents describing sets of discipline-specific conventions. 
+The conventions directory name is currently interpreted relative to the directory
 **`pub/netcdf/Conventions/`** on the host machine
 **`ftp.unidata.ucar.edu`**. The web based versions of this document are
 linked from the
 link:$$http://www.unidata.ucar.edu/netcdf/conventions.html$$[netCDF
 Conventions web page].
+
+It is possible for a netCDF file to adhere to more than one set of conventions, 
+even when there is no inheritance relationship among the conventions. In this case, 
+the value of the Conventions attribute may be a single text string containing a list 
+of the convention names separated by blank space (recommended) or commas (if a convention 
+name contains blanks). This is the Unidata recommended syntax from NetCDF Users Guide, 
+Appendix B. If the string contains any commas, it is assumed to be a comma-separated list.
+
+When CF is listed with other conventions, this asserts the same full compliance with CF 
+requirements and interpretations as if CF was the sole convention. It is the responsibility 
+of the data-writer to ensure that all common metadata is used with consistent meaning between conventions.
+
+
 
 
 [[description-of-file-contents, Section 2.6.2, "Description of file contents"]]
@@ -140,6 +158,11 @@ The NUG defines **`title`** and **`history`** to be global attributes. We wish t
 **`references`**:: Published or web-based references that describe the data or methods used to produce it.
 
 **`comment`**:: Miscellaneous information about the data or methods used to produce it.
+
+
+[[external-variables, Section 2.6.3, "External variables"]]
+==== External Variables
+The global **`external_variables`** attribute is a blank-separated list of the names of variables which are named by attributes in the file but which are not present in the file. These variables are to be found in other files (called "external files") but CF does not provide conventions for identifying the files concerned. The only CF standard attribute which is allowed to refer to external variables is**`cell_measures`**.
 
 
 
