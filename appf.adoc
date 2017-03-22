@@ -36,7 +36,8 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html$$[http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html].
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at
+link:$$http://geotiff.maptools.org/proj_list/albers_equal_area_conic.html$$[http://geotiff.maptools.org/proj_list/albers_equal_area_conic.html].
 
 
 [[azimuthal-equidistant]]
@@ -56,7 +57,39 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/azimuthal_equidistant.html$$[http://www.remotesensing.org/geotiff/proj_list/azimuthal_equidistant.html].
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at
+link:$$http://geotiff.maptools.org/proj_list/azimuthal_equidistant.html$$[http://geotiff.maptools.org/proj_list/azimuthal_equidistant.html]
+and
+link:$$http://proj4.org/projections/aeqd.html$$[http://proj4.org/projections/aeqd.html].
+
+=== Geostationary projection
+
+----
+
+grid_mapping_name = geostationary
+        
+----
+
+__Map parameters:__::
+* **`latitude_of_projection_origin`**
+* **`longitude_of_projection_origin`**
+* **`perspective_point_height`**
+* **`false_easting`**
+* **`false_northing`**
+* **`sweep_angle_axis`**
+* **`fixed_angle_axis`**
+
+__Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively. In the case of this projection, the projection coordinates in this projection are directly related to the scanning angle of the satellite instrument, and their units are radians.
+
+__Notes:__:: The algorithm for computing the mapping may be found at link:$$http://www.cgms-info.org/documents/pdf_cgms_03.pdf$$[http://www.cgms-info.org/documents/pdf_cgms_03.pdf]. This document assumes the point of observation is directly over the equator, and that the **`sweep_angle_axis`** is y.
+
+Notes on using the PROJ.4 software packages for computing the mapping may be found at  link:$$http://proj4.org/$$[http://proj4.org/] and  link:$$https://trac.osgeo.org/geotiff/$$[https://trac.osgeo.org/geotiff/] .
+
+The **`perspective_point_height`** is the distance to the surface of the ellipsoid. Adding the earth major axis gives the distance from the centre of the earth.
+
+The **`sweep_angle_axis`** attribute indicates which axis the instrument sweeps. The value = "y" corresponds to the spin-stabilized Meteosat satellites, the value = "x" to the GOES-R satellite.
+
+The **`fixed_angle_axis`** attribute indicates which axis the instrument is fixed. The values are opposite to **`sweep_angle_axis`**. Only one of those two attributes is mandatory. 
 
 
 [[lambert-azimuthal-equal-area]]
@@ -76,7 +109,10 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html$$[http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html].
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at
+link:$$http://proj4.org/projections/laea.html$$[http://proj4.org/projections/laea.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/lambert_azimuthal_equal_area.html$$[http://geotiff.maptools.org/proj_list/lambert_azimuthal_equal_area.html]
 
 
 === Lambert conformal
@@ -96,8 +132,12 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html$$[http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html].
-
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://proj4.org/projections/lcc.html$$[http://proj4.org/projections/lcc.html].
+and
+link:$$http://geotiff.maptools.org/proj_list/lambert_conic_conformal_1sp.html$$[http://geotiff.maptools.org/proj_list/lambert_conic_conformal_1sp.html]
+("Lambert Conic Conformal (1SP)" or EPSG 9801) or
+link:$$http://geotiff.maptools.org/proj_list/lambert_conic_conformal_2sp.html$$[http://geotiff.maptools.org/proj_list/lambert_conic_conformal_2sp.html]
+ ("Lambert Conic Conformal (2SP)" or EPSG 9802). For the 1SP variant, latitude_of_projection_origin=standard_parallel and the PROJ.4 scale factor is 1.
 
 === Lambert Cylindrical Equal Area
 
@@ -109,13 +149,15 @@ grid_mapping_name = lambert_cylindrical_equal_area
 
 __Map parameters:__::
 * **`longitude_of_central_meridian`**
-* Either **`standard_parallel`** or **`scale_factor_at_projection_origin`**
+* Either **`standard_parallel`** or **`scale_factor_at_projection_origin`** (deprecated)
 * **`false_easting`**
 * **`false_northing`**
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute value **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the PROJ.4 software packages for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/cylindrical_equal_area.html$$[http://www.remotesensing.org/geotiff/proj_list/cylindrical_equal_area.html] ("Lambert Cylindrical Equal Area" or EPSG 9834 or EPSG 9835). Detailed formulas can be found in [Snyder] pages 76-85.
+__Notes:__:: Notes on using the PROJ.4 software packages for computing the mapping may be found at
+link:$$http://geotiff.maptools.org/proj_list/cylindrical_equal_area.html$$[http://geotiff.maptools.org/proj_list/cylindrical_equal_area.html]
+("Lambert Cylindrical Equal Area" or EPSG 9834 or EPSG 9835). Detailed formulas can be found in <<bibliography.adoc#Snyder>> pages 76-85.
 
 
 === Latitude-Longitude
@@ -151,10 +193,42 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute value **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the PROJ.4 software packages for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html$$[http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html] ("Mercator (1SP)" or EPSG 9804) or link:$$http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html$$[http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html] ("Mercator (2SP)" or EPSG 9805).
+__Notes:__:: Notes on using the PROJ.4 software packages for computing the mapping may be found at
+link:$$http://proj4.org/projections/merc.html$$[http://proj4.org/projections/merc.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/mercator_1sp.html$$[http://geotiff.maptools.org/proj_list/mercator_1sp.html]
+("Mercator (1SP)" or EPSG 9804)
+or
+link:$$http://geotiff.maptools.org/proj_list/mercator_2sp.html$$[http://geotiff.maptools.org/proj_list/mercator_2sp.html]
+("Mercator (2SP)" or EPSG 9805).
           
 +
 More information on formulas available in <<OGP-EPSG_GN7_2>>.
+
+
+=== Oblique Mercator
+
+----
+
+grid_mapping_name = oblique_mercator
+        
+----
+
+__Map parameters:__::
+* **`azimuth_of_central_line`**
+* **`latitude_of_projection_origin`**
+* **`longitude_of_projection_origin`**
+* **`scale_factor_at_projection_origin`**
+* **`false_easting`**
+* **`false_northing`**
+
+__Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
+
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at
+link:$$http://proj4.org/projections/omerc.html$$[http://proj4.org/projections/omerc.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/oblique_mercator.html$$[http://geotiff.maptools.org/proj_list/oblique_mercator.html].
+The Rotated Mercator projection is an Oblique Mercator projection with azimuth = +90.
 
 
 === Orthographic
@@ -173,7 +247,11 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute value **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the PROJ.4 software packages for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/orthographic.html$$[http://www.remotesensing.org/geotiff/proj_list/orthographic.html] ("Orthographic" or EPSG 9840).
+__Notes:__:: Notes on using the PROJ.4 software packages for computing the mapping may be found at
+link:$$http://proj4.org/projections/ortho.html$$[http://proj4.org/projections/ortho.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/orthographic.html$$[http://geotiff.maptools.org/proj_list/orthographic.html]
+("Orthographic" or EPSG 9840).
           
 +
 More information on formulas available in <<OGP-EPSG_GN7_2>>.
@@ -192,14 +270,18 @@ grid_mapping_name = polar_stereographic
 __Map parameters:__::
 * **`straight_vertical_longitude_from_pole`**
 * **`latitude_of_projection_origin`** - Either +90. or -90.
-* Either **`standard_parallel`** or **`scale_factor_at_projection_origin`**
+* Either **`standard_parallel`** (EPSG 9829) or **`scale_factor_at_projection_origin`** (EPSG 9810)
 * **`false_easting`**
 * **`false_northing`**
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html$$[http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html].
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at link:$$http://geotiff.maptools.org/proj_list/polar_stereographic.html$$[http://geotiff.maptools.org/proj_list/polar_stereographic.html]
 
+The standard_parallel variant corresponds to EPSG Polar Stereographic (Variant B) (EPSG dataset coordinate operation method code 9829),
+while the scale_factor_at_projection_origin variant corresponds to EPSG Polar Stereographic (Variant A)
+(EPSG dataset coordinate operation method code 9810).
+As PROJ.4 requires the standard parallel, [Snyder] formula 21-7 can be used to compute it from the scale factor if needed.
 
 === Rotated pole
 
@@ -220,6 +302,28 @@ __Notes:__::
 {nbsp}
 
 
+=== Sinusoidal
+
+----
+
+grid_mapping_name = sinusoidal
+        
+----
+
+__Map parameters:__::
+* **`longitude_of_projection_origin`**
+* **`false_easting`**
+* **`false_northing`**
+
+__Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
+
+__Notes:__:: Notes on using the **`PROJ.4`** software package for computing the mapping may be found at
+link:$$http://proj4.org/projections/sinu.html$$[http://proj4.org/projections/sinu.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/sinusoidal.html$$[http://geotiff.maptools.org/proj_list/sinusoidal.html].
+Detailed formulas can be found in <<Snyder>>, pages 243-248.
+
+
 === Stereographic
 
 ----
@@ -237,7 +341,11 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Formulas for the mapping and its inverse along with notes on using the **`PROJ.4`** software package for doing the calcuations may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/stereographic.html$$[http://www.remotesensing.org/geotiff/proj_list/stereographic.html] . See the section "Polar stereographic" for the special case when the projection origin is one of the poles.
+__Notes:__:: Formulas for the mapping and its inverse along with notes on using the **`PROJ.4`** software package for doing the calcuations may be found at
+link:$$http://proj4.org/projections/stere.html$$[http://proj4.org/projections/stere.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/stereographic.html$$[http://geotiff.maptools.org/proj_list/stereographic.html].
+See the section "Polar stereographic" for the special case when the projection origin is one of the poles.
 
 
 === Transverse Mercator
@@ -257,7 +365,10 @@ __Map parameters:__::
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
 
-__Notes:__:: Formulas for the mapping and its inverse along with notes on using the **`PROJ.4`** software package for doing the calcuations may be found at link:$$http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html$$[http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html].
+__Notes:__:: Formulas for the mapping and its inverse along with notes on using the **`PROJ.4`** software package for doing the calcuations may be found at
+link:$$http://proj4.org/projections/tmerc.html$$[http://proj4.org/projections/tmerc.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/transverse_mercator.html$$[http://geotiff.maptools.org/proj_list/transverse_mercator.html].
 
 
 [[vertical-perspective]]
@@ -298,6 +409,11 @@ for numeric.
 |===============
 | Attribute | Type | Description
 
+| **`azimuth_of_central_line`** | N
+| Specifies a horizontal angle measured in degrees clockwise from North. Used by certain
+ projections (e.g., Oblique Mercator) to define the orientation of the map projection relative 
+to a reference direction.
+
 | **`crs_wkt`** | S
 | This optional attribute may be used to specify multiple coordinate system properties
   in well-known text (WKT) format. The syntax must conform to the WKT format as specified
@@ -328,6 +444,18 @@ for numeric.
     the unit of the coordinate variable identified by the
     standard name **`projection_y_coordinate`**.
 
+| **`geoid_name`** | S
+| The name of the estimate or model of the geoid being used as a datum, 
+    e.g. GEOID12B. Corresponds to an OGC WKT VERT_DATUM name. The geoid is 
+    the surface of constant geopotential that the ocean would follow if it 
+    were at rest. This attribute and **`geopotential_datum_name`** cannot both be specified.
+
+| **`geopotential_datum_name`** | S
+
+| The name of an estimated surface of constant geopotential being used as a datum, 
+    e.g. NAVD88. Such a surface is often called an equipotential surface in geodesy. 
+    Corresponds to an OGC WKT VERT_DATUM name. This attribute and **`geoid_name`** cannot 
+    both be specified.
 
 | **`grid_mapping_name`** | N
 | The name used to identify the grid mapping.
