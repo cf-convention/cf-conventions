@@ -494,7 +494,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel3">
 <li><a href="#_dimensional_vertical_coordinate">4.3.1. Dimensional Vertical Coordinate</a></li>
 <li><a href="#dimensionless-vertical-coordinate">4.3.2. Dimensionless Vertical Coordinate</a></li>
-<li><a href="#parameterized-vertical-coordinate">4.3.3. Parameterized Vertical Coordinate</a></li>
+<li><a href="#parametric-vertical-coordinate">4.3.3. Parametric Vertical Coordinate</a></li>
 </ul>
 </li>
 <li><a href="#time-coordinate">4.4. Time Coordinate</a>
@@ -571,7 +571,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#attribute-appendix">Appendix A: Attributes</a></li>
 <li><a href="#standard-name-table-format">Appendix B: Standard Name Table Format</a></li>
 <li><a href="#standard-name-modifiers">Appendix C: Standard Name Modifiers</a></li>
-<li><a href="#computed-v-coord">Appendix D: Computed Vertical Coordinates</a>
+<li><a href="#parametric-v-coord">Appendix D: Parametric Vertical Coordinates</a>
 <ul class="sectlevel2">
 <li><a href="#atmosphere-natural-log-pressure-coordinate">Atmosphere natural log pressure coordinate</a></li>
 <li><a href="#_atmosphere_sigma_coordinate">Atmosphere sigma coordinate</a></li>
@@ -696,7 +696,9 @@ F.1. <a href="#table-grid-mapping-attributes">Grid Mapping Attributes</a></p>
 5.8. <a href="#latitude-and-longitude-on-a-spherical-earth">Latitude and longitude on a spherical Earth</a><br>
 5.9. <a href="#latitude-and-longitude-on-the-wgs-1984-datum">Latitude and longitude on the WGS 1984 datum</a><br>
 5.10. <a href="#british-national-grid">British National Grid</a><br>
-5.11. <a href="#multiple-forecasts-from-single-analysis">Example 5.11, "Multiple forecasts from a single analysis"</a><br>
+5.11. <a href="#latitude-and-longitude-on-the-wgs-1984-datum-in-crs-wkt-format">Latitude and longitude on the WGS 1984 datum + CRS WKT</a><br>
+5.12. <a href="#british-national-grid-newlyn-datum-in-crs-wkt-format">British National Grid + Newlyn Datum in CRS WKT format</a><br>
+5.13. <a href="#multiple-forecasts-from-single-analysis">Example 5.13, "Multiple forecasts from a single analysis"</a><br>
 6.2. <a href="#northward-heat-transport-in-atlantic-ocean-ex">Northward heat transport in Atlantic Ocean</a><br>
 6.3. <a href="#model-level-numbers-ex">Model level numbers</a><br>
 7.1. <a href="#cells-on-a-latitude-axis-ex">Cells on a latitude axis</a><br>
@@ -962,7 +964,7 @@ use CDL syntax.</p>
 <p>Once the variables containing coordinate data are identified, further conventions are required to determine the type of coordinate represented by each of these variables. Latitude, longitude, and time coordinates are identified solely by the value of their <strong><code>units</code></strong> attribute. Vertical coordinates with units of pressure may also be identified by the <strong><code>units</code></strong> attribute. Other vertical coordinates must use the attribute <strong><code>positive</code></strong> which determines whether the direction of increasing coordinate value is up or down. Because identification of a coordinate type by its units involves the use of an external software package <a href="#UDUNITS">[UDUNITS]</a> , we provide the optional attribute <strong><code>axis</code></strong> for a direct identification of coordinates that correspond to latitude, longitude, vertical, or time axes.</p>
 </div>
 <div class="paragraph">
-<p>Latitude, longitude, and time are defined by internationally recognized standards, and hence, identifying the coordinates of these types is sufficient to locate data values uniquely with respect to time and a point on the earth&#8217;s surface. On the other hand identifying the vertical coordinate is not necessarily sufficient to locate a data value vertically with respect to the earth&#8217;s surface. In particular a model may output data on the dimensionless vertical coordinate used in its mathematical formulation. To achieve the goal of being able to spatially locate all data values, this convention includes the definitions of common dimensionless vertical coordinates in <a href="#computed-v-coord">Appendix D, Computed Vertical Coordinates</a> . These definitions provide a mapping between the dimensionless coordinate values and dimensional values that can be uniquely located with respect to a point on the earth&#8217;s surface. The definitions are associated with a coordinate variable via the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes. For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.</p>
+<p>Latitude, longitude, and time are defined by internationally recognized standards, and hence, identifying the coordinates of these types is sufficient to locate data values uniquely with respect to time and a point on the earth&#8217;s surface. On the other hand identifying the vertical coordinate is not necessarily sufficient to locate a data value vertically with respect to the earth&#8217;s surface. In particular a model may output data on the dimensionless vertical coordinate used in its mathematical formulation. To achieve the goal of being able to spatially locate all data values, this convention includes the definitions of common dimensionless vertical coordinates in <a href="#parametric-v-coord">Appendix D, Parametric Vertical Coordinates</a> . These definitions provide a mapping between the dimensionless coordinate values and dimensional values that can be uniquely located with respect to a point on the earth&#8217;s surface. The definitions are associated with a coordinate variable via the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes. For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.</p>
 </div>
 <div class="paragraph">
 <p>It is often the case that data values are not representative of single points in time and/or space, but rather of intervals or multidimensional cells. This convention defines a <strong><code>bounds</code></strong> attribute to specify the extent of intervals or cells. When data that is representative of cells can be described by simple statistical methods, those methods can be indicated using the <strong><code>cell_methods</code></strong> attribute. An important application of this attribute is to describe climatological and diurnal statistics.</p>
@@ -1774,7 +1776,7 @@ axis_name:positive = "down" ;</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="parameterized-vertical-coordinate"><a class="anchor" href="#parameterized-vertical-coordinate"></a>4.3.3. Parameterized Vertical Coordinate</h4>
+<h4 id="parametric-vertical-coordinate"><a class="anchor" href="#parametric-vertical-coordinate"></a>4.3.3. Parametric Vertical Coordinate</h4>
 <div class="paragraph">
 <p>In some cases dimensional vertical coordinates are a function of horizontal
 location as well as parameters which depend on vertical location, and therefore
@@ -1782,7 +1784,7 @@ cannot be stored in the one-dimensional vertical coordinate variable, which is
 in most of these cases is dimensionless. The <code>standard_name</code> of the parametric
 (usually dimensionless) vertical coordinate variable can be used to find the
 definition of the associated computed (always dimensional) vertical coordinate
-in <a href="#computed-v-coord">Appendix D, Computed Vertical Coordinates</a>. The definition provides a mapping between the
+in <a href="#parametric-v-coord">Appendix D, Parametric Vertical Coordinates</a>. The definition provides a mapping between the
 parametric vertical coordinate values and computed values that can positively
 and uniquely indicate the location of the data. The <code>formula_terms</code> attribute
 can be used to associate terms in the definitions with variables in a netCDF
@@ -1811,7 +1813,7 @@ geopotential datum or reference ellipsoid; see
 </div>
 </div>
 <div class="paragraph">
-<p>In this example the <strong><code>standard_name</code></strong> value <strong><code>atmosphere_sigma_coordinate</code></strong> identifies the following definition from <a href="#computed-v-coord">Appendix D, Computed Vertical Coordinates</a> which specifies how to compute pressure at gridpoint <strong><code>(n,k,j,i)</code></strong> where <strong><code>j</code></strong> and <strong><code>i</code></strong> are horizontal indices, <strong><code>k</code></strong> is a vertical index, and <strong><code>n</code></strong> is a time index:</p>
+<p>In this example the <strong><code>standard_name</code></strong> value <strong><code>atmosphere_sigma_coordinate</code></strong> identifies the following definition from <a href="#parametric-v-coord">Appendix D, Parametric Vertical Coordinates</a> which specifies how to compute pressure at gridpoint <strong><code>(n,k,j,i)</code></strong> where <strong><code>j</code></strong> and <strong><code>i</code></strong> are horizontal indices, <strong><code>k</code></strong> is a vertical index, and <strong><code>n</code></strong> is a time index:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2201,7 +2203,20 @@ i = rgrid(n) - 128*j</pre>
 <div class="sect2">
 <h3 id="grid-mappings-and-projections"><a class="anchor" href="#grid-mappings-and-projections"></a>5.6. Horizontal Coordinate Reference Systems, Grid Mappings, and Projections</h3>
 <div class="paragraph">
-<p>When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the <strong><code>coordinates</code></strong> attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, the attribute <strong><code>grid_mapping</code></strong> may be used to supply this description. This attribute is attached to data variables so that variables with different mappings may be present in a single file. The attribute takes a string value which is the name of another variable in the file that provides the description of the mapping via a collection of attached attributes. This variable is called <em>a grid mapping variable</em> and is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is <strong><code>grid_mapping_name</code></strong> which takes a string value that contains the mapping&#8217;s name. The other attributes that define a specific mapping depend on the value of <strong><code>grid_mapping_name</code></strong>. The valid values of <strong><code>grid_mapping_name</code></strong> along with the attributes that provide specific map parameter values are described in <a href="#appendix-grid-mappings">Appendix F, Grid Mappings</a>.</p>
+<p>When the coordinate variables for a horizontal grid are not longitude and latitude, it is required
+that the true latitude and longitude coordinates be supplied via the <strong><code>coordinates</code></strong> attribute. If
+in addition it is desired to describe the mapping between the given coordinate variables and the
+true latitude and longitude coordinates, the attribute <strong><code>grid_mapping</code></strong> may be used to supply this
+description. This attribute is attached to data variables so that variables with different mappings
+may be present in a single file. The attribute takes a string value which is the name of another
+variable in the file that provides the description of the mapping via a collection of attached
+attributes. This variable is called <em>a grid mapping variable</em> and is of arbitrary type since it
+contains no data. Its purpose is to act as a container for the attributes that define the
+mapping. The one attribute that all grid mapping variables must have is <strong><code>grid_mapping_name</code></strong>
+which takes a string value that contains the mapping&#8217;s name. The other attributes that define a
+specific mapping depend on the value of <strong><code>grid_mapping_name</code></strong>. The valid values of
+<strong><code>grid_mapping_name</code></strong> along with the attributes that provide specific map parameter values are
+described in <a href="#appendix-grid-mappings">Appendix F, Grid Mappings</a>.</p>
 </div>
 <div class="paragraph">
 <p>The <code>grid_mapping</code> variable may identify datums (such as the reference
@@ -2376,15 +2391,21 @@ variables:
     temp:coordinates = "lat lon" ;
     temp:grid_mapping = "crs" ;
   int crs ;
-    crs:grid_mapping_name = "transverse_mercator";
+    crs:grid_mapping_name = "transverse_mercator" ;
+    crs:longitude_of_central_meridian = -2. ;
+    crs:false_easting = 400000. ;
+    crs:false_northing = -100000. ;
+    crs:latitude_of_projection_origin = 49. ;
+    crs:scale_factor_at_central_meridian = 0.9996012717 ;
+    crs:longitude_of_prime_meridian = 0. ;
     crs:semi_major_axis = 6377563.396 ;
-    crs:semi_minor_axis = 6356256.910 ;
-    crs:inverse_flattening = 299.3249646 ;
-    crs:latitude_of_projection_origin = 49.0 ;
-    crs:longitude_of_projection_origin = -2.0 ;
-    crs:false_easting = 400000.0 ;
-    crs:false_northing = -100000.0 ;
-    crs:scale_factor_at_projection_origin = 0.9996012717 ;</pre>
+    crs:inverse_flattening = 299.324964600004 ;
+    crs:projected_coordinate_system_name = "OSGB 1936 / British National Grid" ;
+    crs:geographic_coordinate_system_name = "OSGB 1936" ;
+    crs:horizontal_datum_name = "OSGB_1936" ;
+    crs:reference_ellipsoid_name = "Airy 1830" ;
+    crs:prime_meridian_name = "Greenwich" ;
+    crs:towgs84 = 375., -111., 431., 0., 0., 0., 0. ;</pre>
 </div>
 </div>
 </div>
@@ -2392,28 +2413,64 @@ variables:
 <div class="sect3">
 <h4 id="use-of-the-crs-well-known-text-format"><a class="anchor" href="#use-of-the-crs-well-known-text-format"></a>5.6.1. Use of the CRS Well-known Text Format</h4>
 <div class="paragraph">
-<p>An optional grid mapping attribute called <strong><code>crs_wkt</code></strong> may be used to specify multiple coordinate system properties in so-called <em>well-known text</em> format (usually abbreviated to CRS WKT or OGC WKT). The CRS WKT format is widely recognised and used within the geoscience software community. As such it represents a versatile mechanism for encoding information about a variety of coordinate reference system parameters in a highly compact notational form.</p>
+<p>An optional grid mapping attribute called <strong><code>crs_wkt</code></strong> may be used to specify multiple coordinate
+system properties in so-called <em>well-known text</em> format (usually abbreviated to CRS WKT or OGC
+WKT). The CRS WKT format is widely recognised and used within the geoscience software community. As
+such it represents a versatile mechanism for encoding information about a variety of coordinate
+reference system parameters in a highly compact notational form.  The translation of CF coordinate
+variables to/from OGC Well-Known Text (WKT) format is shown in Examples 5.11 and 5.12 below and
+described in detail in
+<a href="https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements" class="bare">https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements</a>.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>crs_wkt</code></strong> attribute should comprise a text string that conforms to the WKT syntax as specified in reference <a href="#OGC_CTS">[OGC_CTS]</a>. If desired the text string may contain embedded newline characters to aid human readability. However, any such characters are purely cosmetic and do not alter the meaning of the attribute value. It is envisaged that the value of the <strong><code>crs_wkt</code></strong> attribute typically will be a single line of text, one intended primarily for machine processing. Other than the requirement to be a valid WKT string, the CF convention does not prescribe the content of the <strong><code>crs_wkt</code></strong> attribute since it will necessarily be context-dependent.</p>
+<p>The <strong><code>crs_wkt</code></strong> attribute should comprise a text string that conforms to the WKT syntax as
+specified in reference <a href="#OGC_CTS">[OGC_CTS]</a>. If desired the text string may contain embedded newline
+characters to aid human readability. However, any such characters are purely cosmetic and do not
+alter the meaning of the attribute value. It is envisaged that the value of the <strong><code>crs_wkt</code></strong>
+attribute typically will be a single line of text, one intended primarily for machine
+processing. Other than the requirement to be a valid WKT string, the CF convention does not
+prescribe the content of the <strong><code>crs_wkt</code></strong> attribute since it will necessarily be context-dependent.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>crs_wkt</code></strong> attribute is intended to act as a <em>supplement</em> to other single-property CF grid mapping attributes (as described in Appendix F); it is not intended to replace those attributes. If data producers omit the single-property grid mapping attributes in favour of the compound <strong><code>crs_wkt</code></strong> attribute, software which cannot interpret <strong><code>crs_wkt</code></strong> will be unable to use the grid_mapping information. Therefore the CRS should be described as thoroughly as possible with the single-property attributes as well as by <strong><code>crs_wkt</code></strong>.</p>
+<p>The <strong><code>crs_wkt</code></strong> attribute is intended to act as a <em>supplement</em> to other single-property CF grid
+mapping attributes (as described in Appendix F); it is not intended to replace those attributes. If
+data producers omit the single-property grid mapping attributes in favour of the compound
+<strong><code>crs_wkt</code></strong> attribute, software which cannot interpret <strong><code>crs_wkt</code></strong> will be unable to use the
+grid_mapping information. Therefore the CRS should be described as thoroughly as possible with the
+single-property attributes as well as by <strong><code>crs_wkt</code></strong>.</p>
 </div>
 <div class="paragraph">
-<p>There will be occasions when a given CRS property value is duplicated in both a single-property grid mapping attribute and the <strong><code>crs_wkt</code></strong> attribute. In such cases the onus is on data producers to ensure that the property values are consistent. However, in those situations where two values of a given property are different, then the value specified by the single-property attribute shall take precedence. For example, if the semi-major axis length of the ellipsoid is defined by the grid mapping attribute <strong><code>semi_major_axis</code></strong> and also by the <strong><code>crs_wkt</code></strong> attribute (via the WKT <strong><code>SPHEROID[&#8230;&#8203;]</code></strong> element) then the former, being the more specific attribute, takes precedence. Naturally if the two values are equal then no ambiguity arises.</p>
+<p>There will be occasions when a given CRS property value is duplicated in both a single-property grid
+mapping attribute and the <strong><code>crs_wkt</code></strong> attribute. In such cases the onus is on data producers to
+ensure that the property values are consistent. However, in those situations where two values of a
+given property are different, then the value specified by the single-property attribute shall take
+precedence. For example, if the semi-major axis length of the ellipsoid is defined by the grid
+mapping attribute <strong><code>semi_major_axis</code></strong> and also by the <strong><code>crs_wkt</code></strong> attribute (via the WKT
+<strong><code>SPHEROID[&#8230;&#8203;]</code></strong> element) then the former, being the more specific attribute, takes
+precedence. Naturally if the two values are equal then no ambiguity arises.</p>
 </div>
 <div class="paragraph">
-<p>Likewise, in those cases where the value of a CRS WKT element should be used consistently across the CF-netCDF community (names of projections and projection parameters, for example) then, the values shown in <a href="http://cf-pcmdi.llnl.gov/trac/wiki/Cf2CrsWkt">1</a> should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is considered to represent the definitive authority as regards CRS property names and values.</p>
+<p>Likewise, in those cases where the value of a CRS WKT element should be used consistently across the
+CF-netCDF community (names of projections and projection parameters, for example) then, the values
+shown in
+<a href="https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements" class="bare">https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements</a>
+should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is
+considered to represent the definitive authority as regards CRS property names and values.</p>
 </div>
 <div class="paragraph">
-<p>Example 5.11 illustrates how the coordinate system properties specified via the crs grid mapping variable in Example 5.10 might be expressed using a <strong><code>crs_wkt</code></strong> attribute (it also represents a slightly modified version of the WKT example shown in section 7.4 of <a href="#OGC_CTS">[OGC_CTS]</a>). For brevity only the grid mapping variable is included in this example; all other elements are as per the earlier example. Names of projection PARAMETERs follow the spellings used in the EPSG geodetic parameter registry. Example 5.11 illustrates how certain WKT elements - all of which are optional - can be used to specify CRS properties not covered by existing CF grid mapping attributes, including:</p>
+<p>Examples 5.11 and 5.12 illustrate how the coordinate system properties specified via the crs grid
+mapping variable in Examples 5.9 and 5.10 might be expressed using a <strong><code>crs_wkt</code></strong> attribute (5.12
+also represents a slightly modified version of the WKT example shown in section 7.4 of
+<a href="#OGC_CTS">[OGC_CTS]</a>). For brevity only the grid mapping variable and its grid_mapping_name and crs_wkt
+attributes are included in these examples; all other elements are as per the earlier examples.
+Names of projection PARAMETERs follow the spellings used in the EPSG geodetic parameter registry.</p>
+</div>
+<div class="paragraph">
+<p>Example 5.12 illustrates how certain WKT elements - all of which are optional - can be used to
+specify CRS properties not covered by existing CF grid mapping attributes, including:</p>
 </div>
 <div class="ulist">
 <ul>
-<li>
-<p>use of the TOWGS84 element to specify horizontal datum transformation parameters (to WGS 1984 datum)</p>
-</li>
 <li>
 <p>use of the VERT_DATUM element to specify vertical datum information</p>
 </li>
@@ -2425,14 +2482,36 @@ variables:
 </li>
 </ul>
 </div>
+<div id="latitude-and-longitude-on-the-wgs-1984-datum-in-crs-wkt-format" class="exampleblock">
+<div class="title">Example 5.11. Latitude and longitude on the WGS 1984 datum + CRS WKT</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre> ...
+  int crs ;
+    crs:grid_mapping_name = "latitude_longitude";
+    ...
+    crs:crs_wkt =
+     GEOGCS["WGS 84",
+       DATUM["WGS_1984",
+         SPHEROID["WGS 84",6378137,298.257223563]
+       ],
+       PRIMEM["Greenwich",0],
+       UNIT["degree",0.0174532925199433]]
+  ...</pre>
+</div>
+</div>
+</div>
+</div>
 <div id="british-national-grid-newlyn-datum-in-crs-wkt-format" class="exampleblock">
-<div class="title">Example 5.11. British National Grid + Newlyn Datum in CRS WKT format</div>
+<div class="title">Example 5.12. British National Grid + Newlyn Datum in CRS WKT format</div>
 <div class="content">
 <div class="literalblock">
 <div class="content">
 <pre>...
  int crs ;
    crs:grid_mapping_name = "transverse_mercator" ;
+   ...
    crs:crs_wkt = "COMPD_CS ["OSGB 1936 / British National Grid + ODN",
      PROJCS ["OSGB 1936 / British National Grid",
        GEOGCS ["OSGB 1936",
@@ -2463,10 +2542,20 @@ variables:
  ...</pre>
 </div>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre></pre>
+</div>
+</div>
 </div>
 </div>
 <div class="paragraph">
-<p>Note: To enhance readability the WKT value has been split across multiple lines and embedded quotation marks (") left unescaped - in real netCDF files such characters would need to be escaped. The WKT specification in <a href="#OGC_CTS">[OGC_CTS]</a> appears to silent be as regards which character(s) may be used to delimit text-valued properties; however, since all the examples in that specification use quotation marks, the use of that particular delimiting character is mandated by the CF convention.</p>
+<p>Note: To enhance readability the WKT value has been split across multiple lines and embedded
+quotation marks (") left unescaped - in real netCDF files such characters would need to be
+escaped. Also for clarity, we have dropped the quotation marks which would delimit the entire crs_wkt
+string.  The WKT specification in <a href="#OGC_CTS">[OGC_CTS]</a> appears to silent be as regards which character(s) may
+be used to delimit text-valued properties; however, since all the examples in that specification use
+quotation marks, the use of that particular delimiting character is mandated by the CF convention.</p>
 </div>
 </div>
 </div>
@@ -2482,7 +2571,7 @@ variables:
 <p>Once a name is used for a scalar coordinate variable it can not be used for a 1D coordinate variable. For this reason we strongly recommend against using a name for a scalar coordinate variable that matches the name of any dimension in the file.</p>
 </div>
 <div id="multiple-forecasts-from-single-analysis" class="exampleblock">
-<div class="title">Example 5.11. Multiple forecasts from a single analysis</div>
+<div class="title">Example 5.13. Multiple forecasts from a single analysis</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -3972,7 +4061,7 @@ data:
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>computed_standard_name</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#parameterized-vertical-coordinate">Section 4.3.3, "Parameterized Vertical Coordinate"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#parametric-vertical-coordinate">Section 4.3.3, "Parametric Vertical Coordinate"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Indicates the standard name, from the standard name table, of the
 computed vertical coordinate values, computed according to the
 formula in the definition.</p></td>
@@ -4038,7 +4127,7 @@ formula in the definition.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>formula_terms</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#parameterized-vertical-coordinate">Section 4.3.3, "Parameterized Vertical Coordinate"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#parametric-vertical-coordinate">Section 4.3.3, "Parametric Vertical Coordinate"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies variables that correspond to the terms in a formula.</p></td>
 </tr>
 <tr>
@@ -4378,7 +4467,7 @@ preferred to describe this type of metadata variable.</p></td>
 </div>
 </div>
 <div class="sect1">
-<h2 id="computed-v-coord"><a class="anchor" href="#computed-v-coord"></a>Appendix D: Computed Vertical Coordinates</h2>
+<h2 id="parametric-v-coord"><a class="anchor" href="#parametric-v-coord"></a>Appendix D: Parametric Vertical Coordinates</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The definitions given here allow an application to compute dimensional
@@ -5090,7 +5179,8 @@ meridian may be included, when applicable, with any grid mapping.</p>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html"><a href="http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/albers_equal_area_conic.html</a></a>.</p>
+<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at
+<a href="http://geotiff.maptools.org/proj_list/albers_equal_area_conic.html"><a href="http://geotiff.maptools.org/proj_list/albers_equal_area_conic.html" class="bare">http://geotiff.maptools.org/proj_list/albers_equal_area_conic.html</a></a>.</p>
 </dd>
 </dl>
 </div>
@@ -5129,7 +5219,10 @@ meridian may be included, when applicable, with any grid mapping.</p>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/azimuthal_equidistant.html"><a href="http://www.remotesensing.org/geotiff/proj_list/azimuthal_equidistant.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/azimuthal_equidistant.html</a></a>.</p>
+<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at
+<a href="http://geotiff.maptools.org/proj_list/azimuthal_equidistant.html"><a href="http://geotiff.maptools.org/proj_list/azimuthal_equidistant.html" class="bare">http://geotiff.maptools.org/proj_list/azimuthal_equidistant.html</a></a>
+and
+<a href="http://proj4.org/projections/aeqd.html"><a href="http://proj4.org/projections/aeqd.html" class="bare">http://proj4.org/projections/aeqd.html</a></a>.</p>
 </dd>
 </dl>
 </div>
@@ -5228,7 +5321,10 @@ meridian may be included, when applicable, with any grid mapping.</p>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html"><a href="http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/lambert_azimuthal_equal_area.html</a></a>.</p>
+<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at
+<a href="http://proj4.org/projections/laea.html"><a href="http://proj4.org/projections/laea.html" class="bare">http://proj4.org/projections/laea.html</a></a>
+and
+<a href="http://geotiff.maptools.org/proj_list/lambert_azimuthal_equal_area.html"><a href="http://geotiff.maptools.org/proj_list/lambert_azimuthal_equal_area.html" class="bare">http://geotiff.maptools.org/proj_list/lambert_azimuthal_equal_area.html</a></a></p>
 </dd>
 </dl>
 </div>
@@ -5270,7 +5366,12 @@ meridian may be included, when applicable, with any grid mapping.</p>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html"><a href="http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/lambert_conic_conformal_2sp.html</a></a>.</p>
+<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://proj4.org/projections/lcc.html"><a href="http://proj4.org/projections/lcc.html" class="bare">http://proj4.org/projections/lcc.html</a></a>.
+and
+<a href="http://geotiff.maptools.org/proj_list/lambert_conic_conformal_1sp.html"><a href="http://geotiff.maptools.org/proj_list/lambert_conic_conformal_1sp.html" class="bare">http://geotiff.maptools.org/proj_list/lambert_conic_conformal_1sp.html</a></a>
+("Lambert Conic Conformal (1SP)" or EPSG 9801) or
+<a href="http://geotiff.maptools.org/proj_list/lambert_conic_conformal_2sp.html"><a href="http://geotiff.maptools.org/proj_list/lambert_conic_conformal_2sp.html" class="bare">http://geotiff.maptools.org/proj_list/lambert_conic_conformal_2sp.html</a></a>
+ ("Lambert Conic Conformal (2SP)" or EPSG 9802). For the 1SP variant, latitude_of_projection_origin=standard_parallel and the PROJ.4 scale factor is 1.</p>
 </dd>
 </dl>
 </div>
@@ -5292,7 +5393,7 @@ meridian may be included, when applicable, with any grid mapping.</p>
 <p><strong><code>longitude_of_central_meridian</code></strong></p>
 </li>
 <li>
-<p>Either <strong><code>standard_parallel</code></strong> or <strong><code>scale_factor_at_projection_origin</code></strong></p>
+<p>Either <strong><code>standard_parallel</code></strong> or <strong><code>scale_factor_at_projection_origin</code></strong> (deprecated)</p>
 </li>
 <li>
 <p><strong><code>false_easting</code></strong></p>
@@ -5309,7 +5410,9 @@ meridian may be included, when applicable, with any grid mapping.</p>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the PROJ.4 software packages for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/cylindrical_equal_area.html"><a href="http://www.remotesensing.org/geotiff/proj_list/cylindrical_equal_area.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/cylindrical_equal_area.html</a></a> ("Lambert Cylindrical Equal Area" or EPSG 9834 or EPSG 9835). Detailed formulas can be found in <a href="#Snyder">[Snyder]</a> pages 76-85.</p>
+<p>Notes on using the PROJ.4 software packages for computing the mapping may be found at
+<a href="http://geotiff.maptools.org/proj_list/cylindrical_equal_area.html"><a href="http://geotiff.maptools.org/proj_list/cylindrical_equal_area.html" class="bare">http://geotiff.maptools.org/proj_list/cylindrical_equal_area.html</a></a>
+("Lambert Cylindrical Equal Area" or EPSG 9834 or EPSG 9835). Detailed formulas can be found in <a href="#Snyder">[Snyder]</a> pages 76-85.</p>
 </dd>
 </dl>
 </div>
@@ -5373,7 +5476,14 @@ identified by the usual conventions
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the PROJ.4 software packages for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html"><a href="http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/mercator_1sp.html</a></a> ("Mercator (1SP)" or EPSG 9804) or <a href="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html"><a href="http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/mercator_2sp.html</a></a> ("Mercator (2SP)" or EPSG 9805).</p>
+<p>Notes on using the PROJ.4 software packages for computing the mapping may be found at
+<a href="http://proj4.org/projections/merc.html"><a href="http://proj4.org/projections/merc.html" class="bare">http://proj4.org/projections/merc.html</a></a>
+and
+<a href="http://geotiff.maptools.org/proj_list/mercator_1sp.html"><a href="http://geotiff.maptools.org/proj_list/mercator_1sp.html" class="bare">http://geotiff.maptools.org/proj_list/mercator_1sp.html</a></a>
+("Mercator (1SP)" or EPSG 9804)
+or
+<a href="http://geotiff.maptools.org/proj_list/mercator_2sp.html"><a href="http://geotiff.maptools.org/proj_list/mercator_2sp.html" class="bare">http://geotiff.maptools.org/proj_list/mercator_2sp.html</a></a>
+("Mercator (2SP)" or EPSG 9805).</p>
 <div class="paragraph">
 <p>More information on formulas available in <a href="#OGP-EPSG_GN7_2">[OGP-EPSG_GN7_2]</a>.</p>
 </div>
@@ -5421,7 +5531,11 @@ identified by the usual conventions
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/oblique_mercator.html"><a href="http://www.remotesensing.org/geotiff/proj_list/" class="bare">http://www.remotesensing.org/geotiff/proj_list/</a> oblique_mercator.html</a>. The Rotated Mercator projection is an Oblique Mercator projection with azimuth = +90.</p>
+<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at
+<a href="http://proj4.org/projections/omerc.html"><a href="http://proj4.org/projections/omerc.html" class="bare">http://proj4.org/projections/omerc.html</a></a>
+and
+<a href="http://geotiff.maptools.org/proj_list/oblique_mercator.html"><a href="http://geotiff.maptools.org/proj_list/oblique_mercator.html" class="bare">http://geotiff.maptools.org/proj_list/oblique_mercator.html</a></a>.
+The Rotated Mercator projection is an Oblique Mercator projection with azimuth = +90.</p>
 </dd>
 </dl>
 </div>
@@ -5460,7 +5574,11 @@ identified by the usual conventions
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the PROJ.4 software packages for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/orthographic.html"><a href="http://www.remotesensing.org/geotiff/proj_list/orthographic.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/orthographic.html</a></a> ("Orthographic" or EPSG 9840).</p>
+<p>Notes on using the PROJ.4 software packages for computing the mapping may be found at
+<a href="http://proj4.org/projections/ortho.html"><a href="http://proj4.org/projections/ortho.html" class="bare">http://proj4.org/projections/ortho.html</a></a>
+and
+<a href="http://geotiff.maptools.org/proj_list/orthographic.html"><a href="http://geotiff.maptools.org/proj_list/orthographic.html" class="bare">http://geotiff.maptools.org/proj_list/orthographic.html</a></a>
+("Orthographic" or EPSG 9840).</p>
 <div class="paragraph">
 <p>More information on formulas available in <a href="#OGP-EPSG_GN7_2">[OGP-EPSG_GN7_2]</a>.</p>
 </div>
@@ -5488,7 +5606,7 @@ identified by the usual conventions
 <p><strong><code>latitude_of_projection_origin</code></strong> - Either +90. or -90.</p>
 </li>
 <li>
-<p>Either <strong><code>standard_parallel</code></strong> or <strong><code>scale_factor_at_projection_origin</code></strong></p>
+<p>Either <strong><code>standard_parallel</code></strong> (EPSG 9829) or <strong><code>scale_factor_at_projection_origin</code></strong> (EPSG 9810)</p>
 </li>
 <li>
 <p><strong><code>false_easting</code></strong></p>
@@ -5505,9 +5623,15 @@ identified by the usual conventions
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html"><a href="http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/polar_stereographic.html</a></a>.</p>
+<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://geotiff.maptools.org/proj_list/polar_stereographic.html"><a href="http://geotiff.maptools.org/proj_list/polar_stereographic.html" class="bare">http://geotiff.maptools.org/proj_list/polar_stereographic.html</a></a></p>
 </dd>
 </dl>
+</div>
+<div class="paragraph">
+<p>The standard_parallel variant corresponds to EPSG Polar Stereographic (Variant B) (EPSG dataset coordinate operation method code 9829),
+while the scale_factor_at_projection_origin variant corresponds to EPSG Polar Stereographic (Variant A)
+(EPSG dataset coordinate operation method code 9810).
+As PROJ.4 requires the standard parallel, [Snyder] formula 21-7 can be used to compute it from the scale factor if needed.</p>
 </div>
 </div>
 <div class="sect2">
@@ -5577,7 +5701,11 @@ identified by the usual conventions
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/sinusoidal.html"><a href="http://www.remotesensing.org/geotiff/proj_list/sinusoidal.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/sinusoidal.html</a></a>. Detailed formulas can be found in <a href="#Snyder">[Snyder]</a>, pages 243-248.</p>
+<p>Notes on using the <strong><code>PROJ.4</code></strong> software package for computing the mapping may be found at
+<a href="http://proj4.org/projections/sinu.html"><a href="http://proj4.org/projections/sinu.html" class="bare">http://proj4.org/projections/sinu.html</a></a>
+and
+<a href="http://geotiff.maptools.org/proj_list/sinusoidal.html"><a href="http://geotiff.maptools.org/proj_list/sinusoidal.html" class="bare">http://geotiff.maptools.org/proj_list/sinusoidal.html</a></a>.
+Detailed formulas can be found in <a href="#Snyder">[Snyder]</a>, pages 243-248.</p>
 </dd>
 </dl>
 </div>
@@ -5619,7 +5747,11 @@ identified by the usual conventions
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Formulas for the mapping and its inverse along with notes on using the <strong><code>PROJ.4</code></strong> software package for doing the calcuations may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/stereographic.html"><a href="http://www.remotesensing.org/geotiff/proj_list/stereographic.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/stereographic.html</a></a> . See the section "Polar stereographic" for the special case when the projection origin is one of the poles.</p>
+<p>Formulas for the mapping and its inverse along with notes on using the <strong><code>PROJ.4</code></strong> software package for doing the calcuations may be found at
+<a href="http://proj4.org/projections/stere.html"><a href="http://proj4.org/projections/stere.html" class="bare">http://proj4.org/projections/stere.html</a></a>
+and
+<a href="http://geotiff.maptools.org/proj_list/stereographic.html"><a href="http://geotiff.maptools.org/proj_list/stereographic.html" class="bare">http://geotiff.maptools.org/proj_list/stereographic.html</a></a>.
+See the section "Polar stereographic" for the special case when the projection origin is one of the poles.</p>
 </dd>
 </dl>
 </div>
@@ -5661,7 +5793,10 @@ identified by the usual conventions
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>Formulas for the mapping and its inverse along with notes on using the <strong><code>PROJ.4</code></strong> software package for doing the calcuations may be found at <a href="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html"><a href="http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html" class="bare">http://www.remotesensing.org/geotiff/proj_list/transverse_mercator.html</a></a>.</p>
+<p>Formulas for the mapping and its inverse along with notes on using the <strong><code>PROJ.4</code></strong> software package for doing the calcuations may be found at
+<a href="http://proj4.org/projections/tmerc.html"><a href="http://proj4.org/projections/tmerc.html" class="bare">http://proj4.org/projections/tmerc.html</a></a>
+and
+<a href="http://geotiff.maptools.org/proj_list/transverse_mercator.html"><a href="http://geotiff.maptools.org/proj_list/transverse_mercator.html" class="bare">http://geotiff.maptools.org/proj_list/transverse_mercator.html</a></a>.</p>
 </dd>
 </dl>
 </div>
@@ -5779,6 +5914,12 @@ to a reference direction.</p></td>
     standard name <strong><code>projection_y_coordinate</code></strong>.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>geographic_crs_name</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the geographic coordinate reference system.
+    Corresponds to a OGC WKT GEOGCS node name.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>geoid_name</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the estimate or model of the geoid being used as a datum,
@@ -5810,6 +5951,23 @@ to a reference direction.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">True longitude (degrees_east) of the north pole of the rotated grid.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>horizontal_datum_name</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the geodetic (horizontal) datum, which corresponds to the
+     procedure used to measure positions on the surface of the Earth. Valid datum
+     names and their associated parameters are given in
+     <a href="https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements" class="bare">https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements</a>
+     (horiz_datum.csv, OGC_DATUM_NAME column)
+     and are
+     obtained by transforming the EPSG name using the following rules (used by OGR
+     and Cadcorp): convert all non alphanumeric characters (including +) to underscores,
+     then strip any leading, trailing or repeating underscores. This is to ensure that
+     named datums can be correctly identified for precise datum transformations
+     (see <a href="https://github.com/cf-convention/cf-conventions/wiki/OGC-WKT-Coordinate-System-Issues" class="bare">https://github.com/cf-convention/cf-conventions/wiki/OGC-WKT-Coordinate-System-Issues</a> for
+      more details).
+     Corresponds to a OGC WKT DATUM node name.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>inverse_flattening</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Used to specify the <em>inverse</em> flattening
@@ -5829,16 +5987,16 @@ to a reference direction.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>latitude_of_projection_origin</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The latitude chosen as the origin of rectangular coordinates for a
-    map projection.
-    Domain: <strong><code>-90.0 &lt;= latitude_of_projection_origin &lt;= 90.0</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The latitude (degrees_north) chosen as the origin of rectangular
+     coordinates for a map projection.
+     Domain: <strong><code>-90.0 &#x2264; latitude_of_projection_origin &#x2264; 90.0</code></strong></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>longitude_of_central_meridian</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The line of longitude at the center of a map projection generally used
-    as the basis for constructing the projection.
-    Domain: <strong><code>-180.0 &lt;= longitude_of_central_meridian &lt; 180.0</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The line of longitude (degrees_east) at the center of a map projection
+    generally used as the basis for constructing the projection.
+    Domain: <strong><code>-180.0 &#x2264; longitude_of_central_meridian &lt; 180.0</code></strong></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>longitude_of_prime_meridian</code></strong></p></td>
@@ -5849,16 +6007,16 @@ to a reference direction.</p></td>
     confused with the projection origin longitude
     (cf. <strong><code>longitude_of_projection_origin</code></strong>, a.k.a. central
     meridian) which defines the longitude of the map projection origin.
-    Domain: <strong><code>-180.0 &lt;= longitude_of_prime_meridian &lt; 180.0</code></strong>
+    Domain: <strong><code>-180.0 &le; longitude_of_prime_meridian &lt; 180.0</code></strong>
     decimal degrees.
     Default = <strong><code>0.0</code></strong></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>longitude_of_projection_origin</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The longitude chosen as the origin of rectangular coordinates for a
-    map projection.
-    Domain: <strong><code>-180.0 &lt;= longitude_of_projection_origin &lt; 180.0</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The longitude (degrees_east) chosen as the origin of rectangular
+    coordinates for a map projection.
+    Domain: <strong><code>-180.0 &le; longitude_of_projection_origin &lt; 180.0</code></strong></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>north_pole_grid_longitude</code></strong></p></td>
@@ -5873,6 +6031,28 @@ to a reference direction.</p></td>
     by perspective-type map projections, for example the Vertical
     Perspective Projection, which may be used to simulate the view from
     a Meteosat satellite.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>prime_meridian_name</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the prime meridian associated with the geodetic datum. Valid
+    names are given in
+   <a href="https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements" class="bare">https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements</a>
+   (prime_meridian.csv). Corresponds to a OGC WKT PRIMEM node name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>projected_crs_name</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the projected coordinate reference system. Corresponds
+    to a OGC WKT PROJCS node name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>reference_ellipsoid_name</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the reference ellipsoid. Valid names are given in
+   <a href="https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements" class="bare">https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements</a>
+   (ellipsoid.csv).
+   Corresponds to a OGC WKT SPHEROID node name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>scale_factor_at_central_meridian</code></strong></p></td>
@@ -5928,11 +6108,38 @@ to a reference direction.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>straight_vertical_longitude_from_pole</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The longitude to be oriented straight up from the North or South Pole.
-    Domain: <strong><code>-180.0 &lt;= straight_vertical_longitude_from_pole &lt; 180.0</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The longitude (degrees_east) to be oriented straight up from the North or
+    South Pole. Domain: <strong><code>-180.0 &le; straight_vertical_longitude_from_pole&lt; 180.0</code></strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>towgs84</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">This indicates a list of up
+     to 7 Bursa Wolf transformation parameters., which can be used to approximate a
+     transformation from the horizontal datum to the WGS84 datum. More precise datum
+     transformations can be done with datum shift grids. Represented as a double-precision
+     array, with 3, 6 or 7 values (if there are less than 7 values the remaining are
+     considered to be zero). Corresponds to a OGC WKT TOWGS84 node.</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>Notes:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The various <strong><code>*_name</code></strong> attributes are optional but recommended when
+known as they allow for a better description and interoperability with WKT
+definitions.</p>
+</li>
+<li>
+<p><strong><code>reference_ellipsoid_name</code></strong>, <strong><code>prime_meridian_name</code></strong>,
+<strong><code>horizontal_datum_name</code></strong> and <strong><code>geographic_crs_name</code></strong> must be all defined if any one
+ is defined, and if <strong><code>projected_crs_name</code></strong> is defined then <strong><code>geographic_crs_name</code></strong> must be also.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 </div>
@@ -7482,7 +7689,7 @@ to a reference direction.</p></td>
 <p><a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a> : Added note that use of scalar coordinate variables inhibits interoperability with COARDS conforming applications.</p>
 </li>
 <li>
-<p><a href="#multiple-forecasts-from-single-analysis">Example 5.11, "Multiple forecasts from a single analysis"</a> : Added <strong><code>positive</code></strong> attribute to the scalar coordinate p500 to make it unambiguous that the pressure is a vertical coordinate value.</p>
+<p><a href="#multiple-forecasts-from-single-analysis">Example 5.13, "Multiple forecasts from a single analysis"</a> : Added <strong><code>positive</code></strong> attribute to the scalar coordinate p500 to make it unambiguous that the pressure is a vertical coordinate value.</p>
 </li>
 </ol>
 </div>
@@ -7807,6 +8014,24 @@ Replaced first para in Section 9.6. "Missing Data". Added verbiage to Section 2.
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">09 March 2017</div>
+<ol class="arabic">
+<li>
+<p>Ticket #75, fix documentation and definitions of 3 grid mapping definitions</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic">
+<div class="title">14 March 2017</div>
+<ol class="arabic">
+<li>
+<p>Ticket #80, added attributes to AppF Table F1, geographic_crs_name, horizontal_datum_name, latitude_of_projection_origin,
+longitude_of_central_meridian, longitude_of_projection_origin, prime_meridian_name, projected_crs_name, reference_ellipsoid_name,
+straight_vertical_longitude_from_pole and notes to the end of table.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -7872,7 +8097,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-03-09 22:31:57 UTC
+Last updated 2017-03-27 17:13:26 UTC
 </div>
 </div>
 </body>
