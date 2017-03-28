@@ -554,7 +554,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#discrete-sampling-geometries">9. Discrete Sampling Geometries</a>
 <ul class="sectlevel2">
 <li><a href="#_features_and_feature_types">9.1. Features and feature types</a></li>
-<li><a href="#_collections_instances_and_elements">9.2. Collections, instances and elements</a></li>
+<li><a href="#collections-instances-elements">9.2. Collections, instances and elements</a></li>
 <li><a href="#representations-features">9.3. Representations of collections of features in data variables</a>
 <ul class="sectlevel3">
 <li><a href="#_orthogonal_multidimensional_array_representation">9.3.1. Orthogonal multidimensional array representation</a></li>
@@ -920,7 +920,10 @@ use CDL syntax.</p>
 </dd>
 <dt class="hdlist1">scalar coordinate variable</dt>
 <dd>
-<p>A scalar variable that contains coordinate data. Functionally equivalent to either a size one coordinate variable or a size one auxiliary coordinate variable.</p>
+<p>A scalar variable (i.e. one with no dimensions) that contains
+coordinate data. Depending on context, it may be functionally equivalent either to a size-one
+coordinate variable (<a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a>) or to a size-one auxiliary coordinate
+variable (<a href="#labels">Section 6.1, "Labels"</a> and <a href="#collections-instances-elements">Section 9.2, "Collections, instances, and elements"</a>).</p>
 </dd>
 <dt class="hdlist1">spatiotemporal dimension</dt>
 <dd>
@@ -2565,13 +2568,16 @@ quotation marks, the use of that particular delimiting character is mandated by 
 <div class="sect2">
 <h3 id="scalar-coordinate-variables"><a class="anchor" href="#scalar-coordinate-variables"></a>5.7. Scalar Coordinate Variables</h3>
 <div class="paragraph">
-<p>When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable. Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the <strong><code>coordinates</code></strong> attribute.</p>
+<p>When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable (i.e. a data variable which has no netCDF dimensions). Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the <strong><code>coordinates</code></strong> attribute.</p>
 </div>
 <div class="paragraph">
-<p>Under COARDS the method of providing a single valued coordinate was to add a dimension of size one to the variable, and supply the corresponding coordinate variable. The new scalar coordinate variable is a convenience feature which avoids adding size one dimensions to variables. Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable. Note however that use of this feature with a latitude, longitude, vertical, or time coordinate will inhibit COARDS conforming applications from recognizing them.</p>
+<p>The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1).</p>
 </div>
 <div class="paragraph">
 <p>Once a name is used for a scalar coordinate variable it can not be used for a 1D coordinate variable. For this reason we strongly recommend against using a name for a scalar coordinate variable that matches the name of any dimension in the file.</p>
+</div>
+<div class="paragraph">
+<p>If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (this might be the case, for instance, for time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.</p>
 </div>
 <div id="multiple-forecasts-from-single-analysis" class="exampleblock">
 <div class="title">Example 5.13. Multiple forecasts from a single analysis</div>
@@ -2640,11 +2646,12 @@ string array. An application processing the variables listed in the
 <strong><code>coordinates</code></strong> attribute can recognize a string-valued auxiliary
 coordinate variable because it contains an array of character data. The
 inner dimension (last dimension in CDL terms) is the maximum length of
-each string, and the other dimensions are axis dimensions. If a
-character variable has only one dimension (the maximum length of the
-string), it is regarded as a string-valued scalar coordinate variable,
-analogous to a numeric scalar coordinate variable (see
-<a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a>).</p>
+each string, and the other dimensions are axis dimensions. If a string-valued
+auxiliary coordinate variable has only one dimension (the maximum length of the string),
+it is a string-valued scalar coordinate variable (see <a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a>).
+As such, it has the same information content and can be used in the same contexts as a
+string-valued auxiliary coordinate variable of a size one dimension which has not been added
+to the data variable. This is a convenience feature.</p>
 </div>
 <div class="sect3">
 <h4 id="geographic-regions"><a class="anchor" href="#geographic-regions"></a>6.1.1. Geographic Regions</h4>
@@ -3546,7 +3553,7 @@ data:
 </div>
 </div>
 <div class="sect2">
-<h3 id="_collections_instances_and_elements"><a class="anchor" href="#_collections_instances_and_elements"></a>9.2. Collections, instances and elements</h3>
+<h3 id="collections-instances-elements"><a class="anchor" href="#collections-instances-elements"></a>9.2. Collections, instances and elements</h3>
 <div class="paragraph">
 <p>In Table 9.1 the dimension with subscript i identifies a particular feature within a collection of features. It is called the <strong>instance dimension</strong> . One-dimensional variables in a Discrete Geometry CF file, which have <em>only</em> this dimension (such as x(i), y(i) and z(i) for a timeseries), are <strong>instance variables</strong> . Instance variables provide the metadata that differentiates individual features.</p>
 </div>
@@ -8049,7 +8056,10 @@ Replaced first para in Section 9.6. "Missing Data". Added verbiage to Section 2.
 <div class="title">28 March 2017</div>
 <ol class="arabic">
 <li>
-<p>Ticket #102, additional cell_methods</p>
+<p>Ticket #102, additional cell_methods, changes in Appendix E and section 7.3</p>
+</li>
+<li>
+<p>Ticket #104, Clarify the interpretation of scalar coordinate variables, changes in sections 5.7 and 6.1</p>
 </li>
 </ol>
 </div>
@@ -8118,7 +8128,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-03-28 18:13:14 UTC
+Last updated 2017-03-28 20:01:48 UTC
 </div>
 </div>
 </body>
