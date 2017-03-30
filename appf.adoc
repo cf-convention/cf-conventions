@@ -430,18 +430,29 @@ to a reference direction.
     which is the radius of the GRS 1980 Authalic Sphere.
 
 | **`false_easting`** | N
-| The value added to all abscissa values in the rectangular
-    coordinates for a map projection. This value frequently
-    is assigned to eliminate negative numbers. Expressed in
+|  Applied to all abscissa values in the rectangular
+    coordinates for a map projection in order to eliminate negative numbers. Expressed in
     the unit of the coordinate variable identified by the
     standard name **`projection_x_coordinate`**.
+    The formula to convert from the coordinate value as written in the **`projection_x_coordinate`**
+    (xf) to a value (x0) used in a transformation without **`false_easting`**, i.e. **`false_easting`**= 0, is:
+    x0 = xf -**`false_easting`**
+
+
 
 | **`false_northing`** | N
-| The value added to all ordinate values in the rectangular
-    coordinates for a map projection. This value frequently
-    is assigned to eliminate negative numbers. Expressed in
+|  Applied to all ordinate values in the rectangular
+    coordinates for a map projection in order to eliminate negative numbers. Expressed in
     the unit of the coordinate variable identified by the
     standard name **`projection_y_coordinate`**.
+    The formula to convert from the coordinate value as written in the **`projection_y_coordinate`**
+    (yf) to a value (y0) used in a transformation without **`false_northing`**, i.e. **`false_northing`**= 0, is:
+    y0 = yf -**`false_northing`**
+
+
+| **`geographic_crs_name`** | S
+| The name of the geographic coordinate reference system. 
+    Corresponds to a OGC WKT GEOGCS node name.
 
 | **`geoid_name`** | S
 | The name of the estimate or model of the geoid being used as a datum, 
@@ -465,6 +476,21 @@ to a reference direction.
 | **`grid_north_pole_longitude`** | N
 | True longitude (degrees_east) of the north pole of the rotated grid.
 
+| **`horizontal_datum_name`** | S
+|  The name of the geodetic (horizontal) datum, which corresponds to the 
+     procedure used to measure positions on the surface of the Earth. Valid datum 
+     names and their associated parameters are given in
+     https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
+     (horiz_datum.csv, OGC_DATUM_NAME column)
+     and are 
+     obtained by transforming the EPSG name using the following rules (used by OGR 
+     and Cadcorp): convert all non alphanumeric characters (including +) to underscores, 
+     then strip any leading, trailing or repeating underscores. This is to ensure that 
+     named datums can be correctly identified for precise datum transformations  
+     (see https://github.com/cf-convention/cf-conventions/wiki/OGC-WKT-Coordinate-System-Issues for
+      more details).
+     Corresponds to a OGC WKT DATUM node name.
+
 | **`inverse_flattening`** | N
 | Used to specify the __inverse__ flattening
     (__1/f__) of the ellipsoidal figure
@@ -481,14 +507,17 @@ to a reference direction.
     aforementioned formula.)
 
 | **`latitude_of_projection_origin`** | N
-| The latitude chosen as the origin of rectangular coordinates for a
-    map projection.
-    Domain: **`-90.0 &lt;= latitude_of_projection_origin &lt;= 90.0`**
+| The latitude (degrees_north) chosen as the origin of rectangular
+     coordinates for a map projection. 
+// The following line shows how to insert Unicode for <=.  A plain '<=' turns into an arrow.
+// An alternative is to use HTML <=, as &le;
+     Domain: **`-90.0 &#x2264; latitude_of_projection_origin &#x2264; 90.0`**
 
 | **`longitude_of_central_meridian`** | N
-| The line of longitude at the center of a map projection generally used
-    as the basis for constructing the projection.
-    Domain: **`-180.0 &lt;= longitude_of_central_meridian &lt; 180.0`**
+| The line of longitude (degrees_east) at the center of a map projection 
+    generally used as the basis for constructing the projection. 
+    Domain: **`-180.0 &#x2264; longitude_of_central_meridian < 180.0`**
+
 
 | **`longitude_of_prime_meridian`** | N
 | Specifies the longitude, with respect to Greenwich, of the prime
@@ -497,17 +526,19 @@ to a reference direction.
     confused with the projection origin longitude
     (cf. **`longitude_of_projection_origin`**, a.k.a. central
     meridian) which defines the longitude of the map projection origin.
-    Domain: **`-180.0 &lt;= longitude_of_prime_meridian &lt; 180.0`**
+    Domain: **`-180.0 &le; longitude_of_prime_meridian &lt; 180.0`**
     decimal degrees.
     Default = **`0.0`**
 
 | **`longitude_of_projection_origin`** | N
-| The longitude chosen as the origin of rectangular coordinates for a
-    map projection.
-    Domain: **`-180.0 &lt;= longitude_of_projection_origin &lt; 180.0`**
+| The longitude (degrees_east) chosen as the origin of rectangular 
+    coordinates for a map projection.  
+    Domain: **`-180.0 &le; longitude_of_projection_origin < 180.0`**
+
 
 | **`north_pole_grid_longitude`** | N
 | Longitude (degrees) of the true north pole in the rotated grid.
+
 
 | **`perspective_point_height`** | N
 | Records the height, __in metres__, of the map
@@ -515,6 +546,26 @@ to a reference direction.
     by perspective-type map projections, for example the Vertical
     Perspective Projection, which may be used to simulate the view from
     a Meteosat satellite.
+
+
+| **`prime_meridian_name`** | S
+| The name of the prime meridian associated with the geodetic datum. Valid 
+    names are given in
+   https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
+   (prime_meridian.csv). Corresponds to a OGC WKT PRIMEM node name.
+
+
+|**`projected_crs_name`** | S
+| The name of the projected coordinate reference system. Corresponds 
+    to a OGC WKT PROJCS node name.
+
+
+| **`reference_ellipsoid_name`** | S
+| The name of the reference ellipsoid. Valid names are given in 
+   https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
+   (ellipsoid.csv). 
+   Corresponds to a OGC WKT SPHEROID node name.
+
 
 | **`scale_factor_at_central_meridian`** | N
 | A multiplier for reducing a distance obtained from a map by
@@ -559,7 +610,26 @@ to a reference direction.
     Domain: **`-90.0 &lt;= standard_parallel &lt;= 90.0`**
 
 | **`straight_vertical_longitude_from_pole`** | N
-| The longitude to be oriented straight up from the North or South Pole.
-    Domain: **`-180.0 &lt;= straight_vertical_longitude_from_pole &lt; 180.0`**
+| The longitude (degrees_east) to be oriented straight up from the North or 
+    South Pole. Domain: **`-180.0 &le; straight_vertical_longitude_from_pole< 180.0`**
+
+| **`towgs84`** | N
+|   This indicates a list of up 
+     to 7 Bursa Wolf transformation parameters., which can be used to approximate a 
+     transformation from the horizontal datum to the WGS84 datum. More precise datum 
+     transformations can be done with datum shift grids. Represented as a double-precision 
+     array, with 3, 6 or 7 values (if there are less than 7 values the remaining are 
+     considered to be zero). Corresponds to a OGC WKT TOWGS84 node.
+
 |===============
+
+Notes:
+
+. The various **`*_name`** attributes are optional but recommended when 
+known as they allow for a better description and interoperability with WKT 
+definitions.
+. **`reference_ellipsoid_name`**, **`prime_meridian_name`**, 
+**`horizontal_datum_name`** and **`geographic_crs_name`** must be all defined if any one
+ is defined, and if **`projected_crs_name`** is defined then **`geographic_crs_name`** must be also.
+
 

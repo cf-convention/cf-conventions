@@ -186,7 +186,20 @@ _This section has been superseded by the treatment of time series as a type of d
 [[grid-mappings-and-projections, Section 5.6, "Horizontal Coordinate Reference Systems, Grid Mappings, and Projections"]]
 === Horizontal Coordinate Reference Systems, Grid Mappings, and Projections
 
-When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the **`coordinates`** attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, the attribute **`grid_mapping`** may be used to supply this description. This attribute is attached to data variables so that variables with different mappings may be present in a single file. The attribute takes a string value which is the name of another variable in the file that provides the description of the mapping via a collection of attached attributes. This variable is called __a grid mapping variable__ and is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is **`grid_mapping_name`** which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of **`grid_mapping_name`**. The valid values of **`grid_mapping_name`** along with the attributes that provide specific map parameter values are described in <<appendix-grid-mappings>>.
+When the coordinate variables for a horizontal grid are not longitude and latitude, it is required
+that the true latitude and longitude coordinates be supplied via the **`coordinates`** attribute. If
+in addition it is desired to describe the mapping between the given coordinate variables and the
+true latitude and longitude coordinates, the attribute **`grid_mapping`** may be used to supply this
+description. This attribute is attached to data variables so that variables with different mappings
+may be present in a single file. The attribute takes a string value which is the name of another
+variable in the file that provides the description of the mapping via a collection of attached
+attributes. This variable is called __a grid mapping variable__ and is of arbitrary type since it
+contains no data. Its purpose is to act as a container for the attributes that define the
+mapping. The one attribute that all grid mapping variables must have is **`grid_mapping_name`**
+which takes a string value that contains the mapping's name. The other attributes that define a
+specific mapping depend on the value of **`grid_mapping_name`**. The valid values of
+**`grid_mapping_name`** along with the attributes that provide specific map parameter values are
+described in <<appendix-grid-mappings>>.
 
 The `grid_mapping` variable may identify datums (such as the reference
 ellipsoid, the geoid or the prime meridian) for horizontal or vertical
@@ -296,7 +309,6 @@ An application can determine that `x` and `y` are the projection coordinates by 
 [caption="Example 5.8. "]
 .Latitude and longitude on a spherical Earth
 ====
-
 ----
 
 dimensions:
@@ -315,16 +327,12 @@ variables:
     crs:inverse_flattening = 0 ;
       
 ----
-
-
 ====
-
 
 [[latitude-and-longitude-on-the-wgs-1984-datum]]
 [caption="Example 5.9. "]
 .Latitude and longitude on the WGS 1984 datum
 ====
-
 ----
 
 dimensions:
@@ -344,8 +352,7 @@ variables:
     crs:inverse_flattening = 298.257223563 ;
       
 ----
-
-
+//    crs:crs_wkt = "GEOGCS[\"WGS 84\", DATUM[\"WGS_1984\", SPHEROID[\"WGS 84\",6378137,298.257223563]], PRIMEM[\"Greenwich\",0], UNIT[\"degree\",0.0174532925199433]]"
 ====
 
 
@@ -353,7 +360,6 @@ variables:
 [caption="Example 5.10. "]
 .British National Grid
 ====
-
 ----
 
 dimensions:
@@ -376,19 +382,24 @@ variables:
     temp:coordinates = "lat lon" ;
     temp:grid_mapping = "crs" ;
   int crs ;
-    crs:grid_mapping_name = "transverse_mercator";
+    crs:grid_mapping_name = "transverse_mercator" ;
+    crs:longitude_of_central_meridian = -2. ;
+    crs:false_easting = 400000. ;
+    crs:false_northing = -100000. ;
+    crs:latitude_of_projection_origin = 49. ;
+    crs:scale_factor_at_central_meridian = 0.9996012717 ;
+    crs:longitude_of_prime_meridian = 0. ;
     crs:semi_major_axis = 6377563.396 ;
-    crs:semi_minor_axis = 6356256.910 ;
-    crs:inverse_flattening = 299.3249646 ;
-    crs:latitude_of_projection_origin = 49.0 ;
-    crs:longitude_of_projection_origin = -2.0 ;
-    crs:false_easting = 400000.0 ;
-    crs:false_northing = -100000.0 ;
-    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+    crs:inverse_flattening = 299.324964600004 ;
+    crs:projected_coordinate_system_name = "OSGB 1936 / British National Grid" ;
+    crs:geographic_coordinate_system_name = "OSGB 1936" ;
+    crs:horizontal_datum_name = "OSGB_1936" ;
+    crs:reference_ellipsoid_name = "Airy 1830" ;
+    crs:prime_meridian_name = "Greenwich" ;
+    crs:towgs84 = 375., -111., 431., 0., 0., 0., 0. ;
       
 ----
-
-
+//    crs:crs_wkt = "PROJCS[\"OSGB 1936 / British National Grid\", GEOGCS[\"OSGB 1936\", DATUM[\"OSGB_1936\", SPHEROID[\"Airy 1830\",6377563.396,299.3249646000044], TOWGS84[375,-111,431,0,0,0,0]], PRIMEM[\"Greenwich\",0], UNIT[\"degree\",0.0174532925199433]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"latitude_of_origin\",49], PARAMETER[\"central_meridian\",-2], PARAMETER[\"scale_factor\",0.9996012717], PARAMETER[\"false_easting\",400000], PARAMETER[\"false_northing\",-100000], UNIT[\"metre\",1]]"
 ====
 
 
@@ -397,19 +408,57 @@ variables:
 [[use-of-the-crs-well-known-text-format, Section 5.6.1, "Use of the CRS Well-known Text Format"]]
 ==== Use of the CRS Well-known Text Format
 
-An optional grid mapping attribute called **`crs_wkt`** may be used to specify multiple coordinate system properties in so-called __well-known text__ format (usually abbreviated to CRS WKT or OGC WKT). The CRS WKT format is widely recognised and used within the geoscience software community. As such it represents a versatile mechanism for encoding information about a variety of coordinate reference system parameters in a highly compact notational form.
+An optional grid mapping attribute called **`crs_wkt`** may be used to specify multiple coordinate
+system properties in so-called __well-known text__ format (usually abbreviated to CRS WKT or OGC
+WKT). The CRS WKT format is widely recognised and used within the geoscience software community. As
+such it represents a versatile mechanism for encoding information about a variety of coordinate
+reference system parameters in a highly compact notational form.  The translation of CF coordinate
+variables to/from OGC Well-Known Text (WKT) format is shown in Examples 5.11 and 5.12 below and
+described in detail in
+https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements.
 
-The **`crs_wkt`** attribute should comprise a text string that conforms to the WKT syntax as specified in reference <<OGC_CTS>>. If desired the text string may contain embedded newline characters to aid human readability. However, any such characters are purely cosmetic and do not alter the meaning of the attribute value. It is envisaged that the value of the **`crs_wkt`** attribute typically will be a single line of text, one intended primarily for machine processing. Other than the requirement to be a valid WKT string, the CF convention does not prescribe the content of the **`crs_wkt`** attribute since it will necessarily be context-dependent.
+The **`crs_wkt`** attribute should comprise a text string that conforms to the WKT syntax as
+specified in reference <<OGC_CTS>>. If desired the text string may contain embedded newline
+characters to aid human readability. However, any such characters are purely cosmetic and do not
+alter the meaning of the attribute value. It is envisaged that the value of the **`crs_wkt`**
+attribute typically will be a single line of text, one intended primarily for machine
+processing. Other than the requirement to be a valid WKT string, the CF convention does not
+prescribe the content of the **`crs_wkt`** attribute since it will necessarily be context-dependent.
 
-The **`crs_wkt`** attribute is intended to act as a _supplement_ to other single-property CF grid mapping attributes (as described in Appendix F); it is not intended to replace those attributes. If data producers omit the single-property grid mapping attributes in favour of the compound **`crs_wkt`** attribute, software which cannot interpret **`crs_wkt`** will be unable to use the grid_mapping information. Therefore the CRS should be described as thoroughly as possible with the single-property attributes as well as by **`crs_wkt`**.
+The **`crs_wkt`** attribute is intended to act as a _supplement_ to other single-property CF grid
+mapping attributes (as described in Appendix F); it is not intended to replace those attributes. If
+data producers omit the single-property grid mapping attributes in favour of the compound
+**`crs_wkt`** attribute, software which cannot interpret **`crs_wkt`** will be unable to use the
+grid_mapping information. Therefore the CRS should be described as thoroughly as possible with the
+single-property attributes as well as by **`crs_wkt`**.
 
-There will be occasions when a given CRS property value is duplicated in both a single-property grid mapping attribute and the **`crs_wkt`** attribute. In such cases the onus is on data producers to ensure that the property values are consistent. However, in those situations where two values of a given property are different, then the value specified by the single-property attribute shall take precedence. For example, if the semi-major axis length of the ellipsoid is defined by the grid mapping attribute **`semi_major_axis`** and also by the **`crs_wkt`** attribute (via the WKT **`SPHEROID[...]`** element) then the former, being the more specific attribute, takes precedence. Naturally if the two values are equal then no ambiguity arises.
+There will be occasions when a given CRS property value is duplicated in both a single-property grid
+mapping attribute and the **`crs_wkt`** attribute. In such cases the onus is on data producers to
+ensure that the property values are consistent. However, in those situations where two values of a
+given property are different, then the value specified by the single-property attribute shall take
+precedence. For example, if the semi-major axis length of the ellipsoid is defined by the grid
+mapping attribute **`semi_major_axis`** and also by the **`crs_wkt`** attribute (via the WKT
+**`SPHEROID[...]`** element) then the former, being the more specific attribute, takes
+precedence. Naturally if the two values are equal then no ambiguity arises.
 
-Likewise, in those cases where the value of a CRS WKT element should be used consistently across the CF-netCDF community (names of projections and projection parameters, for example) then, the values shown in http://cf-pcmdi.llnl.gov/trac/wiki/Cf2CrsWkt[1] should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is considered to represent the definitive authority as regards CRS property names and values.
+Likewise, in those cases where the value of a CRS WKT element should be used consistently across the
+CF-netCDF community (names of projections and projection parameters, for example) then, the values
+shown in
+https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
+should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is
+considered to represent the definitive authority as regards CRS property names and values.
 
-Example 5.11 illustrates how the coordinate system properties specified via the crs grid mapping variable in Example 5.10 might be expressed using a **`crs_wkt`** attribute (it also represents a slightly modified version of the WKT example shown in section 7.4 of <<OGC_CTS>>). For brevity only the grid mapping variable is included in this example; all other elements are as per the earlier example. Names of projection PARAMETERs follow the spellings used in the EPSG geodetic parameter registry. Example 5.11 illustrates how certain WKT elements - all of which are optional - can be used to specify CRS properties not covered by existing CF grid mapping attributes, including:
+Examples 5.11 and 5.12 illustrate how the coordinate system properties specified via the crs grid
+mapping variable in Examples 5.9 and 5.10 might be expressed using a **`crs_wkt`** attribute (5.12
+also represents a slightly modified version of the WKT example shown in section 7.4 of
+<<OGC_CTS>>). For brevity only the grid mapping variable and its grid_mapping_name and crs_wkt
+attributes are included in these examples; all other elements are as per the earlier examples.
+Names of projection PARAMETERs follow the spellings used in the EPSG geodetic parameter registry.
 
- * use of the TOWGS84 element to specify horizontal datum transformation parameters (to WGS 1984 datum)
+Example 5.12 illustrates how certain WKT elements - all of which are optional - can be used to
+specify CRS properties not covered by existing CF grid mapping attributes, including:
+
+// * use of the TOWGS84 element to specify horizontal datum transformation parameters (to WGS 1984 datum)
 
  * use of the VERT_DATUM element to specify vertical datum information
 
@@ -417,14 +466,36 @@ Example 5.11 illustrates how the coordinate system properties specified via the 
 
  * use of AUTHORITY elements to specify object identifier codes assigned by an external authority, OGP/EPSG in this instance
 
-[[british-national-grid-newlyn-datum-in-crs-wkt-format]]
+[[latitude-and-longitude-on-the-wgs-1984-datum-in-crs-wkt-format]]
 [caption="Example 5.11. "]
+.Latitude and longitude on the WGS 1984 datum + CRS WKT
+====
+----
+
+ ...
+  int crs ;
+    crs:grid_mapping_name = "latitude_longitude";
+    ...
+    crs:crs_wkt =
+     GEOGCS["WGS 84",
+       DATUM["WGS_1984",
+         SPHEROID["WGS 84",6378137,298.257223563]
+       ],
+       PRIMEM["Greenwich",0],
+       UNIT["degree",0.0174532925199433]]
+  ...      
+----
+====
+
+[[british-national-grid-newlyn-datum-in-crs-wkt-format]]
+[caption="Example 5.12. "]
 .British National Grid + Newlyn Datum in CRS WKT format
 ====
 
  ...
   int crs ;
     crs:grid_mapping_name = "transverse_mercator" ;
+    ...
     crs:crs_wkt = "COMPD_CS ["OSGB 1936 / British National Grid + ODN",
       PROJCS ["OSGB 1936 / British National Grid",
         GEOGCS ["OSGB 1936",
@@ -453,9 +524,15 @@ Example 5.11 illustrates how the coordinate system properties specified via the 
         AUTHORITY ["EPSG", "5701"]
       ]]" ;
   ...
+----
 ====
 
-Note: To enhance readability the WKT value has been split across multiple lines and embedded quotation marks (") left unescaped - in real netCDF files such characters would need to be escaped. The WKT specification in <<OGC_CTS>> appears to silent be as regards which character(s) may be used to delimit text-valued properties; however, since all the examples in that specification use quotation marks, the use of that particular delimiting character is mandated by the CF convention.
+Note: To enhance readability the WKT value has been split across multiple lines and embedded
+quotation marks (") left unescaped - in real netCDF files such characters would need to be
+escaped. Also for clarity, we have dropped the quotation marks which would delimit the entire crs_wkt
+string.  The WKT specification in <<OGC_CTS>> appears to silent be as regards which character(s) may
+be used to delimit text-valued properties; however, since all the examples in that specification use
+quotation marks, the use of that particular delimiting character is mandated by the CF convention.
 
 
 
@@ -464,18 +541,19 @@ Note: To enhance readability the WKT value has been split across multiple lines 
 [[scalar-coordinate-variables, Section 5.7, "Scalar Coordinate Variables"]]
 === Scalar Coordinate Variables
 
-When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable. Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the **`coordinates`** attribute.
 
-Under COARDS the method of providing a single valued coordinate was to add a dimension of size one to the variable, and supply the corresponding coordinate variable. The new scalar coordinate variable is a convenience feature which avoids adding size one dimensions to variables. Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable. Note however that use of this feature with a latitude, longitude, vertical, or time coordinate will inhibit COARDS conforming applications from recognizing them.
+When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable (i.e. a data variable which has no netCDF dimensions). Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the **`coordinates`** attribute.
+
+The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1).
 
 Once a name is used for a scalar coordinate variable it can not be used for a 1D coordinate variable. For this reason we strongly recommend against using a name for a scalar coordinate variable that matches the name of any dimension in the file.
 
+If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (this might be the case, for instance, for time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
 
-[[multiple-forecasts-from-single-analysis,Example 5.11, "Multiple forecasts from a single analysis"]]
-[caption="Example 5.11. "]
+[[multiple-forecasts-from-single-analysis,Example 5.13, "Multiple forecasts from a single analysis"]]
+[caption="Example 5.13. "]
 .Multiple forecasts from a single analysis
 ====
-
 ----
 
 dimensions:
@@ -510,8 +588,6 @@ data:
   p500 = 500. ;
       
 ----
-
-
 ====
 
 In this example both the analysis time and the single pressure level are represented using scalar coordinate variables. The analysis time is identified by the standard name "forecast_reference_time" while the valid time of the forecast is identified by the standard name "time".
