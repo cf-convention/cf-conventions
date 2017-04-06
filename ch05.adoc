@@ -387,43 +387,56 @@ variables:
 ----
 
 dimensions:
-  lat = 648 ;
-  lon = 648 ;
-  y = 18 ;
-  x = 36 ;
-variables:
-  double x(x) ;
-    x:standard_name = "projection_x_coordinate" ;
-    x:units = "m" ;
-  double y(y) ;
-    y:standard_name = "projection_y_coordinate" ;
-    y:units = "m" ;
-  double lat(y, x) ;
-  double lon(y, x) ;
-  float temp(y, x) ;
-    temp:long_name = "temperature" ;
-    temp:units = "K" ;
-    temp:coordinates = "lat lon" ;
-    temp:grid_mapping = "crs" ;
-  int crs ;
-    crs:grid_mapping_name = "transverse_mercator" ;
-    crs:longitude_of_central_meridian = -2. ;
-    crs:false_easting = 400000. ;
-    crs:false_northing = -100000. ;
-    crs:latitude_of_projection_origin = 49. ;
-    crs:scale_factor_at_central_meridian = 0.9996012717 ;
-    crs:longitude_of_prime_meridian = 0. ;
-    crs:semi_major_axis = 6377563.396 ;
-    crs:inverse_flattening = 299.324964600004 ;
-    crs:projected_coordinate_system_name = "OSGB 1936 / British National Grid" ;
-    crs:geographic_coordinate_system_name = "OSGB 1936" ;
-    crs:horizontal_datum_name = "OSGB_1936" ;
-    crs:reference_ellipsoid_name = "Airy 1830" ;
-    crs:prime_meridian_name = "Greenwich" ;
-    crs:towgs84 = 375., -111., 431., 0., 0., 0., 0. ;
+    z = 100;
+    y = 100000 ;
+    x = 100000 ;
+  variables:
+    double x(x) ;
+      x:standard_name = "projection_x_coordinate" ;
+      x:long_name = "Easting"
+      x:units = "m" ;
+    double y(y) ;
+      y:standard_name = "projection_y_coordinate" ;
+      y:long_name = "Northing"
+      y:units = "m" ;
+    double z(z) ;
+      z:standard_name = "height_above_reference_ellipsoid" ;
+      z:long_name = "height_above_osgb_newlyn_datum_masl" ;
+      z:units = "m" ;
+    double lat(y, x) ;
+      lat:standard_name = "latitude" ;
+      lat:units = "degrees_north" ;
+    double lon(y, x) ;
+      lon:standard_name = "longitude" ;
+      lon:units = "degrees_east" ;
+    float temp(z, y, x) ;
+      temp:standard_name = "air_temperature" ;
+      temp:units = "K" ;
+      temp:coordinates = "lat lon" ;
+      temp:grid_mapping = "crsOSGB: x y crsWGS84: lat lon" ;
+    float pres(z, y, x) ;
+      temp:standard_name = "air_pressure" ;
+      temp:units = "Pa" ;
+      temp:coordinates = "lat lon" ;
+      temp:grid_mapping = "crsOSGB: x y crsWGS84: lat lon" ;
+    int crsOSGB ;
+      crsOSGB:grid_mapping_name = "transverse_mercator";
+      crsOSGB:semi_major_axis = 6377563.396 ;
+      crsOSGB:inverse_flattening = 299.3249646 ;
+      crsOSGB:longitude_of_prime_meridian = 0.0 ;
+      crsOSGB:latitude_of_projection_origin = 49.0 ;
+      crsOSGB:longitude_of_central_meridian = -2.0 ;
+      crsOSGB:scale_factor_at_central_meridian = 0.9996012717 ;
+      crsOSGB:false_easting = 400000.0 ;
+      crsOSGB:false_northing = -100000.0 ;
+      crsOSGB:unit = "metre" ;
+    int crsWGS84 ;
+      crsWGS84:grid_mapping_name = "latitude_longitude";
+      crsWGS84:longitude_of_prime_meridian = 0.0 ;
+      crsWGS84:semi_major_axis = 6378137.0 ;
+      crsWGS84:inverse_flattening = 298.257223563 ;
       
 ----
-//    crs:crs_wkt = "PROJCS[\"OSGB 1936 / British National Grid\", GEOGCS[\"OSGB 1936\", DATUM[\"OSGB_1936\", SPHEROID[\"Airy 1830\",6377563.396,299.3249646000044], TOWGS84[375,-111,431,0,0,0,0]], PRIMEM[\"Greenwich\",0], UNIT[\"degree\",0.0174532925199433]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"latitude_of_origin\",49], PARAMETER[\"central_meridian\",-2], PARAMETER[\"scale_factor\",0.9996012717], PARAMETER[\"false_easting\",400000], PARAMETER[\"false_northing\",-100000], UNIT[\"metre\",1]]"
 ====
 
 
@@ -472,12 +485,14 @@ https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mappin
 should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is
 considered to represent the definitive authority as regards CRS property names and values.
 
-Examples 5.11 and 5.12 illustrate how the coordinate system properties specified via the crs grid
-mapping variable in Examples 5.9 and 5.10 might be expressed using a **`crs_wkt`** attribute (5.12
-also represents a slightly modified version of the WKT example shown in section 7.4 of
-<<OGC_CTS>>). For brevity only the grid mapping variable and its grid_mapping_name and crs_wkt
-attributes are included in these examples; all other elements are as per the earlier examples.
-Names of projection PARAMETERs follow the spellings used in the EPSG geodetic parameter registry.
+Examples 5.11 illustrates how the coordinate system properties specified via the crs grid mapping
+variable in Example 5.9 might be expressed using a **`crs_wkt`** attribute.  Example 5.12 also
+illustrates the addition of the **`crs_wkt`** attribute, but here the attribute is added to the
+**`crs`** variable of a simplified variant of Example 5.10 (5.12 also represents a slightly modified
+version of the WKT example shown in section 7.4 of <<OGC_CTS>>).  For brevity in Example 5.11, only
+the grid mapping variable and its grid_mapping_name and crs_wkt attributes are included; all other
+elements are as per the Example 5.9.  Names of projection PARAMETERs follow the spellings used in
+the EPSG geodetic parameter registry.
 
 Example 5.12 illustrates how certain WKT elements - all of which are optional - can be used to
 specify CRS properties not covered by existing CF grid mapping attributes, including:
@@ -515,11 +530,43 @@ specify CRS properties not covered by existing CF grid mapping attributes, inclu
 [caption="Example 5.12. "]
 .British National Grid + Newlyn Datum in CRS WKT format
 ====
+----
 
- ...
+dimensions:
+  lat = 648 ;
+  lon = 648 ;
+  y = 18 ;
+  x = 36 ;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:units = "m" ;
+  double lat(y, x) ;
+  double lon(y, x) ;
+  float temp(y, x) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crs" ;
   int crs ;
     crs:grid_mapping_name = "transverse_mercator" ;
-    ...
+    crs:longitude_of_central_meridian = -2. ;
+    crs:false_easting = 400000. ;
+    crs:false_northing = -100000. ;
+    crs:latitude_of_projection_origin = 49. ;
+    crs:scale_factor_at_central_meridian = 0.9996012717 ;
+    crs:longitude_of_prime_meridian = 0. ;
+    crs:semi_major_axis = 6377563.396 ;
+    crs:inverse_flattening = 299.324964600004 ;
+    crs:projected_coordinate_system_name = "OSGB 1936 / British National Grid" ;
+    crs:geographic_coordinate_system_name = "OSGB 1936" ;
+    crs:horizontal_datum_name = "OSGB_1936" ;
+    crs:reference_ellipsoid_name = "Airy 1830" ;
+    crs:prime_meridian_name = "Greenwich" ;
+    crs:towgs84 = 375., -111., 431., 0., 0., 0., 0. ;
     crs:crs_wkt = "COMPD_CS ["OSGB 1936 / British National Grid + ODN",
       PROJCS ["OSGB 1936 / British National Grid",
         GEOGCS ["OSGB 1936",
@@ -549,6 +596,8 @@ specify CRS properties not covered by existing CF grid mapping attributes, inclu
       ]]" ;
   ...
 ----
+// From an earlier draft of this example:
+//    crs:crs_wkt = "PROJCS[\"OSGB 1936 / British National Grid\", GEOGCS[\"OSGB 1936\", DATUM[\"OSGB_1936\", SPHEROID[\"Airy 1830\",6377563.396,299.3249646000044], TOWGS84[375,-111,431,0,0,0,0]], PRIMEM[\"Greenwich\",0], UNIT[\"degree\",0.0174532925199433]], PROJECTION[\"Transverse_Mercator\"], PARAMETER[\"latitude_of_origin\",49], PARAMETER[\"central_meridian\",-2], PARAMETER[\"scale_factor\",0.9996012717], PARAMETER[\"false_easting\",400000], PARAMETER[\"false_northing\",-100000], UNIT[\"metre\",1]]"
 ====
 
 Note: To enhance readability the WKT value has been split across multiple lines and embedded
