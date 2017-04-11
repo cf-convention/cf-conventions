@@ -1,0 +1,47 @@
+language: ruby
+rvm:
+    - 2.1.2
+
+install:
+    - gem install asciidoctor
+    - asciidoctor --version
+    - gem install --pre asciidoctor-pdf
+    - asciidoctor-pdf --version
+
+before_script:
+    - git config --global user.email $GIT_EMAIL
+    - git config --global user.name $GIT_NAME
+
+script:
+    - mkdir build
+    - asciidoctor conformance.adoc -D build
+    - asciidoctor-pdf -d book conformance.adoc -D build
+
+after_success:
+    # Always update the "gh-pages" branch, but tag build goes into
+    # tag directory and normal build goes into the root directory.
+    - git fetch origin gh-pages:gh-pages
+    - git checkout gh-pages
+    - if [[ $TRAVIS_TAG ]]; then
+        TARGET_DIR=$TRAVIS_TAG;
+      else
+        TARGET_DIR='.';
+      fi
+    - mkdir -p $TARGET_DIR
+    - cp build/conformance.html $TARGET_DIR/
+    - cp build/conformance.pdf $TARGET_DIR/
+    - git add $TARGET_DIR/conformance.html
+    - git add $TARGET_DIR/conformance.pdf
+    - if [[ $TRAVIS_TAG ]]; then
+        sed s/Latest/$TRAVIS_TAG/ index.html > $TARGET_DIR/index.html;
+        git add $TARGET_DIR/index.html;
+      fi
+    - git commit -m "Auto-generated from ${TRAVIS_REPO_SLUG}@${TRAVIS_COMMIT}"
+    - git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages >/dev/null 2>&1
+
+branches:
+    only:
+        - master
+        # Build tags such as "v1.6"
+        - /^v\d+\.\d+/
+
