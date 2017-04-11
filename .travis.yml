@@ -1,47 +1,33 @@
 language: ruby
 rvm:
-    - 2.1.2
-
+- 2.1.2
 install:
-    - gem install asciidoctor
-    - asciidoctor --version
-    - gem install --pre asciidoctor-pdf
-    - asciidoctor-pdf --version
-
-# before_script:
-#    - git config --global user.email $GIT_EMAIL
-#    - git config --global user.name $GIT_NAME
-
+- gem install asciidoctor
+- asciidoctor --version
+- gem install --pre asciidoctor-pdf
+- asciidoctor-pdf --version
 script:
-    - mkdir build
-    - asciidoctor conformance.adoc -D build
-    - asciidoctor-pdf -d book conformance.adoc -D build
-
+- mkdir build
+- asciidoctor conformance.adoc -D build
+- asciidoctor-pdf -d book conformance.adoc -D build
 after_success:
-    # Always update the "gh-pages" branch, but tag build goes into
-    # tag directory and normal build goes into the root directory.
-    - git fetch origin gh-pages:gh-pages
-    - git checkout gh-pages
-    - if [[ $TRAVIS_TAG ]]; then
-        TARGET_DIR=$TRAVIS_TAG;
-      else
-        TARGET_DIR='.';
-      fi
-    - mkdir -p $TARGET_DIR
-    - cp build/conformance.html $TARGET_DIR/
-    - cp build/conformance.pdf $TARGET_DIR/
-    - git add $TARGET_DIR/conformance.html
-    - git add $TARGET_DIR/conformance.pdf
-    - if [[ $TRAVIS_TAG ]]; then
-        sed s/Latest/$TRAVIS_TAG/ index.html > $TARGET_DIR/index.html;
-        git add $TARGET_DIR/index.html;
-      fi
-    - git commit -m "Auto-generated from ${TRAVIS_REPO_SLUG}@${TRAVIS_COMMIT}"
-    - git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages >/dev/null 2>&1
-
+- git fetch origin gh-pages:gh-pages
+- git checkout gh-pages
+- if [[ $TRAVIS_TAG ]]; then TARGET_DIR=$TRAVIS_TAG; else TARGET_DIR='.'; fi
+- mkdir -p $TARGET_DIR
+- cp build/conformance.html $TARGET_DIR/
+- cp build/conformance.pdf $TARGET_DIR/
+- git add $TARGET_DIR/conformance.html
+- git add $TARGET_DIR/conformance.pdf
+- if [[ $TRAVIS_TAG ]]; then sed s/Latest/$TRAVIS_TAG/ index.html > $TARGET_DIR/index.html;
+  git add $TARGET_DIR/index.html; fi
+- git commit -m "Auto-generated from ${TRAVIS_REPO_SLUG}@${TRAVIS_COMMIT}"
+- git push https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages >/dev/null
+  2>&1
 branches:
-    only:
-        - master
-        # Build tags such as "v1.6"
-        - /^v\d+\.\d+/
-
+  only:
+  - master
+  - /^v\d+\.\d+/
+env:
+  global:
+    secure: eTtQK9ui7m81uoZ22Jms0iZ5N2W5yJfUKTSBDkICZT8xr9yv244PAZkDujhwCkXIKD+ShbKysi/9YiL2TXBmhKze5Mdk9PM8+RElA3rTRkMR93pTHVQ9G0cCsWmMQhNrxaFOkmANfn3zHAt0K4bRDHJj0UdTuETqpN7kl6wj3VPjbBiAymvMiaRocMCEUEgrTgebAbKxyEqb3cF+E0RoIHNlmpSArOv8u9qg+tAJvSAiiQ0A0AuL7H5u2jBrdx3hF61gpIr0O5zUxFK3NvyhGpK1O0YD/njPhyFFitHQ6+qxiK4DdUujyZLNaQxTatZfv+qtekoUH6b6FYkULDwE0U9/2FaKg/5LzHGj8ZPqqSczsevprTaxCVjHffEl5unz8dmFGCMg/tgrrTPLvHuluBhSMtOxfleVpOv6UITLtl7RvX6TrhlyRtobmkLcK2sc10XeUvFnHC/cI/9xDow1DJuwUrJ6rR9+V/zDrjLlTAnMS5S2mKIYU5xEYT2yZnX9TXs/UreBhwkd4ltg3JU6tdRvIYa5d7p0m8Gy4hyD4m47MwDJpQxI5r2OZbugwuVyQnGt8j+/vKmsoBiL22g6G8n2EvxUHqAisGH2O65NQy4xVWwDwqu+m6XEd917sZxDeO1ow6p5eQ5AOHUUsBQSf4NPLMbAF6W4KN6xGY6fxFQ=
