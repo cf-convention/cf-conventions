@@ -1660,13 +1660,16 @@ possible conditions.</p>
 <h2 id="coordinate-types"><a class="anchor" href="#coordinate-types"></a>4. Coordinate Types</h2>
 <div class="sectionbody">
 <div class="paragraph">
+<p>The commonest use of coordinate variables is to locate the data in space and time, but coordinates may be provided for any other continuous geophysical quantity (e.g. density, temperature, radiation wavelength, zenith angle of radiance, sea surface wave frequency) or discrete category (see <a href="#discrete-axis">Section 4.5, "Discrete Axis"</a>, e.g. area type, model level number, ensemble member number) on which the data variable depends.</p>
+</div>
+<div class="paragraph">
 <p>Four types of coordinates receive special treatment by these conventions: latitude, longitude, vertical, and time. We continue to support the special role that the <strong><code>units</code></strong> and <strong><code>positive</code></strong> attributes play in the COARDS convention to identify coordinate type. We extend COARDS by providing explicit definitions of dimensionless vertical coordinates. The definitions are associated with a coordinate variable via the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes. For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.</p>
 </div>
 <div class="paragraph">
 <p>Because identification of a coordinate type by its units is complicated by requiring the use of an external software package <a href="#UDUNITS">[UDUNITS]</a> , we provide two optional methods that yield a direct identification. The attribute <strong><code>axis</code></strong> may be attached to a coordinate variable and given one of the values <strong><code>X</code></strong>, <strong><code>Y</code></strong>, <strong><code>Z</code></strong> or <strong><code>T</code></strong> which stand for a longitude, latitude, vertical, or time axis respectively. Alternatively the <strong><code>standard_name</code></strong> attribute may be used for direct identification. But note that these optional attributes are in addition to the required COARDS metadata.</p>
 </div>
 <div class="paragraph">
-<p>Coordinate types other than latitude, longitude, vertical, and time are allowed. To identify generic spatial coordinates we recommend that the <strong><code>axis</code></strong> attribute be attached to these coordinates and given one of the values <strong><code>X</code></strong>, <strong><code>Y</code></strong> or <strong><code>Z</code></strong>. The values <strong><code>X</code></strong> and <strong><code>Y</code></strong> for the axis attribute should be used to identify horizontal coordinate variables. If both X- and Y-axis are identified, <strong><code>X-Y-up</code></strong> should define a right-handed coordinate system, i.e. rotation from the positive X direction to the positive Y direction is anticlockwise if viewed from above. We strongly recommend that coordinate variables be used for all coordinate types whenever they are applicable.</p>
+<p>To identify generic spatial coordinates we recommend that the <strong><code>axis</code></strong> attribute be attached to these coordinates and given one of the values <strong><code>X</code></strong>, <strong><code>Y</code></strong> or <strong><code>Z</code></strong>. The values <strong><code>X</code></strong> and <strong><code>Y</code></strong> for the axis attribute should be used to identify horizontal coordinate variables. If both X- and Y-axis are identified, <strong><code>X-Y-up</code></strong> should define a right-handed coordinate system, i.e. rotation from the positive X direction to the positive Y direction is anticlockwise if viewed from above. We strongly recommend that coordinate variables be used for all coordinate types whenever they are applicable.</p>
 </div>
 <div class="paragraph">
 <p>The methods of identifying coordinate types described in this section apply both to coordinate variables and to auxiliary coordinate variables named by the <strong><code>coordinates</code></strong> attribute (see <a href="#coordinate-system">Chapter 5, Coordinate Systems</a>).</p>
@@ -2044,17 +2047,14 @@ show that 1582-10-15 *preceded* 1582-10-14 by 9 days.</pre>
 <h2 id="coordinate-system"><a class="anchor" href="#coordinate-system"></a>5. Coordinate Systems</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>A variable&#8217;s spatiotemporal dimensions are used to locate data values in time and space. This is accomplished by associating these dimensions with the relevant set of latitude, longitude, vertical, and time coordinates. This section presents two methods for making that association: the use of <em>coordinate variables</em>, and the use of <em>auxiliary coordinate variables</em>.</p>
+<p>A data variable&#8217;s dimensions are used to locate data values in time and space or as a function of other independent variables. This is accomplished by associating these dimensions with the relevant set of latitude, longitude, vertical, time and any non-spatiotemporal coordinates. This section presents two methods for making that association: the use of <em>coordinate variables</em>, and the use of <em>auxiliary coordinate variables</em>.</p>
 </div>
 <div class="paragraph">
-<p>All of a variable&#8217;s dimensions that are latitude, longitude, vertical, or time dimensions (see <a href="#terminology">Section 1.2, "Terminology"</a>) must have corresponding coordinate variables, i.e., one-dimensional variables with the same name as the dimension (see examples in <a href="#coordinate-types">Chapter 4, Coordinate Types</a>). This is the only method of associating dimensions with coordinates that is supported by <a href="#COARDS">[COARDS]</a>.</p>
+<p>Any of a variable&#8217;s dimensions that is an independently varying latitude, longitude, vertical, or time dimension (see <a href="#terminology">Section 1.2, "Terminology"</a>) and that has a size greater than one must have a corresponding coordinate variable, i.e., a one-dimensional variable with the same name as the dimension (see examples in <a href="#coordinate-types">Chapter 4, Coordinate Types</a>). This is the only method of associating dimensions with coordinates that is supported by <a href="#COARDS">[COARDS]</a>.</p>
 </div>
 <div class="paragraph">
-<p>All of a variable&#8217;s spatiotemporal dimensions that are not latitude,
-longitude, vertical, or time dimensions are required to be associated
-with the relevant latitude, longitude, vertical, or time coordinates via
-the new <strong><code>coordinates</code></strong> attribute of the variable. The value of the
-<strong><code>coordinates</code></strong> attribute is <em>a blank separated list of the names of
+<p>Any longitude, latitude, vertical or time coordinate which depends on more than one spatiotemporal dimension must be identified by the <strong><code>coordinates</code></strong> attribute of the data variable.
+The value of the <strong><code>coordinates</code></strong> attribute is <em>a blank separated list of the names of
 auxiliary coordinate variables</em>. There is no restriction on the order
 in which the auxiliary coordinate variables appear in the
 <strong><code>coordinates</code></strong> attribute string.   The dimensions of an auxiliary
@@ -2069,7 +2069,7 @@ connect the data and coordinates</p>
 <p>We recommend that the name of a multidimensional coordinate variable should not match the name of any of its dimensions because that precludes supplying a coordinate variable for the dimension. This practice also avoids potential bugs in applications that determine coordinate variables by only checking for a name match between a dimension and a variable and not checking that the variable is one dimensional.</p>
 </div>
 <div class="paragraph">
-<p>The use of coordinate variables is required whenever they are applicable. That is, auxiliary coordinate variables may not be used as the only way to identify latitude and longitude coordinates that could be identified using coordinate variables. This is both to enhance conformance to COARDS and to facilitate the use of generic applications that recognize the NUG convention for coordinate variables. An application that is trying to find the latitude coordinate of a variable should always look first to see if any of the variable&#8217;s dimensions correspond to a latitude coordinate variable. If the latitude coordinate is not found this way, then the auxiliary coordinate variables listed by the <strong><code>coordinates</code></strong> attribute should be checked. Note that it is permissible, but optional, to list coordinate variables as well as auxiliary coordinate variables in the <strong><code>coordinates</code></strong> attribute.</p>
+<p>If the longitude, latitude, vertical or time coordinate is multi-valued, varies in only one dimension, and varies independently of other spatiotemporal coordinates, it is not permitted to store it as an auxiliary coordinate variable. This is both to enhance conformance to COARDS and to facilitate the use of generic applications that recognize the NUG convention for coordinate variables. An application that is trying to find the latitude coordinate of a variable should always look first to see if any of the variable&#8217;s dimensions correspond to a latitude coordinate variable. If the latitude coordinate is not found this way, then the auxiliary coordinate variables listed by the <strong><code>coordinates</code></strong> attribute should be checked. Note that it is permissible, but optional, to list coordinate variables as well as auxiliary coordinate variables in the <strong><code>coordinates</code></strong> attribute. If the longitude, latitude, vertical or time coordinate is single-valued, it may be stored either as a coordinate variable with a dimension of size one, or as a scalar coordinate variable (<a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a>).</p>
 </div>
 <div class="paragraph">
 <p>If an <strong><code>axis</code></strong> attribute is attached to an auxiliary coordinate variable, it can be used by applications in the same way the <strong><code>axis</code></strong> attribute attached to a coordinate variable is used. However, it is not permissible for a data variable to have both a coordinate variable and an auxiliary coordinate variable, or more than one of either type of variable, having an <strong><code>axis</code></strong> attribute with any given value e.g. there must be no more than one <strong><code>axis</code></strong> attribute for <strong><code>X</code></strong> for any data variable. Note that if the <strong><code>axis</code></strong> attribute is not specified for an auxiliary coordinate variable, it may still be possible to determine if it is a spatiotemporal dimension from its own units or standard_name, or from the units and standard_name of the coordinate variable corresponding to its dimensions (see <a href="#coordinate-types">Chapter 4, Coordinate Types</a>). For instance, auxiliary coordinate variables which lie on the horizontal surface can be identified as such by their dimensions being horizontal. Horizontal dimensions are those whose coordinate variables have an <strong><code>axis</code></strong> attribute of <strong><code>X</code></strong> or <strong><code>Y</code></strong>, or a <strong><code>units</code></strong> attribute indicating latitude and longitude.</p>
@@ -8093,9 +8093,11 @@ mean_absolute_value to cell methods in Appendix E</p>
 <li>
 <p>Ticket #72, Adding the geostationary projection.</p>
 </li>
-<li>
-<p>16 February 2017</p>
-</li>
+</ol>
+</div>
+<div class="olist arabic">
+<div class="title">16 February 2017</div>
+<ol class="arabic">
 <li>
 <p>Ticket #103, Corrections to Appendices A and H, finish the ticket with remaining changes to Appendix H.</p>
 </li>
@@ -8185,6 +8187,14 @@ Replaced first para in Section 9.6. "Missing Data". Added verbiage to Section 2.
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">25 April 2017</div>
+<ol class="arabic">
+<li>
+<p>Ticket #100, Clarifications to the preamble of sections 4 and 5.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -8250,7 +8260,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-04-18 21:22:07 UTC
+Last updated 2017-04-25 23:15:41 UTC
 </div>
 </div>
 </body>
