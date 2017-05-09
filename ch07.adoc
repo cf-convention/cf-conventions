@@ -554,11 +554,11 @@ A __geometry__ is usually thought to be a spatial representation of a real-world
 
 All geometries are made up of one or more nodes. The geometry type specifies the set of topological assumptions to be applied to relate the nodes. For example, __multipoint__ and __line__ geometries are nearly the same except nodes are interpreted as being connected for lines. Lines and polygons are also nearly the same except the first and last nodes must be identical for polygons. Polygons that have holes, such as waterbodies in a land unit, are encoded as a collection of polygon ring parts, each identified as __exterior__ or __interior__ polygons. Multipart geometries, such as multiple lines representing the same river or multiple islands representing the same jurisdiction, are encoded as collections of un-connected points, lines, or polygons that are logically grouped into a single geometry.
 
-While this geometry encoding is applicable to any variable that shares a dimension with a set of geometry, the application it was originally designed for requires that geometry be joined to the instance dimension of a Discrete Sampling Geometry `timeSeries` featureType. In this case, any data variable can be given a `geometry` attribute that is to be interpreted as the representative geometry for the quantity held in the variable. An example of this is areal average precipitation over a watershed. An example of line geometry with time series data is given in <<appendix-cell-methods>>.
+While this geometry encoding is applicable to any variable that shares a dimension with a set of geometry, the application it was originally designed for requires that geometry be joined to the instance dimension of a Discrete Sampling Geometry `timeSeries` featureType. The instance dimension, in the more general case of features, specifies the number of features in the collection and is also referred to as the feature dimension. In this case, any data variable can be given a `geometry` attribute that is to be interpreted as the representative geometry for the quantity held in the variable. An example of this is areal average precipitation over a watershed. An example of line geometry with time series data is given in <<appendix-cell-methods>>.
 
 ==== Geometry Variables and Attributes
 
-A set of geometries can be added to a file by inserting all required data variables and a __geometry container__ variable that acts as a container for attributes that describe a set of geometries. A **`geometry`** attribute containing the name of a geometry container variable can be added to any variable that shares a dimension with the geometries. The geometry container must hold **`geometry_type`** and **`node_coordinates`** attributes. Depending on the **`geometry_type`**, the geometry container may also need to contain a **`node_count`**, **`part_node_count`**, and **`interior_ring`** attribute. These attributes are described in detail below.
+A set of geometries can be added to a file by inserting all required data variables and a __geometry container__ variable that acts as a container for attributes that describe a set of geometries. A **`geometry`** attribute containing the name of a geometry container variable can be added to any variable that shares the feature dimension with the geometries. The geometry container must hold **`geometry_type`** and **`node_coordinates`** attributes. Depending on the **`geometry_type`**, the geometry container may also need to contain a **`node_count`**, **`part_node_count`**, and **`interior_ring`** attribute. These attributes are described in detail below.
 
 The **`geometry_type`** attribute must be carried by a geometry container variable and indicates the type of geometry present. Its allowable values are: __point__, __multipoint__, __line__, __multiline__, __polygon__, __multipolygon__. The **`node_coordinates`** attribute must be carried by a geometry container variable and contains the space delimited names of the x and y (and z) variables that contain geometry node coordinates. 
 
@@ -586,7 +586,7 @@ This example demonstrates the use of all potential attributes and variables for 
 ----
 dimensions:
   node = 25 ;
-  instance = 1 ;
+  feature = 1 ;
   part = 6 ;
 variables:
   double x(node) ;
@@ -604,8 +604,8 @@ variables:
     geometry_container:crs = "crs" ;
     geometry_container:part_node_count = "part_node_count" ;
     geometry_container:interior_ring = "interior_ring" ;
-  int node_count(instance) ;
-    node_count:long_name = "count of coordinates in each instance geometry" ;
+  int node_count(feature) ;
+    node_count:long_name = "count of coordinates in each feature geometry" ;
   int part_node_count(part) ;
     part_node_count:long_name = "count of nodes in each geometry part" ;
   int interior_ring(part) ;
