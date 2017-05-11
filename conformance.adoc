@@ -107,9 +107,12 @@ same value.
 
 *Requirements:*
 
-* Files that conform to the CF version 1.5 conventions must indicate
+* Files that conform to the CF version 1.7 conventions must indicate
 this by setting the global **`Conventions`** attribute to the string value
-"CF-1.5".
+"CF-1.7".
+* The **`Conventions`** attribute may be a single text string containing a list 
+of convention names separated by blank space or commas, one of which shall 
+be the full CF string as described above.
 
 [[section-5]]
 
@@ -127,6 +130,15 @@ attributes are all type string.
 attributes. If they are used as per variable attributes a CF compliant
 application should treat them exactly as it would treat any other
 unrecognized attribute.
+
+=== 2.6.3 External variables
+
+*Requirements:*
+
+* The **`external_variables`** attribute is of string type and contains a blank-separated 
+list of variable names.
+* No variable named by **`external_variables`** is allowed in the file.
+
 
 [[section-6]]
 
@@ -180,6 +192,13 @@ name modifier.
 name table.
 * The legal values for the standard name modifier are contained in
 Appendix C, Standard Name Modifiers.
+* If a variable has a **`standard_name`** of **`region`** or **`area_type`**, it must have value(s) 
+from the permitted list.
+
+*Recommendataions:*
+
+* Use of the **`standard_name`** modifiers **`status_flag`** and **`number_of_observations`** 
+is deprecated, and the corresponding **`standard_names`** are recommended instead.
 
 [[section-9]]
 
@@ -240,10 +259,15 @@ particular value of the **`axis`** attribute.
 * The only legal values for the **`positive`** attribute are **`up`** or **`down`** (case
 insensitive).
 
+*Recommendations:*
+
+* The **`positive`** attribute should be consistent with the sign convention implied by the 
+definition of the **`standard_name`**, if both are provided.
+
 [[section-12]]
 
 [[dimensionless-vertical-coordinates]]
-=== 4.3.2 Dimensionless Vertical Coordinates
+=== 4.3.3 Parameterized Vertical Coordinate
 
 *Requirements:*
 
@@ -253,6 +277,17 @@ which has a **`standard_name`** listed in Appendix C.
 list of blank separated word pairs in the form **`term: var`**. The legal
 values **`term`** are contained in Appendix C for each valid **`standard_name`**.
 The values of **`var`** must be variables that exist in the file.
+* Where indicated by the appropriate definition in Appendix D, the **`standard_name`** 
+attributes of variables named by the **`formula_terms`** attribute must be consistent 
+with the **`standard_name`** of the coordinate variable it is attached to, according to 
+the appropriate definition in Appendix D.
+* The **`computed_standard_name`** attribute is only allowed on a coordinate variable 
+which has a **`formula_terms`** attribute.
+* The **`computed_standard_name`** attribute is a string whose value must be consistent 
+with the **`standard_name`** of the coordinate variable it is attached to, and in some cases 
+also with the **`standard_name`** attributes of variables named by the **`formula_terms`** attribute, 
+according to the appropriate definition in Appendix D.
+
 
 [[section-13]]
 
@@ -347,10 +382,10 @@ the following form, in which brackets indicate optional text:
 ....
 grid_mapping_name[: coord_var [coord_var ...]] [grid_mapping_name: [coord_var ... ]]
 ....
-* Note that in its simplest form the attribute comprises just a _grid_mapping_name_ as a single word.
-* Each _grid_mapping_name_ is the name of a variable (known as a grid mapping variable), which must
+* Note that in its simplest form the attribute comprises just a grid_mapping_name as a single word.
+* Each grid_mapping_name is the name of a variable (known as a grid mapping variable), which must
 exist in the file.
-* Each _coord_var_ is the name of a coordinate variable or auxiliary coordinate variable, which must 
+* Each coord_var is the name of a coordinate variable or auxiliary coordinate variable, which must 
 exist in the file. If it is an auxiliary coordinate variable, it must be listed in the coordinates attribute.
 
 
@@ -361,6 +396,10 @@ Appendix F.
 specified in Table 1 of Appendix F. +
 * If present, the **`crs_wkt`** attribute must be a text string conforming to
 the CRS WKT specification described in reference [OGC_CTS].
+* **`reference_ellipsoid_name`**, **`prime_meridian_name`**, **`horizontal_datum_name`** and 
+**`geographic_crs_name`** must be all defined if any one is defined.
+* If **`projected_crs_name`** is defined then **`geographic_crs_name`** must be also.
+
 
 *Recommendations:*
 
@@ -411,7 +450,8 @@ attributes.
 * The type of the **`cell_measures`** attribute is a string whose value is
 list of blank separated word pairs in the form **`measure: var`**. The valid
 values for **`measure`** are **`area`** or **`volume`**. The **`var`** token specifies a
-variable that must exist in the file. The dimensions of the variable
+variable that must either exist in the file or be named by the **`external_variables`**
+attribute. The dimensions of the variable
 specified by **`var`** must be the same as, or be a subset of, the dimensions
 of the variable to which they are related.
 * A measure variable must have units that are consistent with the
