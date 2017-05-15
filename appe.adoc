@@ -54,5 +54,62 @@ respect to the specified dimension.
 | `variance` | __u^2^__ | Variance
 |===============
 
- 
 
+[[example-e.1, Example e.1, "timeseries-with-geometry"]]
+[caption="Example E.1. "]
+.Timeseries with geometry.
+====
+----
+dimensions:
+  instance = 2 ;
+  node = 5 ;
+  time = 4 ;
+variables:
+  int time(time) ;
+    time:units = "days since 2000-01-01" ;
+  double lat(instance) ;
+    lat:units = "degrees_north" ;
+    lat:standard_name = "latitude" ;
+    lat:geometry = "geometry_container" ;
+  double lon(instance) ;
+    lon:units = "degrees_east" ;
+    lon:standard_name = "longitude" ;
+    lon:geometry = "geometry_container" ;
+  int crs ;
+    crs:grid_mapping_name = "latitude_longitude" ;
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+  int geometry_container ;
+    geometry_container:geometry_type = "line" ;
+    geometry_container:node_count = "node_count" ;
+    geometry_container:node_coordinates = "x y" ;
+  int node_count(instance) ;
+  double x(node) ;
+    x:units = "degrees_east" ;
+    x:standard_name = "longitude" ;
+    x:cf_role = "geometry_x_node" ;
+  double y(node) ;
+    y:units = "degrees_north" ;
+    y:standard_name = "latitude" ;
+    y:cf_role = "geometry_y_node" ;
+  double someData(instance, time) ;
+    someData:coordinates = "time lat lon" ;
+    someData:grid_mapping = "crs" ;
+    someData:geometry = "geometry_container" ;
+// global attributes:
+  :Conventions = "CF-1.8" ;
+  :featureType = "timeSeries" ;
+data:
+  time = 1, 2, 3, 4 ;
+  lat = 30, 50 ;
+  lon = 10, 60 ;
+  someData =
+    1, 2, 3, 4,
+    1, 2, 3, 4 ;
+  node_count = 3, 2 ;
+  x = 30, 10, 40, 50, 50 ;
+  y = 10, 30, 40, 60, 50 ;
+----
+The time series variable, someData, is associated with line geometries via the geometry attribute. The first line geometry is comprised of three nodes, while the second has two nodes. Client applications unaware of CF geometries can fall back to the lat and lon variables to locate feature instances in space. In this example, lat and lon coordinates are identical to the first node in each line geometry, though any representative point could be used.
+====
