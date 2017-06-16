@@ -549,8 +549,9 @@ data:  // time coordinates translated to date/time format
 === Geometries
 
 For many geospatial applications, data values are associated with a geometry, which is a spatial representation of a real-world feature, for instance a time-series of areal average precipitation over a watershed. 
-Polygonal cells with an arbitrary number of vertices can be described using <<cell-boundaries>>, but in that case every cell must have the same number of vertices. 
-In contrast, each geometry associated with a given data variable may have a different number of nodes, the geometries may be lines (as alternatives to points and polygons), and they may be __multipart__ i.e include several disjoint parts. 
+Polygonal cells with an arbitrary number of vertices can be described using <<cell-boundaries>>, but in that case every cell must have the same number of vertices and must be single polygon rings. 
+In contrast, each geometry may have a different number of nodes, the geometries may be lines (as alternatives to points and polygons), and they may be __multipart__ i.e include several disjoint parts. 
+While line and point geometries don't describe an interval along a dimension as the traditional cell bounds described above do, they do describe the extent of a geometry or real-world feature so are included in this section. 
 The approach described here specifies how to encode such geometries following the pattern in **9.3.3 Contiguous ragged array representation** and attach them to variables in a way that is consistent with the cell bounds approach.
 
 All geometries are made up of one or more nodes. 
@@ -673,11 +674,20 @@ variables:
     y:units = "degrees_north" ;
     y:standard_name = "latitude" ;
     y:cf_role = "geometry_y_node" ;
+  double lat(feature) ;
+    lat:units = "degrees_north" ;
+    lat:standard_name = "latitude" ;
+    lat:geometry = "geometry_container" ;
+  double lon(feature) ;
+    lon:units = "degrees_east" ;
+    lon:standard_name = "longitude" ;
+    lon:geometry = "geometry_container" ;
   float geometry_container ;
     geometry_container:geometry_type = "multipolygon" ;
     geometry_container:node_count = "node_count" ;
     geometry_container:node_coordinates = "x y" ;
     geometry_container:grid_mapping = "crs" ;
+    geometry_container:coordinates = "lat lon"
     geometry_container:part_node_count = "part_node_count" ;
     geometry_container:interior_ring = "interior_ring" ;
   int node_count(feature) ;
@@ -693,7 +703,6 @@ variables:
 data:
  x = 20, 10, 0, 5, 10, 15, 20, 10, 0, 50, 40, 30 ;
  y = 0, 15, 0, 5, 10, 5, 20, 35, 20, 0, 15, 0 ;
- geometry_container = 0. ;
  node_count = 9, 3 ;
  part_node_count = 3, 3, 3, 3 ;
  interior_ring = 0, 1, 0, 0 ;
