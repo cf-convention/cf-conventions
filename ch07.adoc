@@ -11,6 +11,47 @@ When gridded data does not represent the point values of a field but instead rep
 
 To represent cells we add the attribute **`bounds`** to the appropriate coordinate variable(s). The value of **`bounds`** is the name of the variable that contains the vertices of the cell boundaries. We refer to this type of variable as a "boundary variable." __A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.__ The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices. Since a boundary variable is considered to be part of a coordinate variable's metadata, it is not necessary to provide it with attributes such as **`long_name`** and **`units`**.
 
+Boundary variable attributes which determine the coordinate type (**`units`**, **`standard_name`**, **`axis`** and **`positive`**) or those which affect the interpretation of the array values (**`units`**, **`calendar`**, **`leap_month`**, **`leap_year`** and **`month_lengths`**) must always agree exactly with the same attributes of its associated coordinate, scalar coordinate or auxiliary coordinate variable. To avoid duplication, however, it is recommended that these are not provided to a boundary variable.
+
+If a parametric coordinate variable with a **`formula_terms`** attribute (section 4.3.2) also has a **`bounds`** attribute, its boundary variable must have a **`formula_terms`** attribute too. In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula. For any term that depends on the vertical dimension, however, the variable names appearing in the formula terms would differ from those found in the **`formula_terms`** attribute of the coordinate variable itself because the boundary variables for formula terms are two-dimensional while the formula terms themselves are one-dimensional.
+
+Whenever a **`formula_terms`** attribute is attached to a boundary variable, the formula terms may additionally be identified using a second method: variables appearing in the vertical coordinates' **`formula_terms`** may be declared to be coordinate, scalar coordinate or auxiliary coordinate variables, and those coordinates may have **`bounds`** attributes that identify their boundary variables. In that case, the **`bounds`** attribute of a formula terms variable must be consistent with the **`formula_terms`** attribute of the boundary variable. Software digesting legacy datasets (constructed prior to version 1.7 of this standard) may have to rely in some cases on the first method of identifying the formula term variables and in other cases, on the second. Starting from version 1.7, however, the first method will be sufficient.
+
+[[Specifying-**`formula_terms`**-when-a-parametric-coordinate-variable-has-bounds-ex]]
+[caption="Example: "]
+.Specifying **`formula_terms`** when a parametric coordinate variable has bounds.
+====
+----
+float eta(eta) ;
+   eta:long_name = "eta at full levels" ;
+   eta:positive = "down" ;
+   eta:standard_name = " atmosphere_hybrid_sigma_pressure_coordinate" ;
+   eta:formula_terms = "a: A b: B ps: PS p0: P0" ;
+   eta:bounds="eta_bnds" ; 
+ float eta_bnds(eta, 2) ;
+   eta_bnds:formula_terms = "a: A_bnds b: B_bnds ps: PS p0: P0" ; // This attribute is mandatory 
+ float A(eta) ;
+   A:long_name = "'a' coefficient for vertical coordinate at full levels" ;
+   A:units = "Pa" ;
+   A:bounds = "A_bnds" ; // This attribute is included for the optional second method
+ float B(eta) ;
+   B:long_name = "'b' coefficient for vertical coordinate at full levels" ;
+   B:units = "1" ;
+   B:bounds = "B_bnds" ; // This attribute is included for the optional second method
+ float A_bnds(eta, 2) ;
+ float B_bnds(eta, 2) ;
+ float PS(lat, lon) ;
+   PS:units = "Pa" ;
+ float P0 ; 
+   P0:units = "Pa" ;
+ float temp(eta, lat, lon) ;
+   temp:standard_name = "air_temperature" ;
+   temp:units = "K";
+   temp:coordinates = "A B" ; // This attribute is included for the optional second method
+----
+
+
+
 Note that the boundary variable for a set of N contiguous intervals is an array of shape (N,2). Although in this case there will be a duplication of the boundary coordinates between adjacent intervals, this representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.
 
 Applications that process cell boundary data often times need to determine whether or not adjacent cells share an edge. In order to facilitate this type of processing the following restrictions are placed on the data in boundary variables.
