@@ -17,7 +17,7 @@ If a parametric coordinate variable with a **`formula_terms`** attribute (sectio
 
 Whenever a **`formula_terms`** attribute is attached to a boundary variable, the formula terms may additionally be identified using a second method: variables appearing in the vertical coordinates' **`formula_terms`** may be declared to be coordinate, scalar coordinate or auxiliary coordinate variables, and those coordinates may have **`bounds`** attributes that identify their boundary variables. In that case, the **`bounds`** attribute of a formula terms variable must be consistent with the **`formula_terms`** attribute of the boundary variable. Software digesting legacy datasets (constructed prior to version 1.7 of this standard) may have to rely in some cases on the first method of identifying the formula term variables and in other cases, on the second. Starting from version 1.7, however, the first method will be sufficient.
 
-[caption="Example: "]
+[caption="Example 7.1. "]
 .Specifying **`formula_terms`** when a parametric coordinate variable has bounds.
 ====
 ----
@@ -26,9 +26,9 @@ float eta(eta) ;
    eta:positive = "down" ;
    eta:standard_name = " atmosphere_hybrid_sigma_pressure_coordinate" ;
    eta:formula_terms = "a: A b: B ps: PS p0: P0" ;
-   eta:bounds="eta_bnds" ; 
- float eta_bnds(eta, 2) ;
-   eta_bnds:formula_terms = "a: A_bnds b: B_bnds ps: PS p0: P0" ; // This attribute is mandatory 
+   eta:bounds="eta_bnds" ;
+   float eta_bnds(eta, 2) ;
+   eta_bnds:formula_terms = "a: A_bnds b: B_bnds ps: PS p0: P0" ; // This attribute is mandatory
  float A(eta) ;
    A:long_name = "'a' coefficient for vertical coordinate at full levels" ;
    A:units = "Pa" ;
@@ -41,14 +41,14 @@ float eta(eta) ;
  float B_bnds(eta, 2) ;
  float PS(lat, lon) ;
    PS:units = "Pa" ;
- float P0 ; 
+ float P0 ;
    P0:units = "Pa" ;
  float temp(eta, lat, lon) ;
    temp:standard_name = "air_temperature" ;
    temp:units = "K";
    temp:coordinates = "A B" ; // This attribute is included for the optional second method
 ----
-
+====
 
 
 Note that the boundary variable for a set of N contiguous intervals is an array of shape (N,2). Although in this case there will be a duplication of the boundary coordinates between adjacent intervals, this representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.
@@ -80,7 +80,7 @@ Bounds for multi-dimensional coordinate variables with p-sided cells:: In all ot
 
 
 [[cells-on-a-latitude-axis-ex]]
-[caption="Example 7.1. "]
+[caption="Example 7.2. "]
 .Cells on a latitude axis
 ====
 ----
@@ -101,7 +101,7 @@ The boundary variable `lat_bnds` associates a latitude gridpoint `i` with the in
 For rectangular grids, two-dimensional cells can be expressed as Cartesian products of one-dimensional cells of the type in the preceding example. However for non-rectangular grids a "rectangular" cell will in general require specifying all four vertices for each cell.
 
 [[cells-in-a-non-rectangular-grid-ex]]
-[caption="Example 7.2. "]
+[caption="Example 7.3. "]
 .Cells in a non-rectangular grid
 ====
 ----
@@ -145,7 +145,7 @@ For rectangular longitude-latitude grids, the area of grid cells can be calculat
 A variable referenced by **`cell_measures`** is not required to be present in the file containing the data variable. If the **`cell_measures`** variable is located in another file (an "external file"), rather than in the file where it is referenced, it must be listed in the **`external_variables`** attribute of the referencing file (Section 2.6.3). 
 
 [[cell-areas-for-a-spherical-geodesic-grid]]
-[caption="Example 7.3. "]
+[caption="Example 7.4. "]
 .Cell areas for a spherical geodesic grid
 ====
 ----
@@ -209,7 +209,7 @@ spatio-temporal dimension and each spatio-temporal scalar coordinate
 variable.
 
 [[methods-applied-to-a-timeseries-ex]]
-[caption="Example 7.4. "]
+[caption="Example 7.5. "]
 .Methods applied to a timeseries 
 ====
 Consider 12-hourly timeseries of pressure, temperature and precipitation from a number of stations, where pressure is measured instantaneously, maximum temperature for the preceding 12 hours is recorded, and precipitation is accumulated in a rain gauge. For a period of 48 hours from 6 a.m. on 19 April 1998, the data is structured as follows: 
@@ -279,7 +279,7 @@ If there is both standardized and non-standardized information, the non-standard
 A dimension of size one may be the result of "collapsing" an axis by some statistical operation, for instance by calculating a variance from time series data. We strongly recommend that dimensions of size one be retained (or scalar coordinate variables be defined) to enable documentation of the method (through the **`cell_methods`** attribute) and its domain (through the **`bounds`** attribute).
 
 [[surface-air-temperature-variance-ex]]
-[caption="Example 7.5. "]
+[caption="Example 7.6. "]
 .Surface air temperature variance
 ====
 The variance of the diurnal cycle on 1 January 1990 has been calculated from hourly instantaneous surface air temperature measurements. The time dimension of size one has been retained. 
@@ -321,7 +321,7 @@ The second convention is the more general. In this case, the **`cell_methods`** 
 
 
 [[mean-surface-temperature-sensible-heat-flux]]
-[caption="Example 7.6. "]
+[caption="Example 7.7. "]
 .Mean surface temperature over land and sensible heat flux averaged separately over land and sea. 
 ====
 ----
@@ -345,7 +345,7 @@ If the _method_ is `mean`, various ways of calculating the mean can be distingui
 ====
 
 [[thickness-over-sea-area-ex]]
-[caption="Example 7.7. "]
+[caption="Example 7.8. "]
 .Thickness of sea-ice and snow on sea-ice averaged over sea area.
 ====
 ----
@@ -413,7 +413,7 @@ When considering intervals within days, if the earlier time of day is equal to t
 __We have tried to make the examples in this section easier to understand by translating all time coordinate values to date and time formats. This is not currently valid CDL syntax.__ 
 
 [[climatological-seasons-ex]]
-[caption="Example 7.8. "]
+[caption="Example 7.9. "]
 .Climatological seasons
 ====
 This example shows the metadata for the average seasonal-minimum temperature for the four standard climatological seasons MAM JJA SON DJF, made from data for March 1960 to February 1991. 
@@ -441,7 +441,7 @@ data:  // time coordinates translated to date/time format
 
 
 [[decadal-averages-for-january-ex]]
-[caption="Example 7.9. "]
+[caption="Example 7.10. "]
 .Decadal averages for January
 ====
 Average January precipitation totals are given for each of the decades 1961-1970, 1971-1980, 1981-1990. 
@@ -468,7 +468,7 @@ data:  // time coordinates translated to date/time format
 
 
 [[temperature-each-hour-of-average-day-ex]] 
-[caption="Example 7.10. "]
+[caption="Example 7.11. "]
 .Temperature for each hour of the average day
 ====
 Hourly average temperatures are given for April 1997. 
@@ -495,7 +495,7 @@ data:  // time coordinates translated to date/time format
 ====
 
 [[extreme-statistics-and-spell-lengths-ex]]
-[caption="Example 7.11. "]
+[caption="Example 7.12. "]
 .Extreme statistics and spell-lengths 
 ====
 Number of frost days during NH winter 2007-2008, and
@@ -534,7 +534,7 @@ data: // time coordinates translated to date/time format
 
 
 [[temperature-each-hour-of-climatological-day-ex]]
-[caption="Example 7.12. "]
+[caption="Example 7.13. "]
 .Temperature for each hour of the typical climatological day
 ====
 This is a modified version of the previous example, "Temperature
@@ -560,7 +560,7 @@ data:  // time coordinates translated to date/time format
 ====
 
 [[monthly-max-daily-precip-totals-ex]]
-[caption="Example 7.13. "]
+[caption="Example 7.14. "]
 .Monthly-maximum daily precipitation totals
 ====
 Maximum of daily precipitation amounts for each of the three months June, July and August 2000 are given. The first daily total applies to 6 a.m. on 1 June to 6 a.m. on 2 June, the 30th from 6 a.m. on 30 June to 6 a.m. on 1 July. The maximum of these 30 values is stored under time index 0 in the precipitation array. 
