@@ -429,16 +429,28 @@ variable name. The specified variable must exist in the file.
 variable, plus have a trailing dimension (CDL order) for the maximum
 number of vertices in a cell.
 * A boundary variable must be a numeric data type.
-* If a boundary variable has **`units`** or **`standard_name`** attributes, they
-must agree with those of its associated variable.
+
+*  If a boundary variable has **`units`**,**`standard_name`**, **`axis`**, **`positive`**, **`calendar`**, 
+**`leap_month`**, **`leap_year`** or **`month_lengths`** attributes, they must agree with those of its associated variable.
+* Starting with version 1.7, a boundary variable must have a **`formula_terms`** attribute when it contains bounds for a parametric 
+vertical coordinate variable that has a **`formula_terms`** attribute. In this case the same terms and named variables must appear in 
+both except for terms that depend on the vertical dimension. For such terms the variable name appearing in the boundary variable's 
+**`formula_terms`** attribute must differ from that found in the **`formula_terms`** attribute of the coordinate variable itself. The boundary 
+variable of the **`formula_terms`** variable must have the same dimensions as the **`formula_terms`** variable, plus a trailing dimension (CDL order) 
+for the maximum number of vertices in a cell, which must be the same as the trailing dimension of the boundary variable of the parametric 
+vertical coordinate variable. If a named variable in the **`formula_terms`** attribute of the vertical coordinate variable depends on the vertical 
+dimension and is a coordinate, scalar coordinate or auxiliary coordinate variable then its bounds attribute must be consistent with the equivalent 
+term in **`formula_terms`** attribute of the boundary variable. 
+
 
 *Recommendations:*
 
 * The points specified by a coordinate or auxiliary coordinate variable
 should lie within, or on the boundary, of the cells specified by the
 associated boundary variable.
-* Boundary variables should not have the **`_FillValue`** or **`missing_value`**
-attributes.
+* Boundary variables should not have the **`_FillValue`**, **`missing_value`**, **`units`**, **`standard_name`**, **`axis`**, **`positive`**, 
+**`calendar`**, **`leap_month`**, **`leap_year`** or **`month_lengths`** attributes. 
+
 
 [[section-18]]
 
