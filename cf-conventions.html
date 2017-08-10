@@ -2534,8 +2534,7 @@ considered to represent the definitive authority as regards CRS property names a
 <p>Examples 5.11 illustrates how the coordinate system properties specified via the crs grid mapping
 variable in Example 5.9 might be expressed using a <strong><code>crs_wkt</code></strong> attribute.  Example 5.12 also
 illustrates the addition of the <strong><code>crs_wkt</code></strong> attribute, but here the attribute is added to the
-<strong><code>crs</code></strong> variable of a simplified variant of Example 5.10 (5.12 also represents a slightly modified
-version of the WKT example shown in section 7.4 of <a href="#OGC_WKT-CRS">[OGC_WKT-CRS]</a>).  For brevity in Example 5.11, only
+<strong><code>crs</code></strong> variable of a simplified variant of Example 5.10.  For brevity in Example 5.11, only
 the grid mapping variable and its grid_mapping_name and crs_wkt attributes are included; all other
 elements are as per the Example 5.9.  Names of projection PARAMETERs follow the spellings used in
 the EPSG geodetic parameter registry.</p>
@@ -2567,12 +2566,15 @@ specify CRS properties not covered by existing CF grid mapping attributes, inclu
     crs:grid_mapping_name = "latitude_longitude";
     ...
     crs:crs_wkt =
-     GEOGCS["WGS 84",
-       DATUM["WGS_1984",
-         SPHEROID["WGS 84",6378137,298.257223563]
-       ],
-       PRIMEM["Greenwich",0],
-       UNIT["degree",0.0174532925199433]]
+     GEODCRS["WGS 84",
+     DATUM["World Geodetic System 1984",
+       ELLIPSOID["WGS 84",6378137,298.257223563,
+         LENGTHUNIT["metre",1.0]]],
+     PRIMEM["Greenwich",0],
+     CS[ellipsoidal,3],
+       AXIS["(lat)",north,ANGLEUNIT["degree",0.0174532925199433]],
+       AXIS["(lon)",east,ANGLEUNIT["degree",0.0174532925199433]],
+       AXIS["ellipsoidal height (h)",up,LENGTHUNIT["metre",1.0]]]
   ...</pre>
 </div>
 </div>
@@ -2618,33 +2620,40 @@ variables:
     crs:reference_ellipsoid_name = "Airy 1830" ;
     crs:prime_meridian_name = "Greenwich" ;
     crs:towgs84 = 375., -111., 431., 0., 0., 0., 0. ;
-    crs:crs_wkt = "COMPD_CS ["OSGB 1936 / British National Grid + ODN",
-      PROJCS ["OSGB 1936 / British National Grid",
-        GEOGCS ["OSGB 1936",
+    crs:crs_wkt = "COMPOUNDCRS ["OSGB 1936 / British National Grid + ODN",
+      PROJCRS ["OSGB 1936 / British National Grid",
+        GEODCRS ["OSGB 1936",
           DATUM ["OSGB 1936",
-            SPHEROID ["Airy 1830", 6377563.396, 299.3249646],
+            ELLIPSOID ["Airy 1830", 6377563.396, 299.3249646,
+              LENGTHUNIT[“metre”,1.0]],
             TOWGS84[375, -111, 431, 0, 0, 0, 0]
           ],
           PRIMEM ["Greenwich", 0],
           UNIT ["degree", 0.0174532925199433]
         ],
-        PROJECTION ["Transverse Mercator"],
-        PARAMETER ["False easting", 400000],
-        PARAMETER ["False northing", -100000],
-        PARAMETER ["Longitude of natural origin", -2.0],
-        PARAMETER ["Latitude of natural origin", 49.0],
-        PARAMETER ["Longitude of false origin", -7.556],
-        PARAMETER ["Latitude of false origin", 49.766],
-        PARAMETER ["Scale factor at natural origin", 0.9996012717],
-        UNIT ["metre", 1.0],
-        AUTHORITY ["EPSG", "27700"]
+        CONVERSION["OSGB",
+        METHOD["Transverse Mercator",
+          PARAMETER["False easting", 400000, LENGTHUNIT[“metre”,1.0]],
+          PARAMETER["False northing", -100000, LENGTHUNIT[“metre”,1.0]],
+          PARAMETER["Longitude of natural origin", -2.0, ANGLEUNIT[“degree”,0.0174532925199433]],
+          PARAMETER["Latitude of natural origin", 49.0, ANGLEUNIT[“degree”,0.0174532925199433]],
+          PARAMETER["Longitude of false origin", -7.556, ANGLEUNIT[“degree”,0.0174532925199433]],
+          PARAMETER["Latitude of false origin", 49.766, ANGLEUNIT[“degree”,0.0174532925199433]],
+          PARAMETER["Scale factor at natural origin", 0.9996012717, SCALEUNIT[“Unity”,1.0]],
+          AUTHORITY["EPSG", "27700"]]
+       CS[Cartesian,2],
+         AXIS["easting (X)",east],
+         AXIS["northing (Y)",north],
+         LENGTHUNIT[“metre”, 1.0],
       ],
-      VERT_CS ["Newlyn",
-        VERT_DATUM ["Ordnance Datum Newlyn", 2005],
-        UNIT ["metre", 1.0]",
-        AXIS ["Gravity-related height", UP],
+      VERTCRS ["Newlyn",
+        VDATUM ["Ordnance Datum Newlyn", 2005],
         AUTHORITY ["EPSG", "5701"]
-      ]]" ;
+        CS[vertical,1],
+          AXIS["gravity-related height (H)",up],
+          LENGTHUNIT[“metre”,1.0]
+      ]
+      ]" ;
   ...</pre>
 </div>
 </div>
@@ -2654,9 +2663,7 @@ variables:
 <p>Note: To enhance readability the WKT value has been split across multiple lines and embedded
 quotation marks (") left unescaped - in real netCDF files such characters would need to be
 escaped. Also for clarity, we have dropped the quotation marks which would delimit the entire crs_wkt
-string.  The WKT specification in <a href="#OGC_WKT-CRS">[OGC_WKT-CRS]</a> appears to silent be as regards which character(s) may
-be used to delimit text-valued properties; however, since all the examples in that specification use
-quotation marks, the use of that particular delimiting character is mandated by the CF convention.</p>
+string.</p>
 </div>
 </div>
 </div>
@@ -8396,7 +8403,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-08-07 18:00:30 UTC
+Last updated 2017-08-10 22:34:33 UTC
 </div>
 </div>
 </body>
