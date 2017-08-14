@@ -687,13 +687,35 @@ For all geometry types except __point__, in which each geometry contains a singl
 The node count is the total nodes in all the parts. 
 
 
-For __multiline__, __multipolygon__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute indicates a variable of the count of nodes per geometry part. 
+For __multiline__, __multipolygon__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute that indicates a variable of the count of nodes per geometry part. 
 Note that because multipoint geometries always have a single node per part, the **`part_node_count`** is not required. 
 The single dimension of the part node count variable should equal the total number of parts in all the geometries.
 
 For __polygon__ and __multipolygon__ geometries with holes, the geometry container variable must have an **`interior_ring`** attribute that contains the name of a variable that indicates if the polygon parts are interior rings (i.e., holes) or not. 
 This interior ring variable should contain the value 0 to indicate an exterior ring polygon and 1 to indicate an interior ring polygon. 
 The single dimension of the interior ring variable should be the same dimension as that of the part node count variable.
+The geometry types included in this convention are listed in Table 7.1.
+
+
+[cols="4"]
+|===============
+| geometry_type | Dimensions | Description of Geometry Instance | Additional required attributes on geometry container variable
+
+| **point** | 0 | A single location in space |
+
+| **multipoint** | 0 | A collection of one or more points | node_count
+
+| **line** | 1 | An ordered set of data points connected by linearly interpolating between points | node_count
+
+| **multiline** | 1 | A collection of one or more lines | node_count, part_node_count
+
+| **polygon** | 2 | A planar surface comprised of an exterior ring and zero or more interior rings (i.e., holes), where a ring is a closed line (i.e., the first point in the line is coincident with the last point) | node_count, part_node_count (if holes are present), interior_ring (if holes are present)
+
+| **multipolygon** | 2 | A collection of one or more polygons | node_count, part_node_count, interior_ring (if holes are present)
+|===============
+
+**Table 7.1.** Dimensionality, description, and additional required attributes for geometry_types.
+
 
 [[complete-multipolygon-example]]
 [caption="Example 7.15. "]
