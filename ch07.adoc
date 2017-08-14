@@ -721,13 +721,16 @@ The geometry types included in this convention are listed in Table 7.1.
 [caption="Example 7.15. "]
 .A multipolygon with holes
 ====
-This example demonstrates geometry without associated data variables and the use of all potential attributes and variables for encoding geometries.
+This example demonstrates all potential attributes and variables for encoding geometries.
 ----
 dimensions:
   node = 12 ;
-  feature = 2 ;
+  instance = 2 ;
   part = 4 ;
+  time = 4 ;
 variables:
+  int time(time) ;
+    time:units = "days since 2000-01-01" ;
   double x(node) ;
     x:units = "degrees_east" ;
     x:standard_name = "longitude" ;
@@ -736,11 +739,11 @@ variables:
     y:units = "degrees_north" ;
     y:standard_name = "latitude" ;
     y:axis = "Y" ;
-  double lat(feature) ;
+  double lat(instance) ;
     lat:units = "degrees_north" ;
     lat:standard_name = "latitude" ;
     lat:geometry = "geometry_container" ;
-  double lon(feature) ;
+  double lon(instance) ;
     lon:units = "degrees_east" ;
     lon:standard_name = "longitude" ;
     lon:geometry = "geometry_container" ;
@@ -752,7 +755,7 @@ variables:
     geometry_container:coordinates = "lat lon"
     geometry_container:part_node_count = "part_node_count" ;
     geometry_container:interior_ring = "interior_ring" ;
-  int node_count(feature) ;
+  int node_count(instance) ;
   int part_node_count(part) ;
   int interior_ring(part) ;
   float datum ;
@@ -760,13 +763,24 @@ variables:
     datum:semi_major_axis = 6378137. ;
     datum:inverse_flattening = 298.257223563 ;
     datum:longitude_of_prime_meridian = 0. ;
+  double someData(instance, time) ;
+    someData:coordinates = "time lat lon" ;
+    someData:grid_mapping = "datum" ;
+    someData:geometry = "geometry_container" ;
 // global attributes:
   :Conventions = "CF-1.8" ;
+  :featureType = "timeSeries" ;
 data:
+ time = 1, 2, 3, 4 ;
  x = 20, 10, 0, 5, 10, 15, 20, 10, 0, 50, 40, 30 ;
  y = 0, 15, 0, 5, 10, 5, 20, 35, 20, 0, 15, 0 ;
+ lat = 25, 7 ;
+ lon = 10, 40 ;
  node_count = 9, 3 ;
  part_node_count = 3, 3, 3, 3 ;
  interior_ring = 0, 1, 0, 0 ;
+ someData =
+   1, 2, 3, 4,
+   1, 2, 3, 4 ;
 ----
 ====
