@@ -602,7 +602,7 @@ Note that CF does not require the first and last node to be identical but allows
 Polygons that have holes, such as waterbodies in a land unit, are encoded as a collection of polygon ring parts, each identified as __exterior__ or __interior__ polygons. 
 Multipart geometries, such as multiple lines representing the same river or multiple islands representing the same jurisdiction, are encoded as collections of un-connected points, lines, or polygons that are logically grouped into a single geometry.
 
-Any data variable can be given a `geometry` attribute that indicates the geometry for the quantity held in the variable. 
+Any data variable can be given a **`geometry`** attribute that indicates the geometry for the quantity held in the variable. 
 One of the dimensions of the data variable must be the number of geometries to which the data applies. 
 As shown in Example 7.14, if the data variable has a discrete sampling geometry, the number of geometries is the length of the instance dimension (Section 9.2).
 
@@ -687,25 +687,50 @@ For all geometry types except __point__, in which each geometry contains a singl
 The node count is the total nodes in all the parts. 
 
 
-For __multiline__, __multipolygon__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute indicates a variable of the count of nodes per geometry part. 
+For __multiline__, __multipolygon__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute that indicates a variable of the count of nodes per geometry part. 
 Note that because multipoint geometries always have a single node per part, the **`part_node_count`** is not required. 
 The single dimension of the part node count variable should equal the total number of parts in all the geometries.
 
 For __polygon__ and __multipolygon__ geometries with holes, the geometry container variable must have an **`interior_ring`** attribute that contains the name of a variable that indicates if the polygon parts are interior rings (i.e., holes) or not. 
 This interior ring variable should contain the value 0 to indicate an exterior ring polygon and 1 to indicate an interior ring polygon. 
 The single dimension of the interior ring variable should be the same dimension as that of the part node count variable.
+The geometry types included in this convention are listed in Table 7.1.
+
+
+[cols="4"]
+|===============
+| geometry_type | Dimensionality | Description of Geometry Instance | Additional required attributes on geometry container variable
+
+| **point** | 0 | A single location in space |
+
+| **multipoint** | 0 | A collection of one or more points | node_count
+
+| **line** | 1 | An ordered set of data points connected by linearly interpolating between points | node_count
+
+| **multiline** | 1 | A collection of one or more lines | node_count, part_node_count
+
+| **polygon** | 2 | A planar surface comprised of an exterior ring and zero or more interior rings (i.e., holes), where a ring is a closed line (i.e., the first point in the line is coincident with the last point) | node_count, part_node_count (if holes are present), interior_ring (if holes are present)
+
+| **multipolygon** | 2 | A collection of one or more polygons | node_count, part_node_count, interior_ring (if holes are present)
+|===============
+
+**Table 7.1.** Dimensionality, description, and additional required attributes for geometry_types.
+
 
 [[complete-multipolygon-example]]
 [caption="Example 7.15. "]
 .A multipolygon with holes
 ====
-This example demonstrates geometry without associated data variables and the use of all potential attributes and variables for encoding geometries.
+This example demonstrates all potential attributes and variables for encoding geometries.
 ----
 dimensions:
   node = 12 ;
-  feature = 2 ;
+  instance = 2 ;
   part = 4 ;
+  time = 4 ;
 variables:
+  int time(time) ;
+    time:units = "days since 2000-01-01" ;
   double x(node) ;
     x:units = "degrees_east" ;
     x:standard_name = "longitude" ;
@@ -714,11 +739,11 @@ variables:
     y:units = "degrees_north" ;
     y:standard_name = "latitude" ;
     y:axis = "Y" ;
-  double lat(feature) ;
+  double lat(instance) ;
     lat:units = "degrees_north" ;
     lat:standard_name = "latitude" ;
     lat:geometry = "geometry_container" ;
-  double lon(feature) ;
+  double lon(instance) ;
     lon:units = "degrees_east" ;
     lon:standard_name = "longitude" ;
     lon:geometry = "geometry_container" ;
@@ -730,7 +755,7 @@ variables:
     geometry_container:coordinates = "lat lon"
     geometry_container:part_node_count = "part_node_count" ;
     geometry_container:interior_ring = "interior_ring" ;
-  int node_count(feature) ;
+  int node_count(instance) ;
   int part_node_count(part) ;
   int interior_ring(part) ;
   float datum ;
@@ -738,13 +763,24 @@ variables:
     datum:semi_major_axis = 6378137. ;
     datum:inverse_flattening = 298.257223563 ;
     datum:longitude_of_prime_meridian = 0. ;
+  double someData(instance, time) ;
+    someData:coordinates = "time lat lon" ;
+    someData:grid_mapping = "datum" ;
+    someData:geometry = "geometry_container" ;
 // global attributes:
   :Conventions = "CF-1.8" ;
+  :featureType = "timeSeries" ;
 data:
+ time = 1, 2, 3, 4 ;
  x = 20, 10, 0, 5, 10, 15, 20, 10, 0, 50, 40, 30 ;
  y = 0, 15, 0, 5, 10, 5, 20, 35, 20, 0, 15, 0 ;
+ lat = 25, 7 ;
+ lon = 10, 40 ;
  node_count = 9, 3 ;
  part_node_count = 3, 3, 3, 3 ;
  interior_ring = 0, 1, 0, 0 ;
+ someData =
+   1, 2, 3, 4,
+   1, 2, 3, 4 ;
 ----
 ====
