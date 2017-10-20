@@ -239,7 +239,7 @@ required to express the value.
 
 *Requirements:*
 
-* The **`axis`** attribute may only be attached to a coordinate variable.
+* The **`axis`** attribute may only be attached to coordinate variables and geometry node coordinate variables (Chapter 7).
 * The only legal values of axis are **`X`**, **`Y`**, **`Z`**, and **`T`** (case insensitive).
 * The **`axis`** attribute must be consistent with the coordinate type deduced
 from **`units`** and **`positive`**.
@@ -538,6 +538,58 @@ size 2.
 attributes, they must agree with those of its associated variable.
 * A climatology variable must not have **`_FillValue`** or **`missing_value`**
 attributes.
+
+[[geometries]]
+=== 7.5 Geometries
+
+*Requirements:*
+
+* One of the dimensions of the data variable with geometry must be the number of
+geometries to which the data applies.
+* The type of the **`geometry`** attribute is a string whose value is the name of
+a geometry container variable. The variable name must exist in the file.
+* The geometry container variable must hold **`geometry_type`** and
+**`node_coordinates`** attributes.
+* The only legal values of geometry_type are **`point`**, **`line`**,
+and **`polygon`** (case sensitive).
+* The type of the **`node_coordinates`** attribute is a string whose value is a
+blank separated list of variable names. All specified variable names
+must exist in the file.
+* The geometry node coordinate variables must each have an **`axis`** attribute.
+* A geometry container variable must not have more than one node coordinate variable with a
+particular value of the **`axis`** attribute.
+* The **`grid_mapping`** and **`coordinates`** attributes can be carried by the
+geometry container variable provided they are also carried by the data variables
+associated with the container.
+* The geometry node coordinate variables must all have the same single dimension,
+which is the total number of nodes in all the geometries.
+* The nodes must be stored consecutively for each geometry and in the order of the
+geometries, and within each multipart geometry the nodes must be stored
+consecutively for each part and in the order of the parts.
+* Polygon exterior rings must be put in anticlockwise order (viewed from above)
+and polygon interior rings in clockwise order.
+* When more than one geometry instance is present, the geometry container variable
+must have a **`node_count`** attribute that contains the name of a variable indicating
+the count of nodes per geometry. The exception is when all geometries are single part
+point geometries, in which case a node count is not needed since each geometry contains
+a single node.
+* For multipart lines, multipart polygons, and polygons with holes, the geometry
+container variable must have a **`part_node_count`** attribute that indicates a
+variable of the count of nodes per geometry part.
+* The single dimension of the part node count variable should equal the total number
+of parts in all the geometries.
+* For polygon_geometries with holes, the geometry container variable must have
+an **`interior_ring`** attribute that contains the name of a variable that indicates
+if the polygon parts are interior rings (i.e., holes) or not.
+* The interior ring variable must contain the value 0 to indicate an exterior ring
+polygon and 1 to indicate an interior ring polygon.
+* The single dimension of the interior ring variable must be the same dimension as
+that of the part node count variable.
+
+*Recommendations:*
+
+* The coordinates of the first and last node in a given ring of a polygon geometry
+should be coincident
 
 [[section-20]]
 
