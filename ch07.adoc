@@ -597,7 +597,7 @@ The approach described here specifies how to encode such geometries following th
 All geometries are made up of one or more nodes. 
 The geometry type specifies the set of topological assumptions to be applied to relate the nodes (see Table 7.1). 
 For example, multipoint and line geometries are nearly the same except nodes are interpreted as being connected for lines. 
-Lines and polygons are also nearly the same except that it should be assumed that the first and last node are connected. 
+Lines and polygons are also nearly the same except that the first and last nodes are assumed to be connected for polygons. 
 Note that CF does not require the first and last node to be identical but allows them to be coincident if desired. 
 Polygons that have holes, such as waterbodies in a land unit, are encoded as a collection of polygon ring parts, each identified as __exterior__ or __interior__ polygons. 
 Multipart geometries, such as multiple lines representing the same river or multiple islands representing the same jurisdiction, are encoded as collections of unconnected points, lines, or polygons that are logically grouped into a single geometry.
@@ -689,11 +689,11 @@ The exception is when all geometries are single part point geometries, in which 
 
 For multipart __lines__, multipart __polygons__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute that indicates a variable of the count of nodes per geometry part. 
 Note that because multipoint geometries always have a single node per part, the **`part_node_count`** is not required for __point__ geometry types. 
-The single dimension of the part node count variable should equal the total number of parts in all the geometries.
+The single dimension of the part node count variable must equal the total number of parts in all the geometries.
 
 For __polygon__ geometries with holes, the geometry container variable must have an **`interior_ring`** attribute that contains the name of a variable that indicates if the polygon parts are interior rings (i.e., holes) or not. 
-This interior ring variable should contain the value 0 to indicate an exterior ring polygon and 1 to indicate an interior ring polygon. 
-The single dimension of the interior ring variable should be the same dimension as that of the part node count variable.
+This interior ring variable must contain the value 0 to indicate an exterior ring polygon and 1 to indicate an interior ring polygon. 
+The single dimension of the interior ring variable must be the same dimension as that of the part node count variable.
 The geometry types included in this convention are listed in Table 7.1.
 
 [cols="4"]
