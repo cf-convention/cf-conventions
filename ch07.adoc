@@ -1,7 +1,7 @@
 ﻿
 ==  Data Representative of Cells 
 
-When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent. It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells. This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000. The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells. However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.
+When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent. It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells. This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000. The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells. However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.  For cases when data pertain to geospatial features with highly variable geometry node counts such as river lines or watershed boundaries, we provide <<geometries> as an alternative to bounds.
 
 
 
@@ -589,7 +589,7 @@ data:  // time coordinates translated to date/time format
 === Geometries
 
 For many geospatial applications, data values are associated with a geometry, which is a spatial representation of a real-world feature, for instance a time-series of areal average precipitation over a watershed. 
-Polygonal cells with an arbitrary number of vertices can be described using <<cell-boundaries>>, but in that case every cell must have the same number of vertices and must be single polygon rings. 
+Polygonal cells with an arbitrary number of vertices can be described using <<cell-boundaries>>, but in that case every cell must have the same number of vertices and must be a single polygon ring. 
 In contrast, each geometry may have a different number of nodes, the geometries may be lines (as alternatives to points and polygons), and they may be __multipart__, i.e., include several disjoint parts. 
 While line and point geometries don't describe an interval along a dimension as the traditional cell bounds described above do, they do describe the extent of a geometry or real-world feature so are included in this section. 
 The approach described here specifies how to encode such geometries following the pattern in **9.3.3 Contiguous ragged array representation** and attach them to variables in a way that is consistent with the cell bounds approach.
@@ -704,7 +704,7 @@ The geometry types included in this convention are listed in Table 7.1.
 
 | **line** | 1 | A collection of one or more lines, where a line is an ordered set of data points connected by linearly interpolating between points | node_count, part_node_count (if multipart geometries are present)
 
-| **polygon** | 2 | A collection of one or more polygons, where a polygon is a planar surface comprised of an exterior ring and zero or more interior rings (i.e., holes), where a ring is a closed line (i.e., the first point in the line is coincident with the last point) | node_count, part_node_count (if holes or multipart geometries are present), interior_ring (if holes are present)
+| **polygon** | 2 | A collection of one or more polygons, where a polygon is a planar surface comprised of an exterior ring and zero or more interior rings (i.e., holes), where a ring is a closed line (i.e., the last point in the line is assumed to be connected to the first point) | node_count, part_node_count (if holes or multipart geometries are present), interior_ring (if holes are present)
 |===============
 
 **Table 7.1.** Dimensionality, description, and additional required attributes for geometry_types.
