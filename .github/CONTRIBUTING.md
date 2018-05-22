@@ -21,7 +21,7 @@ As of the creation of this version of these guidelines, contributions can also b
 made through the [cf-trac](https://cf-trac.llnl.gov/trac/) infrastructure.
 [Procedures for using trac](http://cfconventions.org/rules.html) are not covered
 here and it is expected that the trac system will be deprecated once the
-community is comfortable using github for the purpose.
+community is comfortable using github for this purpose.
 
 ## General Guidelines
 
@@ -45,12 +45,12 @@ detailed review of the text may take place in a pull request.
 
 ## Issues and Pull Requests
 
-The following cases describe potential patterns of use for Issues.
+The following cases describe potential patterns of use for issues and pull requests.
 
 1. **Typo Fix** If the change is a non-controversial fix such as a typo,
 no issue is required. A pull request with the fix can be submitted directly.
-Contributors not familiar with github are encouraged to submit issues for typos
-and similar issues for others to fix.
+Contributors not familiar with github can submit issues for typos and similar
+issues for others to fix.
 
 2. **Single Section Change** In the case of a change concerning one to a few
 paragraphs, an issue should be opened that describes the problem and proposed
