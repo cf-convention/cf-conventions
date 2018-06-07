@@ -43,6 +43,10 @@ community it should be vetted in an issue. If the proposal is non-controversial
 (such as a typo correction) or has been agreed to in concept in an issue, then
 detailed review of the text may take place in a pull request.
 
+4. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues 
+and pull requests.** Please attempt to present contributions as enhancements, 
+defects, or typos and label them accordingly. 
+
 ## Issues and Pull Requests
 
 The following cases describe potential patterns of use for issues and pull requests.
