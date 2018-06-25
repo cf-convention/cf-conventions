@@ -621,9 +621,11 @@ variables:
   double lat(instance) ;
     lat:units = "degrees_north" ;
     lat:standard_name = "latitude" ;
+    lat:bounds = "y" ;
   double lon(instance) ;
     lon:units = "degrees_east" ;
     lon:standard_name = "longitude" ;
+    lon:bounds = "x" ;
   int datum ;
     datum:grid_mapping_name = "latitude_longitude" ;
     datum:longitude_of_prime_meridian = 0.0 ;
@@ -679,7 +681,9 @@ The geometry node coordinate variables must each have an **`axis`** attribute wh
 If a **`coordinates`** attribute is carried by the geometry container variable or its parent data variable, then those coordinate variables which correspond to node coordinate variables must have a **`bounds`** attribute that names the corresponding node coordinate.
 The geometry node coordinate variables must all have the same single dimension, which is the total number of nodes in all the geometries. 
 The nodes must be stored consecutively for each geometry and in the order of the geometries, and within each multipart geometry the nodes must be stored consecutively for each part and in the order of the parts. 
-Polygon exterior rings must be put in anticlockwise order (viewed from above) and polygon interior rings in clockwise order. 
+Polygon exterior rings must be stored before any interior rings they may contain. 
+Nodes for polygon exterior rings must be ordered using the right-hand rule, e.g., anticlockwise in the lon-lat plane as viewed from above. 
+Polygon interior rings must be in clockwise order. 
 They are put in opposite orders to facilitate calculation of area and consistency with the typical implementation pattern. 
 
 When more than one geometry instance is present, the geometry container variable must have a **`node_count`** attribute that contains the name of a variable indicating the count of nodes per geometry. 
