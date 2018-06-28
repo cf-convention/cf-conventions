@@ -163,5 +163,74 @@ The global **`external_variables`** attribute is a blank-separated list of the n
 These variables are to be found in other files (called "external files") but CF does not provide conventions for identifying the files concerned.
 The only attribute for which CF standardises the use of external variables is **`cell_measures`**.
 
+[[groups, Section 2.7, "Groups"]]
+=== Groups
 
+Groups provide a powerful mechanism to structure data hierarchically.
+This convention does not standardize group names.
+It may be of benefit to name groups in such a way that human readers can interpret them.
+However, files which conform to this standard shall not require software to interpret names of groups.
+Instead, references to out-of-group elements shall be found by applying the scoping rules outlined below.
+
+==== Scope
+
+Objects can be referred to as long as they are visible within the scope from which they are used.
+This means that any object can be referred to, as long as it can be found with one of the following search strategies:
+
+* Search by absolute path
+* Search by relative path
+* Search by proximity
+
+These strategies are explained in detail in the following sections.
+
+===== Search by absolute path
+
+An identifier specified with an absolute path (i.e., with a leading slash "/") resolves to the indicated location.
+For example, a `coordinates` attribute of `/g1/lat` refers to the `lat` variable in group `/g1`.
+The dataset producer must ensure that dimension(s) utilized by out-of-group objects are the same as those used by the referring object.
+For example, the nearest dimension `lat` to the current (referring) group must be the same as the dimension `lat` nearest in scope to the out-of-group coordinates.
+Thus a variable `/g2/temperature` with coordinates attribute containing `/g1/lat` is permissible so long as there is no other lat dimension "in between" those locations, e.g., `/lat`.
+
+===== Search by relative path
+
+An identifier specified with a relative path (i.e., with an internal but no leading slash "/") resolves to the indicated location.
+For example, a `coordinates` attribute of `g1/lat` refers to the `lat` variable in subgroup `g1` of the current (referring) group.
+Upward path traversals from the current group are indicated with the UNIX convention.
+For example, `../g1/lat` refers to the `lat` variable in the sibling group `g1` of the current (referring) group.
+
+===== Search by proximity
+
+An identifier specified with no path resolves to the most proximal identifier of the same name.
+In all cases, if the named object is present in the referring group, that object is the most proximal.
+For example, a `coordinates` attribute of `lat` refers to the `lat` variable (if any) in the present group.
+If the object is not in the referring group then the identifier is termed an out-of-group reference.
+
+Out-of-group references are resolved by searching all direct ancestors until the specified identifier is found.
+
+[NOTE]
+====
+The special search strategy described below is for use with coordinate variables which reference identifiers that are not found within the caller's direct ancestors.
+This strategy is deprecated and may be removed from future versions of the standard.
+====
+
+A special case exists for coordinate variables.
+Because coordinate variables must share dimensions with the variables which reference them, the ancestor search is executed only until the local apex group is reached.
+If the identifier in question cannot be found within the local apex group or any of the intermediate groups between it and the referring group, a width-wise search is initiated from the local apex group.
+The width-wise search proceeds downwards from the local apex group through each level of groups until the sought identifier is found.
+This means that variables may use coordinates which must be found via proximity search, and which are not located in the referring group or any of its ancestors.
+
+==== Application of attributes
+
+The following attributes are considered global attributes:
+
+* `title`
+* `history`
+* `Conventions`
+
+These attributes are considered global attributes and should not be duplicated in child groups.
+They should not be attached to any variable and should not appear in any child groups of the root group.
+
+Other attributes may be present within groups without being attached to a variable.
+Such attributes apply to the group where they are defined, and to that group's descendants, but not to ancestor or sibling groups.
+If a group attribute is defined in a parent group, and one of the child group redefines the same attribute, the definition within the child group applies for the child and all of its descendants.
 
