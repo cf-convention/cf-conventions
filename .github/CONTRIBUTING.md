@@ -13,9 +13,8 @@ The CF community takes great pride in respectful and collegial discourse. Any di
 
 ## General Guidelines
 
-1. **A given proposal should be discussed as one issue.** It shouldn't fork or be superseded by another one, unless that reflects what has happened to the
-proposal. 
-This is so it is easy to trace the discussion what led to a given agreed proposal.
+1. **A given proposal should be discussed as one issue.** It shouldn't fork or be superseded by another one, unless that reflects what has happened to the proposal. 
+This is so it is easy to trace the discussion tha led to a given agreed proposal.
 
 2. **A proposal should convey the reasoning and effect on all relevant sections of the specification.** 
 An overview of all actual changes and the impact the changes have on the specification should be clear. 
@@ -24,15 +23,16 @@ Depending on the length and nature of the proposal, this may require different a
 3. **In general, issues should be used for discussion of proposed changes and pull requests should be used for review of agreed upon changes.** 
 In other words, if the content or concept of what is being proposed needs to be vetted by the community it should be vetted in an issue. 
 If the proposal is non-controversial (such as a typo correction) or has been agreed to in concept in an issue, then detailed review of the text may take place in a pull request.
+Practically all changes should be documented and discussed in an issue fixed in a related pull request.
 
 4. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.** 
-Please attempt to present contributions as enhancements, defects, or typos and label them accordingly. 
+Contributions must be presented as enhancements, defects, or typos and labeled accordingly. 
 
 ## Issues and Pull Requests
 
 The following cases describe potential patterns of use for issues and pull requests.
 
-1. **Typo Fix** If the change is a non-controversial fix such as a typo, no issue is required. 
+1. **Typo Fix** If the change is a non-controversial fix such as a typo, no issue is required as these changes do not appear in the convention history. 
 A pull request with the fix can be submitted directly.
 Contributors not familiar with github can submit issues for typos and similar issues for others to fix.
 
@@ -43,7 +43,8 @@ If the modification is non-controversial, a pull request could be opened simulta
 Discussion of the proposal should take place in one issue. 
 Final review should take place in the pull request and the issue closed when the pull request is merged.
 
-3. **Changes Spanning Multiple Sections** If reasonable, changes concerning multiple sections should follow the patter described in Single Section Change.
+3. **Changes Spanning Multiple Sections** If reasonable, changes concerning multiple sections should follow the pattern described in Single Section Change.
 If explicitly listing proposed changes is not practical, general guideline 2 should be followed to document the proposal. 
 Depending on the nature of the proposal, interested community members can decide what the most effective tool is for development and review of specification changes. 
-Tools used for development of significant changes are up to those contributing and reviewing it.
+Tools used for development of significant changes are up to those contributing and reviewing it. 
+Note that their is a rendered "rich-diff" view of a pull request that can be helpful for review of large contributions.
