@@ -30,6 +30,9 @@ Contributions must be presented as enhancements, defects, or typos and labeled a
 
 ## Issues and Pull Requests
 
+Issues should attempt to follow the guidelines here and in the issue template as much as possible.
+All new pull requests should be submitted to the master branch and will be merged or closed as soon as agreement has been reached. 
+Use of other branches is at the discretion of the repository administrators.
 The following cases describe potential patterns of use for issues and pull requests.
 
 1. **Typo Fix** If the change is a non-controversial fix such as a typo, no issue is required as these changes do not appear in the convention history. 
