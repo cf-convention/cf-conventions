@@ -14,7 +14,7 @@ The CF community takes great pride in respectful and collegial discourse. Any di
 ## General Guidelines
 
 1. **A given proposal should be discussed as one issue.** It shouldn't fork or be superseded by another one, unless that reflects what has happened to the proposal. 
-This is so it is easy to trace the discussion tha led to a given agreed proposal.
+This is so it is easy to trace the discussion that led to a given agreed proposal.
 
 2. **A proposal should convey the reasoning and effect on all relevant sections of the specification.** 
 An overview of all actual changes and the impact the changes have on the specification should be clear. 
@@ -50,4 +50,4 @@ Final review should take place in the pull request and the issue closed when the
 If explicitly listing proposed changes is not practical, general guideline 2 should be followed to document the proposal. 
 Depending on the nature of the proposal, interested community members can decide what the most effective tool is for development and review of specification changes. 
 Tools used for development of significant changes are up to those contributing and reviewing it. 
-Note that their is a rendered "rich-diff" view of a pull request that can be helpful for review of large contributions.
+Note that there is a rendered "rich-diff" view of a pull request that can be helpful for review of large contributions.
