@@ -1,15 +1,15 @@
-﻿[[appendix-examples-groups, Appendix I, Good Practices and Annotated Examples for Using Groups]]
+﻿[[appendix-examples-groups, Appendix I, Recommended Practices and Annotated Examples for Using Groups]]
 
 [appendix]
-== Good Practices and Annotated Examples for Using Groups
+== Recommended Practices and Annotated Examples for Using Groups
 
-This appendix contains good practices for using netCDF-4 groups in CF compliant data, as well as annotated examples of existing use cases for representing data using groups.
+This appendix contains recommended practices for using netCDF-4 groups in CF compliant data, as well as annotated examples of existing use cases for representing data using groups.
 
-=== Good practices
+=== Recommended practices
 
 . The use of attributes attached to a group in order to store metadata normally attached directly to variables is discouraged.
 This includes, for example, replacing per-variable attributes like `_FillValue`, `scale_factor`, `valid_min`, with group-level equivalents.
-Although group attributes might be more concise, it is likely to create problems with downstream software and reduce interoperability.
+Although group attributes might be more concise, it is likely to create problems with downstream software and to reduce interoperability.
 
 . Each group's attributes, dimensions and variables should be self-contained in combination with the group metadata and any inherited properties (e.g., dimension sizes, coordinates).
 This ensures that if a group is renamed or extracted (with any inherited properties) into a new file, its information content is preserved.
@@ -19,7 +19,8 @@ Other commonly enumerated group names, such as station identifiers, buoy numbers
 It is fine to enumerate or itemize names so long as the number or name is redundantly stored as a group attribute.
 
 . Renaming or moving a group or self-contained branch of groups to a new location should not affect the interpretation of data.
-Since relative and absolute paths (containing "/") of coordinates, dimensions, and attributes are fragile, it is preferred they not be present in attributes.
+Relative and absolute paths (containing "/") of coordinates, dimensions, and attributes are fragile in that they may break if groups are moved or renamed.
+To prevent this, it is preferred that paths not be present in attribute values.
 Instead, named objects resolve to the most proximal object (i.e., dimension or variable) of that name that has the referring attribute within its scope.
 This makes files which use groups amenable to sub-setting and aggregation.
 For example, the CF `coordinates` attribute identifies a variable's coordinates in a whitespace-separated list such as `"lat lon"`.
@@ -30,7 +31,7 @@ The simpler `"lat lon"` specification works without alteration in all situations
 
 . When using a grid mapping which is referenced in multiple groups, the reference to the coordinates themselves should be maintained as an attribute of the referencing variables, and not as an attribute of the grid mapping itself. This way the coordinates can resolve to the correct coordinates which are "owned" by the referencing variable, and which are not shared amongst variables, while the grid mapping which is used to interpret the coordinates is stored in only one place. Both coordinates and grid mapping are thus found via regular scoping mechanisms.
 +
-A common use case for this is data produced on board a geostationary platform. Different swaths are stored in different groups, each with their own coordinates, but all of which share a common grid mapping for the entire full disk view.
+A common use case for this is data produced onboard a geostationary platform. Different swaths are stored in different groups, each with their own coordinates, but all of which share a common grid mapping for the entire full disk view.
 
 === Use cases
 
@@ -381,7 +382,7 @@ This can greatly reduce the volume of data which must be transferred between pro
 
 === Mapping between Hierarchical and Flat files
 
-Files which use groups can be mapped to a set of flat files.
+Files that use groups can be mapped to a set of flat files.
 This procedure involves separating the group hierarchy tree into multiple distinct, self-contained, flat files, and is called _dismembering_.
 A related procedure, _flattening_, collapses an entire hierarchical file into a single flat file.
 
@@ -394,11 +395,3 @@ When name identifiers are re-used, a flattening algorithm must disambiguate the 
 To guarantee resolution of such namespace conflicts, the flattening procedure must rename conflicting variables, dimensions, and group attributes.
 For example, variables that share a name in separate groups in a hierarchical file (e.g., `/g1/v1` and `/g2/v1`) can be renamed by concatenating their names with their original group paths, with forward-slash path separators eliminated or replaced by a special character string in the flattened version (e.g., `g1_v1` and `g2_v1`).
 A similar procedure must be followed to resolve namespace conflicts for group metadata and for dimension names.
-
-The link:$$https://www.opendap.org/software/hyrax-data-server$$[OPeNDAP Hyrax Data Server] implements such an algorithm when flattening hierarchical files.
-Hyrax goes further in that it renames all variables beneath the root group by prepending the former full path name (with slashes represented as spaces) to the original short name.
-Hyrax preserves the original name and group path of the variables in new attributes named `origname` and `fullnamepath`.
-Their preservation ensures that a suitably programmed "inflation" tool could reverse the flattening and re-construct a hierarchical file with all the original names.
-To our knowledge, no such inflator is yet available.
-Software to flatten hierarchical files without namespace conflicts is available (e.g., link:$$http://nco.sf.net/nco.html#flatten$$[NCO]).
-It is anticipated that tools (such as flatteners and inflators) that facilitate interoperability of files using groups will become more mature in the future.
