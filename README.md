@@ -9,7 +9,7 @@ process can be seen at: http://cfconventions.org/cf-conventions/cf-conventions.h
 For the official web site please visit: http://cfconventions.org/,
 and the corresponding GitHub organisation: https://github.com/cf-convention.
 
-### Building the HTML
+### Building the HTML 
 
 To convert the AsciiDoc files into the resulting HTML file:
 
