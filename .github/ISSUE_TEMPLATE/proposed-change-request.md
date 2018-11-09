@@ -5,7 +5,7 @@ about: This template should be used as applicable for any proposed change to the
 
 ---
 
-Before submitting an issue be sure you have read and understand the [github contributing guidelines](https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md) and the [rules for CF changes](http://cfconventions.org/rules.html)
+Before submitting an issue be sure you have read and understand the github contributing guidelines: https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md and the rules for CF changes: http://cfconventions.org/rules.html
 
 Change proposals should include the following information as applicable.
 
