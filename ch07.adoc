@@ -1,7 +1,7 @@
 ﻿
 ==  Data Representative of Cells 
 
-When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent. It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells. This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000. The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells. However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.
+When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent. It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells. This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000. The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells. However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.  For cases when data pertain to geospatial features with highly variable geometry node counts such as river lines or watershed boundaries, we provide <<geometries> as an alternative to bounds.
 
 
 
@@ -582,5 +582,201 @@ data:  // time coordinates translated to date/time format
   climatology_bounds="2000-6-1 6:00:00", "2000-7-1 6:00:00",
                      "2000-7-1 6:00:00", "2000-8-1 6:00:00",
                      "2000-8-1 6:00:00", "2000-9-1 6:00:00" ;
+----
+====
+
+[[geometries, Section 7.5, "Geometries"]]
+=== Geometries
+
+For many geospatial applications, data values are associated with a geometry, which is a spatial representation of a real-world feature, for instance a time-series of areal average precipitation over a watershed. 
+Polygonal cells with an arbitrary number of vertices can be described using <<cell-boundaries>>, but in that case every cell must have the same number of vertices and must be a single polygon ring. 
+In contrast, each geometry may have a different number of nodes, the geometries may be lines (as alternatives to points and polygons), and they may be __multipart__, i.e., include several disjoint parts. 
+While line and point geometries don't describe an interval along a dimension as the traditional cell bounds described above do, they do describe the extent of a geometry or real-world feature so are included in this section. 
+The approach described here specifies how to encode such geometries following the pattern in **9.3.3 Contiguous ragged array representation** and attach them to variables in a way that is consistent with the cell bounds approach.
+
+All geometries are made up of one or more nodes. 
+The geometry type specifies the set of topological assumptions to be applied to relate the nodes (see Table 7.1). 
+For example, multipoint and line geometries are nearly the same except nodes are interpreted as being connected for lines. 
+Lines and polygons are also nearly the same except that the first and last nodes are assumed to be connected for polygons. 
+Note that CF does not require the first and last node to be identical but allows them to be coincident if desired. 
+Polygons that have holes, such as waterbodies in a land unit, are encoded as a collection of polygon ring parts, each identified as __exterior__ or __interior__ polygons. 
+Multipart geometries, such as multiple lines representing the same river or multiple islands representing the same jurisdiction, are encoded as collections of unconnected points, lines, or polygons that are logically grouped into a single geometry.
+
+Any data variable can be given a **`geometry`** attribute that indicates the geometry for the quantity held in the variable. 
+One of the dimensions of the data variable must be the number of geometries to which the data applies. 
+As shown in Example 7.15, if the data variable has a discrete sampling geometry, the number of geometries is the length of the instance dimension (Section 9.2).
+
+[["timeseries-with-geometry"]]
+[caption="Example 7.15. "]
+.Timeseries with geometry.
+====
+----
+dimensions:
+  instance = 2 ;
+  node = 5 ;
+  time = 4 ;
+variables:
+  int time(time) ;
+    time:units = "days since 2000-01-01" ;
+  double lat(instance) ;
+    lat:units = "degrees_north" ;
+    lat:standard_name = "latitude" ;
+    lat:nodes = "y" ;
+  double lon(instance) ;
+    lon:units = "degrees_east" ;
+    lon:standard_name = "longitude" ;
+    lon:nodes = "x" ;
+  int datum ;
+    datum:grid_mapping_name = "latitude_longitude" ;
+    datum:longitude_of_prime_meridian = 0.0 ;
+    datum:semi_major_axis = 6378137.0 ;
+    datum:inverse_flattening = 298.257223563 ;
+  int geometry_container ;
+    geometry_container:geometry_type = "line" ;
+    geometry_container:node_count = "node_count" ;
+    geometry_container:node_coordinates = "x y" ;
+  int node_count(instance) ;
+  double x(node) ;
+    x:units = "degrees_east" ;
+    x:standard_name = "longitude" ;
+    x:axis = "X" ;
+  double y(node) ;
+    y:units = "degrees_north" ;
+    y:standard_name = "latitude" ;
+    y:axis = "Y" ;
+  double someData(instance, time) ;
+    someData:coordinates = "time lat lon" ;
+    someData:grid_mapping = "datum" ;
+    someData:geometry = "geometry_container" ;
+// global attributes:
+  :Conventions = "CF-1.8" ;
+  :featureType = "timeSeries" ;
+data:
+  time = 1, 2, 3, 4 ;
+  lat = 30, 50 ;
+  lon = 10, 60 ;
+  someData =
+    1, 2, 3, 4,
+    1, 2, 3, 4 ;
+  node_count = 3, 2 ;
+  x = 30, 10, 40, 50, 50 ;
+  y = 10, 30, 40, 60, 50 ;
+----
+The time series variable, someData, is associated with line geometries via the geometry attribute. The first line geometry is comprised of three nodes, while the second has two nodes. Client applications unaware of CF geometries can fall back to the lat and lon variables to locate feature instances in space. In this example, lat and lon coordinates are identical to the first node in each line geometry, though any representative point could be used.
+====
+
+
+A __geometry container__ variable acts as a container for attributes that describe a set of geometries. 
+The **`geometry`** attribute of the data variable contains the name of a geometry container variable. 
+The geometry container variable must hold **`geometry_type`** and **`node_coordinates`** attributes. 
+The **`grid_mapping`** and **`coordinates`** attributes can be carried by the geometry container variable provided they are also carried by the data variables associated with the container.
+
+The **`geometry_type`** attribute indicates the type of geometry present. 
+Its allowable values are: __point__, __line__, __polygon__. 
+Multipart geometries are allowed for all three geometry types. 
+For example, polygon geometries could include single part geometries like the State of Colorado and multipart geometries like the State of Hawaii. 
+
+The **`node_coordinates`** attribute contains the blank-separated names of the variables that contain geometry node coordinates (one variable for each spatial dimension). 
+The geometry node coordinate variables must each have an **`axis`** attribute whose allowable values are __X__, __Y__, and __Z__. 
+If a **`coordinates`** attribute is carried by the geometry container variable or its parent data variable, then those coordinate variables that have a meaningful correspondence with node coordinates are indicated as such by a **`nodes`** attribute that names the corresponding node coordinates.
+Whether linked to normal CF space-time coordinates with a **`nodes`** attribute or not, inclusion of such coordinates is recommended to maintain backward compatibility with software that has not implemented geometry capabilities.
+The geometry node coordinate variables must all have the same single dimension, which is the total number of nodes in all the geometries. 
+The nodes must be stored consecutively for each geometry and in the order of the geometries, and within each multipart geometry the nodes must be stored consecutively for each part and in the order of the parts. 
+Polygon exterior rings must be stored before any interior rings they may contain. 
+Nodes for polygon exterior rings must be ordered using the right-hand rule, e.g., anticlockwise in the lon-lat plane as viewed from above. 
+Polygon interior rings must be in clockwise order. 
+They are put in opposite orders to facilitate calculation of area and consistency with the typical implementation pattern. 
+
+When more than one geometry instance is present, the geometry container variable must have a **`node_count`** attribute that contains the name of a variable indicating the count of nodes per geometry. 
+The node count is the total number of nodes in all the parts. 
+The exception is when all geometries are single part point geometries, in which case a node count is not needed since each geometry contains a single node. 
+
+For multipart __lines__, multipart __polygons__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute that indicates a variable of the count of nodes per geometry part. 
+Note that because multipoint geometries always have a single node per part, the **`part_node_count`** is not required for __point__ geometry types. 
+The single dimension of the part node count variable must equal the total number of parts in all the geometries.
+
+For __polygon__ geometries with holes, the geometry container variable must have an **`interior_ring`** attribute that contains the name of a variable that indicates if the polygon parts are interior rings (i.e., holes) or not. 
+This interior ring variable must contain the value 0 to indicate an exterior ring polygon and 1 to indicate an interior ring polygon. 
+The single dimension of the interior ring variable must be the same dimension as that of the part node count variable.
+The geometry types included in this convention are listed in Table 7.1.
+
+[cols="4"]
+|===============
+| geometry_type | Dimensionality | Description of Geometry Instance | Additional required attributes on geometry container variable
+
+| **point** | 0 | A collection of one or more points, where a point is a single location in space | node_count (if multipart geometries are present)
+
+| **line** | 1 | A collection of one or more lines, where a line is an ordered set of data points connected by linearly interpolating between points | node_count, part_node_count (if multipart geometries are present)
+
+| **polygon** | 2 | A collection of one or more polygons, where a polygon is a planar surface comprised of an exterior ring and zero or more interior rings (i.e., holes), where a ring is a closed line (i.e., the last point in the line is assumed to be connected to the first point) | node_count, part_node_count (if holes or multipart geometries are present), interior_ring (if holes are present)
+|===============
+
+**Table 7.1.** Dimensionality, description, and additional required attributes for geometry_types.
+
+[[complete-multipolygon-example]]
+[caption="Example 7.16. "]
+.Polygons with holes
+====
+This example demonstrates all potential attributes and variables for encoding geometries.
+----
+dimensions:
+  node = 12 ;
+  instance = 2 ;
+  part = 4 ;
+  time = 4 ;
+variables:
+  int time(time) ;
+    time:units = "days since 2000-01-01" ;
+  double x(node) ;
+    x:units = "degrees_east" ;
+    x:standard_name = "longitude" ;
+    x:axis = "X" ;
+  double y(node) ;
+    y:units = "degrees_north" ;
+    y:standard_name = "latitude" ;
+    y:axis = "Y" ;
+  double lat(instance) ;
+    lat:units = "degrees_north" ;
+    lat:standard_name = "latitude" ;
+    lat:nodes = "y" ;
+  double lon(instance) ;
+    lon:units = "degrees_east" ;
+    lon:standard_name = "longitude" ;
+    lon:nodes = "x" ;
+  float geometry_container ;
+    geometry_container:geometry_type = "polygon" ;
+    geometry_container:node_count = "node_count" ;
+    geometry_container:node_coordinates = "x y" ;
+    geometry_container:grid_mapping = "datum" ;
+    geometry_container:coordinates = "lat lon"
+    geometry_container:part_node_count = "part_node_count" ;
+    geometry_container:interior_ring = "interior_ring" ;
+  int node_count(instance) ;
+  int part_node_count(part) ;
+  int interior_ring(part) ;
+  float datum ;
+    datum:grid_mapping_name = "latitude_longitude" ;
+    datum:semi_major_axis = 6378137. ;
+    datum:inverse_flattening = 298.257223563 ;
+    datum:longitude_of_prime_meridian = 0. ;
+  double someData(instance, time) ;
+    someData:coordinates = "time lat lon" ;
+    someData:grid_mapping = "datum" ;
+    someData:geometry = "geometry_container" ;
+// global attributes:
+  :Conventions = "CF-1.8" ;
+  :featureType = "timeSeries" ;
+data:
+ time = 1, 2, 3, 4 ;
+ x = 20, 10, 0, 5, 10, 15, 20, 10, 0, 50, 40, 30 ;
+ y = 0, 15, 0, 5, 10, 5, 20, 35, 20, 0, 15, 0 ;
+ lat = 25, 7 ;
+ lon = 10, 40 ;
+ node_count = 9, 3 ;
+ part_node_count = 3, 3, 3, 3 ;
+ interior_ring = 0, 1, 0, 0 ;
+ someData =
+   1, 2, 3, 4,
+   1, 2, 3, 4 ;
 ----
 ====
