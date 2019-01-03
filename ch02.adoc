@@ -186,60 +186,43 @@ When referencing out-of-group variables, it is the responsibility of the dataset
 
 ===== Search by absolute path
 
-An variable or dimension specified with an absolute path (i.e., with a leading slash "/") is at the indicated location.
+A variable or dimension specified with an absolute path (i.e., with a leading slash "/") is at the indicated location.
 For example, a `coordinates` attribute of `/g1/lat` refers to the `lat` variable in group `/g1`.
 
 ===== Search by relative path
 
-An variable or dimension specified with a relative path (i.e., with an internal but no leading slash "/") is at the location obtained by affixing the relative path to the absolute path of the referring attribute.
+An variable or dimension specified with a relative path (i.e., containing a slash but not with a leading slash, e.g. `child/lat`) is at the location obtained by affixing the relative path to the absolute path of the referring attribute.
 For example, a `coordinates` attribute of `g1/lat` refers to the `lat` variable in subgroup `g1` of the current (referring) group.
 Upward path traversals from the current group are indicated with the UNIX convention.
 For example, `../g1/lat` refers to the `lat` variable in the sibling group `g1` of the current (referring) group.
 
 ===== Search by proximity
 
-A variable or dimension specified with no path is the variable or dimension of the same name which can be found via a search of direct ancestor groups with the shortest number of intermediate groups.
-For example, a `coordinates` attribute of `lat` refers to the `lat` variable (if any) in the present group.
+A variable or dimension specified with no path (for example, `lat`) refers to the variable or dimension of that name, if there is one, in the referring group.
 If the variable or dimension is not in the referring group then it is termed an out-of-group reference.
 Out-of-group references are resolved by searching all direct ancestors, starting from the direct ancestor and proceeding toward the root group, until the specified variable or dimension is found.
 
+A special case exists for coordinate variables.
+Because coordinate variables must share dimensions with the variables that reference them, the ancestor search is executed only until the local apex group is reached.
+For coordinate variables that are not found in the referring group or its ancestors, a further strategy is provided, called lateral search.
+The lateral search proceeds downwards from the local apex group width-wise through each level of groups until the sought coordinate is found.
+
 [NOTE]
 ====
-The special lateral search strategy described below is for use with variables that reference coordinates that are outside of the referring group's direct ancestors.
-This placement of coordinates and lateral search strategy to find them are discouraged. They are allowed mainly for backwards-compatibility with existing datasets, and may be deprecated in future versions of the standard.
+This use of the lateral search strategy to find them is discouraged.
+They are allowed mainly for backwards-compatibility with existing datasets, and may be deprecated in future versions of the standard.
 ====
-
-A special case exists for coordinate variables.
-Because coordinate variables must share dimensions with the variables that reference them, the ancestor search is executed only until the root group is reached.
-If the coordinate in question cannot be found within the root group or any of the intermediate groups between it and the referring group, a lateral (width-wise) search is initiated from the root group.
-The lateral search proceeds downwards from the root group through each level of groups until the sought coordinate is found.
 
 ==== Application of attributes
 
-The attributes marked in the NUG conventions
-(link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, Attribute Conventions]) as global attributes may only appear in the root group. These include
+The following attributes may only be used in the root group and shall not be duplicated or overridden in child groups:
 
 * `title`
 * `history`
-* `Conventions`
+* `conventions`
 
-These attributes are considered global attributes and should not be duplicated in child groups.
-They should not be attached to any variable and should not appear in any child groups of the root group.
-All other attributes defined in the NUG conventions are per-variable attributes. These include
+Furthermore, per-variable attributes must be attached to the variables to which they refer.
+They may not be attached to a group, even if all variables within that group use the same attribute and value.
 
-* `units`
-* `long_name`
-* `_FillValue`
-* `missing_value`
-* `valid_min`
-* `valid_max`
-* `valid_range`
-* `scale_factor`
-* `add_offset`
-* `Coordinates`
-
-Per-variable attributes should be attached to variables and should not appear as group-level metadata.
-
-Other attributes may be present within groups without being attached to a variable.
-Such attributes apply to the group where they are defined, and to that group's descendants, but not to ancestor or sibling groups.
+If attributes are present within groups without being attached to a variable, they attributes apply to the group where they are defined, and to that group's descendants, but not to ancestor or sibling groups.
 If a group attribute is defined in a parent group, and one of the child group redefines the same attribute, the definition within the child group applies for the child and all of its descendants.
