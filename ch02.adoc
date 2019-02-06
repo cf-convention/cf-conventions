@@ -170,7 +170,7 @@ Groups provide a powerful mechanism to structure data hierarchically.
 This convention does not standardize group names.
 It may be of benefit to name groups in such a way that human readers can interpret them.
 However, files that conform to this standard shall not require software to interpret or decode information from group names.
-Instead, references to out-of-group variable and dimensions shall be found by applying the scoping rules outlined below.
+References to out-of-group variable and dimensions shall be found by applying the scoping rules outlined below.
 
 ==== Scope
 
@@ -182,16 +182,16 @@ Any variable or dimension can be referred to, as long as it can be found with on
 
 These strategies are explained in detail in the following sections.
 
-When referencing out-of-group variables, it is the responsibility of the dataset producer to ensure that the dimension(s) utilized by the out-of-group variable are the same as those used by the referring variable.
+If any dimension of an out-of-group variable has the same name as a dimension of the referring variable, the two must be the same dimension (i.e. they must have the same netCDF dimension ID).
 
 ===== Search by absolute path
 
-A variable or dimension specified with an absolute path (i.e., with a leading slash "/") is at the indicated location.
+A variable or dimension specified with an absolute path (i.e., with a leading slash "/") is at the indicated location relative to the root group, as in a UNIX-style file convention.
 For example, a `coordinates` attribute of `/g1/lat` refers to the `lat` variable in group `/g1`.
 
 ===== Search by relative path
 
-An variable or dimension specified with a relative path (i.e., containing a slash but not with a leading slash, e.g. `child/lat`) is at the location obtained by affixing the relative path to the absolute path of the referring attribute.
+As in a UNIX-style file convention, a variable or dimension specified with a relative path (i.e., containing a slash but not with a leading slash, e.g. `child/lat`) is at the location obtained by affixing the relative path to the absolute path of the referring attribute.
 For example, a `coordinates` attribute of `g1/lat` refers to the `lat` variable in subgroup `g1` of the current (referring) group.
 Upward path traversals from the current group are indicated with the UNIX convention.
 For example, `../g1/lat` refers to the `lat` variable in the sibling group `g1` of the current (referring) group.
@@ -199,8 +199,7 @@ For example, `../g1/lat` refers to the `lat` variable in the sibling group `g1` 
 ===== Search by proximity
 
 A variable or dimension specified with no path (for example, `lat`) refers to the variable or dimension of that name, if there is one, in the referring group.
-If the variable or dimension is not in the referring group then it is termed an out-of-group reference.
-Out-of-group references are resolved by searching all direct ancestors, starting from the direct ancestor and proceeding toward the root group, until the specified variable or dimension is found.
+If not, the ancestors of the referring group are searched for it, starting from the direct ancestor and proceeding toward the root group, until it is found.
 
 A special case exists for coordinate variables.
 Because coordinate variables must share dimensions with the variables that reference them, the ancestor search is executed only until the local apex group is reached.
