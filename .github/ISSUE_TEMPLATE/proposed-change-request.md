@@ -3,7 +3,7 @@ name: Proposed Change Request
 about: This template should be used as applicable for any proposed change to the CF
   convention.
 title: ''
-labels: ''
+labels: 'enhancement'
 assignees: ''
 
 ---
