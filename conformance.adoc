@@ -145,7 +145,7 @@ list of variable names.
 
 * Group names must not embed any metadata that is not redundantly stored in any of the group attributes.
 * The **`Conventions`** and **`external_variables`** attributes must not be used in non-root groups.
-* Group attributes must not be used to store metadata normally attached to variables, such us **`_FillValue`**, **`scale_factor`**, **`valid_min`**.
+* Group attributes must not be used to store metadata normally encoded as per-variable attributes, such us **`_FillValue`**, **`scale_factor`**, **`add_offset`**, **`valid_min`**,  **`valid_max`**, and **`valid_range`**.
 * If any dimension of an out-of-group variable has the same name as a dimension of the referring variable, the two must be the same dimension (i.e. they must have the same netCDF dimension ID).
 * References must be defined by one of the following:
   - Absolute path of the out-of-group item (variable/dimension).
@@ -159,12 +159,13 @@ The delimiting character (group separator) is the slash character ("/").
 * Absolute paths must begin with a leading slash "/" to indicate that the location is relative to the root group.
 * Relative paths must omit the leading slash "/" to indicate that the location is relative to the referring group.
 * Relative paths referencing items out of the referring group and its children shall use the UNIX convention "../" to indicate that the location is higher than the referring group in the group hierarchy.
+* Auxiliary coordinate variables must reside in the referring group or one of its direct ancestors.
 
 *Recommendations:*
 
 * Groups should be named in such a way that human readers can interpret them.
 * The **`title`** and **`history`** attributes may be defined in non-root groups to provide additional provenance and description of the subsidiary data.
-* Out-of-group references with no path are discouraged when the referenced item can't be found in any of the ancestor groups (lateral search strategy).
+* NUG-coordinate variables that are not in the referring group or one of its direct ancestors should be referenced by absolute or relative paths rather than relying on the lateral search algorithm.
 
 [[section-6]]
 
