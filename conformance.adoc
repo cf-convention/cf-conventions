@@ -137,6 +137,34 @@ unrecognized attribute.
 list of variable names.
 * No variable named by **`external_variables`** is allowed in the file.
 
+[[section-groups]]
+[[groups]]
+=== 2.7 Groups
+
+*Requirements:*
+
+* Group names must not embed any metadata that is not redundantly stored in any of the group attributes.
+* The **`Conventions`** and **`external_variables`** attributes must not be used in non-root groups.
+* Group attributes must not be used to store metadata normally attached to variables, such us **`_FillValue`**, **`scale_factor`**, **`valid_min`**.
+* If any dimension of an out-of-group variable has the same name as a dimension of the referring variable, the two must be the same dimension (i.e. they must have the same netCDF dimension ID).
+* References must be defined by one of the following:
+  - Absolute path of the out-of-group item (variable/dimension).
+  - Relative path to the out-of-group item (variable/dimension).
+  - Item (variable/dimension) name, with no path, if the item can be found in one of the following (ordered by precedence):
+    1. In the referring group (thus not an out-of-group reference).
+    2. In an ancestor group (starting from the direct ancestor and proceeding toward the root group, until it is found).
+    3. In any other group, only if the item is a coordinate variable.
+* Paths must follow a UNIX-style file convention.
+The delimiting character (group separator) is the slash character ("/").
+* Absolute paths must begin with a leading slash "/" to indicate that the location is relative to the root group.
+* Relative paths must omit the leading slash "/" to indicate that the location is relative to the referring group.
+* Relative paths referencing items out of the referring group and its children shall use the UNIX convention "../" to indicate that the location is higher than the referring group in the group hierarchy.
+
+*Recommendations:*
+
+* Groups should be named in such a way that human readers can interpret them.
+* The **`title`** and **`history`** attributes may be defined in non-root groups to provide additional provenance and description of the subsidiary data.
+* Out-of-group references with no path are discouraged when the referenced item can't be found in any of the ancestor groups (lateral search strategy).
 
 [[section-6]]
 
