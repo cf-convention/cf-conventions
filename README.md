@@ -2,9 +2,7 @@
 
 ### Status
 
-This is an *unofficial* work-in-progress to show how the CF metadata conventions
-could be managed via GitHub, Travis-CI, and asciidoctor. The output from this
-process can be seen at: http://cfconventions.org/cf-conventions/cf-conventions.html
+This repository contains the official source of the CF metadata conventions. The source files are built into HTML (see below), thw output of which can be seen at: http://cfconventions.org/cf-conventions/cf-conventions.html.
 
 For the official web site please visit: http://cfconventions.org/,
 and the corresponding GitHub organisation: https://github.com/cf-convention.
