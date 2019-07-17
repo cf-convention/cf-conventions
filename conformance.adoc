@@ -11,7 +11,7 @@ http://cfconventions.org/cf-conventions/cf-conventions.html[CF Conventions docum
 If there are any discrepencies between the two, the
 conventions document is the ultimate authority.
 
-* This document will updated as required to correct mistakes or add new
+* This document will be updated as required to correct mistakes or add new
 material required for completeness or clarity.
 
 
@@ -239,7 +239,7 @@ required to express the value.
 
 *Requirements:*
 
-* The **`axis`** attribute may only be attached to a coordinate variable.
+* The **`axis`** attribute may only be attached to coordinate variables and geometry node coordinate variables (Chapter 7).
 * The only legal values of axis are **`X`**, **`Y`**, **`Z`**, and **`T`** (case insensitive).
 * The **`axis`** attribute must be consistent with the coordinate type deduced
 from **`units`** and **`positive`**.
@@ -538,6 +538,53 @@ size 2.
 attributes, they must agree with those of its associated variable.
 * A climatology variable must not have **`_FillValue`** or **`missing_value`**
 attributes.
+
+[[geometries]]
+=== 7.5 Geometries
+
+*Requirements:*
+
+* One of the dimensions of the data variable with geometry must be the number of geometries to which the data applies.
+* The type of the **`geometry`** attribute is a string whose value is the name of
+a geometry container variable. The variable name must exist in the file.
+* The geometry container variable must hold **`geometry_type`** and **`node_coordinates`** attributes.
+* The only legal values of geometry_type are **`point`**, **`line`**,
+and **`polygon`** (case insensitive).
+* For a line **`geometry_type`**, each geometry must have a minimum of two node coordinates.
+* For a polygon **`geometry_type`**, each geometry must have a minimum of three node coordinates.
+* The type of the **`node_coordinates`** attribute is a string whose value is a
+blank separated list of variable names. All specified variable names
+must exist in the file.
+* The geometry node coordinate variables must each have an **`axis`** attribute.
+* A geometry container variable must not have more than one node coordinate variable with a
+particular value of the **`axis`** attribute.
+* The **`grid_mapping`** and **`coordinates`** attributes can be carried by the
+geometry container variable provided they are also carried by the data variables
+associated with the container.
+* If a coordinate variable named by a **`coordinates`** attribute carried by the geometry 
+container variable or its parent data variable has a **`nodes`** attribute, then the **`nodes`** 
+attribute must be a string whose value is a single variable name. The specified variable must be
+a node coordinate variable that exists in the file.
+* If coordinate variables have a **`nodes`** attribute, then the grid mapping of
+the coordinate variables must be the same as the grid mapping of the variables indicated by the **`nodes`** attribute. 
+* The geometry node coordinate variables must all have the same single dimension,
+which is the total number of nodes in all the geometries.
+* Nodes for polygon exterior rings must be put in anticlockwise order (viewed from above)
+and polygon interior rings in clockwise order.
+* The single dimension of the part node count variable should equal the total number
+of parts in all the geometries.
+* When more than one geometry instance is present and the **`node_count`** attribute on the geometry
+container is missing, the geometry type must be **`point`**, and the dimension
+of the node coordinate variables must be one of the dimensions of the data
+variable.
+* If a **`part_node_count`** variable and a **`node_count`** variable are present for a given geometry
+container, then the sum of **`part_node_count`** values must equal the sum of **`node_count`** values.
+* If the **`interior_ring`** attribute is present on the geometry container, then the **`part_node_count`**
+attribute must also be present on the geometry container.
+* The interior ring variable must contain the value 0 to indicate an exterior ring
+polygon and 1 to indicate an interior ring polygon.
+* The single dimension of the interior ring variable must be the same dimension as
+that of the part node count variable.
 
 [[section-20]]
 
