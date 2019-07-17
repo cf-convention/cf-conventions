@@ -113,7 +113,7 @@ This standard describes many attributes (some mandatory, others optional), but a
 
 We recommend that netCDF files that follow these conventions indicate
 this by setting the NUG defined global attribute **`Conventions`** to
-the string value "**`CF-1.7`**". The string is interpreted as a
+the string value "**`CF-1.8`**". The string is interpreted as a
 directory name relative to a directory that is a repository of documents
 describing sets of discipline-specific conventions. The conventions
 directory name is currently interpreted relative to the directory
@@ -163,5 +163,81 @@ The global **`external_variables`** attribute is a blank-separated list of the n
 These variables are to be found in other files (called "external files") but CF does not provide conventions for identifying the files concerned.
 The only attribute for which CF standardises the use of external variables is **`cell_measures`**.
 
+[[groups, Section 2.7, "Groups"]]
+=== Groups
 
+Groups provide a powerful mechanism to structure data hierarchically.
+This convention does not standardize group names.
+It may be of benefit to name groups in such a way that human readers can interpret them.
+However, files that conform to this standard shall not require software to interpret or decode information from group names.
+References to out-of-group variable and dimensions shall be found by applying the scoping rules outlined below.
 
+==== Scope
+
+The scoping mechanism is in keeping with the following principal:
+
+[quote, 'https://www.unidata.ucar.edu/software/netcdf/docs/groups.html[The NetCDF Data Model: Groups]']
+"Dimensions are scoped such that they are visible to all child groups. For example, you can define a dimension in the root group, and use its dimension id when defining a variable in a sub-group."
+
+Any variable or dimension can be referred to, as long as it can be found with one of the following search strategies:
+
+* Search by absolute path
+* Search by relative path
+* Search by proximity
+
+These strategies are explained in detail in the following sections.
+
+If any dimension of an out-of-group variable has the same name as a dimension of the referring variable, the two must be the same dimension (i.e. they must have the same netCDF dimension ID).
+
+===== Search by absolute path
+
+A variable or dimension specified with an absolute path (i.e., with a leading slash "/") is at the indicated location relative to the root group, as in a UNIX-style file convention.
+For example, a `coordinates` attribute of `/g1/lat` refers to the `lat` variable in group `/g1`.
+
+===== Search by relative path
+
+As in a UNIX-style file convention, a variable or dimension specified with a relative path (i.e., containing a slash but not with a leading slash, e.g. `child/lat`) is at the location obtained by affixing the relative path to the absolute path of the referring attribute.
+For example, a `coordinates` attribute of `g1/lat` refers to the `lat` variable in subgroup `g1` of the current (referring) group.
+Upward path traversals from the current group are indicated with the UNIX convention.
+For example, `../g1/lat` refers to the `lat` variable in the sibling group `g1` of the current (referring) group.
+
+===== Search by proximity
+
+A variable or dimension specified with no path (for example, `lat`) refers to the variable or dimension of that name, if there is one, in the referring group.
+If not, the ancestors of the referring group are searched for it, starting from the direct ancestor and proceeding toward the root group, until it is found.
+
+A special case exists for coordinate variables.
+Because coordinate variables must share dimensions with the variables that reference them, the ancestor search is executed only until the local apex group is reached.
+For coordinate variables that are not found in the referring group or its ancestors, a further strategy is provided, called lateral search.
+The lateral search proceeds downwards from the local apex group width-wise through each level of groups until the sought coordinate is found.
+The lateral search algorithm may only be used for NUG coordinate variables; it shall not be used for auxiliary coordinate variables.
+
+[NOTE]
+====
+This use of the lateral search strategy to find them is discouraged.
+They are allowed mainly for backwards-compatibility with existing datasets, and may be deprecated in future versions of the standard.
+====
+
+==== Application of attributes
+
+The following attributes are optional for non-root groups.
+They are allowed in order to provide additional provenance and description of the subsidiary data.
+They do not override attributes from parent groups.
+
+* `title`
+* `history`
+
+If these attributes are present, they may be applied additively to the parent attributes of the same name.
+If a file containing groups is modified, the user or application need only update these attributes in the root group, rather than traversing all groups and updating all attributes that are found with the same name.
+In the case of conflicts, the root group attribute takes precedence over per-group instances of these attributes.
+
+The following attributes may only be used in the root group and shall not be duplicated or overridden in child groups:
+
+* `Conventions`
+* `external_variables`
+
+Furthermore, per-variable attributes must be attached to the variables to which they refer.
+They may not be attached to a group, even if all variables within that group use the same attribute and value.
+
+If attributes are present within groups without being attached to a variable, these attributes apply to the group where they are defined, and to that group's descendants, but not to ancestor or sibling groups.
+If a group attribute is defined in a parent group, and one of the child group redefines the same attribute, the definition within the child group applies for the child and all of its descendants.
