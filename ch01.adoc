@@ -23,6 +23,8 @@ We have also striven to maximize conformance to the COARDS standard, that is, wh
 
 The terms in this document that refer to components of a netCDF file are defined in the NetCDF User's Guide (NUG) <<NUG>> NUG. Some of those definitions are repeated below for convenience.
 
+ancestor group:: A group from which the referring group is descended via direct parent-child relationships
+
 auxiliary coordinate variable:: Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the NUG and used by this standard - see below). Unlike coordinate variables, there is no relationship between the name of an auxiliary coordinate variable and the name(s) of its dimension(s).
 
 boundary variable:: A boundary variable is associated with a variable that contains coordinate data. When a data value provides information about conditions in a cell occupying a region of space/time or some other dimension, the boundary variable provides a description of cell extent.
@@ -48,16 +50,26 @@ grid mapping variable:: A variable used as a container for attributes that defin
 
 latitude dimension:: A dimension of a netCDF variable that has an associated latitude coordinate variable.
 
+local apex group:: The nearest (to a referring group) ancestor group in which a dimension of an out-of-group coordinate is defined. The word "apex" refers to position of this group at the vertex of the tree of groups formed by it, the referring group, and the group where a coordinate is located. 
+
 longitude dimension:: A dimension of a netCDF variable that has an associated longitude coordinate variable.
 
 multidimensional coordinate variable:: An auxiliary coordinate variable that is multidimensional.
 
+nearest item:: The item (variable or group) that can be reached via the shortest traversal of the file from the referring group following the rules set forth in the <<groups>>.
+
+out-of-group reference:: A reference to a variable or dimension that is not contained in the referring group.
+
 recommendation:: Recommendations in this convention are meant to provide advice that may be helpful for reducing common mistakes. In some cases we have recommended rather than required particular attributes in order to maintain backwards compatibility with COARDS. An application must not depend on a dataset's adherence to recommendations.
+
+referring group:: The group in which a reference to a variable or dimension occurs.
 
 scalar coordinate variable:: A scalar variable (i.e. one with no dimensions) that contains
 coordinate data. Depending on context, it may be functionally equivalent either to a size-one
 coordinate variable (<<scalar-coordinate-variables>>) or to a size-one auxiliary coordinate
 variable (<<labels>> and <<collections-instances-elements>>).
+
+sibling group:: Any group with the same parent group as the referring group
 
 spatiotemporal dimension:: A dimension of a netCDF variable that is used to identify a location in time and/or space.
 
@@ -71,7 +83,7 @@ vertical dimension:: A dimension of a netCDF variable that has an associated ver
 
 No variable or dimension names are standardized by this convention. Instead we follow the lead of the NUG and standardize only the names of attributes and some of the values taken by those attributes. The overview provided in this section will be followed with more complete descriptions in following sections. <<attribute-appendix>> contains a summary of all the attributes used in this convention.
 
-We recommend that the NUG defined attribute **`Conventions`** be given the string value     "**`CF-1.7`**" to identify datasets that conform to these conventions.
+We recommend that the NUG defined attribute **`Conventions`** be given the string value     "**`CF-1.8`**" to identify datasets that conform to these conventions.
 
 The general description of a file's contents should be contained in the following attributes: **`title`** , **`history`** , **`institution`** , **`source`** , **`comment`** and **`references`** ( <<description-of-file-contents>> ). For backwards compatibility with COARDS none of these attributes is required, but their use is recommended to provide human readable documentation of the file contents.
 

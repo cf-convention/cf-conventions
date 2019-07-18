@@ -29,8 +29,7 @@ If the proposal is non-controversial (such as a typo correction) or has been agr
 Practically all changes should be documented and discussed in an issue fixed in a related pull request.
 
 4. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.**
-[//]: # (Maybe refer to list of labels below? That way we don't have to change this section if we add more labels)
-Contributions must be presented as enhancements, defects, or typos and labeled accordingly.
+Currently this is achieved by using an appropriate issue template when creating a [new issue](https://github.com/cf-convention/cf-conventions/issues/new/choose).
 
 ## Issues and pull requests
 
