@@ -68,3 +68,8 @@ If explicitly listing proposed changes is not practical, general guideline 2 sho
 Depending on the nature of the proposal, interested community members can decide what the most effective tool is for development and review of specification changes.
 Tools used for development of significant changes are up to those contributing and reviewing it.
 Note that there is a rendered "rich-diff" view of a pull request that can be helpful for review of large contributions.
+
+<!--
+Add merge procedures.
+Also where do we keep track of contributions?
+-->
