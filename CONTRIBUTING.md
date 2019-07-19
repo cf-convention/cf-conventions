@@ -72,4 +72,11 @@ Note that there is a rendered "rich-diff" view of a pull request that can be hel
 <!--
 Add merge procedures.
 Also where do we keep track of contributions?
+
+So at some point a motion is made.
+I guess the moderator is responsible for pinging the people and getting votes.
+Also, make sure that a moderator is found in a timely fashion.
+
+I think there should be one maintainer of the repository who does the merges.
+That way nobody thinks they might be responsible but is not sure.
 -->
