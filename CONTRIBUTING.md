@@ -33,7 +33,7 @@ Currently this is achieved by using an appropriate issue template when creating 
 ## Issues and Pull Requests
 
 Issues should attempt to follow the guidelines here and in the issue template as much as possible.
-All new pull requests should be submitted to the master branch and will be merged or closed as soon as agreement has been reached.
+All new pull requests should be submitted to the master branch of this repository.
 It is recommended that pull requests are created on a branch of a personal fork of this repository.
 Use of other branches is at the discretion of the repository administrators.
 The following cases describe potential patterns of use for issues and pull requests.
