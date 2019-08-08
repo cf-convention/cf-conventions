@@ -59,7 +59,7 @@ Note that there is a rendered "rich-diff" view of a pull request that can be hel
 
 When an issue and accompanying pull request concludes with an agreed change to the conventions, then the pull request will be merged into the master branch after a further 3 weeks has elapsed, assuming that no more discussion occurs. This is as described by the rules for conventions changes at http://cfconventions.org/rules.html. If further substantive comments are raised during this period, then the final 3 week period will restart after a new conclusion is agreed.
 
-The pull request will be merged by a member of the CF conventions and standard names committee.
+The pull request will be merged by a member of the governamce panel or the CF conventions and standard names committee.
 
 The person who merges the pull request should also close the issue, leaving a comment that the issue was concluded with no further comment during the subsequent 3 weeks.
 
