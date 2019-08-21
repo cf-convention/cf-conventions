@@ -2279,7 +2279,11 @@ connect the data and coordinates</p>
 <p>If an <strong><code>axis</code></strong> attribute is attached to an auxiliary coordinate variable, it can be used by applications in the same way the <strong><code>axis</code></strong> attribute attached to a coordinate variable is used. However, it is not permissible for a data variable to have both a coordinate variable and an auxiliary coordinate variable, or more than one of either type of variable, having an <strong><code>axis</code></strong> attribute with any given value e.g. there must be no more than one <strong><code>axis</code></strong> attribute for <strong><code>X</code></strong> for any data variable. Note that if the <strong><code>axis</code></strong> attribute is not specified for an auxiliary coordinate variable, it may still be possible to determine if it is a spatiotemporal dimension from its own units or standard_name, or from the units and standard_name of the coordinate variable corresponding to its dimensions (see <a href="#coordinate-types">Chapter 4, Coordinate Types</a>). For instance, auxiliary coordinate variables which lie on the horizontal surface can be identified as such by their dimensions being horizontal. Horizontal dimensions are those whose coordinate variables have an <strong><code>axis</code></strong> attribute of <strong><code>X</code></strong> or <strong><code>Y</code></strong>, or a <strong><code>units</code></strong> attribute indicating latitude and longitude.</p>
 </div>
 <div class="paragraph">
-<p>If the coordinate variables for a horizontal grid are not longitude and latitude, it is recommended that they be supplied <em>in addition</em> to the required coordinates. For example, the Cartesian coordinates of a map projection should be supplied as coordinate variables in addition to the required two-dimensional latitude and longitude variables that are identified via the <strong><code>coordinates</code></strong> attribute. The use of the <strong><code>axis</code></strong> attribute with values <strong><code>X</code></strong> and <strong><code>Y</code></strong> is recommended for the coordinate variables (see <a href="#coordinate-types">Chapter 4, Coordinate Types</a>).</p>
+<p>To geo-reference data horizontally with respect to the Earth, a <em>grid mapping variable</em> may be provided by the data variable, using the <strong><code>grid_mapping</code></strong> attribute.
+If the coordinate variables for a horizontal grid are not longitude and latitude, then a grid_mapping variable provides the information required to derive longitude and latitude values for each grid location.
+If no <em>grid mapping variable</em> is referenced by a data variable, then longitude and latitude coordinate values shall be supplied <em>in addition</em> to the required coordinates.
+For example, the Cartesian coordinates of a map projection may be supplied as coordinate variables and, in addition, two-dimensional latitude and longitude variables may be supplied via the <strong><code>coordinates</code></strong> attribute on a data variable.
+The use of the <strong><code>axis</code></strong> attribute with values <strong><code>X</code></strong> and <strong><code>Y</code></strong> is recommended for the coordinate variables (see <a href="#coordinate-types">Chapter 4, Coordinate Types</a>).</p>
 </div>
 <div class="paragraph">
 <p>It is sometimes not practical to specify the latitude-longitude location of data which is representative of geographic regions with complex boundaries. For this purpose, provision is made in <a href="#geographic-regions">Section 6.1.1, "Geographic Regions"</a> for indicating the region by a standardized name.</p>
@@ -2429,13 +2433,17 @@ i = rgrid(n) - 128*j</pre>
 <div class="sect2">
 <h3 id="grid-mappings-and-projections"><a class="anchor" href="#grid-mappings-and-projections"></a>5.6. Horizontal Coordinate Reference Systems, Grid Mappings, and Projections</h3>
 <div class="paragraph">
-<p>When the coordinate variables for a horizontal grid are not longitude and latitude, it is required
-that the true latitude and longitude coordinates be supplied via the <strong><code>coordinates</code></strong> attribute.  A
-<em>grid mapping variable</em> is required if, in addition, it is desired to describe the mapping between the
-given coordinate variables and the true latitude and longitude coordinates, or to describe the
-figure of the Earth used to define the latitude and longitude coordinates, or to describe another
-coordinate reference system definition used by some coordinates or auxiliary coordinates. Such a
-grid mapping variable provides the description of the mapping via a collection of attached
+<p>A <em>grid mapping variable</em> may be referenced by a data variable  in order to explicitly declare the coordinate reference system (CRS) used for the horizontal spatial coordinate values.
+For example, if the horizontal spatial coordinates are latitude and longitude, the grid mapping variable can be used to declare the figure of the earth (WGS84 ellipsoid, sphere, etc.) they are based on. If the horizontal spatial coordinates are easting and northing in a map projection, the grid mapping variable declares the map projection CRS used and provides the information needed to calculate latitude and longitude from easting and northing.</p>
+</div>
+<div class="paragraph">
+<p>When the horizontal spatial coordinate variables are not longitude and latitude, it is required that further information is provided to geo-locate the horizontal position.  A <em>grid mapping variable</em> provides this information.</p>
+</div>
+<div class="paragraph">
+<p>If no <em>grid mapping variable</em> is provided and the coordinate variables for a horizontal grid are not longitude and latitude, then it is required that the latitude and longitude coordinates are supplied via the <strong><code>coordinates</code></strong> attribute.  Such coordinates may be provided in addition to the provision of a <em>grid mapping variable</em>, but that is not required.</p>
+</div>
+<div class="paragraph">
+<p>A grid mapping variable provides the description of the mapping via a collection of attached
 attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container
 for the attributes that define the mapping. The one attribute that all grid mapping variables must
 have is grid_mapping_name, which takes a string value that contains the mapping&#8217;s name. The other
@@ -9004,7 +9012,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-08-21 12:12:55 UTC
+Last updated 2019-08-21 12:14:39 UTC
 </div>
 </div>
 </body>
