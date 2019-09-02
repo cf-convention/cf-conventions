@@ -6,13 +6,14 @@ Thank you for taking the time to consider making a contribution to the [cf-conve
 The netCDF Climate and Forecasting conventions are a product by and for a broad community and your contribution is the key to their usefulness.
 
 This set of guidelines provides a brief overview of the practices and procedures that should be used in fixing, updating, or adding to the conventions.
-[//]: # (TODO: Get this link updated once we've gotten the "new rules" figured out)
 It builds on the [rules for CF Convention changes.](http://cfconventions.org/rules.html)
 
 As a prerequisite to this guide, please review the community's code of [conduct.](https://github.com/cf-convention/cf-conventions/blob/master/CODE_OF_CONDUCT.md)
 The CF community takes great pride in respectful and collegial discourse. Any disrespectful or otherwise derogatory communication will not be tolerated.
 
-[//]: # (If this is too hard for you, ask for help and we'll help!)
+These contribution guidelines are designed to make it easy to contribute to the CF Conventions and are tailored to the platform where they are hosted, GitHub.
+They are intended to support your work and not to constrict you; if at any time you find them difficult to follow, ask for help.
+Your contribution is valuable and the community will be happy to give a hand.
 
 ## General guidelines for using GitHub to change the CF Conventions
 
