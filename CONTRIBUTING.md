@@ -13,24 +13,26 @@ The CF community takes great pride in respectful and collegial discourse. Any di
 
 ## General Guidelines
 
-1. **A given proposal should be discussed as one issue.** It shouldn't fork or be superseded by another one, unless that reflects what has happened to the proposal. 
+1. **A given proposal should be discussed as one issue.** It shouldn't fork or be superseded by another one, unless that reflects what has happened to the proposal.
 This is so it is easy to trace the discussion that led to a given agreed proposal.
 
-2. **A proposal should convey the reasoning and effect on all relevant sections of the specification.** 
-An overview of all actual changes and the impact the changes have on the specification should be clear. 
+2. **A proposal should convey the reasoning and effect on all relevant sections of the specification.**
+An overview of all actual changes and the impact the changes have on the specification should be clear.
 Depending on the length and nature of the proposal, this may require different approaches as described below.
 
-3. **In general, issues should be used for discussion of proposed changes and pull requests should be used for review of agreed upon changes.** 
-In other words, if the content or concept of what is being proposed needs to be vetted by the community it should be vetted in an issue. 
+3. **In general, issues should be used for discussion of proposed changes and pull requests should be used for review of agreed upon changes.**
+In other words, if the content or concept of what is being proposed needs to be vetted by the community it should be vetted in an issue.
 If the proposal is non-controversial (such as a typo correction) or has been agreed to in concept in an issue, then detailed review of the text may take place in a pull request.
 Practically all changes should be documented and discussed in an issue fixed in a related pull request.
 
-4. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.** 
+4. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.**
 Currently this is achieved by using an appropriate issue template when creating a [new issue](https://github.com/cf-convention/cf-conventions/issues/new/choose).
 
 5. **Comments in pull requests.** These should be avoided, unless discussing changes to the wording of a proposal that do not impact on the agreed meaning. This is so that the scientific development of the proposal is easily found in one place, i.e. the GitHub issue.
 
 ## Issues and Pull Requests
+Note that it takes a minimum of three weeks for a change to the content of the CF Conventions to be merged into the Convention's next version.
+As the Conventions are published once a year, this means that the de facto "feature freeze" for a given version of the CF Conventions is three weeks before that year's annual meeting.
 
 Issues should attempt to follow the guidelines here and in the issue template as much as possible.
 All new pull requests should be submitted to the master branch of this repository.
@@ -38,21 +40,21 @@ It is recommended that pull requests are created on a branch of a personal fork 
 Use of other branches is at the discretion of the repository administrators.
 The following cases describe potential patterns of use for issues and pull requests.
 
-1. **Typo Fix** If the change is a non-controversial fix such as a typo, no issue is required as these changes do not appear in the convention history. 
+1. **Typo Fix** If the change is a non-controversial fix such as a typo, no issue is required as these changes do not appear in the convention history.
 A pull request with the fix can be submitted directly.
 Contributors not familiar with github can submit issues for typos and similar issues for others to fix.
 
-2. **Single Section Change** In the case of a change concerning one to a few paragraphs, an issue should be opened that describes the problem and proposed fix. 
-If important to the issue, the problem text should be pasted in the body of the issue and proposed fix included. 
+2. **Single Section Change** In the case of a change concerning one to a few paragraphs, an issue should be opened that describes the problem and proposed fix.
+If important to the issue, the problem text should be pasted in the body of the issue and proposed fix included.
 A link to the line where the problem exists could also be included.
-If the modification is non-controversial, a pull request could be opened simultaneously. 
-Discussion of the proposal should take place in one issue. 
+If the modification is non-controversial, a pull request could be opened simultaneously.
+Discussion of the proposal should take place in one issue.
 Final review should take place in the pull request and the issue closed when the pull request is merged.
 
 3. **Changes Spanning Multiple Sections** If reasonable, changes concerning multiple sections should follow the pattern described in Single Section Change.
-If explicitly listing proposed changes is not practical, general guideline 2 should be followed to document the proposal. 
-Depending on the nature of the proposal, interested community members can decide what the most effective tool is for development and review of specification changes. 
-Tools used for development of significant changes are up to those contributing and reviewing it. 
+If explicitly listing proposed changes is not practical, general guideline 2 should be followed to document the proposal.
+Depending on the nature of the proposal, interested community members can decide what the most effective tool is for development and review of specification changes.
+Tools used for development of significant changes are up to those contributing and reviewing it.
 Note that there is a rendered "rich-diff" view of a pull request that can be helpful for review of large contributions.
 
 ## Merging of pull requests, and closing and reopening of issues
