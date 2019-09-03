@@ -1,4 +1,4 @@
-See issue #XXX for discussion of these changes.
+Closes issue #XXX.
 
 # Release checklist
 - [ ] Authors updated in `cf-conventions.adoc`?
