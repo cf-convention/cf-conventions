@@ -32,6 +32,9 @@ Practically all changes should be documented and discussed in an issue fixed in 
 4. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.**
 Currently this is achieved by using an appropriate issue template when creating a [new issue](https://github.com/cf-convention/cf-conventions/issues/new/choose).
 
+Note that it takes a minimum of three weeks for a change to the content of the CF Conventions to be merged into the Convention's next version.
+As the Conventions are published once a year, this means that the de facto "feature freeze" for a given version of the CF Conventions is three weeks before that year's annual meeting.
+
 ## Issues and pull requests
 
 Issues should attempt to follow the guidelines in the issue template as much as possible.
