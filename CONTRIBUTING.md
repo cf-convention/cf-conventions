@@ -37,15 +37,3 @@ Currently this is achieved by using an appropriate issue template when creating 
 Issues should attempt to follow the guidelines in the issue template as much as possible.
 All new pull requests should be submitted to the master branch and will be merged or closed as soon as agreement has been reached.
 Use of other branches is at the discretion of the repository administrators.
-
-<!--
-Add merge procedures.
-Also where do we keep track of contributions?
-
-So at some point a motion is made.
-I guess the moderator is responsible for pinging the people and getting votes.
-Also, make sure that a moderator is found in a timely fashion.
-
-I think there should be one maintainer of the repository who does the merges.
-That way nobody thinks they might be responsible but is not sure.
--->
