@@ -13,6 +13,7 @@ Change proposals should include the following information as applicable.
 
 **Title:** Short and descriptive.  
 **Moderator:** @user  
+**Moderator Status Review [last updated: YY/MM/DD]:** Brief comment on current status, update periodically 
 **Requirement Summary:** A few sentence functional summary  
 **Technical Proposal Summary:** Brief proposal overview  
 **Benefits:** Who or what will benefit from this proposal?  
