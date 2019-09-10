@@ -6,8 +6,6 @@ The attributes described in this section are used to provide a description of th
 The **`standard_name`** attribute can be used to identify variables that contain coordinate data. But since it is an optional attribute, applications that implement these standards must continue to be able to identify coordinate types based on the COARDS conventions.
 
 
-
-
 [[units, Section 3.1, "Units"]]
 === Units
 
@@ -60,7 +58,8 @@ standard name:: The name used to identify the physical quantity. A standard name
 
 canonical units:: Representative units of the physical quantity. Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
 
-description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are. We don"t attempt to provide precise definitions of fundumental physical quantities (e.g., temperature) which may be found in the literature.
+description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are. We don't attempt to provide precise definitions of fundumental physical quantities (e.g., temperature) which may be found in the literature.
+The description may define rules on the variable type, attributes and coordinates which must be complied with by any variable carrying that standard name (such as in example 3.4). 
 
 When appropriate, the table entry also contains the corresponding GRIB parameter code(s) (from ECMWF and NCEP) and AMIP identifiers.
 
@@ -189,8 +188,26 @@ the flagged conditions may be **`true`**, depending on the variable bit
 settings. The following example illustrates the use of **`flag_masks`**
 to express six sensor status conditions.
 
-[[flag-variable-flag-masks-ex]]
+[[region-variable-flag-masks-ex]]
 [caption="Example 3.4. "]
+.A region variable, using **`flag_values`**
+====
+
+----
+int basin(lat, lon);
+       standard_name: region;
+       flag_values: 1, 2, 3;
+       flag_meanings:"atlantic_arctic_ocean indo_pacific_ocean global_ocean";
+data:
+   basin: 1, 1, 1, 1, 2, ..... ;
+----
+
+====
+
+A variable with standard name of `region`, `area_type` or any other standard name which requires string-valued values from a defined list may use flags together with `flag_values` and `flag_meanings` attributes to record the translation to the string values. Example 3.4 illustrates this using integer flag values for a variable with standard name `region` and `flag_values` selected from the link:$$http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html$$[standardized region names] (see section 6.1.1).
+
+[[flag-variable-flag-masks-ex]]
+[caption="Example 3.5. "]
 .A flag variable, using **`flag_masks`**
 ====
 
@@ -226,7 +243,7 @@ number of status conditions with different **`flag_values`**.  The
 conditions and one enumerated status code.
 
 [[flag-variable-flag-masks-flag-values-ex]]
-[caption="Example 3.5. "]
+[caption="Example 3.6. "]
 .A flag variable, using **`flag_masks`** and **`flag_values`**
 ====
 
@@ -283,4 +300,5 @@ with the variable. When a result is equal to the corresponding
 **`flag_values`** element, that condition is **`true`**. The repeated
 **`flag_masks`** enable a simple mechanism for clients to detect all
 possible conditions.
+
 

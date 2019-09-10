@@ -26,7 +26,11 @@ If the longitude, latitude, vertical or time coordinate is multi-valued, varies 
 
 If an **`axis`** attribute is attached to an auxiliary coordinate variable, it can be used by applications in the same way the **`axis`** attribute attached to a coordinate variable is used. However, it is not permissible for a data variable to have both a coordinate variable and an auxiliary coordinate variable, or more than one of either type of variable, having an **`axis`** attribute with any given value e.g. there must be no more than one **`axis`** attribute for **`X`** for any data variable. Note that if the **`axis`** attribute is not specified for an auxiliary coordinate variable, it may still be possible to determine if it is a spatiotemporal dimension from its own units or standard_name, or from the units and standard_name of the coordinate variable corresponding to its dimensions (see <<coordinate-types>>). For instance, auxiliary coordinate variables which lie on the horizontal surface can be identified as such by their dimensions being horizontal. Horizontal dimensions are those whose coordinate variables have an **`axis`** attribute of **`X`** or **`Y`**, or a **`units`** attribute indicating latitude and longitude.
 
-If the coordinate variables for a horizontal grid are not longitude and latitude, it is recommended that they be supplied __in addition__ to the required coordinates. For example, the Cartesian coordinates of a map projection should be supplied as coordinate variables in addition to the required two-dimensional latitude and longitude variables that are identified via the **`coordinates`** attribute. The use of the **`axis`** attribute with values **`X`** and **`Y`** is recommended for the coordinate variables (see <<coordinate-types>>).
+To geo-reference data horizontally with respect to the Earth, a __grid mapping variable__ may be provided by the data variable, using the **`grid_mapping`** attribute.
+If the coordinate variables for a horizontal grid are not longitude and latitude, then a grid_mapping variable provides the information required to derive longitude and latitude values for each grid location.
+If no __grid mapping variable__ is referenced by a data variable, then longitude and latitude coordinate values shall be supplied __in addition__ to the required coordinates. 
+For example, the Cartesian coordinates of a map projection may be supplied as coordinate variables and, in addition, two-dimensional latitude and longitude variables may be supplied via the **`coordinates`** attribute on a data variable. 
+The use of the **`axis`** attribute with values **`X`** and **`Y`** is recommended for the coordinate variables (see <<coordinate-types>>).
 
 It is sometimes not practical to specify the latitude-longitude location of data which is representative of geographic regions with complex boundaries. For this purpose, provision is made in <<geographic-regions>> for indicating the region by a standardized name.
 
@@ -184,13 +188,14 @@ _This section has been superseded by the treatment of time series as a type of d
 [[grid-mappings-and-projections, Section 5.6, "Horizontal Coordinate Reference Systems, Grid Mappings, and Projections"]]
 === Horizontal Coordinate Reference Systems, Grid Mappings, and Projections
 
-When the coordinate variables for a horizontal grid are not longitude and latitude, it is required
-that the true latitude and longitude coordinates be supplied via the **`coordinates`** attribute.  A
-__grid mapping variable__ is required if, in addition, it is desired to describe the mapping between the
-given coordinate variables and the true latitude and longitude coordinates, or to describe the
-figure of the Earth used to define the latitude and longitude coordinates, or to describe another
-coordinate reference system definition used by some coordinates or auxiliary coordinates. Such a
-grid mapping variable provides the description of the mapping via a collection of attached
+A __grid mapping variable__ may be referenced by a data variable  in order to explicitly declare the coordinate reference system (CRS) used for the horizontal spatial coordinate values.
+For example, if the horizontal spatial coordinates are latitude and longitude, the grid mapping variable can be used to declare the figure of the earth (WGS84 ellipsoid, sphere, etc.) they are based on. If the horizontal spatial coordinates are easting and northing in a map projection, the grid mapping variable declares the map projection CRS used and provides the information needed to calculate latitude and longitude from easting and northing.
+
+When the horizontal spatial coordinate variables are not longitude and latitude, it is required that further information is provided to geo-locate the horizontal position.  A __grid mapping variable__ provides this information.
+
+If no __grid mapping variable__ is provided and the coordinate variables for a horizontal grid are not longitude and latitude, then it is required that the latitude and longitude coordinates are supplied via the **`coordinates`** attribute.  Such coordinates may be provided in addition to the provision of a __grid mapping variable__, but that is not required.
+
+A grid mapping variable provides the description of the mapping via a collection of attached
 attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container
 for the attributes that define the mapping. The one attribute that all grid mapping variables must
 have is grid_mapping_name, which takes a string value that contains the mapping's name. The other
@@ -259,7 +264,7 @@ variables:
   float rlat(rlat) ;
     rlat:long_name = "latitude in rotated pole grid" ;
     rlat:units = "degrees" ;
-    rlon:standard_name = "grid_latitude";
+    rlat:standard_name = "grid_latitude";
   float lev(lev) ;
     lev:long_name = "pressure level" ;
     lev:units = "hPa" ;
@@ -391,11 +396,11 @@ dimensions:
   variables:
     double x(x) ;
       x:standard_name = "projection_x_coordinate" ;
-      x:long_name = "Easting"
+      x:long_name = "Easting" ;
       x:units = "m" ;
     double y(y) ;
       y:standard_name = "projection_y_coordinate" ;
-      y:long_name = "Northing"
+      y:long_name = "Northing" ;
       y:units = "m" ;
     double z(z) ;
       z:standard_name = "height_above_reference_ellipsoid" ;
@@ -413,10 +418,10 @@ dimensions:
       temp:coordinates = "lat lon" ;
       temp:grid_mapping = "crsOSGB: x y crsWGS84: lat lon" ;
     float pres(z, y, x) ;
-      temp:standard_name = "air_pressure" ;
-      temp:units = "Pa" ;
-      temp:coordinates = "lat lon" ;
-      temp:grid_mapping = "crsOSGB: x y crsWGS84: lat lon" ;
+      pres:standard_name = "air_pressure" ;
+      pres:units = "Pa" ;
+      pres:coordinates = "lat lon" ;
+      pres:grid_mapping = "crsOSGB: x y crsWGS84: lat lon" ;
     int crsOSGB ;
       crsOSGB:grid_mapping_name = "transverse_mercator";
       crsOSGB:semi_major_axis = 6377563.396 ;
