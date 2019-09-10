@@ -1114,10 +1114,53 @@ variable (<a href="#labels">Section 6.1, "Labels"</a> and <a href="#collections-
 <div class="sect2">
 <h3 id="_data_types"><a class="anchor" href="#_data_types"></a>2.2. Data Types</h3>
 <div class="paragraph">
-<p>The netCDF data types <strong><code>char</code></strong>, <strong><code>byte</code></strong>, <strong><code>short</code></strong>, <strong><code>int</code></strong>, <strong><code>float</code></strong> or <strong><code>real</code></strong>, and <strong><code>double</code></strong> are all acceptable. The <strong><code>char</code></strong> type is not intended for numeric data. One byte numeric data should be stored using the <strong><code>byte</code></strong> data type. All integer types are treated by the netCDF interface as signed. It is possible to treat the <strong><code>byte</code></strong> type as unsigned by using the NUG convention of indicating the unsigned range using the <strong><code>valid_min</code></strong>, <strong><code>valid_max</code></strong>, or <strong><code>valid_range</code></strong> attributes.</p>
+<p>The netCDF data types <strong><code>string</code></strong>, <strong><code>char</code></strong>, <strong><code>byte</code></strong>, <strong><code>short</code></strong>,
+<strong><code>int</code></strong>, <strong><code>float</code></strong> or <strong><code>real</code></strong>, and <strong><code>double</code></strong> are all acceptable.
+The <strong><code>string</code></strong> type is only available in files using the netCDF version 4
+(netCDF-4) format.
+The <strong><code>char</code></strong> and <strong><code>string</code></strong> types are not intended for numeric data.
+One byte numeric data should be stored using the <strong><code>byte</code></strong> data type.
+All integer types are treated by the netCDF interface as signed.
+It is possible to treat the <strong><code>byte</code></strong> type as unsigned by using the NUG
+convention of indicating the unsigned range using the <strong><code>valid_min</code></strong>,
+<strong><code>valid_max</code></strong>, or <strong><code>valid_range</code></strong> attributes.</p>
 </div>
 <div class="paragraph">
-<p>NetCDF does not support a character string type, so these must be represented as character arrays. In this document, a one dimensional array of character data is simply referred to as a "string". An n-dimensional array of strings must be implemented as a character array of dimension (n,max_string_length), with the last (most rapidly varying) dimension declared large enough to contain the longest string in the array. All the strings in a given array are therefore defined to be equal in length. For example, an array of strings containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.</p>
+<p>Strings in variables may be represented one of two ways - as atomic strings or
+as character arrays.
+An n-dimensional array of strings may be implemented as a variable of type
+<strong><code>string</code></strong> with n dimensions, or as a variable of type <strong><code>char</code></strong> with n+1
+dimensions where the last (most rapidly varying) dimension is large enough to
+contain the longest string in the variable.
+For example, a character array variable of strings containing the names of the
+months would be dimensioned (12,9) in order to accommodate "September", the
+month with the longest name.
+The other strings, such as "May", should be padded with trailing NULL or space
+characters so that every array element is filled.
+If the atomic string option is chosen, each element of the variable can be
+assigned a string with a different length.
+The CDL example below shows one variable of each type.</p>
+</div>
+<div id="char-and-string-variables-ex" class="exampleblock">
+<div class="title">Example 1.1. String Variable Representations</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  strings = 30 ;
+  strlen = 10 ;
+variables:
+  char char_variable(strings,strlen) ;
+    char_variable:long_name = "strings of type char" ;
+  string str_variable(strings) ;
+    str_variable:long_name = "strings of type string" ;</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The examples in this document that use string-valued variables alternate between
+these two forms.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2287,8 +2330,9 @@ in which the auxiliary coordinate variables appear in the
 <strong><code>coordinates</code></strong> attribute string.   The dimensions of an auxiliary
 coordinate variable must be a subset of the dimensions of the variable
 with which the coordinate is associated, with two exceptions. First,
-string-valued coordinates (<a href="#labels">Section 6.1, "Labels"</a>) have a dimension for maximum
-string length. Second, in the ragged array representations of data
+string-valued coordinates (<a href="#labels">Section 6.1, "Labels"</a>) will have a dimension for maximum string
+length if the coordinate variable has a type of <strong><code>char</code></strong> rather than a type
+of <strong><code>string</code></strong>. Second, in the ragged array representations of data
 (<a href="#discrete-sampling-geometries">Chapter 9, Discrete Sampling Geometries</a>), special methods are needed to
 connect the data and coordinates</p>
 </div>
@@ -2527,7 +2571,7 @@ variables:
     T:units = "K" ;
     T:coordinates = "lon lat" ;
     T:grid_mapping = "rotated_pole" ;
-  char rotated_pole
+  char rotated_pole ;
     rotated_pole:grid_mapping_name = "rotated_latitude_longitude" ;
     rotated_pole:grid_north_pole_latitude = 32.5 ;
     rotated_pole:grid_north_pole_longitude = 170. ;
@@ -2991,16 +3035,21 @@ to indicate geographic regions.</p>
 <p>Character strings labelling the elements of an axis are regarded as
 string-valued auxiliary coordinate variables. The <strong><code>coordinates</code></strong>
 attribute of the data variable names the variable that contains the
-string array. An application processing the variables listed in the
-<strong><code>coordinates</code></strong> attribute can recognize a string-valued auxiliary
-coordinate variable because it contains an array of character data. The
-inner dimension (last dimension in CDL terms) is the maximum length of
-each string, and the other dimensions are axis dimensions. If a string-valued
-auxiliary coordinate variable has only one dimension (the maximum length of the string),
-it is a string-valued scalar coordinate variable (see <a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a>).
-As such, it has the same information content and can be used in the same contexts as a
-string-valued auxiliary coordinate variable of a size one dimension which has not been added
-to the data variable. This is a convenience feature.</p>
+string array.
+An application processing the variables listed in the <strong><code>coordinates</code></strong>
+attribute can recognize a string-valued auxiliary coordinate variable because
+it has a type of <strong><code>char</code></strong> or <strong><code>string</code></strong>.
+If the variable has a type of <strong><code>char</code></strong>, the inner dimension (last dimension
+in CDL terms) is the maximum length of each string, and the other dimensions
+are axis dimensions.
+If an auxiliary coordinate variable has a type of <strong><code>string</code></strong> and has no
+dimensions, or has a type of <strong><code>char</code></strong> and has only one dimension (the maximum
+length of the string), it is a string-valued scalar coordinate variable (see
+<a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a>).
+As such, it has the same information content and can be used in the same
+contexts as a string-valued auxiliary coordinate variable of a size one
+dimension.
+This is a convenience feature.</p>
 </div>
 <div class="sect3">
 <h4 id="geographic-regions"><a class="anchor" href="#geographic-regions"></a>6.1.1. Geographic Regions</h4>
@@ -3019,7 +3068,6 @@ to the data variable. This is a convenience feature.</p>
   times = 20 ;
   lat = 5
   lbl = 1 ;
-  strlen = 64 ;
 variables:
   float n_heat_transport(time,lat,lbl);
     n_heat_transport:units="W";
@@ -3031,7 +3079,7 @@ variables:
   float lat(lat) ;
     lat:long_name = "latitude" ;
     lat:units = "degrees_north" ;
-  char geo_region(lbl,strlen) ;
+  string geo_region(lbl) ;
     geo_region:standard_name="region"
 data:
   geo_region = "atlantic_ocean" ;
@@ -3453,7 +3501,24 @@ data:
 </div>
 </div>
 <div class="paragraph">
-<p>If the <em>method</em> is <code>mean</code>, various ways of calculating the mean can be distinguished in the <code>cell_methods</code> attribute with a string of the form &#8220;mean where`  <em>type1</em> [<code>over</code> <em>type2</em>]". Here, <em>type1</em> can be any of the possibilities allowed for <em>typevar</em> or <em>type</em> (as specified in the two paragraphs preceding above Example). The same options apply to <em>type2</em>, except it is not allowed to be the name of an auxiliary coordinate variable with a dimension greater than one (ignoring the dimension accommodating the maximum string length). A <code>cell_methods</code> attribute with a string of the form "`mean where` <em>type1</em> <code>over</code> <em>type2</em>" indicates the mean is calculated by summing over the <em>type1</em> portion of the cell and dividing by the area of the <em>type2</em> portion. In particular, a <code>cell_methods</code> string of the form "`mean where all_area_types over` <em>type2</em>" indicates the mean is calculated by summing over all types of area within the cell and dividing by the area of the <em>type2</em> portion. (Note that "`all_area_types&#8221; is one of the valid strings permitted for a variable with the <code>standard_name</code> <code>area_type</code>.) If "`over` <em>type2</em>" is omitted, the mean is calculated by summing over the <em>type1</em> portion of the cell and dividing by the area of this portion.</p>
+<p>If the <em>method</em> is <code>mean</code>, various ways of calculating the mean can be
+distinguished in the <code>cell_methods</code> attribute with a string of the form "mean
+where  <em>type1</em> [over <em>type2</em>]".
+Here, <em>type1</em> can be any of the possibilities allowed for <em>typevar</em> or <em>type</em>
+(as specified in the two paragraphs preceding above Example).
+The same options apply to <em>type2</em>, except it is not allowed to be the name of
+an auxiliary coordinate variable with a dimension greater than one (ignoring
+the possible dimension accommodating the maximum string length).
+A <code>cell_methods</code> attribute with a string of the form "mean where <em>type1</em>
+over <em>type2</em>" indicates the mean is calculated by summing over the <em>type1</em>
+portion of the cell and dividing by the area of the <em>type2</em> portion.
+In particular, a <code>cell_methods</code> string of the form "mean where all_area_types
+over <em>type2</em>" indicates the mean is calculated by summing over all types of
+area within the cell and dividing by the area of the <em>type2</em> portion.
+(Note that <code>all_area_types</code> is one of the valid strings permitted for a
+variable with the <code>standard_name</code> <code>area_type</code>.)
+If "over <em>type2</em>" is omitted, the mean is calculated by summing over the
+<em>type1</em> portion of the cell and dividing by the area of this portion.</p>
 </div>
 </div>
 </div>
@@ -7028,7 +7093,7 @@ definitions.</p>
        alt:units = "m";
        alt:positive = "up";
        alt:axis = "Z";
-     char station_name(station, name_strlen) ;
+     string station_name(station) ;
        station_name:long_name = "station name" ;
        station_name:cf_role = "timeseries_id";
    attributes:
@@ -7118,7 +7183,6 @@ definitions.</p>
 <div class="content">
 <pre>   dimensions:
       time = 100233 ;
-      name_strlen = 23 ;
 
    variables:
       float lon ;
@@ -7135,7 +7199,7 @@ definitions.</p>
           alt:units = "m";
           alt:positive = "up";
           alt:axis = "Z";
-      char station_name(name_strlen) ;
+      string station_name ;
           station_name:long_name = "station name" ;
           station_name:cf_role = "timeseries_id";
 
@@ -7253,7 +7317,7 @@ definitions.</p>
           alt:units = "m";
           alt:positive = "up";
           alt:axis = "Z";
-      char station_name(station, name_strlen) ;
+      string station_name(station) ;
           station_name:long_name = "station name" ;
           station_name:cf_role = "timeseries_id";
       int station_info(station) ;
@@ -7673,7 +7737,7 @@ definitions.</p>
       name_strlen = 23 ;
 
    variables:
-      char trajectory(trajectory, name_strlen) ;
+      string trajectory(trajectory) ;
         trajectory:cf_role = "trajectory_id";
         trajectory:long_name = "trajectory name" ;
       int trajectory_info(trajectory) ;
@@ -7802,7 +7866,7 @@ definitions.</p>
       name_strlen = 23 ;
 
    variables:
-      char trajectory(trajectory, name_strlen) ;
+      string trajectory(trajectory) ;
             trajectory:cf_role = "trajectory_id";
       int rowSize(trajectory) ;
           rowSize:long_name = "number of obs for this trajectory " ;
@@ -7962,7 +8026,7 @@ definitions.</p>
           lat:standard_name = "latitude";
           lat:long_name = "station latitude" ;
           lat:units = "degrees_north" ;
-      char station_name(station, name_strlen) ;
+      string station_name(station) ;
           station_name:cf_role = "timeseries_id" ;
           station_name:long_name = "station name" ;
       int station_info(station) ;
@@ -8155,7 +8219,7 @@ definitions.</p>
       float alt(station) ;
           alt:long_name = "altitude above MSL" ;
           alt:units = "m" ;
-      char station_name(station, name_strlen) ;
+      string station_name(station) ;
           station_name:long_name = "station name" ;
           station_name:cf_role = "timeseries_id";
       int station_info(station) ;
@@ -8967,6 +9031,14 @@ node coordinate variables to be one of the dimensions of the data variable.</p>
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">10 September 2019</div>
+<ol class="arabic">
+<li>
+<p>Issue #139: Added support for variables of type string.</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -9032,7 +9104,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-09-10 15:49:31 UTC
+Last updated 2019-09-10 16:49:43 UTC
 </div>
 </div>
 </body>
