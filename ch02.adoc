@@ -13,9 +13,50 @@ NetCDF files should have the file name extension "**`.nc`**".
 
 === Data Types
 
-The netCDF data types **`char`**, **`byte`**, **`short`**, **`int`**, **`float`** or **`real`**, and **`double`** are all acceptable. The **`char`** type is not intended for numeric data. One byte numeric data should be stored using the **`byte`** data type. All integer types are treated by the netCDF interface as signed. It is possible to treat the **`byte`** type as unsigned by using the NUG convention of indicating the unsigned range using the **`valid_min`**, **`valid_max`**, or **`valid_range`** attributes.
+The netCDF data types **`string`**, **`char`**, **`byte`**, **`short`**,
+**`int`**, **`float`** or **`real`**, and **`double`** are all acceptable.
+The **`string`** type is only available in files using the netCDF version 4
+(netCDF-4) format.
+The **`char`** and **`string`** types are not intended for numeric data.
+One byte numeric data should be stored using the **`byte`** data type.
+All integer types are treated by the netCDF interface as signed.
+It is possible to treat the **`byte`** type as unsigned by using the NUG
+convention of indicating the unsigned range using the **`valid_min`**,
+**`valid_max`**, or **`valid_range`** attributes.
 
-NetCDF does not support a character string type, so these must be represented as character arrays. In this document, a one dimensional array of character data is simply referred to as a "string". An n-dimensional array of strings must be implemented as a character array of dimension (n,max_string_length), with the last (most rapidly varying) dimension declared large enough to contain the longest string in the array. All the strings in a given array are therefore defined to be equal in length. For example, an array of strings containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
+Strings in variables may be represented one of two ways - as atomic strings or
+as character arrays.
+An n-dimensional array of strings may be implemented as a variable of type
+**`string`** with n dimensions, or as a variable of type **`char`** with n+1
+dimensions where the last (most rapidly varying) dimension is large enough to
+contain the longest string in the variable.
+For example, a character array variable of strings containing the names of the
+months would be dimensioned (12,9) in order to accommodate "September", the
+month with the longest name.
+The other strings, such as "May", should be padded with trailing NULL or space
+characters so that every array element is filled.
+If the atomic string option is chosen, each element of the variable can be
+assigned a string with a different length.
+The CDL example below shows one variable of each type.
+
+[[char-and-string-variables-ex]]
+[caption="Example 1.1. "]
+.String Variable Representations
+====
+----
+dimensions:
+  strings = 30 ;
+  strlen = 10 ;
+variables:
+  char char_variable(strings,strlen) ;
+    char_variable:long_name = "strings of type char" ;
+  string str_variable(strings) ;
+    str_variable:long_name = "strings of type string" ;
+----
+====
+
+The examples in this document that use string-valued variables alternate between
+these two forms.
 
 
 
