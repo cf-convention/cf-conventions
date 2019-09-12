@@ -28,10 +28,13 @@ Practically all changes should be documented and discussed in an issue fixed in 
 4. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.** 
 Currently this is achieved by using an appropriate issue template when creating a [new issue](https://github.com/cf-convention/cf-conventions/issues/new/choose).
 
+5. **Comments in pull requests.** These should be avoided, unless discussing changes to the wording of a proposal that do not impact on the agreed meaning. This is so that the scientific development of the proposal is easily found in one place, i.e. the GitHub issue.
+
 ## Issues and Pull Requests
 
 Issues should attempt to follow the guidelines here and in the issue template as much as possible.
-All new pull requests should be submitted to the master branch and will be merged or closed as soon as agreement has been reached. 
+All new pull requests should be submitted to the master branch of this repository.
+It is recommended that pull requests are created on a branch of a personal fork of this repository.
 Use of other branches is at the discretion of the repository administrators.
 The following cases describe potential patterns of use for issues and pull requests.
 
@@ -51,3 +54,14 @@ If explicitly listing proposed changes is not practical, general guideline 2 sho
 Depending on the nature of the proposal, interested community members can decide what the most effective tool is for development and review of specification changes. 
 Tools used for development of significant changes are up to those contributing and reviewing it. 
 Note that there is a rendered "rich-diff" view of a pull request that can be helpful for review of large contributions.
+
+## Merging of pull requests, and closing and reopening of issues
+
+When an issue and accompanying pull request concludes with an agreed change to the conventions, then the pull request will be merged into the master branch after a further 3 weeks has elapsed, assuming that no more discussion occurs. This is as described by the rules for conventions changes at http://cfconventions.org/rules.html. If further substantive comments are raised during this period, then the final 3 week period will restart after a new conclusion is agreed.
+
+The pull request will be merged by a member of the governance panel or the CF conventions and standard names committee.
+
+The person who merges the pull request should also close the issue, leaving a comment that the issue was concluded with no further comment during the subsequent 3 weeks.
+
+If subsequent discussion is required after the pull request has been merged then a new issue should be raised, rather than reopening the closed issue.
+An issue may be closed without the merging of a pull request if the change was not accepted by the community. In this case the issue may be reopened for further discussion at a later date.
