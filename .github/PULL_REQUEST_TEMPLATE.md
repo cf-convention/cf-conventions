@@ -2,7 +2,7 @@ See issue #XXX for discussion of these changes.
 
 # Release checklist
 - [ ] Authors updated in `cf-conventions.adoc`?
-- [ ] Next version in `cf-conventions.adoc` up to date in line with SemVer?
+- [ ] Next version in `cf-conventions.adoc` up to date? Versioning inspired by [SemVer](https://semver.org).
 - [ ] `history.adoc` up to date?
 - [ ] Conformance document up-to-date?
 
