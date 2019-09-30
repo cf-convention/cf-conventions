@@ -17,4 +17,5 @@ Change proposals should include the following information as applicable.
 **Technical Proposal Summary:** Brief proposal overview  
 **Benefits:** Who or what will benefit from this proposal?  
 **Status Quo:** Discussion of the current state CF and other standards.  
+**Associated pull request:** Link to associated pull request, if present
 **Detailed Proposal:** Complete proposal
