@@ -1,5 +1,5 @@
-﻿[[cf-conformance-requirements-and-recommendations-1.7]]
-== CF Conformance Requirements and Recommendations 1.7
+﻿[[cf-conformance-requirements-and-recommendations-1.8]]
+== CF Conformance Requirements and Recommendations 1.8
 
 
 * The following is a list of requirements and recommendations for a CF
@@ -105,9 +105,9 @@ same value.
 
 *Requirements:*
 
-* Files that conform to the CF version 1.7 conventions must indicate
+* Files that conform to the CF version 1.8 conventions must indicate
 this by setting the global **`Conventions`** attribute to the string value
-"CF-1.7".
+"CF-1.8".
 * The **`Conventions`** attribute may be a single text string containing a list 
 of convention names separated by blank space or commas, one of which shall 
 be the full CF string as described above.
@@ -124,7 +124,7 @@ attributes are all type string.
 
 *Recommendations:*
 
-* The **`title`** and **`history`** attributes are only defined as of groups (or if groups are not used explicitly, of the root group).
+* The **`title`** and **`history`** attributes are only defined as global or groups attributes.
 If they are used as per variable attributes a CF compliant
 application should treat them exactly as it would treat any other
 unrecognized attribute.
@@ -143,28 +143,16 @@ list of variable names.
 
 *Requirements:*
 
-* Group names must not embed any metadata that is not redundantly stored in any of the group attributes.
 * The **`Conventions`** and **`external_variables`** attributes must not be used in non-root groups.
-* Group attributes must not be used to store metadata normally encoded as per-variable attributes, such us **`_FillValue`**, **`scale_factor`**, **`add_offset`**, **`valid_min`**,  **`valid_max`**, and **`valid_range`**.
 * If any dimension of an out-of-group variable has the same name as a dimension of the referring variable, the two must be the same dimension (i.e. they must have the same netCDF dimension ID).
-* References must be defined by one of the following:
-  - Absolute path of the out-of-group item (variable/dimension).
-  - Relative path to the out-of-group item (variable/dimension).
-  - Item (variable/dimension) name, with no path, if the item can be found in one of the following (ordered by precedence):
-    1. In the referring group (thus not an out-of-group reference).
-    2. In an ancestor group (starting from the direct ancestor and proceeding toward the root group, until it is found).
-    3. In any other group, only if the item is a coordinate variable.
-* Paths must follow a UNIX-style file convention.
-The delimiting character (group separator) is the slash character ("/").
-* Absolute paths must begin with a leading slash "/" to indicate that the location is relative to the root group.
-* Relative paths must omit the leading slash "/" to indicate that the location is relative to the referring group.
-* Relative paths referencing items out of the referring group and its children shall use the UNIX convention "../" to indicate that the location is higher than the referring group in the group hierarchy.
-* Auxiliary coordinate variables must reside in the referring group or one of its direct ancestors.
+* Variable or dimension paths must follow a UNIX style file convention.  They must be formed of words (composed of letters, digits and underscores) and be  separated by the slash character ('/'). Paths may begin with either '/', '...' or a word.
+* The variable or dimension referenced must exist in the file unless it is an external variable. References can be absolute, relative or with no path, in which case, the variable or dimension must be found in one of the following (in order of precedence):
+  - In the referring group
+  - In the ancestor group (starting from the direct ancestor and proceeding toward the root group, until it is found)
+  - By the lateral search algorithm for coordinate variables only.
 
 *Recommendations:*
 
-* Groups should be named in such a way that human readers can interpret them.
-* The **`title`** and **`history`** attributes may be defined in non-root groups to provide additional provenance and description of the subsidiary data.
 * NUG-coordinate variables that are not in the referring group or one of its direct ancestors should be referenced by absolute or relative paths rather than relying on the lateral search algorithm.
 
 [[section-6]]
