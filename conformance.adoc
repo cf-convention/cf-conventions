@@ -1,5 +1,5 @@
-﻿[[cf-conformance-requirements-and-recommendations-1.7]]
-== CF Conformance Requirements and Recommendations 1.7
+﻿[[cf-conformance-requirements-and-recommendations-1.8]]
+== CF Conformance Requirements and Recommendations 1.8
 
 
 * The following is a list of requirements and recommendations for a CF
@@ -105,9 +105,9 @@ same value.
 
 *Requirements:*
 
-* Files that conform to the CF version 1.7 conventions must indicate
+* Files that conform to the CF version 1.8 conventions must indicate
 this by setting the global **`Conventions`** attribute to the string value
-"CF-1.7".
+"CF-1.8".
 * The **`Conventions`** attribute may be a single text string containing a list 
 of convention names separated by blank space or commas, one of which shall 
 be the full CF string as described above.
@@ -124,8 +124,8 @@ attributes are all type string.
 
 *Recommendations:*
 
-* The **`title`** and **`history`** attributes are only defined as global
-attributes. If they are used as per variable attributes a CF compliant
+* The **`title`** and **`history`** attributes are only defined as global or groups attributes.
+If they are used as per variable attributes a CF compliant
 application should treat them exactly as it would treat any other
 unrecognized attribute.
 
@@ -137,6 +137,23 @@ unrecognized attribute.
 list of variable names.
 * No variable named by **`external_variables`** is allowed in the file.
 
+[[section-groups]]
+[[groups]]
+=== 2.7 Groups
+
+*Requirements:*
+
+* The **`Conventions`** and **`external_variables`** attributes must not be used in non-root groups.
+* If any dimension of an out-of-group variable has the same name as a dimension of the referring variable, the two must be the same dimension (i.e. they must have the same netCDF dimension ID).
+* Variable or dimension paths must follow a UNIX style file convention.  They must be formed of words (composed of letters, digits and underscores) and be  separated by the slash character ('/'). Paths may begin with either '/', '...' or a word.
+* The variable or dimension referenced must exist in the file unless it is an external variable. References can be absolute, relative or with no path, in which case, the variable or dimension must be found in one of the following (in order of precedence):
+  - In the referring group
+  - In the ancestor group (starting from the direct ancestor and proceeding toward the root group, until it is found)
+  - By the lateral search algorithm for coordinate variables only.
+
+*Recommendations:*
+
+* NUG-coordinate variables that are not in the referring group or one of its direct ancestors should be referenced by absolute or relative paths rather than relying on the lateral search algorithm.
 
 [[section-6]]
 
