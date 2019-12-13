@@ -107,7 +107,7 @@ When one data variable provides metadata about the individual values of another 
 
 [[instrument-data-ex]]
 [caption="Example 3.2. "]
-.Instrument data
+.Ancillary instrument data
 ====
 
 ----
@@ -125,10 +125,47 @@ When one data variable provides metadata about the individual values of another 
 
 ----
 
-
 ====
 
 
+Alternatively, **`ancillary_variables`** may be used as status flags indicating the operational status of an instrument producing the data or as quality flags indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable.  In these cases, the flag variable will include a standard name that differs from that of the source variable and indicates the specific type of flag the variable represents.
+
+The standard names table includes many names intended to be used in this situation, both general names meant to be used to flexibly represent any type of status or quality assessment, as well as names for specific quality control tests commonly applied to geophysical phenomena timeseries data.  Several examples are listed below:
+
+.Sample flag variable standard names:
+- **`status_flag`** and **`quality_flag`**: general flag categories for instrument status or quality assessment
+- **`climatology_test_quality_flag`**, **`flat_line_test_quality_flag`**, **`gap_test_quality_flag`**, **`spike_test_quality_flag`**: a subset of standard name flags used to indicate the results of commonly-used geophysical timeseries data quality control tests (consult the standard names table for a full list of published flags)
+- **`aggregate_quality_flag`**: flag indicating an aggregate summary of all quality tests performed on the data variable, both automated and manual (i.e. a master quality flag for a particular variable)
+
+The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregate flag that combines the results of the two tests.
+
+[[quality-flag-ex]]
+[caption="Example 3.2.1 "]
+.Ancillary quality flag data
+====
+
+----
+float salinity(time, z);
+        salinity:units = "1";
+        salinity:long_name = "Salinity";
+        salinity:standard_name = "sea_water_practical_salinity";
+        salinity:ancillary_variables = "salinity_qc_generic salinity_qc_flat_line_test salinity_qc_agg";
+
+    int salinity_qc_generic(time, z);
+        salinity_qc_generic:long_name = "Salinity Generic QC Process Flag";
+        salinity_qc_generic:standard_name = "quality_flag";
+
+    int salinity_qc_flat_line_test(time, z);
+        salinity_qc_flat_line_test:long_name = "Salinity Flat Line Test Flag";
+        salinity_qc_flat_line_test:standard_name = "flat_line_test_quality_flag";
+
+    int salinity_qc_agg(time, z);
+        salinity_qc_agg:long_name = "Salinity Aggregate Flag";
+        salinity_qc_agg:standard_name = "aggregate_quality_flag";
+----
+Note that the ancillary variables in this example are simplified to exclude  **`flag_values`**, **`flag_masks`** and
+**`flag_meanings`** attributes described in <<flags>> that they would ordinarily require
+====
 
 
 [[flags, Section 3.5, "Flags"]]
@@ -175,18 +212,8 @@ attribute with a value containing current_speed_qc.
 
 ====
 
-The **`flag_masks`** and **`flag_meanings`** attributes describe a
-number of independent Boolean conditions using bit field notation by
-setting unique bits in each **`flag_masks`** value.  **`The
-flag_masks`** attribute is the same type as the variable to which it is
-attached, and contains a list of values matching unique bit fields.  The
-**`flag_meanings`** attribute is defined as above, one for each
-**`flag_masks`** value.  A flagged condition is identified by performing
-a bitwise AND of the variable value and each **`flag_masks`** value; a
-non-zero result indicates a **`true`** condition.  Thus, any or all of
-the flagged conditions may be **`true`**, depending on the variable bit
-settings. The following example illustrates the use of **`flag_masks`**
-to express six sensor status conditions.
+The flag_masks and flag_meanings attributes describe a number of independent Boolean conditions using bit field notation by setting unique bits in each flag_masks value. The flag_masks attribute is the same type as the variable to which it is attached, and contains a list of values matching unique bit fields. The flag_meanings attribute is defined as above, one for each flag_masks value. A flagged condition is identified by performing a bitwise AND of the variable value and each flag_masks value; a non-zero result indicates a true condition. Thus, any or all of the flagged conditions may be true, depending on the variable bit settings. The following example illustrates the use of flag_masks to express six sensor status conditions.
+
 
 [[flag-variable-flag-masks-ex]]
 [caption="Example 3.4. "]
@@ -196,6 +223,7 @@ to express six sensor status conditions.
 ----
   byte sensor_status_qc(time, depth, lat, lon) ;
     sensor_status_qc:long_name = "Sensor Status" ;
+    sensor_status_qc:standard_name = "status_flag" ;
     sensor_status_qc:_FillValue = 0b ;
     sensor_status_qc:valid_range = 1b, 63b ;
     sensor_status_qc:flag_masks = 1b, 2b, 4b, 8b, 16b, 32b ;
@@ -250,6 +278,7 @@ conditions and one enumerated status code.
 ----
   byte sensor_status_qc(time, depth, lat, lon) ;
     sensor_status_qc:long_name = "Sensor Status" ;
+    sensor_status_qc:standard_name = "status_flag" ;
     sensor_status_qc:_FillValue = 0b ;
     sensor_status_qc:valid_range = 1b, 15b ;
     sensor_status_qc:flag_masks = 1b, 2b, 12b, 12b, 12b ;
