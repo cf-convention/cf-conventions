@@ -207,10 +207,15 @@ The grid mapping variables are associated with the data and coordinate variables
 **`grid_mapping`** attribute. This attribute is attached to data variables so that variables with
 different mappings may be present in a single file. The attribute takes a string value with two
 possible formats. In the first format, it is a single word, which names a grid mapping variable. In
-the second format, it is a blank-separated list of words "grid_mapping_variable: coordinate_variable
-[coordinate_variable ...] [grid_mapping_variable: ...]", which identifies one or more grid mapping
-variables, and with each grid mapping associates one or more coordinate_variables, i.e. coordinate
+the second format, it is a blank-separated list of words "grid_mapping_variable: coordinates_variable
+[coordinates_variable ...] [grid_mapping_variable: ...]", which identifies one or more grid mapping
+variables, and with each grid mapping associates one or more coordinates_variables, i.e. coordinate
 variables or auxiliary coordinate variables.
+
+Where an extended "grid_mapping_variable: coordinates_variable [coordinates_variable]" entity is defined, then the order of the coordinates_variable references within the definition provides an explicit order for these coordinate value variables, used if they are to be combined into individual coordinate tuples.
+
+This order is only significant if crs_wkt is also specified within the referenced grid mapping variable. Explicit 'axis order' is important when the grid_mapping_variable contains an attribute crs_wkt as it is mandated by the OGC CRS-WKT standard that coordinate tuples with correct axis order are provided as part of the reference to a Coordinate Reference System.
+
 
 Using the simple form, where the **`grid_mapping`** attribute is only the name of a grid mapping
 variable, 2D latitude and longitude coordinates for a projected coordinate reference system use the
@@ -465,6 +470,12 @@ attribute typically will be a single line of text, one intended primarily for ma
 processing. Other than the requirement to be a valid WKT string, the CF convention does not
 prescribe the content of the **`crs_wkt`** attribute since it will necessarily be context-dependent.
 
+Where a **`crs_wkt`** attribute is added to a grid_mapping, the extended syntax for the grid_mapping attribute enables the axis order for the coordinates being referenced to be explicitly stated. The explicit definition of axis order is expected by the OGC standards for referencing by coordinates.  Software implementing these standards are likely to expect to receive coordinate value tuples, with the correct coordinate order, along with the coordinate reference system definition that those coordinate values are defined with respect to.
+
+The order of the coordinates_variable references within the grid_mapping attribute definition defines the order of elements within a derived coordinate value tuple. This enables an application reading the data from a file to construct an array of coordinate value tuples, where each tuple is ordered to match the specification of the coordinate reference system being used whilst the array of tuples is structured according to the netCDF definition.
+
+For example, a file has two coordinate variables, lon and lat, and a grid mapping variable crs with an associated crs_wkt attribute; the WKT definition defines the AXIS order as ["latitude", "longitude"]. The grid_mapping attribute is thus given a value crs:lat lon to define that where coordinate pairs are required, these shall be ordered (lat, lon), to be consistent with the provided crs_wkt string (and not order inverted).  A 2-D array of (lat, lon) tuples can then be explicitly derived from the combination of the lat and lon variables.
+
 The **`crs_wkt`** attribute is intended to act as a _supplement_ to other single-property CF grid
 mapping attributes (as described in Appendix F); it is not intended to replace those attributes. If
 data producers omit the single-property grid mapping attributes in favour of the compound
@@ -514,9 +525,14 @@ specify CRS properties not covered by existing CF grid mapping attributes, inclu
 ----
 
  ...
+  float data(latitude, longitude) ;
+    data:grid_mapping = "crs:latitude, longitude" ;
+    ...
   int crs ;
     crs:grid_mapping_name = "latitude_longitude";
-    ...
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
     crs:crs_wkt =
      GEODCRS["WGS 84",
      DATUM["World Geodetic System 1984",
@@ -530,6 +546,12 @@ specify CRS properties not covered by existing CF grid mapping attributes, inclu
   ...      
 ----
 ====
+
+Note: To enhance readability of these examples, the WKT value has been split across multiple lines and embedded
+quotation marks (") left unescaped - in real netCDF files such characters would need to be escaped.
+In CDL, within the CRS WKT definition string, newlines would need to be encoded within the string as `\n` and double quotes as `\"`.
+Also for readability, we have dropped the quotation marks which would delimit the entire crs_wkt string.
+This pseudo CDL will not parse directly.
 
 [[british-national-grid-newlyn-datum-in-crs-wkt-format]]
 [caption="Example 5.12. "]
@@ -549,13 +571,11 @@ variables:
   double y(y) ;
     y:standard_name = "projection_y_coordinate" ;
     y:units = "m" ;
-  double lat(y, x) ;
-  double lon(y, x) ;
   float temp(y, x) ;
     temp:long_name = "temperature" ;
     temp:units = "K" ;
     temp:coordinates = "lat lon" ;
-    temp:grid_mapping = "crs" ;
+    temp:grid_mapping = "crs: x y" ;
   int crs ;
     crs:grid_mapping_name = "transverse_mercator" ;
     crs:longitude_of_central_meridian = -2. ;
@@ -615,13 +635,45 @@ variables:
 
 ====
 
-Note: To enhance readability the WKT value has been split across multiple lines and embedded
-quotation marks (") left unescaped - in real netCDF files such characters would need to be
-escaped. Also for clarity, we have dropped the quotation marks which would delimit the entire crs_wkt
-string.
+Note: There are unescaped double quotes and newlines in this example, to enhance readability, this pseudo CDL will not parse directly.
 
+The preceding two example (5.11 and 5.12) may be combined, if the data provider desires to provide explicit latitude and longitude coordinates as well as projection coordinates and to provide CRS WKT referencing for both sets of coordinates.  This is demonstrated in example 5.13
 
+[[british-national-grid-newlyn-datum-with-wgs84-in-crs-wkt-format]]
+[caption="Example 5.13. "]
+.British National Grid + Newlyn Datum + referenced WGS84 Geodetic in CRS WKT format
+====
+----
+...
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:units = "m" ;
+  double lat(y, x) ;
+    lat_standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lon(y, x) ;
+    lon_standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float temp(y, x) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crs_osgb: x y crs_wgs84:latitude, longitude" ;
+    ...
+  int crs_wgs84 ;
+    crs_wgs84:grid_mapping_name = "latitude_longitude";
+    crs_wgs84:crs_wkt = ...
+  int crs_osgb ;
+    crs_osgb:grid_mapping_name = "transverse_mercator" ;
+    crs_osgb:crs_wkt = ...
+  ...
+----
 
+====
+Note: There are unescaped double quotes and newlines in this example, to enhance readability, this pseudo CDL will not parse directly.
 
 
 [[scalar-coordinate-variables, Section 5.7, "Scalar Coordinate Variables"]]
@@ -653,7 +705,7 @@ time and forecast period, or vertical coordinate and model level number,
 of the same size one dimension, not as scalar coordinate variables.
 
 [[multiple-forecasts-from-single-analysis,Example 5.13, "Multiple forecasts from a single analysis"]]
-[caption="Example 5.13. "]
+[caption="Example 5.14. "]
 .Multiple forecasts from a single analysis
 ====
 ----
