@@ -207,15 +207,14 @@ The grid mapping variables are associated with the data and coordinate variables
 **`grid_mapping`** attribute. This attribute is attached to data variables so that variables with
 different mappings may be present in a single file. The attribute takes a string value with two
 possible formats. In the first format, it is a single word, which names a grid mapping variable. In
-the second format, it is a blank-separated list of words "grid_mapping_variable: coordinates_variable
-[coordinates_variable ...] [grid_mapping_variable: ...]", which identifies one or more grid mapping
-variables, and with each grid mapping associates one or more coordinates_variables, i.e. coordinate
+the second format, it is a blank-separated list of words 
+"<gridMappingVariable>: <coordinatesVariable> [<coordinatesVariable> ...] [<gridMappingVariable>: <coordinatesVariable>...]"
+, which identifies one or more grid mapping variables, and with each grid mapping associates one or more coordinatesVariables, i.e. coordinate
 variables or auxiliary coordinate variables.
 
-Where an extended "grid_mapping_variable: coordinates_variable [coordinates_variable]" entity is defined, then the order of the coordinates_variable references within the definition provides an explicit order for these coordinate value variables, used if they are to be combined into individual coordinate tuples.
+Where an extended "<gridMappingVariable>: <coordinatesVariable> [<coordinatesVariable>]" entity is defined, then the order of the <coordinatesVariable> references within the definition provides an explicit order for these coordinate value variables, which is used if they are to be combined into individual coordinate tuples.
 
 This order is only significant if crs_wkt is also specified within the referenced grid mapping variable. Explicit 'axis order' is important when the grid_mapping_variable contains an attribute crs_wkt as it is mandated by the OGC CRS-WKT standard that coordinate tuples with correct axis order are provided as part of the reference to a Coordinate Reference System.
-
 
 Using the simple form, where the **`grid_mapping`** attribute is only the name of a grid mapping
 variable, 2D latitude and longitude coordinates for a projected coordinate reference system use the
@@ -470,9 +469,9 @@ attribute typically will be a single line of text, one intended primarily for ma
 processing. Other than the requirement to be a valid WKT string, the CF convention does not
 prescribe the content of the **`crs_wkt`** attribute since it will necessarily be context-dependent.
 
-Where a **`crs_wkt`** attribute is added to a grid_mapping, the extended syntax for the grid_mapping attribute enables the axis order for the coordinates being referenced to be explicitly stated. The explicit definition of axis order is expected by the OGC standards for referencing by coordinates.  Software implementing these standards are likely to expect to receive coordinate value tuples, with the correct coordinate order, along with the coordinate reference system definition that those coordinate values are defined with respect to.
+Where a **`crs_wkt`** attribute is added to a grid_mapping, the extended syntax for the grid_mapping attribute enables the list of variables containing coordinate values being referenced to be explicitly stated and the CRS WKT Axis order to be explicitly defined. The explicit definition of WKT CRS Axis order is expected by the OGC standards for referencing by coordinates.  Software implementing these standards are likely to expect to receive coordinate value tuples, with the correct coordinate value order, along with the coordinate reference system definition that those coordinate values are defined with respect to.
 
-The order of the coordinates_variable references within the grid_mapping attribute definition defines the order of elements within a derived coordinate value tuple. This enables an application reading the data from a file to construct an array of coordinate value tuples, where each tuple is ordered to match the specification of the coordinate reference system being used whilst the array of tuples is structured according to the netCDF definition.
+The order of the <coordinatesVariable> references within the grid_mapping attribute definition defines the order of elements within a derived coordinate value tuple. This enables an application reading the data from a file to construct an array of coordinate value tuples, where each tuple is ordered to match the specification of the coordinate reference system being used whilst the array of tuples is structured according to the netCDF definition.  It is the responsibility of the data producer to ensure that the <coordinatesVariable> list is consistent with the CRS WKT definition of CS AXIS, with the correct number of entries in the correct order (note: this is not a conformance requirement as CF conformance is not dependent on CRS WKT parsing).
 
 For example, a file has two coordinate variables, lon and lat, and a grid mapping variable crs with an associated crs_wkt attribute; the WKT definition defines the AXIS order as ["latitude", "longitude"]. The grid_mapping attribute is thus given a value crs:lat lon to define that where coordinate pairs are required, these shall be ordered (lat, lon), to be consistent with the provided crs_wkt string (and not order inverted).  A 2-D array of (lat, lon) tuples can then be explicitly derived from the combination of the lat and lon variables.
 
@@ -526,7 +525,7 @@ specify CRS properties not covered by existing CF grid mapping attributes, inclu
 
  ...
   float data(latitude, longitude) ;
-    data:grid_mapping = "crs:latitude, longitude" ;
+    data:grid_mapping = "crs: latitude, longitude" ;
     ...
   int crs ;
     crs:grid_mapping_name = "latitude_longitude";
@@ -635,7 +634,7 @@ variables:
 
 ====
 
-Note: There are unescaped double quotes and newlines in this example, to enhance readability, this pseudo CDL will not parse directly.
+Note: There are unescaped double quotes and newlines and the quotation marks which would delimit the entire crs_wkt string are missing in this example.   This is to enhance readability, but it means that this pseudo CDL will not parse directly.
 
 The preceding two example (5.11 and 5.12) may be combined, if the data provider desires to provide explicit latitude and longitude coordinates as well as projection coordinates and to provide CRS WKT referencing for both sets of coordinates.  This is demonstrated in example 5.13
 
@@ -661,7 +660,7 @@ The preceding two example (5.11 and 5.12) may be combined, if the data provider 
     temp:long_name = "temperature" ;
     temp:units = "K" ;
     temp:coordinates = "lat lon" ;
-    temp:grid_mapping = "crs_osgb: x y crs_wgs84:latitude, longitude" ;
+    temp:grid_mapping = "crs_osgb: x y crs_wgs84: latitude longitude" ;
     ...
   int crs_wgs84 ;
     crs_wgs84:grid_mapping_name = "latitude_longitude";
@@ -673,7 +672,8 @@ The preceding two example (5.11 and 5.12) may be combined, if the data provider 
 ----
 
 ====
-Note: There are unescaped double quotes and newlines in this example, to enhance readability, this pseudo CDL will not parse directly.
+
+Note: There are unescaped double quotes and newlines and the quotation marks which would delimit the entire crs_wkt string are missing in this example.   This is to enhance readability, but it means that this pseudo CDL will not parse directly.
 
 
 [[scalar-coordinate-variables, Section 5.7, "Scalar Coordinate Variables"]]
