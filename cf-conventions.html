@@ -554,6 +554,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#labels">6.1. Labels</a>
 <ul class="sectlevel3">
 <li><a href="#geographic-regions">6.1.1. Geographic Regions</a></li>
+<li><a href="#taxon-names-and-identifiers">6.1.2. Taxon Names and Identifiers</a></li>
 </ul>
 </li>
 <li><a href="#alternative-coordinates">6.2. Alternative Coordinates</a></li>
@@ -3088,6 +3089,50 @@ variables:
 data:
   geo_region = "atlantic_ocean" ;
   lat = 10., 20., 30., 40., 50. ;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="taxon-names-and-identifiers"><a class="anchor" href="#taxon-names-and-identifiers"></a>6.1.2. Taxon Names and Identifiers</h4>
+<div class="paragraph">
+<p>A taxon is a named level within a biological classification, such as a class, genus and species. Quantities dependent on taxa have generic standard names containing the phrase "organisms_in_taxon", and the taxa are identified by auxiliary coordinate variables.</p>
+</div>
+<div class="paragraph">
+<p>The taxon auxiliary coordinate variables are string-valued. The plain-language name of the taxon must be contained in a variable with <strong><code>standard_name</code></strong> of <strong><code>biological_taxon_name</code></strong>. A Life Science Identifier (LSID) may be contained in a variable with <strong><code>standard_name</code></strong> of <strong><code>biological_taxon_lsid</code></strong>. This is a URN with the syntax "urn:lsid:&lt;Authority&gt;:&lt;Namespace&gt;:&lt;ObjectID&gt;[:&lt;Version&gt;]". This includes the reference classification in the &lt;Authority&gt; element and these are restricted by the LSID governance. It is strongly recommended in CF that the authority chosen is World Register of Marine Species (WoRMS) for oceanographic data and Integrated Taxonomic Information System (ITIS) for freshwater and terrestrial data. WoRMS LSIDs are built from the WoRMS AphiaID  taxon identifier such as "urn:lsid:marinespecies.org:taxname:104464" for AphiaID 104464. This may be converted to a URL by adding prefixes such as ​http://www.lsid.info/. ITIS LSIDs are built from the ITIS Taxonomic Serial Number (TSN), such as "urn:lsid:itis.gov:itis_tsn:180543".</p>
+</div>
+<div class="paragraph">
+<p>The <strong><code>biological_taxon_name</code></strong> auxiliary coordinate variable included for human readability is mandatory. The <strong><code>biological_taxon_lsid</code></strong> auxliary coordinate variable included for software agent readability is optional, but strongly recommended. If both are present then each <strong><code>biological_taxon_name</code></strong> coordinate must exactly match the name resolved from the <strong><code>biological_taxon_lsid</code></strong> coordinate. If LSIDs are available for some taxa in a dataset then the <strong><code>biological_taxon_lsid</strong></code> auxiliary coordinate variable should be included and missing data given for those taxa that do not have an identifier.</p>
+</div>
+<div id="taxa-ex" class="exampleblock">
+<div class="title">Example 6.1.2. Taxon names and identifiers</div>
+<div class="content">
+<div class="paragraph">
+<p>A skeleton example for taxonomic abundance time series.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dimension:
+  time = 100 ;
+  string80 = 80 ;
+  taxon = 2 ;
+variables:
+  float time(time);
+    time:standard_name = "time" ;
+    time:units = "days since 2019-01-01" ;
+  float abundance(time,taxon) ;
+    abundance:standard_name = "number_concentration_of_organisms_in_taxon_in_sea_water" ;
+    abundance:coordinates = "taxon_lsid taxon_name" ;
+  char taxon_name(taxon,string80) ;
+    taxon_name:standard_name = "biological_taxon_name" ;
+  char taxon_lsid(taxon,string80) ;
+    taxon_lsid:standard_name = "biological_taxon_lsid" ;
+data:
+  time = // 100 values ;
+  abundance = // 200 values ;
+  taxon_name = "Calanus finmarchicus", "Calanus helgolandicus" ;
+  taxon_lsid = "urn:lsid:marinespecies.org:taxname:104464", "urn:lsid:marinespecies.org:taxname:104466" ;</pre>
 </div>
 </div>
 </div>
@@ -9108,7 +9153,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-12-29 03:41:28 UTC
+Last updated 2020-01-11 12:29:42 UTC
 </div>
 </div>
 </body>
