@@ -127,14 +127,16 @@ When one data variable provides metadata about the individual values of another 
 
 ====
 
-Alternatively, **`ancillary_variables`** may be used as a status flag indicating operational status of an instrument producing the data or a quality flag indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable.  In these cases, the flag variable will include a standard name that differs from that of the source variable and indicates the specific type of flag the variable contains.  The standard names table includes several types of names that are intended for use in this situation, with a few examples shown below.
+Alternatively, **`ancillary_variables`** may be used as status flags indicating the operational status of an instrument producing the data or as quality flags indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable.  In these cases, the flag variable will include a standard name that differs from that of the source variable and indicates the specific type of flag the variable represents.
+
+The standard names table includes many names intended to be used in this situation, both general names meant to be used to flexibly represent any type of status or quality assessment, as well as names for specific quality control tests commonly applied to geophysical phenomena timeseries data.  Several examples are listed below:
 
 .Sample flag variable standard names:
-- **`status_flag`** and **`quality_flag`**: general flag categories
-- **`climatology_test_quality_flag`**, **`flat_line_test_quality_flag`**, **`gap_test_quality_flag`**, **`spike_test_quality_flag`**: flags indicating the results of common timeseries data quality control tests
-- **`aggregate_quality_flag`**: flag indicating an aggregated summary of multiple individual quality flags that use the same flagging scheme
+- **`status_flag`** and **`quality_flag`**: general flag categories for instrument status or quality assessment
+- **`climatology_test_quality_flag`**, **`flat_line_test_quality_flag`**, **`gap_test_quality_flag`**, **`spike_test_quality_flag`**: subset of standard name flags for indicating the results of commonly-used geophysical timeseries data quality control tests
+- **`aggregate_quality_flag`**: flag indicating an aggregate summary of multiple individual quality control test flags that use the same flagging scheme (i.e. a master quality flag for a particular variable)
 
-The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregated flag that combines the results of the two tests (assuming common encoding using the techniques defined in <<flags>>).
+The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregate flag that combines the results of the two tests (assuming each test uses a common encoding scheme according to techniques defined in <<flags>> and therefore can be aggregated).
 
 [[quality-flag-ex]]
 [caption="Example 3.2.1 "]
@@ -160,10 +162,9 @@ float salinity(time, z);
         salinity_qc_agg:long_name = "Salinity Aggregate Flag";
         salinity_qc_agg:standard_name = "aggregate_quality_flag";
 ----
-
+Note that the ancillary variables in this example are simplified to exclude  **`flag_values`**, **`flag_masks`** and
+**`flag_meanings`** attributes described in <<flags>> that they would ordinarily require
 ====
-
-Further details on implementation of status and quality flag ancillary variables is found in the following <<flags>>.
 
 
 [[flags, Section 3.5, "Flags"]]
