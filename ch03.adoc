@@ -1,5 +1,5 @@
 
-==  Description of the Data 
+==  Description of the Data
 
 The attributes described in this section are used to provide a description of the content and the units of measurement for each variable. We continue to support the use of the **`units`** and **`long_name`** attributes as defined in COARDS. We extend COARDS by adding the optional **`standard_name`** attribute which is used to provide unique identifiers for variables. This is important for data exchange since one cannot necessarily identify a particular variable based on the name assigned to it by the institution that provided the data.
 
@@ -19,7 +19,7 @@ The units `level`, `layer`, and `sigma_level` are allowed for dimensionless vert
 
 The Udunits syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard. The application of any scale factors or offsets to data should be indicated by the **`scale_factor`** and **`add_offset`** attributes. Use of these attributes for data packing, which is their most important application, is discussed in detail in <<packed-data>>.
 
-Udunits recognizes the following prefixes and their abbreviations. 
+Udunits recognizes the following prefixes and their abbreviations.
 [[table-supported-units]]
 .Supported Units
 [options="header",caption="Table 3.1. "]
@@ -59,7 +59,7 @@ standard name:: The name used to identify the physical quantity. A standard name
 canonical units:: Representative units of the physical quantity. Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
 
 description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are. We don't attempt to provide precise definitions of fundumental physical quantities (e.g., temperature) which may be found in the literature.
-The description may define rules on the variable type, attributes and coordinates which must be complied with by any variable carrying that standard name (such as in example 3.4). 
+The description may define rules on the variable type, attributes and coordinates which must be complied with by any variable carrying that standard name (such as in example 3.4).
 
 When appropriate, the table entry also contains the corresponding GRIB parameter code(s) (from ECMWF and NCEP) and AMIP identifiers.
 
@@ -122,7 +122,7 @@ When one data variable provides metadata about the individual values of another 
   float q_detection_limit(time)
     q_detection_limit:standard_name = "specific_humidity detection_minimum" ;
     q_detection_limit:units = "g/g" ;
-      
+
 ----
 
 
@@ -165,30 +165,21 @@ enumerated status code.
     current_speed_qc:_FillValue = -128b ;
     current_speed_qc:valid_range = 0b, 2b ;
     current_speed_qc:flag_values = 0b, 1b, 2b ;
-    current_speed_qc:flag_meanings = "quality_good sensor_nonfunctional 
+    current_speed_qc:flag_meanings = "quality_good sensor_nonfunctional
                                       outside_valid_range" ;
 ----
 
-Note that the data variable containing current speed has an ancillary_variables 
+Note that the data variable containing current speed has an ancillary_variables
 attribute with a value containing current_speed_qc.
 
 
 ====
 
-The **`flag_masks`** and **`flag_meanings`** attributes describe a
-number of independent Boolean conditions using bit field notation by
-setting unique bits in each **`flag_masks`** value.  **`The
-flag_masks`** attribute is the same type as the variable to which it is
-attached, and contains a list of values matching unique bit fields.  The
-**`flag_meanings`** attribute is defined as above, one for each
-**`flag_masks`** value.  A flagged condition is identified by performing
-a bitwise AND of the variable value and each **`flag_masks`** value; a
-non-zero result indicates a **`true`** condition.  Thus, any or all of
-the flagged conditions may be **`true`**, depending on the variable bit
-settings. The following example illustrates the use of **`flag_masks`**
-to express six sensor status conditions.
 
-[[region-variable-flag-masks-ex]]
+A variable with standard name of `region`, `area_type` or any other standard name which requires string-valued values from a defined list may use flags together with `flag_values` and `flag_meanings` attributes to record the translation to the string values. Example 3.4 illustrates this using integer flag values for a variable with standard name `region` and `flag_values` selected from the link:$$http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html$$[standardized region names] (see section 6.1.1).
+
+
+[[region-variable-flag-values-ex]]
 [caption="Example 3.4. "]
 .A region variable, using **`flag_values`**
 ====
@@ -204,7 +195,18 @@ data:
 
 ====
 
-A variable with standard name of `region`, `area_type` or any other standard name which requires string-valued values from a defined list may use flags together with `flag_values` and `flag_meanings` attributes to record the translation to the string values. Example 3.4 illustrates this using integer flag values for a variable with standard name `region` and `flag_values` selected from the link:$$http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html$$[standardized region names] (see section 6.1.1).
+The **`flag_masks`** and **`flag_meanings`** attributes describe a
+number of independent Boolean conditions using bit field notation by
+setting unique bits in each **`flag_masks`** value.  **`The
+flag_masks`** attribute is the same type as the variable to which it is
+attached, and contains a list of values matching unique bit fields.  The
+**`flag_meanings`** attribute is defined as above, one for each
+**`flag_masks`** value.  A flagged condition is identified by performing
+a bitwise AND of the variable value and each **`flag_masks`** value; a
+non-zero result indicates a **`true`** condition.  Thus, any or all of
+the flagged conditions may be **`true`**, depending on the variable bit
+settings. The following example illustrates the use of **`flag_masks`**
+to express six sensor status conditions.
 
 [[flag-variable-flag-masks-ex]]
 [caption="Example 3.5. "]
@@ -284,7 +286,7 @@ The remaining bits (Bit 2 and Bit 3) are decoded as follows:
 .Flag Variable Bit 2 and Bit 3 (from Example)
 [options="header",caption="Table 3.3. "]
 |===============
-| Bit 3 | Bit 2 | Mode 
+| Bit 3 | Bit 2 | Mode
 | 0 | 1 | offline_mode
 | 1 | 0 | calibration_mode
 | 1 | 1 | maintenance_mode
@@ -300,5 +302,3 @@ with the variable. When a result is equal to the corresponding
 **`flag_values`** element, that condition is **`true`**. The repeated
 **`flag_masks`** enable a simple mechanism for clients to detect all
 possible conditions.
-
-
