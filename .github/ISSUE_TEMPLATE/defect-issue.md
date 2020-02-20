@@ -11,10 +11,17 @@ Before submitting an issue be sure you have read and understand the github contr
 
 Change proposals should include the following information as applicable.
 
-**Title:** Short and descriptive.  
-**Moderator:** @user  
-**Requirement Summary:** A few sentence functional summary  
-**Technical Proposal Summary:** Brief proposal overview  
-**Benefits:** Who or what will benefit from this proposal?  
-**Status Quo:** Discussion of the current state CF and other standards.  
-**Detailed Proposal:** Complete proposal
+# Title
+Short and descriptive.
+# Moderator
+@user
+# Requirement Summary
+A few sentence functional summary
+# Technical Proposal Summary
+Brief proposal overview
+# Benefits
+Who or what will benefit from this proposal?
+# Status Quo
+Discussion of the current state CF and other standards.
+# Detailed Proposal
+Complete proposal
