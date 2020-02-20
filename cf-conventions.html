@@ -6195,25 +6195,35 @@ and
 </dd>
 <dt class="hdlist1"><em>Map coordinates:</em></dt>
 <dd>
-<p>The x (abscissa) and y (ordinate) rectangular coordinates are identified by the <strong><code>standard_name</code></strong> attribute values <strong><code>projection_x_coordinate</code></strong> and <strong><code>projection_y_coordinate</code></strong> respectively. In the case of this projection, the projection coordinates in this projection are directly related to the scanning angle of the satellite instrument, and their units are radians.</p>
+<p>The x (abscissa) and y (ordinate) rectangular coordinates are identified by the <strong><code>standard_name</code></strong> attribute values <strong><code>projection_x_angular_coordinate</code></strong> and <strong><code>projection_y_angular_coordinate</code></strong>, respectively.
+CF specified the standard names <strong><code>projection_x_coordinate</code></strong> and <strong><code>projection_y_coordinate</code></strong> for these coordinates prior to version 1.9, but that use is deprecated.
+In the case of this projection, the projection coordinates in this projection are directly related to the scanning angle of the satellite instrument.</p>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
-<p>The algorithm for computing the mapping may be found at <a href="http://www.cgms-info.org/documents/pdf_cgms_03.pdf"><a href="http://www.cgms-info.org/documents/pdf_cgms_03.pdf" class="bare">http://www.cgms-info.org/documents/pdf_cgms_03.pdf</a></a>. This document assumes the point of observation is directly over the equator, and that the <strong><code>sweep_angle_axis</code></strong> is y.</p>
-</dd>
-</dl>
-</div>
+<p>The algorithm for computing the mapping may be found at <a href="http://www.cgms-info.org/documents/pdf_cgms_03.pdf"><a href="http://www.cgms-info.org/documents/pdf_cgms_03.pdf" class="bare">http://www.cgms-info.org/documents/pdf_cgms_03.pdf</a></a>.
+This document assumes the point of observation is directly over the equator, and that the <strong><code>sweep_angle_axis</code></strong> is y.</p>
 <div class="paragraph">
 <p>Notes on using the PROJ.4 software packages for computing the mapping may be found at  <a href="http://proj4.org/"><a href="http://proj4.org/" class="bare">http://proj4.org/</a></a> and  <a href="https://trac.osgeo.org/geotiff/"><a href="https://trac.osgeo.org/geotiff/" class="bare">https://trac.osgeo.org/geotiff/</a></a> .</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>perspective_point_height</code></strong> is the distance to the surface of the ellipsoid. Adding the earth major axis gives the distance from the centre of the earth.</p>
+<p>The <strong><code>perspective_point_height</code></strong> is the distance to the surface of the ellipsoid.
+Adding the earth major axis gives the distance from the centre of the earth.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>sweep_angle_axis</code></strong> attribute indicates which axis the instrument sweeps. The value = "y" corresponds to the spin-stabilized Meteosat satellites, the value = "x" to the GOES-R satellite.</p>
+<p>The <strong><code>sweep_angle_axis</code></strong> attribute indicates which axis the instrument sweeps.
+The value = "y" corresponds to the spin-stabilized Meteosat satellites, the value = "x" to the GOES-R satellite.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>fixed_angle_axis</code></strong> attribute indicates which axis the instrument is fixed. The values are opposite to <strong><code>sweep_angle_axis</code></strong>. Only one of those two attributes is mandatory.</p>
+<p>The <strong><code>fixed_angle_axis</code></strong> attribute indicates which axis the instrument is fixed.
+The values are opposite to <strong><code>sweep_angle_axis</code></strong>. Only one of those two attributes is mandatory.</p>
+</div>
+<div class="paragraph">
+<p>The use of <code>projection_x_coordinate</code> and <code>projection_y_coordinate</code> was deprecated in version 1.9 of the CF Conventions.
+The initial definition of this projection used these standard names to identify the projection coordinates even though their canonical units (meters) do not match those required for this projection (radians).</p>
+</div>
+</dd>
+</dl>
 </div>
 </div>
 <div class="sect2">
@@ -6364,9 +6374,7 @@ and
 </dd>
 <dt class="hdlist1"><em>Map coordinates:</em></dt>
 <dd>
-<p>The rectangular coordinates are longitude and latitude
-identified by the usual conventions
-(<a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>).</p>
+<p>The rectangular coordinates are longitude and latitude identified by the usual conventions (<a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>).</p>
 </dd>
 </dl>
 </div>
@@ -6780,8 +6788,7 @@ This should not be confused with the PROJ.4 geos projection.</p>
 </dl>
 </div>
 <div class="paragraph">
-<p>In the following table the "Type" values are <strong>S</strong> for string and <strong>N</strong>
-for numeric.</p>
+<p>In the following table the "Type" values are <strong>S</strong> for string and <strong>N</strong> for numeric.</p>
 </div>
 <table id="table-grid-mapping-attributes" class="tableblock frame-all grid-all stretch">
 <caption class="title">Table F.1. Grid Mapping Attributes</caption>
@@ -9189,6 +9196,14 @@ node coordinate variables to be one of the dimensions of the data variable.</p>
 <div class="title">10 September 2019</div>
 <ol class="arabic">
 <li>
+<p>Issue #139: Added support for variables of type string.</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic">
+<div class="title">10 September 2019</div>
+<ol class="arabic">
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/179">Issue #179</a>: Don&#8217;t require longitude and Latitude for projected coordinates.</p>
 </li>
 </ol>
@@ -9246,6 +9261,14 @@ node coordinate variables to be one of the dimensions of the data variable.</p>
 <ol class="arabic">
 <li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/223">Issue #223</a>: Axis Order for CRS-WKT grid mappings</p>
+</li>
+</ol>
+</div>
+<div class="olist arabic">
+<div class="title">20 February 2020</div>
+<ol class="arabic">
+<li>
+<p>#230 - Correct inconsistency in units or geostationary projection</p>
 </li>
 </ol>
 </div>
@@ -9314,7 +9337,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-02-13 21:33:11 UTC
+Last updated 2020-02-20 17:00:36 UTC
 </div>
 </div>
 </body>
