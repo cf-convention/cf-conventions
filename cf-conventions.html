@@ -1119,16 +1119,21 @@ variable (<a href="#labels">Section 6.1, "Labels"</a> and <a href="#collections-
 <div class="sect2">
 <h3 id="_data_types"><a class="anchor" href="#_data_types"></a>2.2. Data Types</h3>
 <div class="paragraph">
-<p>The netCDF data types <strong><code>string</code></strong>, <strong><code>char</code></strong>, <strong><code>byte</code></strong>, <strong><code>short</code></strong>,
-<strong><code>int</code></strong>, <strong><code>float</code></strong> or <strong><code>real</code></strong>, and <strong><code>double</code></strong> are all acceptable.
+<p>The netCDF data types <strong><code>string</code></strong>, <strong><code>char</code></strong>, <strong><code>byte</code></strong>, <strong><code>unsigned byte</code></strong>, <strong><code>short</code></strong>, <strong><code>unsigned short</code></strong>,
+<strong><code>int</code></strong>, <strong><code>unsigned int</code></strong>, <strong><code>int64</code></strong>, <strong><code>unsigned int64</code></strong>,
+<strong><code>float</code></strong> or <strong><code>real</code></strong>, and <strong><code>double</code></strong> are all acceptable.
 The <strong><code>string</code></strong> type is only available in files using the netCDF version 4
 (netCDF-4) format.
 The <strong><code>char</code></strong> and <strong><code>string</code></strong> types are not intended for numeric data.
-One byte numeric data should be stored using the <strong><code>byte</code></strong> data type.
-All integer types are treated by the netCDF interface as signed.
-It is possible to treat the <strong><code>byte</code></strong> type as unsigned by using the NUG
+One byte numeric data should be stored using the <strong><code>byte</code></strong> or <strong><code>unsigned byte</code></strong> data types.
+It is possible to treat the <strong><code>byte</code></strong> and <strong><code>short</code></strong> types as unsigned by using the NUG
 convention of indicating the unsigned range using the <strong><code>valid_min</code></strong>,
-<strong><code>valid_max</code></strong>, or <strong><code>valid_range</code></strong> attributes.</p>
+<strong><code>valid_max</code></strong>, or <strong><code>valid_range</code></strong> attributes.
+In many situations, any integer type may be used.
+When the phrases "an integer type" or "any integer type" are used in this document,
+it should be understood to mean <strong><code>byte</code></strong>, <strong><code>unsigned byte</code></strong>,
+<strong><code>short</code></strong>, <strong><code>unsigned short</code></strong>,
+<strong><code>int</code></strong>, <strong><code>unsigned int</code></strong>, <strong><code>int64</code></strong>, or <strong><code>unsigned int64</code></strong>.</p>
 </div>
 <div class="paragraph">
 <p>Strings in variables may be represented one of two ways - as atomic strings or
@@ -4607,7 +4612,8 @@ data:
 <p>Table 9.4. The storage of data using the contiguous ragged representation (subscripts in CDL order).</p>
 </div>
 <div class="paragraph">
-<p>In this representation, the file contains a <strong>count variable</strong> , which must be of type integer and</p>
+<p>In this representation, the file contains a <strong>count variable</strong> ,
+which must be an integer type and</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -4728,7 +4734,11 @@ data:
 <p>Table 9.4 The storage of data using the indexed ragged representation (subscripts in CDL order).  The left hand side of the table illustrates a data variable; the right hand side of the table contains the values of the index variable.</p>
 </div>
 <div class="paragraph">
-<p>In this representation, the file contains an <strong>index variable</strong> , which must be of type integer, and must have the sample dimension as its single dimension. The index variable contains the zero-based index of the feature to which each element belongs. This representation is identifiable by the presence of an attribute, <strong><code>instance_dimension</code></strong> , on the index variable, which names the dimension of the instance variables. For those indices of the sample dimension, into which data have not yet been written, the index variable should be pre-filled with missing values.</p>
+<p>In this representation, the file contains an <strong>index variable</strong> ,
+which must be an integer type, and must have the sample dimension as its single dimension.
+The index variable contains the zero-based index of the feature to which each element belongs.
+This representation is identifiable by the presence of an attribute, <strong><code>instance_dimension</code></strong> , on the index variable, which names the dimension of the instance variables.
+For those indices of the sample dimension, into which data have not yet been written, the index variable should be pre-filled with missing values.</p>
 </div>
 </div>
 </div>
@@ -7475,7 +7485,13 @@ definitions.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The variable, <strong><code>row_size</code></strong> , is the count variable containing the length of each time series feature.   It is identified by having an attribute with name <code><strong>sample_dimension</strong></code> whose value is name of the sample dimension ( <strong><code>obs</code></strong> in this example). The sample dimension could optionally be the netCDF unlimited dimension. The variable bearing the <code><strong>sample_dimension</strong></code> attribute must have the instance dimension ( <strong><code>station</code></strong> in this example) as its single dimension, and must be of type integer.   This variable implicitly partitions into individual instances all variables that have the sample dimension. The auxiliary coordinate variables <strong><code>lat</code></strong> , <strong><code>lon</code></strong> , <strong><code>alt</code></strong> and <strong><code>station_name</code></strong> are station variables.</p>
+<p>The variable, <strong><code>row_size</code></strong> , is the count variable containing the length of each time series feature.
+It is identified by having an attribute with name <code><strong>sample_dimension</strong></code> whose value is name of the sample dimension ( <strong><code>obs</code></strong> in this example).
+The sample dimension could optionally be the netCDF unlimited dimension.
+The variable bearing the <code><strong>sample_dimension</strong></code> attribute must have the instance dimension ( <strong><code>station</code></strong> in this example)
+as its single dimension, and must have an integer type.
+This variable implicitly partitions into individual instances all variables that have the sample dimension.
+The auxiliary coordinate variables <strong><code>lat</code></strong> , <strong><code>lon</code></strong> , <strong><code>alt</code></strong> and <strong><code>station_name</code></strong> are station variables.</p>
 </div>
 </div>
 </div>
@@ -7541,7 +7557,12 @@ definitions.</p>
 <p>The humidity(o) and temp(o) data are associated with the coordinate values time(o), lat(i), lon(i), and alt(i), where i = stationIndex(o) is a zero-based index indicating which time series. Thus, time(0), humidity(0) and temp(0) belong to the element of the <strong><code>station</code></strong> dimension that is indicated by <strong><code>stationIndex(0)</code></strong> ; time(1), humidity(1) and temp(1) belong to element <strong><code>stationIndex(1)</code></strong> of the <strong><code>station</code></strong> dimension, etc.</p>
 </div>
 <div class="paragraph">
-<p>The variable, <strong><code>stationIndex</code></strong> , is identified as the index variable by having an attribute with name of <code><strong>instance_dimension</strong></code> whose value is the instance dimension ( <strong><code>station</code></strong> in this example).  The variable bearing the <code><strong>instance_dimension</strong></code> attribute must have the sample dimension ( <strong><code>obs</code></strong> in this example) as its single dimension, and must be type integer. This variable implicitly assigns the station to each value of any variable having the sample dimension. The sample dimension need not be the netCDF unlimited dimension, though it commonly is.</p>
+<p>The variable, <strong><code>stationIndex</code></strong> , is identified as the index variable by having an attribute with name of <code><strong>instance_dimension</strong></code> whose value is the instance dimension ( <strong><code>station</code></strong> in this example).
+The variable bearing the <code><strong>instance_dimension</strong></code> attribute
+must have the sample dimension ( <strong><code>obs</code></strong> in this example) as its single dimension,
+and must have an integer type.
+This variable implicitly assigns the station to each value of any variable having the sample dimension.
+The sample dimension need not be the netCDF unlimited dimension, though it commonly is.</p>
 </div>
 </div>
 </div>
@@ -7754,7 +7775,9 @@ definitions.</p>
 <p>The pressure(o), temperature(o), and humidity(o) data is associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile. All elements for one profile are contiguous along the sample dimension. The sample dimension (obs) may be the unlimited dimension or not. All variables that have the instance dimension (profile) as their single dimension are considered to be information about the profiles.</p>
 </div>
 <div class="paragraph">
-<p>The count variable (row_size) contains the number of elements for each profile, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted. It must have the profile dimension as its single dimension, and must be type integer. The elements are associated with the profile using the same algorithm as in H.2.4.</p>
+<p>The count variable (row_size) contains the number of elements for each profile, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted.
+It must have the profile dimension as its single dimension, and must have an integer type.
+The elements are associated with the profile using the same algorithm as in H.2.4.</p>
 </div>
 </div>
 </div>
@@ -7823,7 +7846,9 @@ definitions.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The pressure(o), temperature(o), and humidity(o) data are associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile. The sample dimension (obs) may be the unlimited dimension or not. The profile index variable (parentIndex) is identified by having an attribute with name of "instance_dimension" whose value is the profile dimension name. It must have the sample dimension as its single dimension, and must be type integer. Each value in the profile index variable is the zero-based profile index that the element belongs to. The elements are associated with the profiles using the same algorithm as in H.2.5.</p>
+<p>The pressure(o), temperature(o), and humidity(o) data are associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile. The sample dimension (obs) may be the unlimited dimension or not. The profile index variable (parentIndex) is identified by having an attribute with name of "instance_dimension" whose value is the profile dimension name.
+It must have the sample dimension as its single dimension, and must have an integer type.
+Each value in the profile index variable is the zero-based profile index that the element belongs to. The elements are associated with the profiles using the same algorithm as in H.2.5.</p>
 </div>
 </div>
 </div>
@@ -8024,7 +8049,9 @@ definitions.</p>
 <p>The O3(o) and NO3(o) data are associated with the coordinate values time(o), lat(o), lon(o), and alt(o). All elements for one trajectory are contiguous along the sample dimension. The sample dimension (obs) may be the unlimited dimension or not. All variables that have the instance dimension (trajectory) as their single dimension are considered to be information about that trajectory.</p>
 </div>
 <div class="paragraph">
-<p>The count variable (row_size) contains the number of elements for each trajectory, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted. It must have the trajectory dimension as its single dimension, and must be type integer. The elements are associated with the trajectories using the same algorithm as in H.2.4.</p>
+<p>The count variable (row_size) contains the number of elements for each trajectory, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted.
+It must have the trajectory dimension as its single dimension, and must have an integer type.
+The elements are associated with the trajectories using the same algorithm as in H.2.4.</p>
 </div>
 </div>
 </div>
@@ -8090,7 +8117,9 @@ definitions.</p>
 <p>The O3(o) and NO3(o) data are associated with the coordinate values time(o), lat(o), lon(o), and alt(o). All elements for one trajectory will have the same trajectory index value. The sample dimension (obs) may be the unlimited dimension or not.</p>
 </div>
 <div class="paragraph">
-<p>The index variable (trajectory_index) is identified by having an attribute with name of "instance_dimension" whose value is the trajectory dimension name. It must have the sample dimension as its single dimension, and must be type integer. Each value in the trajectory_index variable is the zero-based trajectory index that the element belongs to. The elements are associated with the trajectories using the same algorithm as in H.2.5.</p>
+<p>The index variable (trajectory_index) is identified by having an attribute with name of "instance_dimension" whose value is the trajectory dimension name.
+It must have the sample dimension as its single dimension, and must have an integer type.
+Each value in the trajectory_index variable is the zero-based trajectory index that the element belongs to. The elements are associated with the trajectories using the same algorithm as in H.2.5.</p>
 </div>
 </div>
 </div>
@@ -8384,10 +8413,14 @@ definitions.</p>
 <p>The pressure(o), temperature(o), and humidity(o) data for element o of profile p at station i are associated with the coordinate values time(p), z(o), lat(i), and lon(i).</p>
 </div>
 <div class="paragraph">
-<p>The index variable (station_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (station in this example). The index variable must have the profile dimension as its sole dimension, and must be type integer. Each value in the index variable is the zero-based station index that the profile belongs to i.e. profile p belongs to station i=station_index(p), as in section H.2.5.</p>
+<p>The index variable (station_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (station in this example).
+The index variable must have the profile dimension as its sole dimension, and must have an integer type.
+Each value in the index variable is the zero-based station index that the profile belongs to i.e. profile p belongs to station i=station_index(p), as in section H.2.5.</p>
 </div>
 <div class="paragraph">
-<p>The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted. It must have the profile dimension as its sole dimension, and must be type integer. The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.</p>
+<p>The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted.
+It must have the profile dimension as its sole dimension, and must have an integer type.
+The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.</p>
 </div>
 </div>
 </div>
@@ -8613,10 +8646,14 @@ definitions.</p>
 <p>The pressure(o), temperature(o), and humidity(o) data for element o of profile p along trajectory i are associated with the coordinate values time(p), z(o), lat(p), and lon(p).</p>
 </div>
 <div class="paragraph">
-<p>The index variable (trajectory_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (trajectory in this example). The index variable must have the profile dimension as its sole dimension, and must be type integer. Each value in the index variable is the zero-based trajectory index that the profile belongs to i.e. profile p belongs to trajectory i=trajectory_index(p), as in section H.2.5.</p>
+<p>The index variable (trajectory_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (trajectory in this example).
+The index variable must have the profile dimension as its sole dimension, and must have an integer type.
+Each value in the index variable is the zero-based trajectory index that the profile belongs to i.e. profile p belongs to trajectory i=trajectory_index(p), as in section H.2.5.</p>
 </div>
 <div class="paragraph">
-<p>The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted. It must have the profile dimension as its sole dimension, and must be type integer. The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.</p>
+<p>The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted.
+It must have the profile dimension as its sole dimension, and must have an integer type.
+The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.</p>
 </div>
 </div>
 </div>
@@ -9337,7 +9374,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-02 08:11:32 UTC
+Last updated 2020-04-16 06:42:14 UTC
 </div>
 </div>
 </body>
