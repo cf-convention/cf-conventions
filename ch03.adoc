@@ -130,6 +130,7 @@ When one data variable provides metadata about the individual values of another 
 Alternatively, **`ancillary_variables`** may be used as status flags indicating the operational status of an instrument producing the data or as quality flags indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable.  In these cases, the flag variable will include a standard name that differs from that of the source variable and indicates the specific type of flag the variable represents.
 
 The standard names table includes many names intended to be used in this situation, both general names meant to be used to flexibly represent any type of status or quality assessment, as well as names for specific quality control tests commonly applied to geophysical phenomena timeseries data.  Several examples are listed below:
+<<<<<<< HEAD
 
 .Sample flag variable standard names:
 - **`status_flag`** and **`quality_flag`**: general flag categories for instrument status or quality assessment
@@ -138,6 +139,16 @@ The standard names table includes many names intended to be used in this situati
 
 The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregate flag that combines the results of the two tests (assuming each test uses a common encoding scheme according to techniques defined in <<flags>> and therefore can be aggregated).
 
+=======
+
+.Sample flag variable standard names:
+- **`status_flag`** and **`quality_flag`**: general flag categories for instrument status or quality assessment
+- **`climatology_test_quality_flag`**, **`flat_line_test_quality_flag`**, **`gap_test_quality_flag`**, **`spike_test_quality_flag`**: subset of standard name flags for indicating the results of commonly-used geophysical timeseries data quality control tests
+- **`aggregate_quality_flag`**: flag indicating an aggregate summary of multiple individual quality control test flags that use the same flagging scheme (i.e. a master quality flag for a particular variable)
+
+The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregate flag that combines the results of the two tests (assuming each test uses a common encoding scheme according to techniques defined in <<flags>> and therefore can be aggregated).
+
+>>>>>>> origin/chap_34_update
 [[quality-flag-ex]]
 [caption="Example 3.2.1 "]
 .Ancillary quality flag data
@@ -211,8 +222,43 @@ attribute with a value containing current_speed_qc.
 
 ====
 
+<<<<<<< HEAD
 The flag_masks and flag_meanings attributes describe a number of independent Boolean conditions using bit field notation by setting unique bits in each flag_masks value. The flag_masks attribute is the same type as the variable to which it is attached, and contains a list of values matching unique bit fields. The flag_meanings attribute is defined as above, one for each flag_masks value. A flagged condition is identified by performing a bitwise AND of the variable value and each flag_masks value; a non-zero result indicates a true condition. Thus, any or all of the flagged conditions may be true, depending on the variable bit settings. The following example illustrates the use of flag_masks to express six sensor status conditions.
 
+=======
+
+A variable with standard name of `region`, `area_type` or any other standard name which requires string-valued values from a defined list may use flags together with `flag_values` and `flag_meanings` attributes to record the translation to the string values. Example 3.4 illustrates this using integer flag values for a variable with standard name `region` and `flag_values` selected from the link:$$http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html$$[standardized region names] (see section 6.1.1).
+
+
+[[region-variable-flag-values-ex]]
+[caption="Example 3.4. "]
+.A region variable, using **`flag_values`**
+====
+
+----
+int basin(lat, lon);
+       standard_name: region;
+       flag_values: 1, 2, 3;
+       flag_meanings:"atlantic_arctic_ocean indo_pacific_ocean global_ocean";
+data:
+   basin: 1, 1, 1, 1, 2, ..... ;
+----
+
+====
+
+The **`flag_masks`** and **`flag_meanings`** attributes describe a
+number of independent Boolean conditions using bit field notation by
+setting unique bits in each **`flag_masks`** value.  **`The
+flag_masks`** attribute is the same type as the variable to which it is
+attached, and contains a list of values matching unique bit fields.  The
+**`flag_meanings`** attribute is defined as above, one for each
+**`flag_masks`** value.  A flagged condition is identified by performing
+a bitwise AND of the variable value and each **`flag_masks`** value; a
+non-zero result indicates a **`true`** condition.  Thus, any or all of
+the flagged conditions may be **`true`**, depending on the variable bit
+settings. The following example illustrates the use of **`flag_masks`**
+to express six sensor status conditions.
+>>>>>>> origin/chap_34_update
 
 [[flag-variable-flag-masks-ex]]
 [caption="Example 3.4. "]
