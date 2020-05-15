@@ -10,6 +10,9 @@ assignees: ''
 Before submitting an issue be sure you have read and understand the github contributing guidelines: https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md and the rules for CF changes: http://cfconventions.org/rules.html
 
 Change proposals should include the following information as applicable.
+If important to the issue, the problem text should be pasted in the body of the issue and proposed fix included.
+A link to the line where the problem exists could also be included.
+Alternatively, a pull request can be used to describe the problem and the proposed solution more precisely.
 
 # Title
 Short and descriptive.
