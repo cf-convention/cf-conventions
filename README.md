@@ -19,3 +19,13 @@ To convert the AsciiDoc files into the resulting HTML file:
 4. Build the HTML: `asciidoctor cf-conventions.adoc`
 
 See the [GitHub help](https://help.github.com/) pages and plethora of other git/GitHub guides for more details on how to work with repos, forks, pull requests, etc.
+
+### Latest Spec Build
+
+Whenever a [pull request](https://github.com/cf-convention/cf-conventions/pulls) is merged, a [travis-ci build](https://travis-ci.org/github/cf-convention/cf-conventions) generates the latest specification draft and adds it to the [gh-pages branch here](https://github.com/cf-convention/cf-conventions/tree/gh-pages). The gh-pages branch is deployed to github pages at the following documents:
+- http://cfconventions.org/cf-conventions/cf-conventions.html
+- http://cfconventions.org/cf-conventions/cf-conventions.pdf
+- http://cfconventions.org/cf-conventions/conformance.html
+- http://cfconventions.org/cf-conventions/conformance.pdf 
+
+These documents are linked in the cf-conventions web site. [source here](https://github.com/cf-convention/cf-convention.github.io) which is published to: http://cfconventions.org/. The latest spec documents are linked from those web pages here: http://cfconventions.org/latest.html. 
