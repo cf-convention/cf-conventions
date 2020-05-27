@@ -324,13 +324,12 @@ When cell bounds are provided, each cell comprises one or more parts,
 and each part is either a collection of points, a line defined by a
 connected series of points, or a polygonal area (i.e. the region
 enclosed by a connected series of points, where the first and last
-points are connected as well). For a given coordinate construct, all
-the parts of all the cells must be of the same one of these three
-kinds, which are called "geometry types". The bounds array spans the
-domain axis constructs of the coordinate construct, with the addition
-of two trailing ragged dimensions. The first extra dimension indexes
-the parts of each cell and the second indexes the points that describe
-each part.
+points are connected as well). All parts of all the cells must be of
+the same one of these three kinds, which are called "geometry
+types". The bounds array spans the domain axis constructs of the
+coordinate construct, with the addition of two trailing ragged
+dimensions. The first extra dimension indexes the parts of each cell
+and the second indexes the points that describe each part.
 
 If cell bounds are provided for a dimension coordinate construct then
 each cell must have exactly two vertices forming a line geometry. For
@@ -341,11 +340,24 @@ earliest and latest times of the sequence. The cell method constructs
 indicate how the multiple time segments should be inferred from these
 climatological bounds.
 
-If a cell is composed of multiple polygon parts, an individual polygon
-may define an "interior ring", i.e. a region that is to be omitted
-from, as opposed to included in, the cell extent. In this case an
-interior ring array is required that records whether each polygon is
-to be included or excluded from the cell, and is supplied by an
+If a polygonal cell is composed of multiple parts it may have holes,
+i.e. polygon regions that are to be omitted from, as opposed to
+included in, the cell extent. When such holes are present an "interior
+ring" array is required that records whether each polygon is to be
+included or excluded from the cell, and is supplied by an interior
+ring variable in CF-netCDF. The interior ring array spans the domain
+axis constructs of the coordinate construct, with the addition of an
+extra ragged dimension that indexes the parts for each cell. For
+example, a cell describing the land area surrounding a lake would
+require two polygon parts: one defines the outer boundary of the land
+area; the other, recorded as an interior ring, is the lake boundary,
+defining the inner boundary of the land area.
+
+If a polygonal cell is composed of multiple parts, an individual
+polygon may define an "interior ring", i.e. a region that is to be
+omitted from, as opposed to included in, the cell extent. In this case
+an interior ring array is required that records whether each polygon
+is to be included or excluded from the cell, and is supplied by an
 interior ring variable in CF-netCDF. The interior ring array spans the
 domain axis constructs of the coordinate construct, with the addition
 of an extra ragged dimension that indexes the parts for each cell. For
@@ -367,23 +379,26 @@ defined for such cells. A CF-netCDF geometry container variable is
 used to store cell bounds without coordinates for a discrete axis.
 
 In CF-netCDF, when a geometry container variable is present it
-explicitly describes the geometry type, identifies the node coordinate
-variables that contain the cell vertices, and references the node
-count variable that contains the number of parts per cell. When a
-geometry container variable is not present then the bounds contain
-exactly one part and their geometry type is implied by convention: for
-multidimensional auxiliary coordinates each cell is a single polygon,
-and for all other types of coordinate each cell is a single line
-segment defined by two points. In the case of climatological time
-coordinates, the two points of the cell bounds, in conjunction with
-the cell methods, imply the existence of multiple line parts,
-different subsets of which are associated with the different cell
-methods required to define the climatology. For example, when the
-field construct's data are multiannual averages of monthly minima, the
-implied cell parts define the individual months over which the
-original data was minimised; and all of the implied parts taken
-together define the exact temporal extent of the average of the
-monthly minima.
+explicitly describes the geometry type and identifies the node
+coordinate variables that contain the cell vertices. The geometry
+container variable also identifies a node count variable that contains
+the number of nodes per cell when more than one cell is present, and a
+part node count variable that contains the number of nodes per cell
+part when cells are comprised of multipart lines, multipart polygons,
+and polygons with holes. When a geometry container variable is not
+present then the bounds contain exactly one part and their geometry
+type is implied by convention: for multidimensional auxiliary
+coordinates each cell is a single polygon, and for all other types of
+coordinate each cell is a single line segment defined by two
+points. In the case of climatological time coordinates, the two points
+of the cell bounds, in conjunction with the cell methods, imply the
+existence of multiple line parts, different subsets of which are
+associated with the different cell methods required to define the
+climatology. For example, when the field construct's data are
+multiannual averages of monthly minima, the implied cell parts define
+the individual months over which the original data was minimised; and
+all of the implied parts taken together define the exact temporal
+extent of the average of the monthly minima.
 
 [[img-dim-aux, figure 4]]
 [.text-center]
