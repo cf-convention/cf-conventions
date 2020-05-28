@@ -43,11 +43,14 @@ Use of other branches is at the discretion of the repository administrators.
 
 ## Merging of pull requests, and closing and reopening of issues
 
-When an issue and accompanying pull request concludes with an agreed change to the conventions, then the pull request will be merged into the master branch after a further 3 weeks has elapsed, assuming that no more discussion occurs. This is as described by the rules for conventions changes at http://cfconventions.org/rules.html. If further substantive comments are raised during this period, then the final 3 week period will restart after a new conclusion is agreed.
+When an issue and accompanying pull request concludes with an agreed change to the conventions, then the pull request will be merged into the master branch after a further 3 weeks has elapsed, assuming that no more discussion occurs.
+This is as described by the rules for conventions changes at http://cfconventions.org/rules.html.
+If further substantive comments are raised during this period, then the final 3 week period will restart after a new conclusion is agreed.
 
 The pull request will be merged by a member of the governance panel or the CF conventions and standard names committee.
 
 The person who merges the pull request should also close the issue, leaving a comment that the issue was concluded with no further comment during the subsequent 3 weeks.
 
 If subsequent discussion is required after the pull request has been merged then a new issue should be raised, rather than reopening the closed issue.
-An issue may be closed without the merging of a pull request if the change was not accepted by the community. In this case the issue may be reopened for further discussion at a later date.
+An issue may be closed without the merging of a pull request if the change was not accepted by the community.
+In this case the issue may be reopened for further discussion at a later date.
