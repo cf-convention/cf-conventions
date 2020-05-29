@@ -731,11 +731,12 @@ F.1. <a href="#table-grid-mapping-attributes">Grid Mapping Attributes</a></p>
 </div>
 <div class="paragraph">
 <p>3.1. <a href="#use-of-standard-name-ex">Use of <strong><code>standard_name</code></strong></a><br>
-3.2. <a href="#instrument-data-ex">Instrument data</a><br>
-3.3. <a href="#flag-variable-flag-values-ex">A flag variable, using <strong><code>flag_values</code></strong></a><br>
-3.4. <a href="#flag-variable-flag-masks-ex">A flag variable, using <strong><code>flag_masks</code></strong></a><br>
-3.5. <a href="#region-variable-flag-values-ex">A region variable, using <strong><code>flag_values</code></strong></a><br>
-3.6. <a href="#flag-variable-flag-masks-flag-values-ex">A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></a><br>
+3.2. <a href="#instrument-data-ex">Ancillary instrument data</a><br>
+3.3. <a href="#quality-flag-ex">Ancillary quality flag data</a><br>
+3.4. <a href="#flag-variable-flag-values-ex">A flag variable, using <strong><code>flag_values</code></strong></a><br>
+3.5. <a href="#flag-variable-flag-masks-ex">A flag variable, using <strong><code>flag_masks</code></strong></a><br>
+3.6. <a href="#region-variable-flag-values-ex">A region variable, using <strong><code>flag_values</code></strong></a><br>
+3.7. <a href="#flag-variable-flag-masks-flag-values-ex">A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></a><br>
 4.1. <a href="#latitude-axis-ex">Latitude axis</a><br>
 4.2. <a href="#longitude-axis-ex">Longitude axis</a><br>
 4.3. <a href="#atm-sigma-coord-ex">Atmosphere sigma coordinate</a><br>
@@ -1719,7 +1720,7 @@ of the permitted values.</p>
 <p>When one data variable provides metadata about the individual values of another data variable it may be desirable to express this association by providing a link between the variables. For example, instrument data may have associated measures of uncertainty. The attribute <strong><code>ancillary_variables</code></strong> is used to express these types of relationships. It is a string attribute whose value is a blank separated list of variable names. The nature of the relationship between variables associated via <strong><code>ancillary_variables</code></strong> must be determined by other attributes. The variables listed by the <strong><code>ancillary_variables</code></strong> attribute will often have the standard name of the variable which points to them including a modifier (<a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>) to indicate the relationship.</p>
 </div>
 <div id="instrument-data-ex" class="exampleblock">
-<div class="title">Example 3.2. Instrument data</div>
+<div class="title">Example 3.2. Ancillary instrument data</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -1734,6 +1735,59 @@ of the permitted values.</p>
     q_detection_limit:standard_name = "specific_humidity detection_minimum" ;
     q_detection_limit:units = "g/g" ;</pre>
 </div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, <strong><code>ancillary_variables</code></strong> may be used as status flags indicating the operational status of an instrument producing the data or as quality flags indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable.  In these cases, the flag variable will include a standard name that differs from that of the source variable and indicates the specific type of flag the variable represents.</p>
+</div>
+<div class="paragraph">
+<p>The standard names table includes many names intended to be used in this situation, both general names meant to be used to flexibly represent any type of status or quality assessment, as well as names for specific quality control tests commonly applied to geophysical phenomena timeseries data.  Several examples are listed below:</p>
+</div>
+<div class="ulist">
+<div class="title">Sample flag variable standard names:</div>
+<ul>
+<li>
+<p><strong><code>status_flag</code></strong> and <strong><code>quality_flag</code></strong>: general flag categories for instrument status or quality assessment</p>
+</li>
+<li>
+<p><strong><code>climatology_test_quality_flag</code></strong>, <strong><code>flat_line_test_quality_flag</code></strong>, <strong><code>gap_test_quality_flag</code></strong>, <strong><code>spike_test_quality_flag</code></strong>: a subset of standard name flags used to indicate the results of commonly-used geophysical timeseries data quality control tests (consult the standard names table for a full list of published flags)</p>
+</li>
+<li>
+<p><strong><code>aggregate_quality_flag</code></strong>: flag indicating an aggregate summary of all quality tests performed on the data variable, both automated and manual (i.e. a master quality flag for a particular variable)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregate flag that combines the results of the two tests.</p>
+</div>
+<div id="quality-flag-ex" class="exampleblock">
+<div class="title">Example 3.3 Ancillary quality flag data</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>float salinity(time, z);
+        salinity:units = "1";
+        salinity:long_name = "Salinity";
+        salinity:standard_name = "sea_water_practical_salinity";
+        salinity:ancillary_variables = "salinity_qc_generic salinity_qc_flat_line_test salinity_qc_agg";
+
+    int salinity_qc_generic(time, z);
+        salinity_qc_generic:long_name = "Salinity Generic QC Process Flag";
+        salinity_qc_generic:standard_name = "quality_flag";
+
+    int salinity_qc_flat_line_test(time, z);
+        salinity_qc_flat_line_test:long_name = "Salinity Flat Line Test Flag";
+        salinity_qc_flat_line_test:standard_name = "flat_line_test_quality_flag";
+
+    int salinity_qc_agg(time, z);
+        salinity_qc_agg:long_name = "Salinity Aggregate Flag";
+        salinity_qc_agg:standard_name = "aggregate_quality_flag";</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the ancillary variables in this example are simplified to exclude  <strong><code>flag_values</code></strong>, <strong><code>flag_masks</code></strong> and
+<strong><code>flag_meanings</code></strong> attributes described in <a href="#flags">Section 3.5, "Flags"</a> that they would ordinarily require</p>
 </div>
 </div>
 </div>
@@ -1762,7 +1816,7 @@ illustrates the use of flag values to express a speed quality with an
 enumerated status code.</p>
 </div>
 <div id="flag-variable-flag-values-ex" class="exampleblock">
-<div class="title">Example 3.3. A flag variable, using <strong><code>flag_values</code></strong></div>
+<div class="title">Example 3.4. A flag variable, using <strong><code>flag_values</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -1783,26 +1837,16 @@ attribute with a value containing current_speed_qc.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The <strong><code>flag_masks</code></strong> and <strong><code>flag_meanings</code></strong> attributes describe a
-number of independent Boolean conditions using bit field notation by
-setting unique bits in each <strong><code>flag_masks</code></strong> value.  <strong><code>The
-flag_masks</code></strong> attribute is the same type as the variable to which it is
-attached, and contains a list of values matching unique bit fields.  The
-<strong><code>flag_meanings</code></strong> attribute is defined as above, one for each
-<strong><code>flag_masks</code></strong> value.  A flagged condition is identified by performing
-a bitwise AND of the variable value and each <strong><code>flag_masks</code></strong> value; a
-non-zero result indicates a <strong><code>true</code></strong> condition.  Thus, any or all of
-the flagged conditions may be <strong><code>true</code></strong>, depending on the variable bit
-settings. The following example illustrates the use of <strong><code>flag_masks</code></strong>
-to express six sensor status conditions.</p>
+<p>The flag_masks and flag_meanings attributes describe a number of independent Boolean conditions using bit field notation by setting unique bits in each flag_masks value. The flag_masks attribute is the same type as the variable to which it is attached, and contains a list of values matching unique bit fields. The flag_meanings attribute is defined as above, one for each flag_masks value. A flagged condition is identified by performing a bitwise AND of the variable value and each flag_masks value; a non-zero result indicates a true condition. Thus, any or all of the flagged conditions may be true, depending on the variable bit settings. The following example illustrates the use of flag_masks to express six sensor status conditions.</p>
 </div>
 <div id="flag-variable-flag-masks-ex" class="exampleblock">
-<div class="title">Example 3.4. A flag variable, using <strong><code>flag_masks</code></strong></div>
+<div class="title">Example 3.5. A flag variable, using <strong><code>flag_masks</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
 <pre>  byte sensor_status_qc(time, depth, lat, lon) ;
     sensor_status_qc:long_name = "Sensor Status" ;
+    sensor_status_qc:standard_name = "status_flag" ;
     sensor_status_qc:_FillValue = 0b ;
     sensor_status_qc:valid_range = 1b, 63b ;
     sensor_status_qc:flag_masks = 1b, 2b, 4b, 8b, 16b, 32b ;
@@ -1815,10 +1859,10 @@ to express six sensor status conditions.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>A variable with standard name of <code>region</code>, <code>area_type</code> or any other standard name which requires string-valued values from a defined list may use flags together with <code>flag_values</code> and <code>flag_meanings</code> attributes to record the translation to the string values. Example 3.5 illustrates this using integer flag values for a variable with standard name <code>region</code> and <code>flag_values</code> selected from the <a href="http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html">standardized region names</a> (see section 6.1.1).</p>
+<p>A variable with standard name of <code>region</code>, <code>area_type</code> or any other standard name which requires string-valued values from a defined list may use flags together with <code>flag_values</code> and <code>flag_meanings</code> attributes to record the translation to the string values. The following example illustrates this using integer flag values for a variable with standard name <code>region</code> and <code>flag_values</code> selected from the <a href="http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html">standardized region names</a> (see section 6.1.1).</p>
 </div>
 <div id="region-variable-flag-values-ex" class="exampleblock">
-<div class="title">Example 3.5. A region variable, using <strong><code>flag_values</code></strong></div>
+<div class="title">Example 3.6. A region variable, using <strong><code>flag_values</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -1850,12 +1894,13 @@ number of status conditions with different <strong><code>flag_values</code></str
 conditions and one enumerated status code.</p>
 </div>
 <div id="flag-variable-flag-masks-flag-values-ex" class="exampleblock">
-<div class="title">Example 3.6. A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></div>
+<div class="title">Example 3.7. A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
 <pre>  byte sensor_status_qc(time, depth, lat, lon) ;
     sensor_status_qc:long_name = "Sensor Status" ;
+    sensor_status_qc:standard_name = "status_flag" ;
     sensor_status_qc:_FillValue = 0b ;
     sensor_status_qc:valid_range = 1b, 15b ;
     sensor_status_qc:flag_masks = 1b, 2b, 12b, 12b, 12b ;
@@ -10098,7 +10143,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-25 10:49:28 UTC
+Last updated 2020-05-29 11:30:36 UTC
 </div>
 </div>
 </body>
