@@ -6,6 +6,11 @@ The latest build of the specification is held in the `gh-pages` branch and can b
 
 For the official web site please visit: http://cfconventions.org and the [corresponding GitHub organisation](https://github.com/cf-convention).
 
+# Contributing to the CF Conventions
+The CF Conventions are changed by changing the source files in this repository.
+The rules for doing this are set forth on the [CF website](http://cfconventions.org/rules.html).
+Their implementation in GitHub is described in this repository's [CONTRIBUTING.md file](https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md).
+
 # Building the HTML
 
 To convert the AsciiDoc files into the resulting HTML file:
