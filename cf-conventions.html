@@ -6303,30 +6303,39 @@ and
 <dt class="hdlist1"><em>Map coordinates:</em></dt>
 <dd>
 <p>The x (abscissa) and y (ordinate) rectangular coordinates are identified by the <strong><code>standard_name</code></strong> attribute values <strong><code>projection_x_angular_coordinate</code></strong> and <strong><code>projection_y_angular_coordinate</code></strong>, respectively.
+It is assumed that the y-axis is aligned to the Earth&#8217;s N/S axis, whereas the x-axis aligns with the E/W axis.
 CF specified the standard names <strong><code>projection_x_coordinate</code></strong> and <strong><code>projection_y_coordinate</code></strong> for these coordinates prior to version 1.9, but that use is deprecated.
-In the case of this projection, the projection coordinates in this projection are directly related to the scanning angle of the satellite instrument.</p>
+In the case of this projection, the projection coordinates are the scanning angle of the satellite instrument.</p>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
+<p>The geostationary projection assumes a hypothetical view of the Earth from a perspective above the Earth where the azimuth and elevation viewing angles are described using a hypothetical gimbal model.
+This model is independent of the physical scan principles of any observing instrument.
+The model consists conceptually of a set of two rotating circles with a colocated centre, whose axes of rotation are perpendicular to each other.
+The axis of the outer circle is stationary, while the axis of the inner circle moves about the stationary axis.
+This means that a given viewing angle described using this model is the result of matrix multiplications, which is not commutative, so that order of operations is essential in achieving accurate results.
+The two axes are conventionally called the sweep-angle and fixed-angle axes; we adhere to this terminology, although some find these terms confusing, for the sake of interoperability with existing implementations.</p>
+<div class="paragraph">
 <p>The algorithm for computing the mapping may be found at <a href="http://www.cgms-info.org/documents/pdf_cgms_03.pdf"><a href="http://www.cgms-info.org/documents/pdf_cgms_03.pdf" class="bare">http://www.cgms-info.org/documents/pdf_cgms_03.pdf</a></a>.
 This document assumes the point of observation is directly over the equator, and that the <strong><code>sweep_angle_axis</code></strong> is y.</p>
-<div class="paragraph">
-<p>Notes on using the <strong><code>PROJ</code></strong> software packages for computing the mapping may be found at
-<a href="https://proj.org/operations/projections/geos.html"><a href="https://proj.org/operations/projections/geos.html" class="bare">https://proj.org/operations/projections/geos.html</a></a>
-and
-<a href="https://trac.osgeo.org/geotiff/"><a href="https://trac.osgeo.org/geotiff/" class="bare">https://trac.osgeo.org/geotiff/</a></a>.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>perspective_point_height</code></strong> is the distance to the surface of the ellipsoid.
-Adding the earth major axis gives the distance from the centre of the earth.</p>
+<p>Explanatory diagrams for the projection may be found <a href="http://proj.org/operations/projections/geos.html">on the PROJ website</a>, as well as notes on using the PROJ software for computing the mapping.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>sweep_angle_axis</code></strong> attribute indicates which axis the instrument sweeps.
-The value = "y" corresponds to the spin-stabilized Meteosat satellites, the value = "x" to the GOES-R satellite.</p>
+<p>The <strong><code>perspective_point_height</code></strong> is the distance to the surface of the ellipsoid.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>fixed_angle_axis</code></strong> attribute indicates which axis the instrument is fixed.
-The values are opposite to <strong><code>sweep_angle_axis</code></strong>. Only one of those two attributes is mandatory.</p>
+<p>The <strong><code>sweep_angle_axis</code></strong> attribute indicates the axis on which the view sweeps.
+It corresponds to the outer-gimbal (stable) axis of the gimbal view model.
+For example, the value = "y" corresponds to the Meteosat satellites, the value = "x" to the GOES satellites.</p>
+</div>
+<div class="paragraph">
+<p>The <strong><code>fixed_angle_axis</code></strong> attribute indicates the axis on which the view is fixed.
+It corresponds to the inner-gimbal axis of the gimbal view model, whose axis of rotation moves about the outer-gimbal axis.
+If <strong><code>fixed_angle_axis</code></strong> is "x", <strong><code>sweep_angle_axis</code></strong> is "y", and vice versa.
+Only one of those the attributes <strong><code>fixed_angle_axis</code></strong> or <strong><code>sweep_angle_axis</code></strong> is mandatory, as they can be used to infer each other.
+Note also that the values "x" and "y" are not case-sensitive.</p>
 </div>
 <div class="paragraph">
 <p>The use of <code>projection_x_coordinate</code> and <code>projection_y_coordinate</code> was deprecated in version 1.9 of the CF Conventions.
@@ -6971,6 +6980,16 @@ to a reference direction.</p></td>
     y0 = yf -<strong><code>false_northing</code></strong></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>`fixed_angle_axis `</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates the axis on which the view is fixed in a hypothetical gimbal view model of the Earth, as used in the geostationary grid mapping.
+    It corresponds to the inner-gimbal axis of the gimbal view model, whose axis of rotation moves about the outer-gimbal axis.
+    This value can adopt two values, "x" or "y", corresponding with the Earth&#8217;s E-W or N-S axis, respectively.
+    The counterpart to this attribute is <code>sweep_angle_axis</code>.
+    If set to "x", <code>sweep_angle_axis</code> is "y", and vice versa.
+    If one of the attributes <code>fixed_angle_axis</code> or <code>sweep_angle_axis</code> is provided, the other is not mandatory, as they can be used to infer each other.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>geographic_crs_name</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the geographic coordinate reference system.
@@ -7170,6 +7189,16 @@ to a reference direction.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The longitude (degrees_east) to be oriented straight up from the North or
     South Pole. Domain: <strong><code>-180.0 &lt;= straight_vertical_longitude_from_pole &lt; 180.0</code></strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>`sweep_angle_axis `</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates the axis on which the view sweeps in a hypothetical gimbal view model of the Earth, as used in the geostationary grid mapping.
+    It corresponds to the outer-gimbal axis of the gimbal view model, about whose axis of rotation the gimbal-gimbal axis moves.
+    This value can adopt two values, "x" or "y", corresponding with the Earth&#8217;s E-W or N-S axis, respectively.
+    The counterpart to this attribute is <code>fixed_angle_axis</code>.
+    If set to "x", <code>fixed_angle_axis</code> is "y", and vice versa.
+    If one of the attributes <code>fixed_angle_axis</code> or <code>sweep_angle_axis</code> is provided, the other is not mandatory, as they can be used to infer each other.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>towgs84</code></strong></p></td>
@@ -10075,6 +10104,14 @@ node coordinate variables to be one of the dimensions of the data variable.</p>
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">2 June 2020</div>
+<ol class="arabic">
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/259">Issue #259</a>: Clarify geostationary projection items</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -10143,7 +10180,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-29 11:30:36 UTC
+Last updated 2020-06-02 14:13:24 UTC
 </div>
 </div>
 </body>
