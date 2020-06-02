@@ -91,34 +91,42 @@ __Map parameters:__::
 * **`fixed_angle_axis`**
 
 __Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_angular_coordinate`** and **`projection_y_angular_coordinate`**, respectively.
+It is assumed that the y-axis is aligned to the Earth's N/S axis, whereas the x-axis aligns with the E/W axis.
 CF specified the standard names **`projection_x_coordinate`** and **`projection_y_coordinate`** for these coordinates prior to version 1.9, but that use is deprecated.
-In the case of this projection, the projection coordinates in this projection are directly related to the scanning angle of the satellite instrument.
+In the case of this projection, the projection coordinates are the scanning angle of the satellite instrument.
 
-__Notes:__:: The algorithm for computing the mapping may be found at link:$$http://www.cgms-info.org/documents/pdf_cgms_03.pdf$$[http://www.cgms-info.org/documents/pdf_cgms_03.pdf].
+__Notes:__:: The geostationary projection assumes a hypothetical view of the Earth from a perspective above the Earth where the azimuth and elevation viewing angles are described using a hypothetical gimbal model.
+This model is independent of the physical scan principles of any observing instrument.
+The model consists conceptually of a set of two rotating circles with a colocated centre, whose axes of rotation are perpendicular to each other.
+The axis of the outer circle is stationary, while the axis of the inner circle moves about the stationary axis.
+This means that a given viewing angle described using this model is the result of matrix multiplications, which is not commutative, so that order of operations is essential in achieving accurate results.
+The two axes are conventionally called the sweep-angle and fixed-angle axes; we adhere to this terminology, although some find these terms confusing, for the sake of interoperability with existing implementations.
+
++
+The algorithm for computing the mapping may be found at link:$$http://www.cgms-info.org/documents/pdf_cgms_03.pdf$$[http://www.cgms-info.org/documents/pdf_cgms_03.pdf].
 This document assumes the point of observation is directly over the equator, and that the **`sweep_angle_axis`** is y.
 
 +
-Notes on using the **`PROJ`** software packages for computing the mapping may be found at
-link:$$https://proj.org/operations/projections/geos.html$$[https://proj.org/operations/projections/geos.html]
-and
-link:$$https://trac.osgeo.org/geotiff/$$[https://trac.osgeo.org/geotiff/].
+Explanatory diagrams for the projection may be found link:$$http://proj.org/operations/projections/geos.html$$[on the PROJ website], as well as notes on using the PROJ software for computing the mapping.
 
 +
 The **`perspective_point_height`** is the distance to the surface of the ellipsoid.
-Adding the earth major axis gives the distance from the centre of the earth.
 
 +
-The **`sweep_angle_axis`** attribute indicates which axis the instrument sweeps.
-The value = "y" corresponds to the spin-stabilized Meteosat satellites, the value = "x" to the GOES-R satellite.
+The **`sweep_angle_axis`** attribute indicates the axis on which the view sweeps.
+It corresponds to the outer-gimbal (stable) axis of the gimbal view model.
+For example, the value = "y" corresponds to the Meteosat satellites, the value = "x" to the GOES satellites.
 
 +
-The **`fixed_angle_axis`** attribute indicates which axis the instrument is fixed.
-The values are opposite to **`sweep_angle_axis`**. Only one of those two attributes is mandatory.
+The **`fixed_angle_axis`** attribute indicates the axis on which the view is fixed.
+It corresponds to the inner-gimbal axis of the gimbal view model, whose axis of rotation moves about the outer-gimbal axis.
+If **`fixed_angle_axis`** is "x", **`sweep_angle_axis`** is "y", and vice versa.
+Only one of those the attributes **`fixed_angle_axis`** or **`sweep_angle_axis`** is mandatory, as they can be used to infer each other.
+Note also that the values "x" and "y" are not case-sensitive.
 
 +
 The use of `projection_x_coordinate` and `projection_y_coordinate` was deprecated in version 1.9 of the CF Conventions.
 The initial definition of this projection used these standard names to identify the projection coordinates even though their canonical units (meters) do not match those required for this projection (radians).
-
 
 [[lambert-azimuthal-equal-area]]
 === Lambert azimuthal equal area
@@ -481,6 +489,13 @@ to a reference direction.
     (yf) to a value (y0) used in a transformation without **`false_northing`**, i.e. **`false_northing`**= 0, is:
     y0 = yf -**`false_northing`**
 
+| **`fixed_angle_axis `** | S
+| Indicates the axis on which the view is fixed in a hypothetical gimbal view model of the Earth, as used in the geostationary grid mapping.
+    It corresponds to the inner-gimbal axis of the gimbal view model, whose axis of rotation moves about the outer-gimbal axis.
+    This value can adopt two values, "x" or "y", corresponding with the Earth's E-W or N-S axis, respectively.
+    The counterpart to this attribute is `sweep_angle_axis`.
+    If set to "x", `sweep_angle_axis` is "y", and vice versa.
+    If one of the attributes `fixed_angle_axis` or `sweep_angle_axis` is provided, the other is not mandatory, as they can be used to infer each other.
 
 | **`geographic_crs_name`** | S
 | The name of the geographic coordinate reference system. 
@@ -655,6 +670,14 @@ to a reference direction.
 | **`straight_vertical_longitude_from_pole`** | N
 | The longitude (degrees_east) to be oriented straight up from the North or 
     South Pole. Domain: **`-180.0 &lt;= straight_vertical_longitude_from_pole &lt; 180.0`**
+
+| **`sweep_angle_axis `** | S
+| Indicates the axis on which the view sweeps in a hypothetical gimbal view model of the Earth, as used in the geostationary grid mapping.
+    It corresponds to the outer-gimbal axis of the gimbal view model, about whose axis of rotation the gimbal-gimbal axis moves.
+    This value can adopt two values, "x" or "y", corresponding with the Earth's E-W or N-S axis, respectively.
+    The counterpart to this attribute is `fixed_angle_axis`.
+    If set to "x", `fixed_angle_axis` is "y", and vice versa.
+    If one of the attributes `fixed_angle_axis` or `sweep_angle_axis` is provided, the other is not mandatory, as they can be used to infer each other.
 
 | **`towgs84`** | N
 |   This indicates a list of up 
