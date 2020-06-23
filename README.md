@@ -1,15 +1,17 @@
 [![Build Status](https://secure.travis-ci.org/cf-convention/cf-conventions.png)](http://travis-ci.org/cf-convention/cf-conventions)
 
-### Status
+This repository contains the official source of the CF metadata conventions.
+The source files are built into HTML automatically when changes are merged into this repository.
+The latest build of the specification is held in the `gh-pages` branch and can be seen [here](http://cfconventions.org/cf-conventions/cf-conventions.html).
 
-This repository contains the official source of the CF metadata conventions. 
-The source files are built into HTML automatically when changes are merged into this repository. 
-The latest build of the specfication is held in the `gh-pages` branch and can be seen at: http://cfconventions.org/cf-conventions/cf-conventions.html.
+For the official web site please visit: http://cfconventions.org and the [corresponding GitHub organisation](https://github.com/cf-convention).
 
-For the official web site please visit: http://cfconventions.org/,
-and the corresponding GitHub organisation: https://github.com/cf-convention.
+# Contributing to the CF Conventions
+The CF Conventions are changed by changing the source files in this repository.
+The rules for doing this are set forth on the [CF website](http://cfconventions.org/rules.html).
+Their implementation in GitHub is described in this repository's [CONTRIBUTING.md file](https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md).
 
-### Building the HTML
+# Building the HTML
 
 To convert the AsciiDoc files into the resulting HTML file:
 
