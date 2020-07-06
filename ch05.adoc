@@ -485,11 +485,15 @@ single-property attributes as well as by **`crs_wkt`**.
 There will be occasions when a given CRS property value is duplicated in both a single-property grid
 mapping attribute and the **`crs_wkt`** attribute. In such cases the onus is on data producers to
 ensure that the property values are consistent. However, in those situations where two values of a
-given property are different, then the value specified by the single-property attribute shall take
-precedence. For example, if the semi-major axis length of the ellipsoid is defined by the grid
-mapping attribute **`semi_major_axis`** and also by the **`crs_wkt`** attribute (via the WKT
-**`SPHEROID[...]`** element) then the former, being the more specific attribute, takes
-precedence. Naturally if the two values are equal then no ambiguity arises.
+given property are different, If both crs_wkt and grid mapping attributes exist, the attributes
+must be the same and grid mapping parameters should always be completed as fully as possible.
+As such, information from either one (or both) may be read in by the user without needing to
+check both. However, in those situations where the two values of a given property are different,
+the CRS information cannot be interpreted accurately and users should inform the provider so
+the issue can be addressed. For example, if the semi-major axis length of the ellipsoid is
+defined by the grid mapping attribute **`semi_major_axis`** and also by the **`crs_wkt`**
+attribute (via the WKT **`SPHEROID[...]`** element), the value of this attribute cannot be
+interpreted accurately. Naturally if the two values are equal then no ambiguity arises.
 
 Likewise, in those cases where the value of a CRS WKT element should be used consistently across the
 CF-netCDF community (names of projections and projection parameters, for example) then, the values
