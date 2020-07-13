@@ -9143,39 +9143,33 @@ corresponding to a different field construct.</p>
 <h3 id="_coordinates_dimension_coordinate_and_auxiliary_constructs"><a class="anchor" href="#_coordinates_dimension_coordinate_and_auxiliary_constructs"></a>Coordinates: dimension coordinate and auxiliary constructs</h3>
 <div class="paragraph">
 <p>Coordinate constructs (<a href="#img-dim-aux">figure 4</a>) provide information which
-locate the cells of the domain and which depend on one, more or all of
-the domain axis constructs. There are two distinct types of coordinate
-construct: a dimension coordinate construct provides monotonic numeric
-coordinates for a single domain axis, and an auxiliary coordinate
-construct provides any type of coordinate information for one or more
-of the domain axes.</p>
+locate the cells of the domain and which depend on a subset of the
+domain axis constructs. A coordinate construct consists of an optional
+data array of the coordinate values spanning the subset of the domain
+axis constructs, properties to describe the coordinates (in the same
+sense as for the field construct), an optional data array of cell
+bounds recording the extents of each cell, and any extra arrays needed
+to interpret the cell bounds values. The data array of the coordinate
+values is required, execpt for the special cases described below.</p>
 </div>
 <div class="paragraph">
-<p>In both cases, the coordinate construct consists of a data array of
-the coordinate values which spans one, more or all of the domain axis
-constructs, an optional array of cell bounds recording the extents of
-each cell, and properties to describe the coordinates (in the same
-sense as for the field construct). An array of cell bounds spans the
-same domain axes as its coordinate array, with the addition of an
-extra dimension whose size is that of the number of vertices of each
-cell. This extra dimension does not correspond to a domain axis
-construct since it does not relate to an independent axis of the
-domain. Note that, for climatological time axes, the bounds are
-interpreted in a special way indicated by the cell method constructs.</p>
+<p>There are two distinct types of coordinate construct: dimension
+coordinate constructs unambiguously describe cell locations for a
+single domain axis, thus providing independent variables on which the
+field construct&#8217;s data depend; and auxiliary coordinate constructs
+provide any type of coordinate information for one or more of the
+domain axes.</p>
 </div>
 <div class="paragraph">
-<p>The dimension coordinate construct is able to unambiguously describe
-cell locations because a domain axis can be associated with at most
-one dimension coordinate construct, whose data array values must all
-be non-missing and strictly monotonically increasing or
-decreasing. They must also all be of the same numeric data type. If
-cell bounds are provided, then each cell must have exactly two
-vertices. CF-netCDF coordinate variables and numeric scalar coordinate
-variables correspond to dimension coordinate constructs.</p>
+<p>A dimension coordinate construct contains numeric coordinates for a
+single domain axis that are non-missing and strictly monotonically
+increasing or decreasing. CF-netCDF coordinate variables and numeric
+scalar coordinate variables correspond to dimension coordinate
+constructs.</p>
 </div>
 <div class="paragraph">
 <p>Auxiliary coordinate constructs have to be used, instead of dimension
-coordinate constructs, when a single domain axis requires more then
+coordinate constructs, when a single domain axis requires more than
 one set of coordinate values, when coordinate values are not numeric,
 strictly monotonic, or contain missing values, or when they vary along
 more than one domain axis construct simultaneously. CF-netCDF
@@ -9183,13 +9177,76 @@ auxiliary coordinate variables and non-numeric scalar coordinate
 variables correspond to auxiliary coordinate constructs.</p>
 </div>
 <div class="paragraph">
+<p>When cell bounds are provided, each cell comprises one or more parts,
+and each part is either a collection of points, a line defined by a
+connected series of points, or a polygonal area (i.e. the region
+enclosed by a connected series of points, where the first and last
+points are connected as well). All parts of all the cells must be of
+the same one of these three kinds, which are called "geometry
+types". The bounds array spans the domain axis constructs of the
+coordinate construct, with the addition of two trailing ragged
+dimensions. The first extra dimension indexes the parts of each cell
+and the second indexes the points that describe each part.</p>
+</div>
+<div class="paragraph">
+<p>If cell bounds are provided for a dimension coordinate construct then
+each cell must have exactly two vertices forming a line geometry. For
+climatological time coordinates the actual cell extent comprises
+multiple time segments equivalent to multiple line geometry parts, but
+the bounds require just two points to define each cell, namely the
+earliest and latest times of the sequence. The cell method constructs
+indicate how the multiple time segments should be inferred from these
+climatological bounds.</p>
+</div>
+<div class="paragraph">
+<p>If a polygonal cell is composed of multiple parts it may have holes,
+i.e. polygon regions that are to be omitted from, as opposed to
+included in, the cell extent. When such holes are present an "interior
+ring" array is required that records whether each polygon is to be
+included or excluded from the cell, and is supplied by an interior
+ring variable in CF-netCDF. The interior ring array spans the domain
+axis constructs of the coordinate construct, with the addition of an
+extra ragged dimension that indexes the parts for each cell. For
+example, a cell describing the land area surrounding a lake would
+require two polygon parts: one defines the outer boundary of the land
+area; the other, recorded as an interior ring, is the lake boundary,
+defining the inner boundary of the land area.</p>
+</div>
+<div class="paragraph">
 <p>If a domain axis construct does not correspond to a continuous
 physical quantity, then it is not necessary for it to be associated
 with a dimension coordinate construct. For example, this is the case
 for an axis that runs over ocean basins or area types, or for a domain
-axis that indexes a time series at scattered points. In such cases,
-one-dimensional auxiliary coordinate constructs could be used to store
-coordinate values. These axes are called "discrete" axes in CF-netCDF.</p>
+axis that indexes a time series at scattered points. These axes are
+discrete axes in CF-netCDF. In such cases cells may be described with
+one-dimensional auxiliary coordinate constructs for which, provided
+that there is a cell bounds array to describe the cell extents, the
+coordinate array is optional, since coordinates are not always well
+defined for such cells. A CF-netCDF geometry container variable is
+used to store cell bounds without coordinates for a discrete axis.</p>
+</div>
+<div class="paragraph">
+<p>In CF-netCDF, when a geometry container variable is present it
+explicitly describes the geometry type and identifies the node
+coordinate variables that contain the cell vertices. The geometry
+container variable also identifies a node count variable that contains
+the number of nodes per cell when more than one cell is present, and a
+part node count variable that contains the number of nodes per cell
+part when cells are composed of multipart lines, multipart polygons,
+or polygons with holes. When a geometry container variable is not
+present then the bounds contain exactly one part and their geometry
+type is implied by convention: for multidimensional auxiliary
+coordinates each cell is a single polygon, and for all other types of
+coordinate each cell is a single line segment defined by two
+points. In the case of climatological time coordinates, the two points
+of the cell bounds, in conjunction with the cell methods, imply the
+existence of multiple line parts, different subsets of which are
+associated with the different cell methods required to define the
+climatology. For example, when the field construct&#8217;s data are
+multiannual averages of monthly minima, the implied cell parts define
+the individual months over which the original data was minimised; and
+all of the implied parts taken together define the exact temporal
+extent of the average of the monthly minima.</p>
 </div>
 <div id="img-dim-aux" class="imageblock text-center text-center">
 <div class="content">
@@ -10174,7 +10231,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-06-23 07:56:57 UTC
+Last updated 2020-07-13 16:06:15 UTC
 </div>
 </div>
 </body>
