@@ -3361,16 +3361,28 @@ int model_level(sigma); // model level number at each height
 <dl>
 <dt class="hdlist1">Bounds for 1-D coordinate variables</dt>
 <dd>
-<p>For a coordinate variable such as <strong><code>lat(lat)</code></strong> with associated boundary variable <strong><code>latbnd(x,2)</code></strong>, the interval endpoints must be ordered consistently with the associated coordinate, e.g., for an increasing coordinate, <strong><code>lat(1)</code></strong> &gt; <strong><code>lat(0)</code></strong> implies <strong><code>latbnd(i,1)</code></strong> &gt;= <strong><code>latbnd(i,0)</code></strong> for all <strong><code>i</code></strong></p>
+<p>For a coordinate variable such as <strong><code>lat(lat)</code></strong> with associated boundary variable <strong><code>latbnd(x,2)</code></strong>, the interval endpoints must be ordered consistently with the associated coordinate, e.g., for an increasing coordinate, <strong><code>lat(1)</code></strong> &gt; <strong><code>lat(0)</code></strong> implies <strong><code>latbnd(i,1)</code></strong> &gt;= <strong><code>latbnd(i,0)</code></strong> for all <strong><code>i</code></strong> (<a href="#img-bnd_1d_coords">figure 1</a>).</p>
 <div class="paragraph">
 <p>If adjacent intervals are contiguous, the shared endpoint must be represented indentically in each instance where it occurs in the boundary variable. For example, if the intervals that contain grid points <strong><code>lat(i)</code></strong> and <strong><code>lat(i+1)</code></strong> are contiguous, then <strong><code>latbnd(i+1,0)</code></strong> = <strong><code>latbnd(i,1)</code></strong>.</p>
+</div>
+<div id="img-bnd_1d_coords" class="imageblock text-center text-center">
+<div class="content">
+<img src="images/order_horizontal_bounds__1D_coord_variables.png" alt="order horizontal bounds  1D coord variables" width="50%">
+</div>
+<div class="title">Figure 1. Order of <strong><code>lonbnd(i,0)</code></strong> and <strong><code>lonbnd(i,1)</code></strong> as well as of <strong><code>latbnd(i,0)</code></strong> and <strong><code>latbnd(i,1)</code></strong> in the case of one-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(i),lat(j))</code></strong> represent grid cell centers. The four grid cell vertices are given by <strong><code>(lonbnd(i,0),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,1))</code></strong> and <strong><code>(lonbnd(i,0),latbnd(j,1))</code></strong>.</div>
 </div>
 </dd>
 <dt class="hdlist1">Bounds for 2-D coordinate variables with 4-sided cells</dt>
 <dd>
 <p>In the case where the horizontal grid is described by two-dimensional auxiliary coordinate variables in latitude <strong><code>lat(n,m)</code></strong> and longitude <strong><code>lon(n,m)</code></strong>, and the associated cells are four-sided, then the boundary variables are given in the form <strong><code>latbnd(n,m,4)</code></strong> and <strong><code>lonbnd(n,m,4)</code></strong>, where the trailing index runs over the four vertices of the cells. Let us call the side of cell <strong><code>(j,i)</code></strong> facing cell <strong><code>(j,i-1)</code></strong> the "<strong><code>i-1</code></strong>" side, the side facing cell <strong><code>(j,i+1)</code></strong> the "<strong><code>i+1</code></strong>" side, and similarly for "<strong><code>j-1</code></strong>" and "<strong><code>j+1</code></strong>". Then we can refer to the vertex formed by sides <strong><code>i-1</code></strong> and <strong><code>j-1</code></strong> as <strong><code>(j-1,i-1)</code></strong>. With this notation, the four vertices are indexed as follows: <strong><code>0=(j-1,i-1)</code></strong>, <strong><code>1=(j-1,i+1)</code></strong>, <strong><code>2=(j+1,i+1)</code></strong>, <strong><code>3=(j+1,i-1)</code></strong>.</p>
+<div id="img-bnd_2d_coords" class="imageblock text-center text-center">
+<div class="content">
+<img src="images/order_horizontal_bounds__2D_coord_variables.png" alt="order horizontal bounds  2D coord variables" width="50%">
+</div>
+<div class="title">Figure 2. Order of <strong><code>lonbnd(i,j,0)</code></strong> to <strong><code>lonbnd(i,j,3)</code></strong> and of <strong><code>latbnd(i,j,0)</code></strong> and <strong><code>latbnd(i,j,3)</code></strong> in the case of two-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(i,j),lat(i,j))</code></strong> represent grid cell centers and tuples <strong><code>(lonbnd(i,j,n),latbnd(i,j,n))</code></strong> represent the grid cell vertices.</div>
+</div>
 <div class="paragraph">
-<p>If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this ordering means the vertices will be traversed anticlockwise on the lon-lat surface seen from above. If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat surface.</p>
+<p>If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this ordering means the vertices will be traversed anticlockwise on the lon-lat surface seen from above (<a href="#img-bnd_2d_coords">figure 2</a>). If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat surface.</p>
 </div>
 <div class="paragraph">
 <p>The bounds can be used to decide whether cells are contiguous via the following relationships. In these equations the variable <strong><code>bnd</code></strong> is used generically to represent either the latitude or longitude boundary variable.</p>
@@ -8893,7 +8905,7 @@ and read data.</p>
 <div class="content">
 <img src="images/cfdm_netcdf_classic_data_model.png" alt="cfdm netcdf classic data model" width="50%">
 </div>
-<div class="title">Figure 1. Key components of the netCDF classic data model. Files consist of global attributes, dimensions and variables. Variables contain attributes and data, and attributes also contain data. Variables, attributes and dimensions all contain properties, such as a "name" which identifies them in the file. A data array has a data type for all of its elements (e.g. "double" for 64-bit floating point numbers).</div>
+<div class="title">Figure 3. Key components of the netCDF classic data model. Files consist of global attributes, dimensions and variables. Variables contain attributes and data, and attributes also contain data. Variables, attributes and dimensions all contain properties, such as a "name" which identifies them in the file. A data array has a data type for all of its elements (e.g. "double" for 64-bit floating point numbers).</div>
 </div>
 </div>
 <div class="sect2">
@@ -8974,7 +8986,7 @@ design criteria.</p>
 <div class="content">
 <img src="images/cfdm_cf_concepts.png" alt="cfdm cf concepts" width="75%">
 </div>
-<div class="title">Figure 2. The relationships between CF-netCDF elements and their corresponding netCDF variables, dimensions and attributes (defined in <a href="#img-netCDF">figure 1</a> and identified here with the "NC" prefix). It is useful to define an abstract generic coordinate variable that can be used to refer to coordinates when the their type (coordinate, auxiliary or scalar coordinate variable) is not an issue. The CF convention details the mechanisms which are used in the netCDF file to express the relationships among the CF-netCDF elements, but these are not shown.</div>
+<div class="title">Figure 4. The relationships between CF-netCDF elements and their corresponding netCDF variables, dimensions and attributes (defined in <a href="#img-netCDF">figure 1</a> and identified here with the "NC" prefix). It is useful to define an abstract generic coordinate variable that can be used to refer to coordinates when the their type (coordinate, auxiliary or scalar coordinate variable) is not an issue. The CF convention details the mechanisms which are used in the netCDF file to express the relationships among the CF-netCDF elements, but these are not shown.</div>
 </div>
 </div>
 </div>
@@ -9109,7 +9121,7 @@ interpretation.</p>
 <div class="content">
 <img src="images/cfdm_field.png" alt="cfdm field" width="50%">
 </div>
-<div class="title">Figure 3. The constructs of the CF data model. The field construct corresponds to a CF-netCDF data variable (defined in <a href="#img-cf-concepts">figure 2</a> and identified here with the "CN" prefix). Relationships between other constructs and CF-netCDF are given in <a href="#img-dim-aux">figure 4</a> and <a href="#img-coordinate-reference">figure 5</a>. The domain provides the linkage between the field construct and the constructs which describe measurement locations and cell properties. It is not a construct of the data model, but is an abstract concept that is useful for understanding it. Similarly, it is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.</div>
+<div class="title">Figure 5. The constructs of the CF data model. The field construct corresponds to a CF-netCDF data variable (defined in <a href="#img-cf-concepts">figure 2</a> and identified here with the "CN" prefix). Relationships between other constructs and CF-netCDF are given in <a href="#img-dim-aux">figure 4</a> and <a href="#img-coordinate-reference">figure 5</a>. The domain provides the linkage between the field construct and the constructs which describe measurement locations and cell properties. It is not a construct of the data model, but is an abstract concept that is useful for understanding it. Similarly, it is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.</div>
 </div>
 </div>
 <div class="sect2">
@@ -9252,7 +9264,7 @@ extent of the average of the monthly minima.</p>
 <div class="content">
 <img src="images/cfdm_coordinates.png" alt="cfdm coordinates" width="75%">
 </div>
-<div class="title">Figure 4. The relationship between domain axis, dimension coordinate and auxiliary coordinate constructs and CF-netCDF (defined in <a href="#img-cf-concepts">figure 2</a> and identified here with the "CN" prefix). A dimension or auxiliary coordinate construct is defined by a CF-netCDF coordinate, scalar coordinate or auxiliary coordinate variable, and the associated CF-netCDF boundary variable if it exists. A generic coordinate construct spans one or more domain axis constructs, but the mapping of which ones is only held by the parent field construct.</div>
+<div class="title">Figure 6. The relationship between domain axis, dimension coordinate and auxiliary coordinate constructs and CF-netCDF (defined in <a href="#img-cf-concepts">figure 2</a> and identified here with the "CN" prefix). A dimension or auxiliary coordinate construct is defined by a CF-netCDF coordinate, scalar coordinate or auxiliary coordinate variable, and the associated CF-netCDF boundary variable if it exists. A generic coordinate construct spans one or more domain axis constructs, but the mapping of which ones is only held by the parent field construct.</div>
 </div>
 </div>
 <div class="sect2">
@@ -9353,7 +9365,7 @@ if it is zero-dimensional, a scalar parameter.</p>
 <div class="content">
 <img src="images/cfdm_coordinate_reference.png" alt="cfdm coordinate reference" width="75%">
 </div>
-<div class="title">Figure 5. The relationship between coordinate reference and domain ancillary constructs and CF-netCDF (defined in <a href="#img-cf-concepts">figure 2</a> and identified here with the "CN" prefix). A coordinate reference construct is defined either by a grid mapping variable, or a <strong><code>formula_terms</code></strong> attribute of a CF-netCDF coordinate variable. The coordinate reference construct is composed of generic coordinate constructs, a datum, and a coordinate conversion formula. The coordinate conversion formula is usually defined by a named formula in the CF conventions. A domain ancillary construct term of a coordinate conversion formula is defined by a CF-netCDF data variable or a CF-netCDF generic coordinate variable.</div>
+<div class="title">Figure 7. The relationship between coordinate reference and domain ancillary constructs and CF-netCDF (defined in <a href="#img-cf-concepts">figure 2</a> and identified here with the "CN" prefix). A coordinate reference construct is defined either by a grid mapping variable, or a <strong><code>formula_terms</code></strong> attribute of a CF-netCDF coordinate variable. The coordinate reference construct is composed of generic coordinate constructs, a datum, and a coordinate conversion formula. The coordinate conversion formula is usually defined by a named formula in the CF conventions. A domain ancillary construct term of a coordinate conversion formula is defined by a CF-netCDF data variable or a CF-netCDF generic coordinate variable.</div>
 </div>
 </div>
 <div class="sect2">
@@ -10231,7 +10243,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-13 16:06:15 UTC
+Last updated 2020-07-22 13:25:15 UTC
 </div>
 </div>
 </body>
