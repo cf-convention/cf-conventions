@@ -477,19 +477,20 @@ For example, a file has two coordinate variables, lon and lat, and a grid mappin
 
 The **`crs_wkt`** attribute is intended to act as a _supplement_ to other single-property CF grid
 mapping attributes (as described in Appendix F); it is not intended to replace those attributes. If
-data producers omit the single-property grid mapping attributes in favour of the compound
-**`crs_wkt`** attribute, software which cannot interpret **`crs_wkt`** will be unable to use the
-grid_mapping information. Therefore the CRS should be described as thoroughly as possible with the
-single-property attributes as well as by **`crs_wkt`**.
+data producers omit the single-property grid mapping attributes in favour of the **`crs_wkt`**
+attribute, software which cannot interpret **`crs_wkt`** will be unable to use the grid_mapping
+information. Therefore the CRS should be described as thoroughly as possible with the single-property
+grid mapping attributes as well as by **`crs_wkt`**.
 
-There will be occasions when a given CRS property value is duplicated in both a single-property grid
-mapping attribute and the **`crs_wkt`** attribute. In such cases the onus is on data producers to
-ensure that the property values are consistent. However, in those situations where two values of a
-given property are different, then the value specified by the single-property attribute shall take
-precedence. For example, if the semi-major axis length of the ellipsoid is defined by the grid
-mapping attribute **`semi_major_axis`** and also by the **`crs_wkt`** attribute (via the WKT
-**`SPHEROID[...]`** element) then the former, being the more specific attribute, takes
-precedence. Naturally if the two values are equal then no ambiguity arises.
+In cases where CRS property values can be represented by both a single-property grid mapping attribute
+and the **`crs_wkt`** attribute, the grid mapping should be provided, and if both are provided, the
+onus is on data producers to ensure that their property values are consistent. Therefore information
+from either one (or both) may be read in by the user without needing to check both. However, if the
+two values of a given property are different, the CRS information cannot be interpreted accurately
+and users should inform the provider so the issue can be addressed. For example, if the semi-major
+axis length of the ellipsoid defined by the grid mapping attribute **`semi_major_axis`** disagrees
+with the **`crs_wkt`** attribute (via the **`WKT SPHEROID[…​]`** element), the value of this attribute
+cannot be interpreted accurately. Naturally if the two values are equal then no ambiguity arises.
 
 Likewise, in those cases where the value of a CRS WKT element should be used consistently across the
 CF-netCDF community (names of projections and projection parameters, for example) then, the values
