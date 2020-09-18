@@ -747,3 +747,264 @@ data:
 
 In this example both the analysis time and the single pressure level are represented using scalar coordinate variables. The analysis time is identified by the standard name "forecast_reference_time" while the valid time of the forecast is identified by the standard name "time".
 
+
+[[domain-variables, Section 5.8, "Domain Variables"]]
+=== Domain Variables
+
+A domain describes cell locations and properties. It defines cells
+that span a collection of dimensions by identifying the cell
+coordinates, measures, and coordinate reference systems.
+
+A domain variable provides the description of the domain, in the
+absence of any data values, via a collection of attached
+attributes. It is of arbitrary type since it contains no data. Its
+purpose is to act as a container for the attributes that define the
+domain. A domain variable can not be utilized by a data variable, as
+that defines its own domain via its own attributes. The purpose of the
+domain variable is to provide domain information to applications that
+have no need of data values at the domain's locations, thus removing
+any ambiguity when retrieving a domain from a dataset. A domain
+variable may exist in a file with or without other data variables.
+
+The domain variable supports the same attributes as are allowed on a
+data variable for describing aspects of the domain,
+i.e. `cell_measures`, `coordinates`, `geometry`, and `grid_mapping`,
+with exactly the same meanings and syntaxes as descibed in
+<<attribute-appendix>>.
+
+The dimensions of the domain must be stored with the `dimensions`
+attribute. It is necessary to list these dimensions, rather than
+inferring them from the contents of the other attributes, as it can
+not be guaranteed that the referenced variables span all of the
+required dimensions (as could be the case for a discrete axis). The
+value of the `dimensions` attribute is a blank separated list of the
+dimensions names. There is no restriction on the order in which the
+dimension appear in the `dimensions` attribute string. The presence of
+a `dimensions` attribute will identify the variable as a domain
+variable.
+
+It is optional for coordinate variables to be listed by a domain
+variable's `coordinates` attribute. Any coordinate variable that
+shares its name with a dimension given by the `dimensions` attribute
+will considered as part of the domain definition.
+
+[[a-domain-with-independent-coordinate-variables]]
+[caption="Example 5.15. "]
+.A domain with independent coordinate variables.
+====
+----
+
+dimensions:
+  lat = 18 ;
+  lon = 36 ;
+  pres = 15 ;
+  time = 4 ;
+variables:
+  char domain ;
+    domain:dimensions = "time pres lat lon" ;
+  float lon(lon) ;
+    lon:long_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float lat(lat) ;
+    lat:long_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  float pres(pres) ;
+    pres:long_name = "pressure" ;
+    pres:units = "hPa" ;
+  double time(time) ;
+    time:long_name = "time" ;
+    time:units = "days since 1990-1-1 0:0:0" ;
+     
+----
+
+In this example, the data variable `xwind` from
+<<independent-coordinate-variables-ex>> has been replaced by the
+domain variable `domain`.
+
+====
+
+[[a-domain-with-a-rotated-pole-grid-and-a-scalar-coordinate-variable]]
+[caption="Example 5.16. "]
+.A domain with a rotated pole grid and a scalar coordinate variable.
+====
+----
+
+dimensions:
+  rlon = 128 ;
+  rlat = 64 ;
+  lev = 18 ;
+variables:
+  char domain
+    domain:dimensions  ="lev rlat rlon" ;
+    domain:coordinates = "lon lat time" ;
+    domain:grid_mapping = "rotated_pole" ;
+  char rotated_pole ;
+    rotated_pole:grid_mapping_name = "rotated_latitude_longitude" ;
+    rotated_pole:grid_north_pole_latitude = 32.5 ;
+    rotated_pole:grid_north_pole_longitude = 170. ;
+  double time
+    atime:standard_name = "time" ;
+    atime:units = "days since 2000-12-01 00:00" ;
+  float rlon(rlon) ;
+    rlon:long_name = "longitude in rotated pole grid" ;
+    rlon:units = "degrees" ;
+    rlon:standard_name = "grid_longitude";
+  float rlat(rlat) ;
+    rlat:long_name = "latitude in rotated pole grid" ;
+    rlat:units = "degrees" ;
+    rlat:standard_name = "grid_latitude";
+  float lev(lev) ;
+    lev:long_name = "pressure level" ;
+    lev:units = "hPa" ;
+  float lon(rlat,rlon) ;
+    lon:long_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float lat(rlat,rlon) ;
+    lat:long_name = "latitude" ;
+    lat:units = "degrees_north" ;
+     
+----
+====
+
+[[a-domain-containing-cell-areas-for-a-sphericalgeodesic-grid]]
+[caption="Example 5.17. "]
+.A domain containing cell areas for a spherical geodesic grid.
+====
+----
+
+dimensions:
+  cell = 2562 ;  // number of grid cells
+  time = 12 ;
+  nv = 6 ;       // maximum number of cell vertices
+variables:
+  char domain ;
+    domain:dimensions = "time cell" ;
+    domain:coordinates = "lon lat" ;
+    domain:cell_measures = "area: cell_area" ;
+  float lon(cell) ;
+    lon:long_name = "longitude" ;
+    lon:units = "degrees_east" ;
+    lon:bounds="lon_vertices" ;
+  float lat(cell) ;
+    lat:long_name = "latitude" ;
+    lat:units = "degrees_north" ;
+    lat:bounds="lat_vertices" ;
+  float time(time) ;
+    time:long_name = "time" ;
+    time:units = "days since 1979-01-01 0:0:0" ;
+  float cell_area(cell) ;
+    cell_area:long_name = "area of grid cell" ;
+    cell_area:standard_name="cell_area";
+    cell_area:units = "m2"
+  float lon_vertices(cell,nv) ;
+  float lat_vertices(cell,nv) ;
+
+----
+
+In this example, the data variable `PS` from
+<<cell-areas-for-a-spherical-geodesic-grid>> has been replaced by the
+domain variable `domain`.
+
+===
+
+[[a-domain-containing-a-timeseries-geometry]]
+[caption="Example 5.18. "]
+.A domain containing a timeseries geometry.
+====
+----
+
+dimensions:
+  instance = 2 ;
+  node = 5 ;
+  time = 4 ;
+variables:
+  char domain ;
+    domain:dimensions = "instance time" ;
+    domain:coordinates = "lat lon" ;
+    domain:grid_mapping = "datum" ;
+    domain:geometry = "geometry_container" ;
+  int time(time) ;
+  double lat(instance) ;
+    lat:units = "degrees_north" ;
+    lat:standard_name = "latitude" ;
+    lat:nodes = "y" ;
+  double lon(instance) ;
+    lon:units = "degrees_east" ;
+    lon:standard_name = "longitude" ;
+    lon:nodes = "x" ;
+  int datum ;
+    datum:grid_mapping_name = "latitude_longitude" ;
+    datum:longitude_of_prime_meridian = 0.0 ;
+    datum:semi_major_axis = 6378137.0 ;
+    datum:inverse_flattening = 298.257223563 ;
+  int geometry_container ;
+    geometry_container:geometry_type = "line" ;
+    geometry_container:node_count = "node_count" ;
+    geometry_container:node_coordinates = "x y" ;
+  int node_count(instance) ;
+  double x(node) ;
+    x:units = "degrees_east" ;
+    x:standard_name = "longitude" ;
+    x:axis = "X" ;
+  double y(node) ;
+    y:units = "degrees_north" ;
+    y:standard_name = "latitude" ;
+    y:axis = "Y" ;
+
+----
+
+In this example, the data variable `someData` from
+<<timeseries-with-geometry>> has been replaced by the domain variable
+`domain`.
+
+====
+
+[[a-domain-containing-a-timeseries-of-station-data-in-the-indexed-ragged-array-representation]]
+[caption="Example 5.18. "]
+.A domain containing a timeseries of station data in the indexed ragged array representation.
+====
+----
+
+dimensions:
+  station = 23 ;
+  obs = UNLIMITED ;
+  name_strlen = 23 ;
+variables:
+  char domain ;
+    domain:dimensions = "obs" ; 
+    domain:coordinates = "time lat lon alt station_name" ;
+  float lon(station) ;
+    lon:standard_name = "longitude";
+    lon:long_name = "station longitude";
+    lon:units = "degrees_east";
+ float lat(station) ;
+    lat:standard_name = "latitude";
+    lat:long_name = "station latitude" ;
+    lat:units = "degrees_north" ;
+ float alt(station) ;
+    alt:long_name = "vertical distance above the surface" ;
+    alt:standard_name = "height" ;
+    alt:units = "m";
+    alt:positive = "up";
+    alt:axis = "Z";
+ char station_name(station, name_strlen) ;
+    station_name:long_name = "station name" ;
+    station_name:cf_role = "timeseries_id";
+ int station_info(station) ;
+    station_info:long_name = "some kind of station info" ;
+ int stationIndex(obs) ;
+    stationIndex:long_name = "which station this obs is for" ;
+    stationIndex:instance_dimension= "station" ;
+ double time(obs) ;
+    time:standard_name = "time";
+    time:long_name = "time of measurement" ;
+    time:units = "days since 1970-01-01 00:00:00" ;
+attributes:
+    :featureType = "timeSeries";
+
+----
+
+In this example, the data variables `humidity` and `temp` from
+<<example-h.7>> have been replaced by the domain variable `domain`.
+
+====
