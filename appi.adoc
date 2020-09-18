@@ -175,6 +175,9 @@ CF construct
 | Field
 | Scientific data discretised within a domain
 
+| Domain
+| Describes a domain
+
 | Domain axis
 | Independent axes of the domain
 
@@ -212,18 +215,15 @@ that the constructs contained by the field construct cannot exist
 independently, as is indicated by the nature of the class associations
 shown in <<img-field>>.
 
-The field construct consists of a data array and the definition of its
-domain, ancillary metadata defined over the same domain, metadata to
-describe how the cell values represent the variation of the physical
-quantity within the cells of the domain (<<img-field>>), and
-properties to describe aspects of the data that are independent of the
-domain. All of the constructs contained by the field construct are
-optional (as indicated by "0..*" in <<img-field>>). The only component
-of the field which is mandatory is the data array. Because the CF
-conventions do not mention the concept of the domain, it is not
-regarded as a construct of the data model. Instead, the domain is
-defined collectively by various other constructs included in the
-field.
+The field construct consists of a data array, a domain construct
+defining the domain of the data, ancillary metadata defined over the
+same domain, metadata to describe how the cell values represent the
+variation of the physical quantity within the cells of the domain
+(<<img-field>>), and properties to describe aspects of the data that
+are independent of the domain. All of the constructs contained by the
+field construct are optional (as indicated by "0..*" in
+<<img-field>>). The only component of the field which is mandatory is
+the data array.
 
 The properties of the field construct correspond to some netCDF
 attributes of variables (e.g. the **`units`**, **`long_name`**, and
@@ -260,8 +260,34 @@ interpretation.
 
 [[img-field, figure 3]]
 [.text-center]
-.The constructs of the CF data model. The field construct corresponds to a CF-netCDF data variable (defined in <<img-cf-concepts>> and identified here with the "CN" prefix). Relationships between other constructs and CF-netCDF are given in <<img-dim-aux>> and <<img-coordinate-reference>>. The domain provides the linkage between the field construct and the constructs which describe measurement locations and cell properties. It is not a construct of the data model, but is an abstract concept that is useful for understanding it. Similarly, it is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.
+.The constructs of the CF data model. The field construct corresponds to a CF-netCDF data variable (defined in <<img-cf-concepts>> and identified here with the "CN" prefix). Relationships between other constructs and CF-netCDF are given in <<img-dim-aux>> and <<img-coordinate-reference>>. The domain provides the linkage between the field construct and the constructs which describe measurement locations and cell properties. It is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.
 image::images/cfdm_field.png[,50%,pdfwidth=50vw,align="center"]
+
+=== Domain construct
+
+The domain construct describes measurement locations and cell
+properties. It corresponds to a CF-netCDF domain variable, or the
+domain defined collectively by various data variable attributes. The
+domain construct is the only construct that may also exist
+independently of a field construct.
+
+The domain construct consists of the following metadata constructs
+required to define a domain:
+
+* Domain axis constructs
+
+* Dimension coordinate and auxiliary coordinate constructs
+
+* Coordinate reference constructs
+
+* Domain ancillary constructs
+
+* Cell measure constructs
+
+All of the constructs contained by the domain construct are optional
+(as indicated by "0..*" in <<img-field>>). Note that in CF-netCDF the
+domain of a data variable is defined implicitly by its attributes,
+rather than by reference to a domain variable.
 
 === Domain axis construct and the data array
 
