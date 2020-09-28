@@ -1,11 +1,9 @@
 
-==  Description of the Data 
+==  Description of the Data
 
 The attributes described in this section are used to provide a description of the content and the units of measurement for each variable. We continue to support the use of the **`units`** and **`long_name`** attributes as defined in COARDS. We extend COARDS by adding the optional **`standard_name`** attribute which is used to provide unique identifiers for variables. This is important for data exchange since one cannot necessarily identify a particular variable based on the name assigned to it by the institution that provided the data.
 
 The **`standard_name`** attribute can be used to identify variables that contain coordinate data. But since it is an optional attribute, applications that implement these standards must continue to be able to identify coordinate types based on the COARDS conventions.
-
-
 
 
 [[units, Section 3.1, "Units"]]
@@ -21,7 +19,7 @@ The units `level`, `layer`, and `sigma_level` are allowed for dimensionless vert
 
 The Udunits syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard. The application of any scale factors or offsets to data should be indicated by the **`scale_factor`** and **`add_offset`** attributes. Use of these attributes for data packing, which is their most important application, is discussed in detail in <<packed-data>>.
 
-Udunits recognizes the following prefixes and their abbreviations. 
+Udunits recognizes the following prefixes and their abbreviations.
 [[table-supported-units]]
 .Supported Units
 [options="header",caption="Table 3.1. "]
@@ -50,7 +48,7 @@ The **`long_name`** attribute is defined by the NUG to contain a long descriptiv
 [[standard-name, Section 3.3, "Standard Name"]]
 === Standard Name
 
-A fundamental requirement for exchange of scientific data is the ability to describe precisely the physical quantities being represented. To some extent this is the role of the **`long_name`** attribute as defined in the NUG. However, usage of **`long_name`** is completely ad-hoc. For some applications it would be desirable to have a more definitive description of the quantity, which would allow users of data from different sources to determine whether quantities were in fact comparable. For this reason an optional mechanism for uniquely associating each variable with a standard name is provided.
+A fundamental requirement for exchange of scientific data is the ability to describe precisely the physical quantities being represented. To some extent this is the role of the **`long_name`** attribute as defined in the NUG. However, usage of **`long_name`** is completely ad-hoc. For some applications it would be desirable to have a more definitive description of the quantity, which would allow users of data from different sources (some of which might be models and others observational) to determine whether quantities were in fact comparable. For this reason an optional mechanism for uniquely associating each variable with a standard name is provided.
 
 A standard name is associated with a variable via the attribute **`standard_name`** which takes a string value comprised of a standard name optionally followed by one or more blanks and a standard name modifier (a string value from <<standard-name-modifiers>>).
 
@@ -58,9 +56,10 @@ The set of permissible standard names is contained in the standard name table. T
 
 standard name:: The name used to identify the physical quantity. A standard name contains no whitespace and is case sensitive.
 
-canonical units:: Representative units of the physical quantity. Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical) to the canonical units, possibly modified by an operation specified by either the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>).
+canonical units:: Representative units of the physical quantity. Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
 
-description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are. We don"t attempt to provide precise definitions of fundumental physical quantities (e.g., temperature) which may be found in the literature.
+description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are. We don't attempt to provide precise definitions of fundumental physical quantities (e.g., temperature) which may be found in the literature.
+The description may define rules on the variable type, attributes and coordinates which must be complied with by any variable carrying that standard name (such as in example 3.4).
 
 When appropriate, the table entry also contains the corresponding GRIB parameter code(s) (from ECMWF and NCEP) and AMIP identifiers.
 
@@ -108,7 +107,7 @@ When one data variable provides metadata about the individual values of another 
 
 [[instrument-data-ex]]
 [caption="Example 3.2. "]
-.Instrument data
+.Ancillary instrument data
 ====
 
 ----
@@ -123,13 +122,51 @@ When one data variable provides metadata about the individual values of another 
   float q_detection_limit(time)
     q_detection_limit:standard_name = "specific_humidity detection_minimum" ;
     q_detection_limit:units = "g/g" ;
-      
-----
 
+----
 
 ====
 
 
+Alternatively, **`ancillary_variables`** may be used as status flags indicating the operational status of an instrument producing the data or as quality flags indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable.  In these cases, the flag variable will include a standard name that differs from that of the source variable and indicates the specific type of flag the variable represents.
+
+The standard names table includes many names intended to be used in this situation, both general names meant to be used to flexibly represent any type of status or quality assessment, as well as names for specific quality control tests commonly applied to geophysical phenomena timeseries data.  Several examples are listed below:
+
+.Sample flag variable standard names:
+- **`status_flag`** and **`quality_flag`**: general flag categories for instrument status or quality assessment
+- **`climatology_test_quality_flag`**, **`flat_line_test_quality_flag`**, **`gap_test_quality_flag`**, **`spike_test_quality_flag`**: a subset of standard name flags used to indicate the results of commonly-used geophysical timeseries data quality control tests (consult the standard names table for a full list of published flags)
+- **`aggregate_quality_flag`**: flag indicating an aggregate summary of all quality tests performed on the data variable, both automated and manual (i.e. a master quality flag for a particular variable)
+
+The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregate flag that combines the results of the two tests.
+
+[[quality-flag-ex]]
+[caption="Example 3.3 "]
+.Ancillary quality flag data
+====
+
+----
+float salinity(time, z);
+        salinity:units = "1";
+        salinity:long_name = "Salinity";
+        salinity:standard_name = "sea_water_practical_salinity";
+        salinity:ancillary_variables = "salinity_qc_generic salinity_qc_flat_line_test salinity_qc_agg";
+
+    int salinity_qc_generic(time, z);
+        salinity_qc_generic:long_name = "Salinity Generic QC Process Flag";
+        salinity_qc_generic:standard_name = "quality_flag";
+
+    int salinity_qc_flat_line_test(time, z);
+        salinity_qc_flat_line_test:long_name = "Salinity Flat Line Test Flag";
+        salinity_qc_flat_line_test:standard_name = "flat_line_test_quality_flag";
+
+    int salinity_qc_agg(time, z);
+        salinity_qc_agg:long_name = "Salinity Aggregate Flag";
+        salinity_qc_agg:standard_name = "aggregate_quality_flag";
+----
+
+Note that the ancillary variables in this example are simplified to exclude  **`flag_values`**, **`flag_masks`** and
+**`flag_meanings`** attributes described in <<flags>> that they would ordinarily require
+====
 
 
 [[flags, Section 3.5, "Flags"]]
@@ -155,45 +192,39 @@ illustrates the use of flag values to express a speed quality with an
 enumerated status code.
 
 [[flag-variable-flag-values-ex]]
-[caption="Example 3.3. "]
+[caption="Example 3.4. "]
 .A flag variable, using **`flag_values`**
 ====
 
 ----
   byte current_speed_qc(time, depth, lat, lon) ;
     current_speed_qc:long_name = "Current Speed Quality" ;
-    current_speed_qc:standard_name = "sea_water_speed status_flag" ;
+    current_speed_qc:standard_name = "status_flag" ;
     current_speed_qc:_FillValue = -128b ;
     current_speed_qc:valid_range = 0b, 2b ;
     current_speed_qc:flag_values = 0b, 1b, 2b ;
-    current_speed_qc:flag_meanings = "quality_good sensor_nonfunctional 
+    current_speed_qc:flag_meanings = "quality_good sensor_nonfunctional
                                       outside_valid_range" ;
 ----
+
+Note that the data variable containing current speed has an ancillary_variables
+attribute with a value containing current_speed_qc.
 
 
 ====
 
-The **`flag_masks`** and **`flag_meanings`** attributes describe a
-number of independent Boolean conditions using bit field notation by
-setting unique bits in each **`flag_masks`** value.  **`The
-flag_masks`** attribute is the same type as the variable to which it is
-attached, and contains a list of values matching unique bit fields.  The
-**`flag_meanings`** attribute is defined as above, one for each
-**`flag_masks`** value.  A flagged condition is identified by performing
-a bitwise AND of the variable value and each **`flag_masks`** value; a
-non-zero result indicates a **`true`** condition.  Thus, any or all of
-the flagged conditions may be **`true`**, depending on the variable bit
-settings. The following example illustrates the use of **`flag_masks`**
-to express six sensor status conditions.
+The flag_masks and flag_meanings attributes describe a number of independent Boolean conditions using bit field notation by setting unique bits in each flag_masks value. The flag_masks attribute is the same type as the variable to which it is attached, and contains a list of values matching unique bit fields. The flag_meanings attribute is defined as above, one for each flag_masks value. A flagged condition is identified by performing a bitwise AND of the variable value and each flag_masks value; a non-zero result indicates a true condition. Thus, any or all of the flagged conditions may be true, depending on the variable bit settings. The following example illustrates the use of flag_masks to express six sensor status conditions.
+
 
 [[flag-variable-flag-masks-ex]]
-[caption="Example 3.4. "]
+[caption="Example 3.5. "]
 .A flag variable, using **`flag_masks`**
 ====
 
 ----
   byte sensor_status_qc(time, depth, lat, lon) ;
     sensor_status_qc:long_name = "Sensor Status" ;
+    sensor_status_qc:standard_name = "status_flag" ;
     sensor_status_qc:_FillValue = 0b ;
     sensor_status_qc:valid_range = 1b, 63b ;
     sensor_status_qc:flag_masks = 1b, 2b, 4b, 8b, 16b, 32b ;
@@ -203,6 +234,24 @@ to express six sensor status conditions.
                                       maintenance_required" ;
 ----
 
+====
+
+A variable with standard name of `region`, `area_type` or any other standard name which requires string-valued values from a defined list may use flags together with `flag_values` and `flag_meanings` attributes to record the translation to the string values. The following example illustrates this using integer flag values for a variable with standard name `region` and `flag_values` selected from the link:$$http://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html$$[standardized region names] (see section 6.1.1).
+
+
+[[region-variable-flag-values-ex]]
+[caption="Example 3.6. "]
+.A region variable, using **`flag_values`**
+====
+
+----
+int basin(lat, lon);
+       standard_name: region;
+       flag_values: 1, 2, 3;
+       flag_meanings:"atlantic_arctic_ocean indo_pacific_ocean global_ocean";
+data:
+   basin: 1, 1, 1, 1, 2, ..... ;
+----
 
 ====
 
@@ -223,13 +272,14 @@ number of status conditions with different **`flag_values`**.  The
 conditions and one enumerated status code.
 
 [[flag-variable-flag-masks-flag-values-ex]]
-[caption="Example 3.5. "]
+[caption="Example 3.7. "]
 .A flag variable, using **`flag_masks`** and **`flag_values`**
 ====
 
 ----
   byte sensor_status_qc(time, depth, lat, lon) ;
     sensor_status_qc:long_name = "Sensor Status" ;
+    sensor_status_qc:standard_name = "status_flag" ;
     sensor_status_qc:_FillValue = 0b ;
     sensor_status_qc:valid_range = 1b, 15b ;
     sensor_status_qc:flag_masks = 1b, 2b, 12b, 12b, 12b ;
@@ -264,7 +314,7 @@ The remaining bits (Bit 2 and Bit 3) are decoded as follows:
 .Flag Variable Bit 2 and Bit 3 (from Example)
 [options="header",caption="Table 3.3. "]
 |===============
-| Bit 3 | Bit 2 | Mode 
+| Bit 3 | Bit 2 | Mode
 | 0 | 1 | offline_mode
 | 1 | 0 | calibration_mode
 | 1 | 1 | maintenance_mode
@@ -280,4 +330,3 @@ with the variable. When a result is equal to the corresponding
 **`flag_values`** element, that condition is **`true`**. The repeated
 **`flag_masks`** enable a simple mechanism for clients to detect all
 possible conditions.
-

@@ -1,9 +1,10 @@
-
+﻿
 [[appendix-examples-discrete-geometries, Appendix H, Annotated Examples of Discrete Geometries]]
 
 [appendix]
 == Annotated Examples of Discrete Geometries
 
+[[point-data, Section H.1, "Point Data"]]
 === Point Data
 
 To represent data at scattered locations and times with no implied relationship among of coordinate positions, both data and coordinates must share the same (sample) instance dimension.   Because each feature contains only a single data element, there is no need for a separate element dimension.  The representation of point features is a special, degenerate case of the standard four representations.  The **`coordinates`** attribute is used on the data variables to unambiguously identify the relevant space and time auxiliary coordinate variables.
@@ -75,11 +76,12 @@ If the time series instances have the same number of elements and the time value
    dimensions:
      station = 10 ;  // measurement locations
      time = UNLIMITED ;
+
    variables:
      float humidity(station,time) ;
        humidity:standard_name = "specific humidity" ;
        humidity:coordinates = "lat lon alt station_name" ;
-       humidity:_FillValue = -999.9;
+       humidity:_FillValue = -999.9f;
      double time(time) ; 
        time:standard_name = "time";
        time:long_name = "time of measurement" ;
@@ -98,7 +100,7 @@ If the time series instances have the same number of elements and the time value
        alt:units = "m";
        alt:positive = "up";
        alt:axis = "Z";
-     char station_name(station, name_strlen) ;
+     string station_name(station) ;
        station_name:long_name = "station name" ;
        station_name:cf_role = "timeseries_id";
    attributes:
@@ -121,6 +123,7 @@ Much of the simplicity of the orthogonal multidimensional representation can be 
    dimensions:
       station = UNLIMITED ;
       obs = 13 ;
+      name_strlen = 23 ;
 
    variables:
       float lon(station) ; 
@@ -155,12 +158,12 @@ Much of the simplicity of the orthogonal multidimensional representation can be 
       float humidity(station, obs) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9;
+          humidity:_FillValue = -999.9f;
       float temp(station, obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9;
+          temp:_FillValue = -999.9f;
 
    attributes:
           :featureType = "timeSeries";
@@ -180,7 +183,6 @@ When the intention of a data variable is to contain only a single time series, t
 ----
    dimensions:
       time = 100233 ;
-      name_strlen = 23 ;
 
    variables:
       float lon ; 
@@ -197,7 +199,7 @@ When the intention of a data variable is to contain only a single time series, t
           alt:units = "m";
           alt:positive = "up";
           alt:axis = "Z";
-      char station_name(name_strlen) ;
+      string station_name ;
           station_name:long_name = "station name" ;
           station_name:cf_role = "timeseries_id";
 
@@ -209,12 +211,12 @@ When the intention of a data variable is to contain only a single time series, t
       float humidity(time) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9;
+          humidity:_FillValue = -999.9f;
       float temp(time) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9;
+          temp:_FillValue = -999.9f;
 
    attributes:
           :featureType = "timeSeries";
@@ -270,12 +272,12 @@ While an idealized time series is defined at a single, stable point location, th
       float humidity(time) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
-          humidity:_FillValue = -999.9;
+          humidity:_FillValue = -999.9f;
       float temp(time) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
-          temp:_FillValue = -999.9;
+          temp:_FillValue = -999.9f;
 
    attributes:
           :featureType = "timeSeries";
@@ -311,7 +313,7 @@ When the time series have different lengths and the data values for entire time 
           alt:units = "m";
           alt:positive = "up";
           alt:axis = "Z";
-      char station_name(station, name_strlen) ;
+      string station_name(station) ;
           station_name:long_name = "station name" ;
           station_name:cf_role = "timeseries_id";
       int station_info(station) ;
@@ -327,12 +329,12 @@ When the time series have different lengths and the data values for entire time 
       float humidity(obs) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9;
+          humidity:_FillValue = -999.9f;
       float temp(obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9;
+          temp:_FillValue = -999.9f;
 
    attributes:
           :featureType = "timeSeries";
@@ -353,7 +355,13 @@ where
       rowStart(i) = rowStart(i-1) + row_size(i-1) if i > 0
 ----
 
-The variable, **`row_size`** , is the count variable containing the length of each time series feature.   It is identified by having an attribute with name `**sample_dimension**` whose value is name of the sample dimension ( **`obs`** in this example). The sample dimension could optionally be the netCDF unlimited dimension. The variable bearing the `**sample_dimension**` attribute must have the instance dimension ( **`station`** in this example) as its single dimension, and must be of type integer.   This variable implicitly partitions into individual instances all variables that have the sample dimension. The auxiliary coordinate variables **`lat`** , **`lon`** , **`alt`** and **`station_name`** are station variables.
+The variable, **`row_size`** , is the count variable containing the length of each time series feature.
+It is identified by having an attribute with name `**sample_dimension**` whose value is name of the sample dimension ( **`obs`** in this example).
+The sample dimension could optionally be the netCDF unlimited dimension.
+The variable bearing the `**sample_dimension**` attribute must have the instance dimension ( **`station`** in this example)
+as its single dimension, and must have an integer type.
+This variable implicitly partitions into individual instances all variables that have the sample dimension.
+The auxiliary coordinate variables **`lat`** , **`lon`** , **`alt`** and **`station_name`** are station variables.
 ====
 
 
@@ -369,6 +377,7 @@ When time series with different lengths are written incrementally, the indexed r
    dimensions:
       station = 23 ;
       obs = UNLIMITED ;
+      name_strlen = 23 ;
 
    variables:
       float lon(station) ; 
@@ -401,22 +410,28 @@ When time series with different lengths are written incrementally, the indexed r
       float humidity(obs) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9;
+          humidity:_FillValue = -999.9f;
       float temp(obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9;
+          temp:_FillValue = -999.9f;
 
    attributes:
           :featureType = "timeSeries";
 ----
 The humidity(o) and temp(o) data are associated with the coordinate values time(o), lat(i), lon(i), and alt(i), where i = stationIndex(o) is a zero-based index indicating which time series. Thus, time(0), humidity(0) and temp(0) belong to the element of the **`station`** dimension that is indicated by **`stationIndex(0)`** ; time(1), humidity(1) and temp(1) belong to element **`stationIndex(1)`** of the **`station`** dimension, etc.
 
-The variable, **`stationIndex`** , is identified as the index variable by having an attribute with name of `**instance_dimension**` whose value is the instance dimension ( **`station`** in this example).  The variable bearing the `**instance_dimension**` attribute must have the sample dimension ( **`obs`** in this example) as its single dimension, and must be type integer. This variable implicitly assigns the station to each value of any variable having the sample dimension. The sample dimension need not be the netCDF unlimited dimension, though it commonly is.
+The variable, **`stationIndex`** , is identified as the index variable by having an attribute with name of `**instance_dimension**` whose value is the instance dimension ( **`station`** in this example).
+The variable bearing the `**instance_dimension**` attribute
+must have the sample dimension ( **`obs`** in this example) as its single dimension,
+and must have an integer type.
+This variable implicitly assigns the station to each value of any variable having the sample dimension.
+The sample dimension need not be the netCDF unlimited dimension, though it commonly is.
 ====
 
 
+[[profile-data, Section H.3, "Profile Data"]]
 === Profile Data
 
 A series of connected observations along a vertical line, like an atmospheric or ocean sounding, is called a profile. For each profile, there is a single time, lat and lon. A data variable may contain a collection of profile features. The instance dimension in the case of profiles specifies the number of profiles in the collection and is also referred to as the **profile dimension** . The instance variables, which have just this dimension, including latitude and longitude for example, are also referred to as **profile variables** and are considered to be information about the profiles. It is strongly recommended that there always be a profile variable (of any data type) with **`cf_role`** attribute " **`profile_id`** ", whose values uniquely identify the profiles. The profile variables may contain missing values. This allows one to reserve space for additional profiles that may be added at a later time, as discussed in section 9.6. All the representations described in section 9.1.3 can be used for profiles. The global attribute **`featureType={rdquo}profile{rdquo}`** (case-insensitive) should be included if all data variables in the file contain profiles.
@@ -611,7 +626,9 @@ When the number of vertical levels for each profile varies, and one can control 
 ----
 The pressure(o), temperature(o), and humidity(o) data is associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile. All elements for one profile are contiguous along the sample dimension. The sample dimension (obs) may be the unlimited dimension or not. All variables that have the instance dimension (profile) as their single dimension are considered to be information about the profiles.
 
-The count variable (row_size) contains the number of elements for each profile, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted. It must have the profile dimension as its single dimension, and must be type integer. The elements are associated with the profile using the same algorithm as in H.2.4.
+The count variable (row_size) contains the number of elements for each profile, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted.
+It must have the profile dimension as its single dimension, and must have an integer type.
+The elements are associated with the profile using the same algorithm as in H.2.4.
 ====
 
 
@@ -626,7 +643,7 @@ When the number of vertical levels for each profile varies, and one cannot write
 ----
    dimensions:
       obs = UNLIMITED ;
-      profiles = 142 ;
+      profile = 142 ;
 
    variables:
       int profile(profile) ;
@@ -676,10 +693,13 @@ When the number of vertical levels for each profile varies, and one cannot write
    attributes:
       :featureType = "profile";
 ----
-The pressure(o), temperature(o), and humidity(o) data are associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile. The sample dimension (obs) may be the unlimited dimension or not. The profile index variable (parentIndex) is identified by having an attribute with name of "instance_dimension" whose value is the profile dimension name. It must have the sample dimension as its single dimension, and must be type integer. Each value in the profile index variable is the zero-based profile index that the element belongs to. The elements are associated with the profiles using the same algorithm as in H.2.5.
+The pressure(o), temperature(o), and humidity(o) data are associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile. The sample dimension (obs) may be the unlimited dimension or not. The profile index variable (parentIndex) is identified by having an attribute with name of "instance_dimension" whose value is the profile dimension name.
+It must have the sample dimension as its single dimension, and must have an integer type.
+Each value in the profile index variable is the zero-based profile index that the element belongs to. The elements are associated with the profiles using the same algorithm as in H.2.5.
 ====
 
 
+[[trajectory-data, Section H.4, "Trajectory Data"]]
 === Trajectory Data
 
 Data may be taken along discrete paths through space, each path constituting a connected set of points called a trajectory, for example along a flight path, a ship path or the path of a parcel in a Lagrangian calculation. A data variable may contain a collection of trajectory features. The instance dimension in the case of trajectories specifies the number of trajectories in the collection and is also referred to as the **trajectory dimension** . The instance variables, which have just this dimension, are also referred to as **trajectory variables** and are considered to be information about the trajectories. It is strongly recommended that there always be a trajectory variable (of any data type) with the attribute **`cf_role={rdquo}trajectory_id{rdquo}`** attribute, whose values uniquely identify the trajectories. The trajectory variables may contain missing values. This allows one to reserve space for additional trajectories that may be added at a later time, as discussed in section 9.6. All the representations described in section 9.3 can be used for trajectories. The global attribute **`featureType={rdquo}trajectory{rdquo}`** (case-insensitive) should be included if all data variables in the file contain trajectories.
@@ -699,7 +719,7 @@ When storing multiple trajectories in the same file, and the number of elements 
       trajectory = 77 ;
 
    variables:
-      char trajectory(trajectory, name_strlen) ;
+      string trajectory(trajectory) ;
         trajectory:cf_role = "trajectory_id";
         trajectory:long_name = "trajectory name" ;
       int trajectory_info(trajectory) ;
@@ -757,6 +777,7 @@ When a single trajectory is stored in the data variable, there is no need for th
 ----
    dimensions:
       time = 42;
+      name_strlen = 23 ;
 
    variables:
       char trajectory(name_strlen) ;
@@ -816,7 +837,7 @@ When the number of elements for each trajectory varies, and one can control the 
       trajectory = 77 ;
    
    variables:
-      char trajectory(trajectory, name_strlen) ;
+      string trajectory(trajectory) ;
             trajectory:cf_role = "trajectory_id";
       int rowSize(trajectory) ;
           rowSize:long_name = "number of obs for this trajectory " ;
@@ -858,7 +879,9 @@ When the number of elements for each trajectory varies, and one can control the 
 ----
 The O3(o) and NO3(o) data are associated with the coordinate values time(o), lat(o), lon(o), and alt(o). All elements for one trajectory are contiguous along the sample dimension. The sample dimension (obs) may be the unlimited dimension or not. All variables that have the instance dimension (trajectory) as their single dimension are considered to be information about that trajectory.
 
-The count variable (row_size) contains the number of elements for each trajectory, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted. It must have the trajectory dimension as its single dimension, and must be type integer. The elements are associated with the trajectories using the same algorithm as in H.2.4.
+The count variable (row_size) contains the number of elements for each trajectory, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted.
+It must have the trajectory dimension as its single dimension, and must have an integer type.
+The elements are associated with the trajectories using the same algorithm as in H.2.4.
 ====
 
 
@@ -874,7 +897,8 @@ When the number of elements at each trajectory vary, and the elements cannot be 
    dimensions:
       obs = UNLIMITED ;
       trajectory = 77 ;
-   
+      name_strlen = 23 ;
+
    variables:
       char trajectory(trajectory, name_strlen) ;
           trajectory:cf_role = "trajectory_id";
@@ -918,10 +942,13 @@ When the number of elements at each trajectory vary, and the elements cannot be 
 ----
 The O3(o) and NO3(o) data are associated with the coordinate values time(o), lat(o), lon(o), and alt(o). All elements for one trajectory will have the same trajectory index value. The sample dimension (obs) may be the unlimited dimension or not.
 
-The index variable (trajectory_index) is identified by having an attribute with name of "instance_dimension" whose value is the trajectory dimension name. It must have the sample dimension as its single dimension, and must be type integer. Each value in the trajectory_index variable is the zero-based trajectory index that the element belongs to. The elements are associated with the trajectories using the same algorithm as in H.2.5.
+The index variable (trajectory_index) is identified by having an attribute with name of "instance_dimension" whose value is the trajectory dimension name.
+It must have the sample dimension as its single dimension, and must have an integer type.
+Each value in the trajectory_index variable is the zero-based trajectory index that the element belongs to. The elements are associated with the trajectories using the same algorithm as in H.2.5.
 ====
 
 
+[[time-series-profiles, Section H.5, "Time Series of Profiles"]]
 === Time Series of Profiles
 
 When profiles are taken repeatedly at a station, one gets a time series of profiles (see also section H.2 for discussion of stations and time series). The resulting collection of profiles is called a timeSeriesProfile. A data variable may contain a collection of such timeSeriesProfile features, one feature per station. The instance dimension in the case of a timeSeriesProfile is also referred to as the **station dimension** . The instance variables, which have just this dimension, including latitude and longitude for example, are also referred to as **station variables** and are considered to contain information describing the stations. The station variables may contain missing values. This allows one to reserve space for additional stations that may be added at a later time, as discussed in section 9.6. In addition,
@@ -956,11 +983,11 @@ When storing time series of profiles at multiple stations in the same data varia
           lat:standard_name = "latitude";
           lat:long_name = "station latitude" ;
           lat:units = "degrees_north" ;
-      char station_name(station, name_strlen) ;
+      string station_name(station) ;
           station_name:cf_role = "timeseries_id" ;
           station_name:long_name = "station name" ;
       int station_info(station) ;
-          station_name:long_name = "some kind of station info" ;
+          station_info:long_name = "some kind of station info" ;
    
       float alt(station, profile , z) ; 
           alt:standard_name = “altitude”;
@@ -979,19 +1006,19 @@ When storing time series of profiles at multiple stations in the same data varia
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
-          pressure:coordinates = "time lon lat alt" ;
+          pressure:coordinates = "time lon lat alt station_name" ;
    
       float temperature(station, profile , z) ; 
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
-          temperature:coordinates = "time lon lat alt" ;
+          temperature:coordinates = "time lon lat alt station_name" ;
    
       float humidity(station, profile , z) ; 
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
           humidity:units = "%" ;
-          humidity:coordinates = "time lon lat alt" ;
+          humidity:coordinates = "time lon lat alt station_name" ;
    
    attributes:
     :featureType = "timeSeriesProfile";
@@ -1052,7 +1079,8 @@ If there is only one station in the data variable, there is no need for the stat
    dimensions:
       profile = 30 ;
       z = 42 ;
-   
+      name_strlen = 23 ;
+
    variables:
       float lon ; 
           lon:standard_name = "longitude";
@@ -1066,7 +1094,7 @@ If there is only one station in the data variable, there is no need for the stat
           station_name:cf_role = "timeseries_id" ;
           station_name:long_name = "station name" ;
       int station_info;
-          station_name:long_name = "some kind of station info" ;
+          station_info:long_name = "some kind of station info" ;
    
       float alt(profile , z) ; 
           alt:standard_name = “altitude”;
@@ -1085,19 +1113,19 @@ If there is only one station in the data variable, there is no need for the stat
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
-          pressure:coordinates = "time lon lat alt" ;
+          pressure:coordinates = "time lon lat alt station_name" ;
    
       float temperature(profile , z) ; 
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
-          temperature:coordinates = "time lon lat alt" ;
+          temperature:coordinates = "time lon lat alt station_name" ;
    
       float humidity(profile , z) ; 
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
           humidity:units = "%" ;
-          humidity:coordinates = "time lon lat alt" ;
+          humidity:coordinates = "time lon lat alt station_name" ;
    
    attributes:
     :featureType = "timeSeriesProfile";
@@ -1132,7 +1160,7 @@ When the number of profiles and levels for each station varies, one can use a ra
       float alt(station) ;
           alt:long_name = "altitude above MSL" ;
           alt:units = "m" ;
-      char station_name(station, name_strlen) ;
+      string station_name(station) ;
           station_name:long_name = "station name" ;
           station_name:cf_role = "timeseries_id";
       int station_info(station) ;
@@ -1162,31 +1190,36 @@ When the number of profiles and levels for each station varies, one can use a ra
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
-          pressure:coordinates = "time lon lat z" ;
+          pressure:coordinates = "time lon lat z station_name" ;
    
       float temperature(obs) ; 
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
-          temperature:coordinates = "time lon lat z" ;
+          temperature:coordinates = "time lon lat z station_name" ;
    
       float humidity(obs) ; 
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
           humidity:units = "%" ;
-          humidity:coordinates = "time lon lat z" ;
+          humidity:coordinates = "time lon lat z station_name" ;
    
    attributes:
       :featureType = "timeSeriesProfile";
 ----
 The pressure(o), temperature(o), and humidity(o) data for element o of profile p at station i are associated with the coordinate values time(p), z(o), lat(i), and lon(i).
 
-The index variable (station_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (station in this example). The index variable must have the profile dimension as its sole dimension, and must be type integer. Each value in the index variable is the zero-based station index that the profile belongs to i.e. profile p belongs to station i=station_index(p), as in section H.2.5.
+The index variable (station_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (station in this example).
+The index variable must have the profile dimension as its sole dimension, and must have an integer type.
+Each value in the index variable is the zero-based station index that the profile belongs to i.e. profile p belongs to station i=station_index(p), as in section H.2.5.
 
-The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted. It must have the profile dimension as its sole dimension, and must be type integer. The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
+The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted.
+It must have the profile dimension as its sole dimension, and must have an integer type.
+The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====
 
 
+[[trajectory-profiles, Section H.6, "Trajectory of Profiles"]]
 === Trajectory of Profiles
 
 When profiles are taken along a trajectory, one gets a collection of profiles called a trajectoryProfile. A data variable may contain a collection of such trajectoryProfile features, one feature per trajectory. The instance dimension in the case of a trajectoryProfile is also referred to as the **trajectory dimension** . The instance variables, which have just this dimension, are also referred to as **trajectory variables** and are considered to contain information describing the trajectories. The trajectory variables may contain missing values. This allows one to reserve space for additional trajectories that may be added at a later time, as discussed in section 9.6. TrajectoryProfiles are more complicated than trajectories because there are two element dimensions. Each trajectory has a number of profiles as its elements, and each profile has a number of data from various levels as its elements. It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the **`cf_role`** attribute " **`profile_id`** ", whose values uniquely identify the profiles.
@@ -1327,7 +1360,7 @@ The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of pro
 
 ==== Ragged array representation of trajectory profiles
 
-When the number of profiles and levels for each trajectory varies, one can use a ragged array representation. Each of the two element dimensions (along a projectory, within a profile) could in principle be stored either contiguous or indexed, but this convention supports only one of the four possible choices. This uses the contiguous ragged array representation for each profile (9.3.3), and the indexed ragged array representation to organise the profiles into time series (9.3.4). The canonical use case is when writing real-time data streams that contain profiles from many trajectories, arriving randomly, with the data for each entire profile written all at once.
+When the number of profiles and levels for each trajectory varies, one can use a ragged array representation. Each of the two element dimensions (along a trajectory, within a profile) could in principle be stored either contiguous or indexed, but this convention supports only one of the four possible choices. This uses the contiguous ragged array representation for each profile (9.3.3), and the indexed ragged array representation to organise the profiles into time series (9.3.4). The canonical use case is when writing real-time data streams that contain profiles from many trajectories, arriving randomly, with the data for each entire profile written all at once.
 
 [[example-h.22]]
 [caption="Example H.22. "]
@@ -1336,12 +1369,12 @@ When the number of profiles and levels for each trajectory varies, one can use a
 ----
    dimensions:
       obs = UNLIMITED ;
-      profiles = 142 ;
-      section = 3;
+      trajectory = 22 ;
+      profile = 142 ;
    
    variables:
       int trajectory(trajectory) ;
-          section:standard_namecf_role = "trajectory_id" ;
+          cf_role = "trajectory_id" ;
    
       double time(profile); 
           time:standard_name = "time";
@@ -1392,7 +1425,11 @@ When the number of profiles and levels for each trajectory varies, one can use a
 ----
 The pressure(o), temperature(o), and humidity(o) data for element o of profile p along trajectory i are associated with the coordinate values time(p), z(o), lat(p), and lon(p).
 
-The index variable (trajectory_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (trajectory in this example). The index variable must have the profile dimension as its sole dimension, and must be type integer. Each value in the index variable is the zero-based trajectory index that the profile belongs to i.e. profile p belongs to trajectory i=trajectory_index(p), as in section H.2.5.
+The index variable (trajectory_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (trajectory in this example).
+The index variable must have the profile dimension as its sole dimension, and must have an integer type.
+Each value in the index variable is the zero-based trajectory index that the profile belongs to i.e. profile p belongs to trajectory i=trajectory_index(p), as in section H.2.5.
 
-The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted. It must have the profile dimension as its sole dimension, and must be type integer. The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
+The count variable (row_size) contains the number of elements for each profile, which must be written contiguously. The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted.
+It must have the profile dimension as its sole dimension, and must have an integer type.
+The number of elements in profile p is recorded in row_size(p), as in section H.2.4. The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====

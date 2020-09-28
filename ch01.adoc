@@ -23,6 +23,8 @@ We have also striven to maximize conformance to the COARDS standard, that is, wh
 
 The terms in this document that refer to components of a netCDF file are defined in the NetCDF User's Guide (NUG) <<NUG>> NUG. Some of those definitions are repeated below for convenience.
 
+ancestor group:: A group from which the referring group is descended via direct parent-child relationships
+
 auxiliary coordinate variable:: Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the NUG and used by this standard - see below). Unlike coordinate variables, there is no relationship between the name of an auxiliary coordinate variable and the name(s) of its dimension(s).
 
 boundary variable:: A boundary variable is associated with a variable that contains coordinate data. When a data value provides information about conditions in a cell occupying a region of space/time or some other dimension, the boundary variable provides a description of cell extent.
@@ -35,25 +37,41 @@ in multidimensional arrays, when indexing over the elements of the
 array, it is the last declared dimension that is the fastest varying
 in terms of file storage order. The netCDF utilities ncdump and ncgen
 use this format (see   
-link:$$http://www.unidata.ucar.edu/netcdf/docs/netcdf.html#NetCDF-Utilities$$[chapter 5 of the NUG]). All examples in this document
-use CDL syntax.
+link:$$http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_utilities_guide.html#cdl_syntax$$[NUG section on CDL syntax]).
+All examples in this document use CDL syntax.
 
 cell:: A region in one or more dimensions whose boundary can be described by a set of vertices. The term __interval__ is sometimes used for one-dimensional cells.
 
-coordinate variable:: We use this term precisely as it is defined in section   
-link:$$http://www.unidata.ucar.edu/netcdf/docs/netcdf.html#Variables$$[ 2.3.1 of the NUG ] . It is a one-dimensional variable with the same name as its dimension [e.g., **`time(time)`** ], and it is defined as a numeric data type with values that are ordered monotonically. Missing values are not allowed in coordinate variables.
+coordinate variable:: We use this term precisely as it is defined in the
+link:$$http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_data_set_components.html#coordinate_variables$$[NUG section on coordinate variables].
+It is a one-dimensional variable with the same name as its dimension [e.g., **`time(time)`** ], and it is defined as a numeric data type with values that are ordered monotonically. Missing values are not allowed in coordinate variables.
 
 grid mapping variable:: A variable used as a container for attributes that define a specific grid mapping. The type of the variable is arbitrary since it contains no data.
 
 latitude dimension:: A dimension of a netCDF variable that has an associated latitude coordinate variable.
 
+local apex group:: The nearest (to a referring group) ancestor group in which a dimension of an out-of-group coordinate is defined. The word "apex" refers to position of this group at the vertex of the tree of groups formed by it, the referring group, and the group where a coordinate is located. 
+
 longitude dimension:: A dimension of a netCDF variable that has an associated longitude coordinate variable.
 
 multidimensional coordinate variable:: An auxiliary coordinate variable that is multidimensional.
 
+nearest item:: The item (variable or group) that can be reached via the shortest traversal of the file from the referring group following the rules set forth in the <<groups>>.
+
+out-of-group reference:: A reference to a variable or dimension that is not contained in the referring group.
+
+path:: Paths must follow the UNIX style path convention and may begin with either a '/', '..', or a word.
+
 recommendation:: Recommendations in this convention are meant to provide advice that may be helpful for reducing common mistakes. In some cases we have recommended rather than required particular attributes in order to maintain backwards compatibility with COARDS. An application must not depend on a dataset's adherence to recommendations.
 
-scalar coordinate variable:: A scalar variable that contains coordinate data. Functionally equivalent to either a size one coordinate variable or a size one auxiliary coordinate variable.
+referring group:: The group in which a reference to a variable or dimension occurs.
+
+scalar coordinate variable:: A scalar variable (i.e. one with no dimensions) that contains
+coordinate data. Depending on context, it may be functionally equivalent either to a size-one
+coordinate variable (<<scalar-coordinate-variables>>) or to a size-one auxiliary coordinate
+variable (<<labels>> and <<collections-instances-elements>>).
+
+sibling group:: Any group with the same parent group as the referring group
 
 spatiotemporal dimension:: A dimension of a netCDF variable that is used to identify a location in time and/or space.
 
@@ -65,9 +83,9 @@ vertical dimension:: A dimension of a netCDF variable that has an associated ver
 
 === Overview
 
-No variable or dimension names are standardized by this convention. Instead we follow the lead of the NUG and standardize only the names of attributes and some of the values taken by those attributes. The overview provided in this section will be followed with more complete descriptions in following sections. <<attribute-appendix>> contains a summary of all the attributes used in this convention.
+No variable or dimension names are standardized by this convention. Instead we follow the lead of the NUG and standardize only the names of attributes and some of the values taken by those attributes. Variable or dimension names can either be a single variable name or a path to a variable. The overview provided in this section will be followed with more complete descriptions in following sections. <<attribute-appendix>> contains a summary of all the attributes used in this convention.
 
-We recommend that the NUG defined attribute **`Conventions`** be given the string value     "**`CF-1.6`**" to identify datasets that conform to these conventions.
+Files using this version of the CF Conventions must set the NUG defined attribute **`Conventions`** to contain the string value "**`CF-1.8`**" to identify datasets that conform to these conventions.
 
 The general description of a file's contents should be contained in the following attributes: **`title`** , **`history`** , **`institution`** , **`source`** , **`comment`** and **`references`** ( <<description-of-file-contents>> ). For backwards compatibility with COARDS none of these attributes is required, but their use is recommended to provide human readable documentation of the file contents.
 
@@ -83,7 +101,7 @@ There are two methods used to identify variables that contain coordinate data. T
 
 Once the variables containing coordinate data are identified, further conventions are required to determine the type of coordinate represented by each of these variables. Latitude, longitude, and time coordinates are identified solely by the value of their **`units`** attribute. Vertical coordinates with units of pressure may also be identified by the **`units`** attribute. Other vertical coordinates must use the attribute **`positive`** which determines whether the direction of increasing coordinate value is up or down. Because identification of a coordinate type by its units involves the use of an external software package <<UDUNITS>> , we provide the optional attribute **`axis`** for a direct identification of coordinates that correspond to latitude, longitude, vertical, or time axes.
 
-Latitude, longitude, and time are defined by internationally recognized standards, and hence, identifying the coordinates of these types is sufficient to locate data values uniquely with respect to time and a point on the earth's surface. On the other hand identifying the vertical coordinate is not necessarily sufficient to locate a data value vertically with respect to the earth's surface. In particular a model may output data on the dimensionless vertical coordinate used in its mathematical formulation. To achieve the goal of being able to spatially locate all data values, this convention includes the definitions of common dimensionless vertical coordinates in <<dimensionless-v-coord>> . These definitions provide a mapping between the dimensionless coordinate values and dimensional values that can be uniquely located with respect to a point on the earth's surface. The definitions are associated with a coordinate variable via the **`standard_name`** and **`formula_terms`** attributes. For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.
+Latitude, longitude, and time are defined by internationally recognized standards, and hence, identifying the coordinates of these types is sufficient to locate data values uniquely with respect to time and a point on the earth's surface. On the other hand identifying the vertical coordinate is not necessarily sufficient to locate a data value vertically with respect to the earth's surface. In particular a model may output data on the dimensionless vertical coordinate used in its mathematical formulation. To achieve the goal of being able to spatially locate all data values, this convention includes the definitions of common dimensionless vertical coordinates in <<parametric-v-coord>> . These definitions provide a mapping between the dimensionless coordinate values and dimensional values that can be uniquely located with respect to a point on the earth's surface. The definitions are associated with a coordinate variable via the **`standard_name`** and **`formula_terms`** attributes. For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.
 
 It is often the case that data values are not representative of single points in time and/or space, but rather of intervals or multidimensional cells. This convention defines a **`bounds`** attribute to specify the extent of intervals or cells. When data that is representative of cells can be described by simple statistical methods, those methods can be indicated using the **`cell_methods`** attribute. An important application of this attribute is to describe climatological and diurnal statistics.
 

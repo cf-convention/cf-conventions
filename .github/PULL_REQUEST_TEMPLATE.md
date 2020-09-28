@@ -1,7 +1,11 @@
-See http://cf-trac.llnl.gov/trac/ticket/XXX
+See issue #XXX for discussion of these changes.
 
- - [ ] Added link from trac ticket to this PR?
+# Release checklist
+- [ ] Authors updated in `cf-conventions.adoc`?
+- [ ] Next version in `cf-conventions.adoc` up to date? Versioning inspired by [SemVer](https://semver.org).
+- [ ] `history.adoc` up to date?
+- [ ] Conformance document up-to-date?
 
- > Applied via ​https://github.com/cf-convention/cf-conventions/pull/XXX
-
- - [ ] Updated "Revision History"? (Use the date you applied the changes.)
+# For maintainers
+After the merge remember to delete the source branch.
+Tags are set at the conclusion of the annual meeting; until then `master` always is a draft for the next version.
