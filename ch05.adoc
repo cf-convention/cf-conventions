@@ -1,7 +1,7 @@
 
-[[coordinate-system, Chapter 5, Coordinate Systems]]
+[[coordinate-system, Chapter 5, Coordinate Systems and Domain]]
 
-==  Coordinate Systems 
+==  Coordinate Systems and Domain
 
 A data variable's dimensions are used to locate data values in time and space or as a function of other independent variables. This is accomplished by associating these dimensions with the relevant set of latitude, longitude, vertical, time and any non-spatiotemporal coordinates. This section presents two methods for making that association: the use of __coordinate variables__, and the use of __auxiliary coordinate variables__.
 
@@ -757,13 +757,15 @@ measures, and coordinate reference systems.
 
 A data variable defines its domain via its own attributes, but a
 domain variable provides the description of a domain in the absence of
-any data values. It is of arbitrary type since it contains no data. It
-acts as a container for the attributes that define the domain. The
-purpose of a domain variable is to provide domain information to
-applications that have no need of data values at the domain's
-locations, thus removing any ambiguity when retrieving a domain from a
-dataset. Ancillary variables and cell methods are not part of the
-domain, because they are only defined in relation to data values.
+any data values. The variable should be a scalar (i.e. it has no
+dimensions) of arbitrary type, and the value of its single element is
+immaterial. It acts as a container for the attributes that define the
+domain. The purpose of a domain variable is to provide domain
+information to applications that have no need of data values at the
+domain's locations, thus removing any ambiguity when retrieving a
+domain from a dataset. Ancillary variables and cell methods are not
+part of the domain, because they are only defined in relation to data
+values.
 
 The domain variable supports the same attributes as are allowed on a
 data variable for describing a domain, with exactly the same meanings
@@ -772,16 +774,20 @@ is needed by a particular data variable to describe its domain, then
 that attribute would also be needed by the equivalent domain variable.
 
 The dimensions of the domain must be stored with the **`dimensions`**
-attribute. It is necessary to list these dimensions, rather than
-inferring them from the contents of the other attributes, as it can
-not be guaranteed that the referenced variables span all of the
-required dimensions (as could be the case for a discrete axis, for
-instance). The value of the **`dimensions`** attribute is a blank
-separated list of the dimensions names. There is no restriction on the
-order in which the dimensions appear in the **`dimensions`** attribute
-string. The presence of a **`dimensions`** attribute will identify the
-variable as a domain variable. If a domain has no dimensions then the
-value of the **`dimensions`** attribute must be an empty string.
+attribute, and the presence of a **`dimensions`** attribute will
+identify the variable as a domain variable. Therefore the
+*`dimensions`** attribute must not be present on any variables that
+are to be interpreted as data variables. It is necessary to list these
+dimensions, rather than inferring them from the contents of the other
+attributes, as it can not be guaranteed that the referenced variables
+span all of the required dimensions (as could be the case for a
+discrete axis, for instance). The value of the **`dimensions`**
+attribute is a blank separated list of the dimensions names. There is
+no restriction on the order in which the dimensions appear in the
+**`dimensions`** attribute string. If a domain has no named dimensions
+then the value of the **`dimensions`** attribute must be an empty
+string. This could be the case, for instance, if the dimensions of the
+domain are all defined implicitly by scalar coordinate variables.
 
 The dimensions listed by the **`dimensions`** attribute constrain the
 dimensions that may be be spanned by variables referenced from any of
@@ -799,14 +805,13 @@ attribute will be considered as part of the domain definition.
 It is recommended that a domain variable has a **`long_name`**
 attribute to describe its contents.
 
-It is recommended that a domain variable does not have any other
-attributes that are also used to directly describe data values,
-defined in <<attribute-appendix>> as those attributes that are used
-for non-coordinate data which also do not have domain variable nor
-global use.
+It is recommended that a domain variable does not have any of the
+attributes marked in <<attribute-appendix>> as applicable to data
+variables except those which are also marked as applicable to domain
+variables.
 
-Domain variables may exist in a file with or without other data
-variables. Note that the data variable attributes describing its
+Multiple domain variables may exist in a file with, or without other
+data variables. Note that the data variable attributes describing its
 domain can not be replaced by a reference to a domain variable.
 
 [[a-domain-with-independent-coordinate-variables]]
@@ -931,8 +936,26 @@ domain variable **`domain`**.
 
 ====
 
-[[a-domain-containing-a-timeseries-geometry]]
+[[a-domain-with-no-explicit-dimensions]]
 [caption="Example 5.18. "]
+.A domain with no explicit dimensions.
+====
+----
+
+dimensions:
+variables:
+  char domain ;
+    domain:dimensions = "" ;
+    domain:coordinates = "t" ;
+  double t ;
+    t:standard_name = "time" ; 
+    t:units = "days since 2021-01-01" ;
+     
+----
+====
+
+[[a-domain-containing-a-timeseries-geometry]]
+[caption="Example 5.19. "]
 .A domain containing a timeseries geometry.
 ====
 ----
@@ -985,7 +1008,7 @@ In this example the data variable **`someData`** from
 ====
 
 [[a-domain-containing-a-timeseries-of-station-data-in-the-indexed-ragged-array-representation]]
-[caption="Example 5.18. "]
+[caption="Example 5.20. "]
 .A domain containing a timeseries of station data in the indexed ragged array representation.
 ====
 ----
