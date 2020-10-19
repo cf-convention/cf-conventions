@@ -475,9 +475,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_introduction">1. Introduction</a>
 <ul class="sectlevel2">
 <li><a href="#_goals">1.1. Goals</a></li>
-<li><a href="#terminology">1.2. Terminology</a></li>
-<li><a href="#_overview">1.3. Overview</a></li>
-<li><a href="#coards-relationship">1.4. Relationship to the COARDS Conventions</a></li>
+<li><a href="#design">1.2. Principles for design</a></li>
+<li><a href="#terminology">1.3. Terminology</a></li>
+<li><a href="#_overview">1.4. Overview</a></li>
+<li><a href="#coards-relationship">1.5. Relationship to the COARDS Conventions</a></li>
 </ul>
 </li>
 <li><a href="#_netcdf_files_and_components">2. NetCDF Files and Components</a>
@@ -938,7 +939,47 @@ See <a href="#revhistory">Revision History</a> for the full revision history.</p
 </div>
 </div>
 <div class="sect2">
-<h3 id="terminology"><a class="anchor" href="#terminology"></a>1.2. Terminology</h3>
+<h3 id="design"><a class="anchor" href="#design"></a>1.2. Principles for design</h3>
+<div class="paragraph">
+<p>The following principles are followed in the design of these conventions:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>CF-netCDF metadata is designed to make datasets self-describing as far as practically possible. A self-describing dataset is one which can be interpreted without need for reference to resources outside itself, and the CF principle is to minimise that need. Therefore CF-netCDF does not use codes, but instead relies on controlled vocabularies containing terms that are chosen to be self-explanatory (but more detailed definitions of them are provided in CF documents).</p>
+</li>
+<li>
+<p>The conventions are changed only as actually required by common use-cases, and not for needs which cannot be anticipated with certainty.</p>
+</li>
+<li>
+<p>In order to keep them logical, consistent in approach and as simple as possible, the netCDF conventions are devised with and within the conceptual framework of the CF data model, and new standard names are constructed as far as possible to follow the syntax and vocabulary of existing standard names.</p>
+</li>
+<li>
+<p>The conventions should be practicable for both producers and users of data.</p>
+</li>
+<li>
+<p>The metadata should be both easily readable by humans and easily parsable by programs.</p>
+</li>
+<li>
+<p>To avoid potential inconsistency within the metadata, the conventions should minimise redundancy.</p>
+</li>
+<li>
+<p>The conventions should minimise the possibility for mistakes by data-writers and data-readers.</p>
+</li>
+<li>
+<p>Conventions are provided to allow data-producers to describe the data they wish to produce, rather than attempting to prescribe what data they should produce; consequently most CF conventions are optional.</p>
+</li>
+<li>
+<p>Because many datasets remain in use for a long time after production, it is desirable that metadata written according to previous versions of the convention should also be compliant with and have the same interpretation under later versions.</p>
+</li>
+<li>
+<p>Because all previous versions must generally continue to be supported in software for the sake of archived datasets, and in order to limit the complexity of the conventions, there is a strong preference against introducing any new capability to the conventions when there is already some method that can adequately serve the same purpose (even if a different method would arguably be better than the existing one).</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="terminology"><a class="anchor" href="#terminology"></a>1.3. Terminology</h3>
 <div class="paragraph">
 <p>The terms in this document that refer to components of a netCDF file are defined in the NetCDF User&#8217;s Guide (NUG) <a href="#NUG">[NUG]</a> NUG. Some of those definitions are repeated below for convenience.</p>
 </div>
@@ -1046,7 +1087,7 @@ variable (<a href="#labels">Section 6.1, "Labels"</a> and <a href="#collections-
 </div>
 </div>
 <div class="sect2">
-<h3 id="_overview"><a class="anchor" href="#_overview"></a>1.3. Overview</h3>
+<h3 id="_overview"><a class="anchor" href="#_overview"></a>1.4. Overview</h3>
 <div class="paragraph">
 <p>No variable or dimension names are standardized by this convention. Instead we follow the lead of the NUG and standardize only the names of attributes and some of the values taken by those attributes. Variable or dimension names can either be a single variable name or a path to a variable. The overview provided in this section will be followed with more complete descriptions in following sections. <a href="#attribute-appendix">Appendix A, Attributes</a> contains a summary of all the attributes used in this convention.</p>
 </div>
@@ -1085,7 +1126,7 @@ variable (<a href="#labels">Section 6.1, "Labels"</a> and <a href="#collections-
 </div>
 </div>
 <div class="sect2">
-<h3 id="coards-relationship"><a class="anchor" href="#coards-relationship"></a>1.4. Relationship to the COARDS Conventions</h3>
+<h3 id="coards-relationship"><a class="anchor" href="#coards-relationship"></a>1.5. Relationship to the COARDS Conventions</h3>
 <div class="paragraph">
 <p>These conventions generalize and extend the COARDS conventions <a href="#COARDS">[COARDS]</a> . A major design goal has been to maintain <em>backward compatibility</em> with COARDS. Hence applications written to process datasets that conform to these conventions will also be able to process COARDS conforming datasets. We have also striven to maximize <em>conformance</em> to the COARDS standard so that datasets that only require the metadata that was available under COARDS will still be able to be processed by COARDS conforming applications. But because of the extensions that provide new metadata content, and the relaxation of some COARDS requirements, datasets that conform to these conventions will not necessarily be recognized by applications that adhere to the COARDS conventions. The features of these conventions that allow writing netCDF files that are not COARDS conforming are summarized below.</p>
 </div>
@@ -1221,7 +1262,7 @@ these two forms.</p>
 <p>A variable may have any number of dimensions, including zero, and the dimensions must all have different names. <em>COARDS strongly recommends limiting the number of dimensions to four, but we wish to allow greater flexibility</em> . The dimensions of the variable define the axes of the quantity it contains. Dimensions other than those of space and time may be included. Several examples can be found in this document. Under certain circumstances, one may need more than one dimension in a particular quantity. For instance, a variable containing a two-dimensional probability density function might correlate the temperature at two different vertical levels, and hence would have temperature on both axes.</p>
 </div>
 <div class="paragraph">
-<p>If any or all of the dimensions of a variable have the interpretations of "date or time" (<strong><code>T</code></strong>), "height or depth" (<strong><code>Z</code></strong>), "latitude" (<strong><code>Y</code></strong>), or "longitude" (<strong><code>X</code></strong>) then we recommend, but do not require (see <a href="#coards-relationship">Section 1.4, "Relationship to the COARDS Conventions"</a> ), those dimensions to appear in the relative order <strong><code>T</code></strong>, then <strong><code>Z</code></strong>, then <strong><code>Y</code></strong>, then <strong><code>X</code></strong> in the CDL definition corresponding to the file. All other dimensions should, whenever possible, be placed to the left of the spatiotemporal dimensions.</p>
+<p>If any or all of the dimensions of a variable have the interpretations of "date or time" (<strong><code>T</code></strong>), "height or depth" (<strong><code>Z</code></strong>), "latitude" (<strong><code>Y</code></strong>), or "longitude" (<strong><code>X</code></strong>) then we recommend, but do not require (see <a href="#coards-relationship">Section 1.5, "Relationship to the COARDS Conventions"</a> ), those dimensions to appear in the relative order <strong><code>T</code></strong>, then <strong><code>Z</code></strong>, then <strong><code>Y</code></strong>, then <strong><code>X</code></strong> in the CDL definition corresponding to the file. All other dimensions should, whenever possible, be placed to the left of the spatiotemporal dimensions.</p>
 </div>
 <div class="paragraph">
 <p>Dimensions may be of any size, including unity. When a single value of some coordinate applies to all the values in a variable, the recommended means of attaching this information to the variable is by use of a dimension of size unity with a one-element coordinate variable. It is also acceptable to use a scalar coordinate variable which eliminates the need for an associated size one dimension in the data variable. The advantage of using either a coordinate variable or an auxiliary coordinate variable is that all its attributes can be used to describe the single-valued quantity, including boundaries. For example, a variable containing data for temperature at 1.5 m above the ground has a single-valued coordinate supplying a height of 1.5 m, and a time-mean quantity has a single-valued time coordinate with an associated boundary variable to record the start and end of the averaging period.</p>
@@ -2396,7 +2437,7 @@ show that 1582-10-15 *preceded* 1582-10-14 by 9 days.</pre>
 <p>A data variable&#8217;s dimensions are used to locate data values in time and space or as a function of other independent variables. This is accomplished by associating these dimensions with the relevant set of latitude, longitude, vertical, time and any non-spatiotemporal coordinates. This section presents two methods for making that association: the use of <em>coordinate variables</em>, and the use of <em>auxiliary coordinate variables</em>.</p>
 </div>
 <div class="paragraph">
-<p>Any of a variable&#8217;s dimensions that is an independently varying latitude, longitude, vertical, or time dimension (see <a href="#terminology">Section 1.2, "Terminology"</a>) and that has a size greater than one must have a corresponding coordinate variable, i.e., a one-dimensional variable with the same name as the dimension (see examples in <a href="#coordinate-types">Chapter 4, Coordinate Types</a>). This is the only method of associating dimensions with coordinates that is supported by <a href="#COARDS">[COARDS]</a>.</p>
+<p>Any of a variable&#8217;s dimensions that is an independently varying latitude, longitude, vertical, or time dimension (see <a href="#terminology">Section 1.3, "Terminology"</a>) and that has a size greater than one must have a corresponding coordinate variable, i.e., a one-dimensional variable with the same name as the dimension (see examples in <a href="#coordinate-types">Chapter 4, Coordinate Types</a>). This is the only method of associating dimensions with coordinates that is supported by <a href="#COARDS">[COARDS]</a>.</p>
 </div>
 <div class="paragraph">
 <p>Any longitude, latitude, vertical or time coordinate which depends on more than one spatiotemporal dimension must be identified by the <strong><code>coordinates</code></strong> attribute of the data variable.
@@ -10197,6 +10238,14 @@ node coordinate variables to be one of the dimensions of the data variable.</p>
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">28 September 2020</div>
+<ol class="arabic">
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/273">Issue #273</a>: State the principles for design of the CF conventions</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -10265,7 +10314,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-09-29 09:47:55 UTC
+Last updated 2020-10-19 15:44:25 UTC
 </div>
 </div>
 </body>
