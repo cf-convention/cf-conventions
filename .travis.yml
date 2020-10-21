@@ -24,6 +24,7 @@ script:
 after_success:
     # Always update the "gh-pages" branch, but tag build goes into
     # tag directory and normal build goes into the root directory.
+    - mv images/ images~
     - git fetch origin gh-pages:gh-pages
     - git checkout gh-pages
     - if [[ $TRAVIS_TAG ]]; then
@@ -32,10 +33,12 @@ after_success:
         TARGET_DIR='.';
       fi
     - mkdir -p $TARGET_DIR
+    - mv images~ $TARGET_DIR/images
     - cp build/cf-conventions.html $TARGET_DIR/
     - cp build/cf-conventions.pdf $TARGET_DIR/
     - cp build/conformance.html $TARGET_DIR/
     - cp build/conformance.pdf $TARGET_DIR/
+    - git add $TARGET_DIR/images
     - git add $TARGET_DIR/cf-conventions.html
     - git add $TARGET_DIR/cf-conventions.pdf
     - git add $TARGET_DIR/conformance.html

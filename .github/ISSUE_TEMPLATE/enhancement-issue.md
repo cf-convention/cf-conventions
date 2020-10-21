@@ -17,7 +17,7 @@ Change proposals should include the following information as applicable.
 Short and descriptive.
 # Moderator
 @user
-# Moderator Status Review [last updated: YY/MM/DD]
+# Moderator Status Review [last updated: YYYY-MM-DD]
 Brief comment on current status, update periodically
 # Requirement Summary
 A few sentence functional summary
