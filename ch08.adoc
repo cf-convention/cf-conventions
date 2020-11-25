@@ -90,11 +90,11 @@ Reconstitution of the uncompressed coordinates and auxiliary coordinates is base
 
 Although the coordinates and auxiliary coordinates are stored in regular arrays, the actual coordinate values may contain discontinuities. A discontinuity could be an overlap or a gap in the location coordinates or a change in cell size or cell alignment. As an example, such discontinuities are common in remote sensing data and may be caused by combinations of the instrument scan motion, the motion of the sensor platform and changes in the instrument scan mode.  
 
-As the interpolation methods relies on a certain regularity and continuity of the coordinate values within each interpolation zone, special attention must be given to the discontinuities in the process of defining the interpolation zones. When discontinuities are present, the grid is first divided into multiple __interpolation areas__, each of which is free of grid discontinuities. When no discontinuities are present, the whole grid is a single interpolation area. Following this step, each interpolation area is segmented into interpolation zones. The processes of generating interpolation zones for a grid without discontinuities and for a grid with discontinuities is illustrated in Figure XX.
+As the interpolation methods relies on a certain regularity and continuity of the coordinate values within each interpolation zone, special attention must be given to the discontinuities in the process of defining the interpolation zones. When discontinuities are present, the grid is first divided into multiple __interpolation areas__, each of which is free of grid discontinuities. When no discontinuities are present, the whole grid is a single interpolation area. Following this step, each interpolation area is segmented into interpolation zones. The processes of generating interpolation zones for a grid without discontinuities and for a grid with discontinuities is illustrated in Figure <<interpolation_zone_generation>>.
 
-Within an interpolation areas, interpolation zones must share tie point with neighbouring interpolation zones. Between interpolation areas, interpolation zones are not permitted to share tie points. This results in a different number of tie points in the to cases shown the lower part of Figure XX.
+Within an interpolation area, interpolation zones must share tie point with neighbouring interpolation zones. Between interpolation areas, interpolation zones are not permitted to share tie points. This results in a different number of tie points in the to cases shown in Figure <<interpolation_zone_generation>>.
 
-For each dimension, the indices of the tie points in the target domain are stored in a corresponding tie point indices variable(<<compression-by-coordinate-interpolation-tie-point-indices>>). In the tie point indices variable, two subsequent indices where the value of the second is the equal to the value of the first incremented by one, indicates the location of a interpolation area boundary.
+For each dimension, the indices of the tie points in the target domain are stored in a corresponding tie point indices variable (<<compression-by-coordinate-interpolation-tie-point-indices>>). In the tie point indices variable, two subsequent indices where the value of the second is the equal to the value of the first incremented by one, indicates the location of a interpolation area boundary.
 
 For each dimension, the number interpolation zones is equal to the number of tie points minus the number of interpolation areas.
 
@@ -130,6 +130,10 @@ The tie point indices variable contains, for each tie point, the zero-based indi
 For the interpolation dimensions, the relationships between target domain dimensions and the tie point dimensions are defined trough the **`tie_point_indices`** attribute in combination with the tie point indices variables. Each target domain dimension of the **`tie_point_indices`** attribute is related with the dimension of the corresponding tie point indices variable. 
 
 Inclusion of non-interpolation dimensions in the **`tie_point_indices`** attribute is not permitted.
+
+If there is a tie point for every element of a full resolution data dimension, then the tie point indices variable need not be included in the dataset, and may instead be replaced with the name of the corresponding tie point dimension during the usual mapping of data dimensions to tie point indices variables. This indicates that the tie point indices for this data dimension are simply the integers 0 to [size of tie point dimension minus one], and therefore do not need to be stored in a variable. In this case, if there is a coordinate variable with the same name as the tie point dimension then the variable is not to be used as an indices variable.
+
+(To Do: Add text on super-sampling)
 
 [caption="Example 8.3. "]
 .Two-dimensional tie point interpolation
@@ -243,8 +247,6 @@ The **`interpolation_flags`** attribute is a string attribute that lists the __i
 The interpolation coefficients variables and the interpolation flags variables must either be scalar, or else their dimensions may include any of the tie point dimensions that are being interpolated, as well as the interpolation zone dimensions corresponding to each tie point dimension. The size of an interpolation zone dimension is equal the number of tie points, minus the number of interpolation areas. 
 
 No other dimensions may be spanned by an interpolation coefficients variable or an interpolation flags variable.
-
-If there is a tie point for every element of a full resolution data dimension, then the tie point indices variable need not be included in the dataset, and may instead be replaced with the name of the corresponding tie point dimension during the usual mapping of data dimensions to tie point indices variables. This indicates that the tie point indices for this data dimension are simply the integers 0 to [size of tie point dimension minus one], and therefore do not need to be stored in a variable. In this case, if there is a coordinate variable with the same name as the tie point dimension then the variable is not to be used as an indices variable.
 
 [caption="Example 8.5. "]
 .Example demonstrating the use of multiple interpolation variables, the reusability of the interpolation variable between data variables of different dimensions and the use of the interpolation coefficients and interpolation flags attributes.
