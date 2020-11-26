@@ -218,39 +218,41 @@ data:
 ----
 ====
 
-[[compression-by-coordinate-interpolation-tie-point-indices, Section 8.3.5, "Tie Point Offsets Attribute"]]
-==== Tie Point Offsets Attribute
+[[compression-by-coordinate-interpolation-tie-point-indices, Section 8.3.5, "Tie Point Offsets"]]
+==== Tie Point Offsets
 
-Additionally to the **`tie_points`** and **`tie_point_indices`** attributes, which are always required for coordinate interpolation, a **`tie_point_offsets`** attribute is required if the tie point coordinate values are not a subset of the target domain coordinate values, but are offset with respect to these.
+By default, it is assumed that the tie point coordinates are a subset of the uncompressed coordinates. However, it may be that the tie point coordinates are offset from a subset of the uncompressed coordinates. <>. In this case, the data variable requires a **`tie_point_offsets`** attribute to record the nature of this offset.
 
-The **`tie_point_offsets`** is a string attribute that, limited to horizontal interpolation dimensions, maps target domain dimensions to the corresponding tie point offsets variables. It is a blank-separated list of words of the form "__target_domain_dimension: tie_point_offsets_variable [target_domain_dimension: tie_point_offsets_variable] ...]__". 
+The **`tie_point_offsets`** attribute is a string attribute maps interpolation dimensions to the corresponding __tie point offset variables__. It is a blank-separated list of words of the form "__interpolation_dimension: tie_point_offset_variable [interpolation_dimension: tie_point_offset_variable] ...]__".
 
-This mapping is not part of the interpolation variable because different data variables may apply the same interpolation method, with the same tie points, but with different offsets.
+This mapping is not part of the interpolation variable because different data variables may apply the same interpolation method, with the same tie points variables, but with different offsets.
 
-A tie point offset is a spatial offset, in terms of fraction of target domain grid cell size in the named dimension, between the tie point cells and the corresponding target domain cells. The corresponding target domain cell is defined through the **`tie_point_indices`** attribute. A tie point offset variable may be a scalar, or else its dimensions may include the tie point dimension corresponding to the named target domain dimension, as well as any subset of the non-interpolation dimensions. No other dimensions may be spanned by a tie point offset variable.
+A tie point offset variable defines a numerical offset in terms of the fraction of the size of a target domain cell along a single dimension. When associated with an interpolation dimension by the **`tie_point_offsets`** attribute, this offset locates the tie point variable coordinates relative to the uncompressed coordinates. A tie point offset variable may be a scalar, or else its dimensions may include the tie point interpolation dimension corresponding to the named interpolation dimension, as well as any subset of the non-interpolation dimensions. No other dimensions may be spanned by a tie point offset variable.
 
-For example, to specify that for both of the target dimensions **`track`** and **`scan`** the offset is contained in the scalar variable **`offset`**, could be indicated with  **`track: offset  scan: offset`**, where the offset variable is declared as **`double offset`** and could have the value **`offset = -0.5`**.
+For example, specifying that for both of the interpolation dimensions **`track`** and **`scan`** the offset is -0.5 (indicating that the tie point coordinates are offset by half a grid cell in each each direction from their corresponding uncompressed corodinates), could be indicated could be indicated with a **`tie_point_offsets`** attribute of **`track: offset scan: offset`**, where **`offset`** is a scalar tie point variable that has the value **`offset = -0.5`**.
+
+### Anders: what happens if the tie point coordinates are decreasing in index space - does -0.5 still mean offset to the "left", or is it to the "right" in this case??
 
 [[compression-by-coordinate-interpolation-interpolation-variable, Section 8.3.6, "Interpolation Variable"]]
 ==== Interpolation Variable
 
 The method used to uncompress the tie point variables is described by an interpolation variable that acts as a container for the attributes that define the interpolation technique and the parameters that should be used. The variable should be a scalar (i.e. it has no dimensions) of arbitrary type, and the value of its single element is immaterial.
 
-To indicate that a standard interpolation method should be used, the interpolation variable must have a **`interpolation_name`** attribute defined, containing one of the valid values described in Appendix <?>. This appendix also describes the interpolation technique and the interpolation variable attributes for configuring the interpolation process.
-     
-If an interpolation name is not given, the interpolation variable must have a **`description`** attribute defined instead, containing a description of the non-standardised interpolation (in a similar manner to a long name being used instead of a standard name). This description is free text that can take any form (including a URI, for example). Whilst it is recommended that a standardised interpolation is provided, the alternative is provided to promote interoperability in cases where a well defined user community needs to use sophisticated interpolation techniques that may also be under development.
+The interpolation method must be identified in one of two ways. Either by the **`interpolation_name`** attribute, which takes a string value that contains the method's name, or else by the **`interpolation_description`** attribute, which takes a string value that contains a non-standardized description of the method. These attributes must not be both set.
 
-The definition of a standard or a non-standard interpolation method may include instructions to treat groups of particular physically related coordinates simultaneously, if such tie points are present. For example, there are cases where longitudes cannot be interpolated without considering the corresponding latitudes. It is up to the interpolation description to describe how such coordinates are to be identified (e.g. it may be that such tie point variables require particular standard names).
+The valid values of **`interpolation_name`** are given in Appendix <?>. This appendix also describes the interpolation technique and optional interpolation variable attributes for configuring the interpolation process.
 
-In addition to the **`interpolation_name`** or the **`description`** attribute, only two other interpolation variable attributes are permitted, the **`interpolation_coefficients`** and the **`interpolation_flags`** attributes.   
+If a standardized interpolation name is not given, the interpolation variable must have a **`interpolation_description`** attribute defined instead, containing a description of the non-standardised interpolation (in a similar manner to a long name being used instead of a standard name). This description is free text that can take any form (including a URI, for example). Whilst it is recommended that astandardised interpolation is provided, the alternative is provided to promote interoperability in cases where a well defined user community needs to use sophisticated interpolation techniques that may also be under development.
 
-The **`interpolation_coefficients`** attribute is a string attribute that lists the __interpolation coefficients variables__. The variables referenced must contain numeric data. It is a blank-separated list of words of the form "__interpolation_coefficients [interpolation_coefficients] ...]__".
+The definition of the interpolation method, however it is specified, may include instructions to treat groups of physically related coordinates simultaneously, if such tie points are present. For example, there are cases where longitudes cannot be interpolated without considering the corresponding latitudes. It is up to the interpolation description to describe how such coordinates are to be identified (e.g. it may be that such tie point variables require particular units or standard names).
 
-The **`interpolation_flags`** attribute is a string attribute that lists the __interpolation flags variables__. The variables referenced must be flag variables (<<flags>>). It is a blank-separated list of words of the form "__interpolation_flags [interpolation_flags] ...]__".
+The interpolation variable attributes **`interpolation_coefficients`** and **`interpolation_flags`** may be used to configure the interpolation process. These attributes name other variables that contain parameters needed to correctly configure the interpolation process. Both of these attributes are a blank-separated list of words of the form "__variable [variable] ...]__".
 
-The interpolation coefficients variables and the interpolation flags variables must either be scalar, or else their dimensions may include any of the tie point dimensions that are being interpolated, as well as the interpolation zone dimensions corresponding to each tie point dimension. The size of an interpolation zone dimension is equal the number of tie points, minus the number of interpolation areas. 
+The variables names by the **`interpolation_coefficients`** and **`interpolation_flags`** attributes must either be scalar, or else their dimensions may include any of the tie point interpolation dimensions, as well any __interpolation zone dimension__ that corresponds to a interpolation dimension. An interpolation zone dimension is a dimension whose size is equal to the number of interpolation zones along particular interpolation dimension. Therefore, if a variable spans a interpolation zone dimension then it allows its parameters to be stored differently for each interpolation zone.
 
-No other dimensions may be spanned by an interpolation coefficients variable or an interpolation flags variable.
+Note that an interpolation dimension size is the same as the tie point coordinates along the corresponding interpolation dimension, minus the number of interpolation areas.
+
+If the interpolation method has been given with an **`interpolation_name`** attribute, then the **`interpolation_coefficients`** and **`interpolation_flags`** attributes must only be present if they are allowed by the interpolation method's description in appendix <?>, and the variable they reference must meet the requirements given in the description
 
 [caption="Example 8.5. "]
 .Example demonstrating the use of multiple interpolation variables, the reusability of the interpolation variable between data variables of different dimensions and the use of the interpolation coefficients and interpolation flags attributes.
