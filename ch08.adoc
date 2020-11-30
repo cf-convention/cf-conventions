@@ -122,7 +122,7 @@ The presence of non-interpolation dimensions in the tie point variable impacts t
 
 Each interpolation dimension must be associated with its corresponding tie point interpolation dimension and, if required, its corresponding __interpolation zone dimension__ that defines the number of interpolation zones which partition the interpolation dimension. Regardless of its size, an interpolation zone dimension is only required if it is spanned by one or more interpolation coefficient or configuation variables, as described in <<compression-by-coordinate-interpolation-interpolation-variable>>. The association is stored in the data variable's **`tie_point_dimensions`** attribute that contains a blank-separated list of words of the form __"interpolation_dimension: tie_point_interpolation_dimension [interpolation_zone_dimension] [interpolation_dimension: ...]"__. If an interpolation zone dimension is provided then it must be the second of the two named dimensions following the interpolation dimension.
 
-Note that an interpolation zone dimension size is, by definition, the same as the size of the corresponding tie point interpolation dimension, minus the number of interpolation areas.
+Note that an interpolation zone dimension has, by definition, the same size as the corresponding tie point interpolation dimension, minus the number of interpolation areas.
 
 [[compression-by-coordinate-interpolation-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
 ==== Tie Point Indices
@@ -257,9 +257,11 @@ The variables named by the **`interpolation_coefficients`** and **`interpolation
 
 The interpretation of interpolation coefficent and configuration variables depends on the nature of the dimensions that they span:
 
-* If all of the dimensions comprise a subset of the interpolation zone dimensions, then the variable defines a value for every interpolation zone. This case is akin to values being defined at the centre of interpolation zones.
+* If no tie point interpolation dimensions are spanned, then the variable defines a value for every interpolation zone. This case is akin to values being defined at the centre of interpolation zones.
   
-* If at least one dimension is a tie point interpolation dimension, then the of each of the variable's values is to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary (<<interpolation_variable>>).
+* If at least one dimension is a tie point interpolation dimension, then each of the variable's values is to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary (<<interpolation_variable>>).
+
+In both cases, values are broadcast along any interpolation zone dimension s that are not spanned by the variable.
 
 [[interpolation_variable, figure 4]]
 [.text-center]
