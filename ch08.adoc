@@ -172,6 +172,7 @@ variables:
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
     Temperature:tie_points = "lat: lon: bi_linear" ;
+    Temperature:tie_point_dimensions = "xc: tp_xc  yc: tp_y"  ;
     Temperature:tie_point_indices = "yc: y_indices xc: x_indices" ;
 
 data:
@@ -211,6 +212,7 @@ variables:
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
     Temperature:tie_points = "lat: lon: linear" ;
+    Temperature:tie_point_dimensions = "xc: tp_xc"  ;
     Temperature:tie_point_indices = "xc: x_indices" ;
 
 data:
@@ -218,21 +220,6 @@ data:
   ...
 ----
 ====
-
-[[compression-by-coordinate-interpolation-tie-point-indices, Section 8.3.5, "Tie Point Offsets"]]
-==== Tie Point Offsets
-
-By default, it is assumed that the tie points are a subset of the uncompressed coordinates. However, it may be that the tie points are offset from a subset of the uncompressed coordinates. In this case, the data variable requires a **`tie_point_offsets`** attribute to record the nature of this offset.
-
-The **`tie_point_offsets`** attribute is a string attribute maps interpolation dimensions to the corresponding __tie point offset variables__. It is a blank-separated list of words of the form "__interpolation_dimension: tie_point_offset_variable [interpolation_dimension: tie_point_offset_variable ...]__".
-
-This mapping is not part of the interpolation variable because different data variables may apply the same interpolation method, with the same tie points variables, but with different offsets.
-
-A tie point offset variable defines numerical offsets in terms of the fraction of the size of a target domain cell along a single dimension. When associated with an interpolation dimension by the **`tie_point_offsets`** attribute, this offset locates the tie point variable coordinates relative to the uncompressed coordinates. A tie point offset variable may be a scalar, or else its dimensions may include the tie point interpolation dimension corresponding to the named interpolation dimension, as well as any subset of the non-interpolation dimensions. No other dimensions may be spanned by a tie point offset variable.
-
-An offset value, which must be in the open range `(-1.0, 1.0)`, indicates a tie point offset towards an adjacent element of the corresponding interpolation dimension as follows: A positive offset value indicates a tie point offset towards the next element, and a negative offset indicates a tie point offset towards the previous element. Note that the location of the offset does not depend on whether the uncompressed coordinates are increasing or decreasing along the interpolation dimension.
-
-For example, specifying that for both of the interpolation dimensions **`track`** and **`scan`** the offset is `-0.5` (indicating that the tie points are offset by half a grid cell along each dimension from their corresponding uncompressed coordinates), could be indicated with a **`tie_point_offsets`** attribute of **`track: offset scan: offset`**, where **`offset`** is a scalar tie point variable that has the value **`offset = -0.5`**.
 
 [[compression-by-coordinate-interpolation-interpolation-variable, Section 8.3.6, "Interpolation Variable"]]
 ==== Interpolation Variable
@@ -275,7 +262,7 @@ Note that the interpolation method is always applied on a per interpolation zone
 [[compression-by-coordinate-interpolation-bounds, Section 8.3.6, "Interpolation of Tie Point Bounds"]]
 ==== Interpolation of Tie Point Bounds
 
-If a tie point variable has cell boundaries bounds then it must have the attribute **`bounds`** that names the variable that contains the vertices of the cell boundaries. The bounds should be the same as the bounds of the corresponding target grid cells, unless there is a non-zero offset, in which case the offset applies to the bounds values in exactly the same manner as it does to the cell coordinates. It is thereforefore likely that tie point cells will be non-contiguous.
+If a tie point variable has cell boundaries bounds then it must have the attribute **`bounds`** that names the variable that contains the vertices of the cell boundaries. The bounds should be the same as the bounds of the corresponding target grid cells. It is thereforefore likely that tie point cells will be non-contiguous.
 
 The target domain cell bounds are calculated by interpolating each cell bound position independently of the others, using the same interpolation method and tie point index variables as used for the cell coordinates. In this case, though, the tie point index variables are the indentifying target domain cells to which the bounds apply, rather than bounds values themselves. For instance, in the case of a two-dimensionsal tie point variable with four-sided cells then the target domain cell bounds would be calculated with four separate interpolations, one for each of the bounds positions (following the notation of <<cell-boundaries>>) `(j-1,i-1)`, `(j-1,i+1)`, `(j+1,i+1)`, `(j+1,i-1)`.
 
@@ -299,8 +286,8 @@ dimensions :
   // Tie points and interpolation zones (shared between VIIRS M-Band and I-Band)
   tp_track = 96 ;  // 48 VIIRS scans
   tp_scan = 205 ;
-  track_interpolation_zone = 48 ;
-  scan_interpolation_zone = 200 ;
+  zone_track = 48 ;   // track interpolation zone 
+  zone_scan= 200 ;    // scan interpolation zone 
 
   // Time, stored at scan-start and scan-end of each scan
   time_scan = 2;
@@ -308,17 +295,15 @@ dimensions :
 variables:
   // VIIRS M-Band 
   float m_radiance(m_track, m_scan, m_channel) ;
-    m_radiance:tie_points = "lat: lon: sen_azi_ang: sen_zen_ang: sol_azi_ang: sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan: m_scan_indices  time_scan: m_time_scan_indices" ;
-    m_radiance:tie_point_offsets = "m_track: offset  m_scan: offset" ;
+    m_radiance:tie_points = "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
+    m_radiance:tie_point_dimensions = "m_track: tp_track  zone_track  m_scan: tp_scan  zone_scan"  ;
+    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan:  m_scan_indices  time_scan: m_time_scan_indices" ;
 
   // VIIRS I-Band 
   float i_radiance(i_track, i_scan, i_channel) ;
-    i_radiance:tie_points = "lat: lon: sen_azi_ang: sen_zen_ang: sol_azi_ang: sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    i_radiance:tie_point_indices = "i_track: i_track_indices  i_scan: i_scan_indices  time_scan: i_time_scan_indices" ;
-    i_radiance:tie_point_offsets = "i_track: offset  i_scan: offset" ;
-
-  double offset;   // = -0.5
+    i_radiance:tie_points = "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
+    m_radiance:tie_point_dimensions = "i_track: tp_track  zone_track  i_scan: tp_scan  zone_scan"  ;
+    i_radiance:tie_point_indices = "i_track: zone_track: i_track_indices  i_scan: zone_scan: i_scan_indices  time_scan: i_time_scan_indices" ;
 
   // Tie point index variables
   int m_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
@@ -329,37 +314,56 @@ variables:
   int i_time_scan_indices(time_scan) 
 
   // Tie points
-  float lat(tp_track, tp_scan) ;
-    lat : standard_name = "latitude" ;
-    lat : units = "degrees_north" ;
-  float lon(tp_track, tp_scan) ;
-    lon : standard_name = "longitude" ;
-    lon : units = "degrees_east" ;
-  float sen_azi_ang(tp_track, tp_scan) ;
-    sen_azi_ang : standard_name = "sensor_azimuth_angle" ;
-    sen_azi_ang : units = "degrees" ;
-  float sen_zen_ang(tp_track, tp_scan) ;
-    sen_zen_ang : standard_name = "sensor_zenith_angle" ;
-    sen_zen_ang : units = "degrees" ;
-  float sol_azi_ang(tp_track, tp_scan) ;
-    sol_azi_ang : standard_name = "solar_azimuth_angle" ;
-    sol_azi_ang : units = "degrees" ;
-  float sol_zen_ang(tp_track, tp_scan) ;
-    sol_zen_ang : standard_name = "solar_zenith_angle" ;
-    sol_zen_ang : units = "degrees" ;
+  float m_lat(tp_track, tp_scan) ;
+    m_lat : standard_name = "latitude" ;
+    m_lat : units = "degrees_north" ;
+  float m_lon(tp_track, tp_scan) ;
+    m_lon : standard_name = "longitude" ;
+    m_lon : units = "degrees_east" ;
+  float m_sen_azi_ang(tp_track, tp_scan) ;
+    m_sen_azi_ang : standard_name = "sensor_azimuth_angle" ;
+    m_sen_azi_ang : units = "degrees" ;
+  float m_sen_zen_ang(tp_track, tp_scan) ;
+    m_sen_zen_ang : standard_name = "sensor_zenith_angle" ;
+    m_sen_zen_ang : units = "degrees" ;
+  float m_sol_azi_ang(tp_track, tp_scan) ;
+    m_sol_azi_ang : standard_name = "solar_azimuth_angle" ;
+    m_sol_azi_ang : units = "degrees" ;
+  float m_sol_zen_ang(tp_track, tp_scan) ;
+    m_sol_zen_ang : standard_name = "solar_zenith_angle" ;
+    m_sol_zen_ang : units = "degrees" ;
+
+  float i_lat(tp_track, tp_scan) ;
+    i_lat : standard_name = "latitude" ;
+    i_lat : units = "degrees_north" ;
+  float i_lon(tp_track, tp_scan) ;
+    i_lon : standard_name = "longitude" ;
+    i_lon : units = "degrees_east" ;
+  float i_sen_azi_ang(tp_track, tp_scan) ;
+    i_sen_azi_ang : standard_name = "sensor_azimuth_angle" ;
+    i_sen_azi_ang : units = "degrees" ;
+  float i_sen_zen_ang(tp_track, tp_scan) ;
+    i_sen_zen_ang : standard_name = "sensor_zenith_angle" ;
+    i_sen_zen_ang : units = "degrees" ;
+  float i_sol_azi_ang(tp_track, tp_scan) ;
+    i_sol_azi_ang : standard_name = "solar_azimuth_angle" ;
+    i_sol_azi_ang : units = "degrees" ;
+  float i_sol_zen_ang(tp_track, tp_scan) ;
+    i_sol_zen_ang : standard_name = "solar_zenith_angle" ;
+    i_sol_zen_ang : units = "degrees" ;
 
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_1" ;
-    tp_interpolation:interpolation_coefficients = "TOO1:D expansion_coefficient_track TODO2: alignment_coefficient_track TODO3: expansion_coefficient_scan TODO4: alignment_coefficient_scan" ;
-    tp_interpolation:interpolation_configuration = "TODO5: interpolation_zone_flags" ;
+    tp_interpolation:interpolation_coefficients = "exp1: expansion1  align1: alignment1  exp2: expansion2  align2:alignment2" ;
+    tp_interpolation:interpolation_configuration = "flags: interpolation_zone_flags" ;
 
   // Interpolation coefficient and configuration variables
-  short expansion_coefficient_track(track_interpolation_zone, tp_scan) ;
-  short alignment_coefficient_track(track_interpolation_zone, tp_scan) ;
-  short expansion_coefficient_scan(tp_track, scan_interpolation_zone) ;
-  short alignment_coefficient_scan(tp_track, scan_interpolation_zone) ;
-  byte interpolation_zone_flags(track_interpolation_zone, scan_interpolation_zone) ;
+  short expansion1(zone_track , tp_scan) ;
+  short alignment1(zone_track , tp_scan) ;
+  short expansion2(tp_track, zone_scan) ;
+  short alignment2(tp_track, zone_scan) ;
+  byte interpolation_zone_flags(zone_track , zone_scan) ;
     interpolation_zone_flags : valid_range = "1b, 7b" ;
     interpolation_zone_flags : flag_masks = "1b, 2b, 4b" ;
     interpolation_zone_flags : flag_meanings = "location_use_cartesian  sensor_direction_use_cartesian  solar_direction_use_cartesian" ;
