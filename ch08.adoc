@@ -98,7 +98,7 @@ For each interpolation dimension, the location of the tie points is defined by a
 
 For each interpolation dimension, the number interpolation zones is equal to the number of tie points minus the number of interpolation areas.
 
-[[interpolation_zone_generation, figure 3]]
+[[interpolation_zone_generation, figure 1]]
 [.text-center]
 .Process for generating the interpolation zones for a grid without discontinuities and for a grid with discontinuities.
 image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,align="center"]
@@ -122,7 +122,15 @@ The presence of non-interpolation dimensions in the tie point variable impacts t
 
 Each interpolation dimension must be associated with its corresponding tie point interpolation dimension and, if required, its corresponding __interpolation zone dimension__ that defines the number of interpolation zones which partition the interpolation dimension. Regardless of its size, an interpolation zone dimension is only required if it is spanned by one or more interpolation coefficient or configuation variables, as described in <<compression-by-coordinate-interpolation-interpolation-variable>>. The association is stored in the data variable's **`tie_point_dimensions`** attribute that contains a blank-separated list of words of the form __"interpolation_dimension: tie_point_interpolation_dimension [interpolation_zone_dimension] [interpolation_dimension: ...]"__. If an interpolation zone dimension is provided then it must be the second of the two named dimensions following the interpolation dimension.
 
+An overview of the different dimensions for coordinate interpolation is shown in figure <<ci_dimensions_overview>>.
+
 Note that an interpolation zone dimension has, by definition, the same size as the corresponding tie point interpolation dimension, minus the number of interpolation areas.
+
+
+[[ci_dimensions_overview, figure 2]]
+[.text-center]
+.Overview of the different dimensions for coordinate interpolation.
+image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
 
 [[compression-by-coordinate-interpolation-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
 ==== Tie Point Indices
@@ -246,17 +254,16 @@ The interpretation of interpolation coefficent and configuration variables depen
 
 * If no tie point interpolation dimensions are spanned, then the variable provides a value for every interpolation zone. This case is akin to values being defined at the centre of interpolation zones.
   
-* If at least one dimension is a tie point interpolation dimension, then each of the variable's values is to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary (<<interpolation_variable>>).
+* If at least one dimension is a tie point interpolation dimension, then each of the variable's values is to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary (<<ci_interpolation_coefficients>>).
 
 In both cases, the implementation of the interpolation method should broadcast an interpolation coefficent or configuration variable along any interpolation zone dimensions that it does not span.
 
-[[interpolation_variable, figure 4]]
-[.text-center]
-.Interpolation coefficients and interpolation flags variable dimensions in relation to an interpolation zone and its boundaries.
-
-image::images/interpolation_variables.png[,100%,pdfwidth=50vw,align="center"]
-
 Note that the interpolation method is always applied on a per interpolation zone basis, for which the construction of the uncompressed coordinates may only access the tie point that define the extent of the of the interpolation zone, as well as any interpolation coefficient and configuration variables defined for the interpolation zone, including its boundaries.
+
+[[ci_interpolation_coefficients, figure 3]]
+[.text-center]
+.Through combination of dimensions, interpolation coefficients and configuration variables may provide values for each interpolation zone, for couples of neighboring interpolation zones or for multiple interpolation zones sharing a boundary.
+image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
 [[compression-by-coordinate-interpolation-bounds, Section 8.3.6, "Interpolation of Tie Point Bounds"]]
