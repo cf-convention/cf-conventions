@@ -1,7 +1,7 @@
 
 ==  Reduction of Dataset Size 
 
-There are two methods for reducing dataset size: packing and compression. By packing we mean altering the data in a way that reduces its precision. By compression we mean techniques that store the data more efficiently and result in no precision loss. Compression only works in certain circumstances, e.g., when a variable contains a significant amount of missing or repeated data values. In this case it is possible to make use of standard utilities, e.g., UNIX **`compress`** or GNU **`gzip`** , to compress the entire file after it has been written. In this section we offer an alternative compression method that is applied on a variable by variable basis. This has the advantage that only one variable need be uncompressed at a given time. The disadvantage is that generic utilities that don't recognize the CF conventions will not be able to operate on compressed variables.
+There are three methods for reducing dataset size: packing, lossless compression, and lossy compression. By packing we mean altering the data in a way that reduces its precision. By lossless compression we mean techniques that store the data more efficiently and result in no precision loss. By lossy compression we mean techniques that store the data more efficiently but result in some loss in accuracy. Lossless compression only works in certain circumstances, e.g., when a variable contains a significant amount of missing or repeated data values. In this case it is possible to make use of standard utilities, e.g., UNIX **`compress`** or GNU **`gzip`** , to compress the entire file after it has been written. In this section we offer an alternative compression method that is applied on a variable by variable basis. This has the advantage that only one variable need be uncompressed at a given time. The disadvantage is that generic utilities that don't recognize the CF conventions will not be able to operate on compressed variables.
 
 
 
@@ -18,8 +18,8 @@ When data to be packed contains missing values the attributes that indicate miss
 
 
 
-[[compression-by-gathering, Section 8.2, "Compression by Gathering"]]
-=== Compression by Gathering
+[[compression-by-gathering, Section 8.2, "Lossless Compression by Gathering"]]
+=== Lossless Compression by Gathering
 
 To save space in the netCDF file, it may be desirable to eliminate points from data arrays that are invariably missing. Such a compression can operate over one or more adjacent axes, and is accomplished with reference to a list of the points to be stored. The list is constructed by considering a mask array that only includes the axes to be compressed, and then mapping this array onto one dimension without reordering. The list is the set of indices in this one-dimensional mask of the required points. In the compressed array, the axes to be compressed are all replaced by a single axis, whose dimension is the number of wanted points. The wanted points appear along this dimension in the same order they appear in the uncompressed array, with the unwanted points skipped over. Compression and uncompression are executed by looping over the list.
 
@@ -70,8 +70,8 @@ This information implies that the salinity field should be uncompressed to an ar
 ====
 
 
-[[compression-by-coordinate-interpolation, Section 8.3, "Compression by Coordinate Interpolation"]]
-=== Compression by Coordinate Interpolation
+[[compression-by-coordinate-interpolation, Section 8.3, "Lossy Compression by Coordinate Interpolation"]]
+=== Lossy Compression by Coordinate Interpolation
 
 For some applications the coordinates of a data variable can require considerably more storage than the data itself. Space may be saved in the netCDF file by the storing coordinates at a lower resolution than the data which they describe. The uncompressed coordinate and auxiliary coordinate variables can be reconstituted by interpolation, from the lower resolution coordinate values to the domain of the data (i.e. the target domain). This process will likely result in a loss in accuracy (as opposed to precision) in the uncompressed variables, due to rounding and approximation errors in the interpolation calculations, but it is assumed that these errors will be small enough to not be of concern to user of the uncompressed dataset.
 
