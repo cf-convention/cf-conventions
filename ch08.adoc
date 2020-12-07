@@ -108,7 +108,7 @@ image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,a
 
 To indicate that coordinate interpolation is required, a **`tie_points`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables **`lat`** and **`lon`** are to be interpolated according to the interpolation variable **`bi_linear`** could be indicated with **`lat: lon: bi_linear`**.
 
-[[compression-by-coordinate-interpolation-dimensions,Section 8.3.3, "Data Variable Attributes"]]
+[[compression-by-coordinate-interpolation-dimensions,Section 8.3.3, "Interpolation and Non-Interpolation Dimensions"]]
 ==== Interpolation and Non-Interpolation Dimensions
 
 For each interpolation variable identified in the **`tie_points`** attribute, all corresponding tie point variables must share the same set of one or more dimensions. This set of dimensions must contain at least one __tie point interpolation dimension__ that corresponds to an __interpolation dimension__, i.e. a target domain dimension for which coordinate interpolation is required; and may additionally contain one or more __non-interpolation dimensions__, i.e. those of the target domain for which no coordinate interpolation is required.
@@ -446,3 +446,53 @@ variables:
     Temperature:tie_point_indices = "y: y_indices x: x_indices" ;
 ----
 ====
+
+
+[[Compression-by-coordinate-interpolation-generation-of-tie-points]]
+.Generation of Tie Point Variables and Interpolation Variables
+[options="header",cols="1,40,20",caption="Table 8.1. "]
+|===============
+| Step | Description | Link
+
+| 1
+| Identify the coordinate and auxillary coordinate variables for which tie point and interpolation variables are required.
+| 
+
+| 2
+| Identify non-overlapping subsets of the coordinate variables to be interpolated by the same interpolation method. For each coordinate variable subset, create an interpolation variable and specify the selected interpolation method using the **`interpolation_name`** attribute of the interpolation variable. 
+| <<compression-by-coordinate-interpolation-interpolation-variable>>
+
+| 3
+| For each coordinate variable subset, add the coordinates variable subset and the corresponding interpolation variable to the the **`tie_points`** attribute of the data variable. 
+| <<compression-by-coordinate-tie-points-attribute>>
+
+
+| 4
+| For each coordinate variable subset, identify the set of interpolation and the set of non-interpolation dimensions.
+| <<compression-by-coordinate-interpolation-dimensions>>
+
+| 5
+| For each set of the interpolation dimensions, identify the interpolation areas and select the interpolation zones and the tie points, taking into account the required coordinate reconstitution accuracy when selecting the density of tie points.
+| <<compression-by-coordinate-tie-points>>
+
+| 6
+| For each of the interpolation dimensions, add the interpolation dimension, the corresponding tie point interpolation dimension and, if required by the selected interpolation method, its corresponding interpolation zone dimension to the **`tie_point_dimensions`** attribute of the data variable.
+| <<compression-by-coordinate-interpolation-tie-point-dimensions-attribute>>
+
+| 7
+| For each of the interpolation dimensions, record the location of each identified tie point in a tie point index variable. For each interpolation dimension, add the interpolation dimension and its tie point index variable to the **`tie_point_indices`** attribute of the data variable.
+| <<compression-by-coordinate-interpolation-tie-point-indices>>
+
+| 8
+| For each of the target coordinate and auxillary coordinate variables, create the corresponding tie point coordinate variable and copy the coordinate values from the target domain coordinate variables to the tie point variables for the target domain indices identified by the tie point index variable. Repeat this step for each combination of indices of the non-interpolation dimensions.
+| <<compression-by-coordinate-interpolation-tie-point-indices>>
+
+| 9
+| For each of the target coordinate and auxillary coordinate variable having a **`bounds`** attribute, add the **`bounds`** attribute to the tie point coordinate variable, create the tie point bounds variable and copy the bounds values from the target domain bounds variable to the tie point bounds variable for the target domain indices identified by the tie point index variable. Repeat this step for each combination of indices of the non-interpolation dimensions.
+| <<compression-by-coordinate-interpolation-bounds>>
+
+| 10
+| Finally, if required by the selected interpolation method, follow the steps defined for the method in Appendix J to create any required interpolation coefficients variables and interpolation configuration variables. As relevant, create the  **`interpolation_coefficients`** and **`interpolation_configuration`** attributes and populate them with the interpolation coefficients variables and interpolation configuration variables respectively.
+| <<compression-by-coordinate-interpolation-interpolation-variable>>
+
+|===============
