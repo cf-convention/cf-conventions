@@ -1,0 +1,377 @@
+
+[[appendix-grid-mappings, Appendix J, Coordinate Interpolation]]
+
+[appendix]
+== Coordinate Interpolation
+
+
+[[table-grid-mapping-attributes]]
+
+
+[[Compression-by-coordinate-interpolation-generation-of-tie-points]]
+.Generation of Tie Point Variables and Interpolation Variables
+[options="header",cols="1,40,20",caption="Table 8.1. "]
+|===============
+| Step | Description | Link
+
+| 1
+| Identify the coordinate and auxillary coordinate variables for which tie point and interpolation variables are required.
+| 
+
+| 2
+| Identify non-overlapping subsets of the coordinate variables to be interpolated by the same interpolation method. For each coordinate variable subset, create an interpolation variable and specify the selected interpolation method using the **`interpolation_name`** attribute of the interpolation variable. 
+| <<compression-by-coordinate-interpolation-interpolation-variable>>
+
+| 3
+| For each coordinate variable subset, add the coordinates variable subset and the corresponding interpolation variable to the the **`tie_points`** attribute of the data variable. 
+| <<compression-by-coordinate-tie-points-attribute>>
+
+
+| 4
+| For each coordinate variable subset, identify the set of interpolation and the set of non-interpolation dimensions.
+| <<compression-by-coordinate-interpolation-dimensions>>
+
+| 5
+| For each set of the interpolation dimensions, identify the interpolation areas and select the interpolation zones and the tie points, taking into account the required coordinate reconstitution accuracy when selecting the density of tie points.
+| <<compression-by-coordinate-tie-points>>
+
+| 6
+| For each of the interpolation dimensions, add the interpolation dimension, the corresponding tie point interpolation dimension and, if required by the selected interpolation method, its corresponding interpolation zone dimension to the **`tie_point_dimensions`** attribute of the data variable.
+| <<compression-by-coordinate-interpolation-tie-point-dimensions-attribute>>
+
+| 7
+| For each of the interpolation dimensions, record the location of each identified tie point in a tie point index variable. For each interpolation dimension, add the interpolation dimension and its tie point index variable to the **`tie_point_indices`** attribute of the data variable.
+| <<compression-by-coordinate-interpolation-tie-point-indices>>
+
+| 8
+| For each of the target coordinate and auxillary coordinate variables, create the corresponding tie point coordinate variable and copy the coordinate values from the target domain coordinate variables to the tie point variables for the target domain indices identified by the tie point index variable. Repeat this step for each combination of indices of the non-interpolation dimensions.
+| <<compression-by-coordinate-interpolation-tie-point-indices>>
+
+| 9
+| For each of the target coordinate and auxillary coordinate variable having a **`bounds`** attribute, add the **`bounds`** attribute to the tie point coordinate variable, create the tie point bounds variable and copy the bounds values from the target domain bounds variable to the tie point bounds variable for the target domain indices identified by the tie point index variable. Repeat this step for each combination of indices of the non-interpolation dimensions.
+| <<compression-by-coordinate-interpolation-bounds>>
+
+| 10
+| Finally, if required by the selected interpolation method, follow the steps defined for the method in Appendix J to create any required interpolation coefficients variables and interpolation configuration variables. As relevant, create the  **`interpolation_coefficients`** and **`interpolation_configuration`** attributes and populate them with the interpolation coefficients variables and interpolation configuration variables respectively.
+| <<compression-by-coordinate-interpolation-interpolation-variable>>
+
+|===============
+
+
+
+|===============
+
+Each recognized coordinate interpolation is described in one of the sections below.
+Each section contains: the valid name that is used with the
+**`tie_point`** attribute; 
+
+
+
+a list of the specific attributes
+that may be used to assign values to the mapping's parameters; the
+standard names used to identify the coordinate variables that contain
+the mapping's independent variables; and references to the mapping's
+definition or other information that may help in using the mapping.
+Since the attributes used to set a mapping's parameters may be shared
+among several mappings, their definitions are contained in a table in
+the final section.
+The attributes which describe the ellipsoid and prime meridian may be included, when applicable, with any grid mapping.
+These are:
+
+- `earth_radius`
+- `inverse_flattening`
+- `longitude_of_prime_meridian`
+- `prime_meridian_name`
+- `reference_ellipsoid_name`
+- `semi_major_axis`
+- `semi_minor_axis`
+
+We have used the FGDC "Content Standard for Digital Geospatial Metadata" <<FGDC>> as a guide in choosing the values for **`grid_mapping_name`** and the attribute names for the parameters describing map projections.
+
+
+=== Linear
+
+----
+
+interpolation_name = linear
+
+----
+
+__Map parameters:__::
+* **`standard_parallel`** - There may be 1 or 2 values.
+* **`longitude_of_central_meridian`**
+* **`latitude_of_projection_origin`**
+* **`false_easting`** - This parameter is optional (default is 0)
+* **`false_northing`** - This parameter is optional (default is 0)
+
+__Map coordinates:__:: The x (abscissa) and y (ordinate) rectangular coordinates are identified by the **`standard_name`** attribute values **`projection_x_coordinate`** and **`projection_y_coordinate`** respectively.
+
+__Notes:__:: Notes on using the **`PROJ`** software package for computing the mapping may be found at
+link:$$https://proj.org/operations/projections/aea.html$$[https://proj.org/operations/projections/aea.html]
+and
+link:$$http://geotiff.maptools.org/proj_list/albers_equal_area_conic.html$$[http://geotiff.maptools.org/proj_list/albers_equal_area_conic.html].
+
+
+
+
+
+In the following table the "Type" values are **S** for string and **N** for numeric.
+
+[[table-grid-mapping-attributes]]
+.Grid Mapping Attributes
+[options="header",cols="6,1,16",caption="Table F.1. "]
+|===============
+| Attribute | Type | Description
+
+| **`azimuth_of_central_line`** | N
+| Specifies a horizontal angle measured in degrees clockwise from North. Used by certain
+ projections (e.g., Oblique Mercator) to define the orientation of the map projection relative 
+to a reference direction.
+
+| **`crs_wkt`** | S
+| This optional attribute may be used to specify multiple coordinate system properties
+  in well-known text (WKT) format. The syntax must conform to the WKT format as specified
+  in reference <<OGC_WKT-CRS>>. Use of the **`crs_wkt`** attribute is described in section 5.6.1. 
+
+| **`earth_radius`** | N
+| Used to specify the radius, in metres, of the spherical
+    figure used to approximate the shape of the Earth. This
+    attribute should be specified for those projected coordinate
+    reference systems in which the X-Y cartesian coordinates
+    have been derived using a spherical Earth approximation. If
+    the cartesian coordinates were derived using an ellipsoid,
+    this attribute should not be defined. Example: "6371007",
+    which is the radius of the GRS 1980 Authalic Sphere.
+
+| **`false_easting`** | N
+|  Applied to all abscissa values in the rectangular
+    coordinates for a map projection in order to eliminate negative numbers. Expressed in
+    the unit of the coordinate variable identified by the
+    standard name **`projection_x_coordinate`**. 
+    If **`false_easting`** is not provided it is assumed to be 0.
+    The formula to convert from the coordinate value as written in the **`projection_x_coordinate`**
+    (xf) to a value (x0) used in a transformation without **`false_easting`**, i.e. **`false_easting`**= 0, is:
+    x0 = xf -**`false_easting`**
+
+
+
+| **`false_northing`** | N
+|  Applied to all ordinate values in the rectangular
+    coordinates for a map projection in order to eliminate negative numbers. Expressed in
+    the unit of the coordinate variable identified by the
+    standard name **`projection_y_coordinate`**. 
+    If **`false_northing`** is not provided it is assumed to be 0.
+    The formula to convert from the coordinate value as written in the **`projection_y_coordinate`**
+    (yf) to a value (y0) used in a transformation without **`false_northing`**, i.e. **`false_northing`**= 0, is:
+    y0 = yf -**`false_northing`**
+
+| **`fixed_angle_axis `** | S
+| Indicates the axis on which the view is fixed in a hypothetical gimbal view model of the Earth, as used in the geostationary grid mapping.
+    It corresponds to the inner-gimbal axis of the gimbal view model, whose axis of rotation moves about the outer-gimbal axis.
+    This value can adopt two values, "x" or "y", corresponding with the Earth's E-W or N-S axis, respectively.
+    The counterpart to this attribute is `sweep_angle_axis`.
+    If set to "x", `sweep_angle_axis` is "y", and vice versa.
+    If one of the attributes `fixed_angle_axis` or `sweep_angle_axis` is provided, the other is not mandatory, as they can be used to infer each other.
+
+| **`geographic_crs_name`** | S
+| The name of the geographic coordinate reference system. 
+    Corresponds to a OGC WKT GEOGCS node name.
+
+| **`geoid_name`** | S
+| The name of the estimate or model of the geoid being used as a datum, 
+    e.g. GEOID12B. Corresponds to an OGC WKT VERT_DATUM name. The geoid is 
+    the surface of constant geopotential that the ocean would follow if it 
+    were at rest. This attribute and **`geopotential_datum_name`** cannot both be specified.
+
+| **`geopotential_datum_name`** | S
+
+| The name of an estimated surface of constant geopotential being used as a datum, 
+    e.g. NAVD88. Such a surface is often called an equipotential surface in geodesy. 
+    Corresponds to an OGC WKT VERT_DATUM name. This attribute and **`geoid_name`** cannot 
+    both be specified.
+
+| **`grid_mapping_name`** | S
+| The name used to identify the grid mapping.
+
+| **`grid_north_pole_latitude`** | N
+| True latitude (degrees_north) of the north pole of the rotated grid.
+
+| **`grid_north_pole_longitude`** | N
+| True longitude (degrees_east) of the north pole of the rotated grid.
+
+| **`horizontal_datum_name`** | S
+|  The name of the geodetic (horizontal) datum, which corresponds to the 
+     procedure used to measure positions on the surface of the Earth. Valid datum 
+     names and their associated parameters are given in
+     https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
+     (horiz_datum.csv, OGC_DATUM_NAME column)
+     and are 
+     obtained by transforming the EPSG name using the following rules (used by OGR 
+     and Cadcorp): convert all non alphanumeric characters (including +) to underscores, 
+     then strip any leading, trailing or repeating underscores. This is to ensure that 
+     named datums can be correctly identified for precise datum transformations  
+     (see https://github.com/cf-convention/cf-conventions/wiki/OGC-WKT-Coordinate-System-Issues for
+      more details).
+     Corresponds to a OGC WKT DATUM node name.
+
+| **`inverse_flattening`** | N
+| Used to specify the __inverse__ flattening
+    (__1/f__) of the ellipsoidal figure
+    associated with the geodetic datum and used to approximate the shape
+    of the Earth. The flattening (__f__) of the ellipsoid
+    is related to the semi-major and semi-minor axes by the formula
+    __f = (a-b)/a__. In the case
+    of a spherical Earth this attribute should be omitted or set to zero.
+    Example: 298.257222101 for the GRS 1980 ellipsoid. (Note: By
+    convention the dimensions of an ellipsoid are specified using either
+    the semi-major and semi-minor axis lengths, or the semi-major axis
+    length and the inverse flattening. If all three attributes are
+    specified then the supplied values must be consistent with the
+    aforementioned formula.)
+
+| **`latitude_of_projection_origin`** | N
+| The latitude (degrees_north) chosen as the origin of rectangular
+     coordinates for a map projection.  Domain: +
+// The following lines shows how to insert Unicode for <=.  A plain '<=' turns into an arrow.
+// Except as marked, all work for asciidoctor and none work for asciidoctor-pdf.
+//     **`-90.0 &#x2264; latitude_of_projection_origin &#x2264; 90.0`** +
+//doesn't work for asciidoctor     **`-90.0 &#2264; latitude_of_projection_origin &#2264; 90.0`** +
+//     **`-90.0 &le; latitude_of_projection_origin &le; 90.0`** +
+//     **`-90.0 &leq; latitude_of_projection_origin &leq; 90.0`** +
+//     **`-90.0 +++<u>&le;</u>+++ latitude_of_projection_origin +++<u>&le;</u>+++ 90.0`** +
+//     **`-90.0 < = latitude_of_projection_origin < = 90.0`** +
+//     **`-90.0 \<= latitude_of_projection_origin \<= 90.0`** +
+// The cleanest-looking, which sometimes works for asciidoctor-pdf:
+     **`-90.0 \<= latitude_of_projection_origin \<= 90.0`**
+
+| **`longitude_of_central_meridian`** | N
+| The line of longitude (degrees_east) at the center of a map projection 
+    generally used as the basis for constructing the projection. 
+    Domain: +
+     **`-180.0 \<= longitude_of_central_meridian < 180.0`**
+
+
+| **`longitude_of_prime_meridian`** | N
+| Specifies the longitude, with respect to Greenwich, of the prime
+    meridian associated with the geodetic datum. The prime meridian defines
+    the origin from which longitude values are determined. Not to be
+    confused with the projection origin longitude
+    (cf. **`longitude_of_projection_origin`**, a.k.a. central
+    meridian) which defines the longitude of the map projection origin.
+    Domain: +
+    **`-180.0 \<= longitude_of_prime_meridian < 180.0`**
+    decimal degrees.
+    Default = **`0.0`**
+
+| **`longitude_of_projection_origin`** | N
+| The longitude (degrees_east) chosen as the origin of rectangular 
+    coordinates for a map projection.  
+    Domain: +
+    **`-180.0 \<= longitude_of_projection_origin < 180.0`**
+
+
+| **`north_pole_grid_longitude`** | N
+| Longitude (degrees) of the true north pole in the rotated grid.
+
+
+| **`perspective_point_height`** | N
+| Records the height, __in metres__, of the map
+    projection perspective point above the ellipsoid (or sphere). Used
+    by perspective-type map projections, for example the Vertical
+    Perspective Projection, which may be used to simulate the view from
+    a Meteosat satellite.
+
+
+| **`prime_meridian_name`** | S
+| The name of the prime meridian associated with the geodetic datum. Valid 
+    names are given in
+   https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
+   (prime_meridian.csv). Corresponds to a OGC WKT PRIMEM node name.
+
+
+|**`projected_crs_name`** | S
+| The name of the projected coordinate reference system. Corresponds 
+    to a OGC WKT PROJCS node name.
+
+
+| **`reference_ellipsoid_name`** | S
+| The name of the reference ellipsoid. Valid names are given in 
+   https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
+   (ellipsoid.csv). 
+   Corresponds to a OGC WKT SPHEROID node name.
+
+
+| **`scale_factor_at_central_meridian`** | N
+| A multiplier for reducing a distance obtained from a map by
+    computation or scaling to the actual distance along the
+    central meridian.
+    Domain: **`scale_factor_at_central_meridian &gt; 0.0`**
+
+| **`scale_factor_at_projection_origin`** | N
+| A multiplier for reducing a distance obtained from
+    a map by computation or scaling to the actual distance
+    at the projection origin.
+    Domain: **`scale_factor_at_projection_origin &gt; 0.0`**
+
+
+| **`semi_major_axis`** | N
+| Specifies the length, __in metres__, of the semi-major
+    axis of the ellipsoidal figure associated with the geodetic datum and
+    used to approximate the shape of the Earth. Commonly denoted using the
+    symbol __a__. In the case of a spherical Earth
+    approximation this attribute defines the radius of the Earth. See
+    also the **`inverse_flattening`** attribute.
+
+| **`semi_minor_axis`** | N
+| Specifies the length, __in metres__, of the semi-minor
+    axis of the ellipsoidal figure associated with the geodetic datum and
+    used to approximate the shape of the Earth. Commonly denoted using the
+    symbol __b__. In the case of a spherical Earth
+    approximation this attribute should be omitted (the preferred option)
+    or else set equal to the value of the semi_major_axis attribute. See
+    also the inverse_flattening attribute.
+
+| **`standard_parallel`** | N
+| Specifies the line, or lines, of latitude at which the developable map
+    projection surface (plane, cone, or cylinder) touches the reference
+    sphere or ellipsoid used to represent the Earth. Since there is zero
+    scale distortion along a standard parallel it is also referred to as
+    a "latitude of true scale". In the situation where a conical
+    developable surface intersects the reference ellipsoid there are two
+    standard parallels, in which case this attribute can be used as a
+    vector to record both latitude values, with the additional convention
+    that the standard parallel nearest the pole (N or S) is provided first.
+    Domain: **`-90.0 &lt;= standard_parallel &lt;= 90.0`**
+
+| **`straight_vertical_longitude_from_pole`** | N
+| The longitude (degrees_east) to be oriented straight up from the North or 
+    South Pole. Domain: **`-180.0 &lt;= straight_vertical_longitude_from_pole &lt; 180.0`**
+
+| **`sweep_angle_axis `** | S
+| Indicates the axis on which the view sweeps in a hypothetical gimbal view model of the Earth, as used in the geostationary grid mapping.
+    It corresponds to the outer-gimbal axis of the gimbal view model, about whose axis of rotation the gimbal-gimbal axis moves.
+    This value can adopt two values, "x" or "y", corresponding with the Earth's E-W or N-S axis, respectively.
+    The counterpart to this attribute is `fixed_angle_axis`.
+    If set to "x", `fixed_angle_axis` is "y", and vice versa.
+    If one of the attributes `fixed_angle_axis` or `sweep_angle_axis` is provided, the other is not mandatory, as they can be used to infer each other.
+
+| **`towgs84`** | N
+|   This indicates a list of up 
+     to 7 Bursa Wolf transformation parameters., which can be used to approximate a 
+     transformation from the horizontal datum to the WGS84 datum. More precise datum 
+     transformations can be done with datum shift grids. Represented as a double-precision 
+     array, with 3, 6 or 7 values (if there are less than 7 values the remaining are 
+     considered to be zero). Corresponds to a OGC WKT TOWGS84 node.
+
+|===============
+
+Notes:
+
+. The various **`*_name`** attributes are optional but recommended when 
+known as they allow for a better description and interoperability with WKT 
+definitions.
+. **`reference_ellipsoid_name`**, **`prime_meridian_name`**, 
+**`horizontal_datum_name`** and **`geographic_crs_name`** must be all defined if any one
+ is defined, and if **`projected_crs_name`** is defined then **`geographic_crs_name`** must be also.
+
+
