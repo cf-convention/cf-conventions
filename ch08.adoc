@@ -83,7 +83,7 @@ The metadata that define the interpolation formula and its inputs are complete, 
 
 The data variable coordinate interpolation attributes may also be used on a domain variable (<<domain-variables>>) with the same effect.
 
-[[compression-by-coordinate-tie-points, Section 8.3.1, "Tie Points and Interpolation Zones"]]
+[[compression-by-coordinate-sampling-tie-points, Section 8.3.1, "Tie Points and Interpolation Zones"]]
 ==== Tie Points and Interpolation Zones
 
 Reconstitution of the uncompressed coordinate and auxiliary coordinate variables is based on interpolation. To accomplish this, the target domain is segmented into smaller __interpolation zones__, for each of which the interpolation method is applied independently. For one dimensional interpolation, an interpolation zone is defined by two tie points, one at each end of the interpolation zone; for two-dimensional interpolation, an interpolation zone is defined by four tie points, one at each corner of a rectangular area aligned with the domain axes; etc. For the reconstitution of the uncompressed coordinate and auxiliary coordinate variables within an interpolation zone, the interpolation method is permitted to access the coordinates of the defining tie points, but not the coordinates of any other tie points.  
@@ -103,7 +103,7 @@ For each interpolation dimension, the number interpolation zones is equal to the
 .Process for generating the interpolation zones for a grid without discontinuities and for a grid with discontinuities.
 image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,align="center"] 
 
-[[compression-by-coordinate-tie-points-attribute, Section 8.3.2, "Tie Points Attribute"]]
+[[compression-by-coordinate-sampling-tie-points-attribute, Section 8.3.2, "Tie Points Attribute"]]
 ==== Tie Points Attribute
 
 To indicate that coordinate interpolation is required, a **`tie_points`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables **`lat`** and **`lon`** are to be interpolated according to the interpolation variable **`bi_linear`** could be indicated with **`lat: lon: bi_linear`**.
@@ -135,7 +135,7 @@ image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
 [[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
 ==== Tie Point Indices
 
-The relationship between a tie point interpolation dimension and its corresponding interpolation dimension is defined with a __tie point index variable__. This contains zero-based indices that relate each element of a tie point interpolation dimension to its related location in the corresponding interpolation dimension. The tie point index variable is a one-dimensional integer variable that must span the tie point interpolation dimension specified by the  **`tie_point_dimensions`** attribute. The values must be strictly monotonically increasing within interpolation areas, and two adjacent indices that are equal, or differ by one, indicates the location of an interpolation area boundary relating to an grid discontinuity (<<compression-by-coordinate-tie-points>>).
+The relationship between a tie point interpolation dimension and its corresponding interpolation dimension is defined with a __tie point index variable__. This contains zero-based indices that relate each element of a tie point interpolation dimension to its related location in the corresponding interpolation dimension. The tie point index variable is a one-dimensional integer variable that must span the tie point interpolation dimension specified by the  **`tie_point_dimensions`** attribute. The values must be strictly monotonically increasing within interpolation areas, and two adjacent indices that are equal, or differ by one, indicates the location of an interpolation area boundary relating to an grid discontinuity (<<compression-by-coordinate-sampling-tie-points>>).
 
 When tie point variables represent a subset of the uncompressed coordinates, each value of the tie point index variable is the index of the interpolation dimension that corresponds to the corresponding tie point interpolation dimension.
 
