@@ -24,7 +24,7 @@
 
 
 | 4
-| For each coordinate variable subset, identify the set of interpolation and the set of non-interpolation dimensions.
+| For each coordinate variable subset, identify the set of interpolation dimensions and the set of non-interpolation dimensions.
 | <<compression-by-coordinate-sampling-dimensions>>
 
 | 5
@@ -50,6 +50,54 @@
 | 10
 | Finally, if required by the selected interpolation method, follow the steps defined for the method in Appendix J to create any required interpolation coefficients variables and interpolation configuration variables. As relevant, create the  **`interpolation_coefficients`** and **`interpolation_configuration`** attributes and populate them with the interpolation coefficients variables and interpolation configuration variables respectively.
 | <<compression-by-coordinate-sampling-interpolation-variable>>
+
+|===============
+
+
+
+[[compression-by-coordinate-sampling-reconstitution-of-coordinates]]
+.Reconstitution of Coordinate and Auxillary Coordinate Variables
+[options="header",cols="1,16,6",caption="Table J.1. "]
+|===============
+| Step | Description | Link
+
+| 1
+| From the **`tie_points`** attribute of the data variable, identify the coordinate and auxillary coordinate variable subsets for which tie point interpolation is required.
+| <<compression-by-coordinate-sampling-tie-points-attribute>>
+
+| 2
+| For each coordinate variable subset, identify the set of dimension. Using the **`tie_point_dimensions`** attribute of the data variable, identify the set of interpolation dimensions and the set of non-interpolation dimensions.
+| <<compression-by-coordinate-sampling-dimensions>>
+
+<<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>
+
+| 3
+| From the **`tie_point_dimensions`** attribute of the data variable, identify for each of the interpolation dimensions the corresponding tie point interpolation dimension and, if defined, the corresponding interpolation zone dimension.
+| <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>
+
+| 4
+| From the tie point index variables referenced in the **`tie_point_indices`** attribute of the data variable, identify the location of the tie points in the corresponding interpolation dimension.
+| <<compression-by-coordinate-sampling-tie-point-indices>>
+
+| 5
+| For each of the interpolation dimensions, identify pairs of adjacent indices in the tie point index variable with index values differing by more than one, each index pair defining the extend of an interpolation zone in that dimension. A full interpolation zone is defined by one such index pair per interpolation dimension, with combinations of one index from each pair defining the interpolation zone tie points.
+| <<compression-by-coordinate-sampling-tie-points>>
+
+| 6
+| From the **`tie_points`** attribute of the data variable, identify the interpolation variable for the coordinate and auxillary coordinate variable subset. From the **`interpolation_name`** attribute of the interpolation variable, identify the interpolation method. 
+| <<compression-by-coordinate-sampling-interpolation-variable>>
+
+| 7
+| As required by the selected interpolation method, identify the interpolation coefficients variables and interpolation configuration variables from the interpolation variable **`interpolation_coefficients`** and **`interpolation_configuration`** attributes respectively.
+| <<compression-by-coordinate-sampling-interpolation-variable>>
+
+| 8
+| For each of the tie point coordinate and auxillary coordinate variables, create the corresponding target coordinate variable. For each interpolation zone, apply the interpolation method to reconstitute the target domain coordinate values and store these in the target domain coordinate variables. Repeat this step for each combination of indices of the non-interpolation dimensions.
+| <<compression-by-coordinate-sampling-tie-point-indices>>
+
+| 9
+| For each of the tie point coordinate and auxillary coordinate variables having a **`bounds`** attribute, add the **`bounds`** attribute to the target coordinate variable and create the target domain bounds variable. For each interpolation zone, apply the interpolation method to reconstitute the target domain bound values and store these in the target domain bound variables. Repeat this step for each combination of indices of the non-interpolation dimensions.
+| <<compression-by-coordinate-sampling-bounds>>
 
 |===============
 
