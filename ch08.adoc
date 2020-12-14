@@ -77,7 +77,7 @@ For some applications the coordinates of a data variable can require considerabl
 
 The lower resolution coordinates are called __tie points__ and are stored in __tie point variables__.
 
-In addition to the tie point variables themselves, metadata definging the coordinate interpolation method is stored in attributes of the data variable and of the associated __interpolation variable__. The partitioning of metadata between the data variable and the interpolation variable has been designed to minimise redundancy and maximise the reusability of the interpolation variable within a dataset.
+In addition to the tie point variables themselves, metadata defining the coordinate interpolation method is stored in attributes of the data variable and of the associated __interpolation variable__. The partitioning of metadata between the data variable and the interpolation variable has been designed to minimise redundancy and maximise the reusability of the interpolation variable within a dataset.
 
 The metadata that define the interpolation formula and its inputs are complete, so that the results of the coordinate reconstitution process are well defined and of a predictable accuracy.
 
@@ -86,11 +86,35 @@ The data variable coordinate interpolation attributes may also be used on a doma
 [[compression-by-coordinate-sampling-tie-points, Section 8.3.1, "Tie Points and Interpolation Zones"]]
 ==== Tie Points and Interpolation Zones
 
-Reconstitution of the uncompressed coordinate and auxiliary coordinate variables is based on interpolation. To accomplish this, the target domain is segmented into smaller __interpolation zones__, for each of which the interpolation method is applied independently. For one dimensional interpolation, an interpolation zone is defined by two tie points, one at each end of the interpolation zone; for two-dimensional interpolation, an interpolation zone is defined by four tie points, one at each corner of a rectangular area aligned with the domain axes; etc. For the reconstitution of the uncompressed coordinate and auxiliary coordinate variables within an interpolation zone, the interpolation method is permitted to access the coordinates of the defining tie points, but not the coordinates of any other tie points.  
+Reconstitution of the uncompressed coordinate and auxiliary coordinate
+variables is based on interpolation. To accomplish this, the target
+domain is segmented into smaller __interpolation zones__, for each of
+which the interpolation method is applied independently. For
+one-dimensional interpolation, an interpolation zone is defined by two
+tie points, one at each end of the interpolation zone; for
+two-dimensional interpolation, an interpolation zone is defined by
+four tie points, one at each corner of a rectangular area aligned with
+the domain axes; etc. For the reconstitution of the uncompressed
+coordinate and auxiliary coordinate variables within an interpolation
+zone, the interpolation method is permitted to access its defining tie
+points, but not the tie points of any other interpolation zone.
 
-Although the coordinate and auxiliary coordinate variables are stored in orthogonal multidimensional array representation, the actual coordinate values may contain discontinuities. A discontinuity could be an overlap or a gap in the coordinates, or a change in cell size or cell alignment. As an example, such discontinuities are common in remote sensing data and may be caused by combinations of the instrument scan motion, the motion of the sensor platform and changes in the instrument scan mode. In such cases the location of the discontinuities in the coordinate values can be based either on knowledge of how the data set was created, e.g. by a remote sensing instrument, or alternatively by inspection of the actual coordinates.
-
-As the interpolation methods rely on a certain regularity and continuity of the coordinate values within each interpolation zone, special attention must be given to the discontinuities in the process of defining the interpolation zones. When discontinuities are present, the grid is first divided into multiple __interpolation areas__, each of which is free of grid discontinuities. When no discontinuities are present, the whole grid is a single interpolation area. Following this step, each interpolation area is segmented into interpolation zones. The processes of generating interpolation zones for a grid without discontinuities and for a grid with discontinuities is illustrated in <<interpolation_zone_generation>>.
+As an interpolation method relies on the regularity and continuity of
+the coordinate values within each interpolation zone, special
+attention must be given to the case when uncompressed coordinates
+contain discontinuities. A discontinuity could be an overlap or a gap
+in the coordinates' coverage, or a change in cell size or cell
+alignment. As an example, such discontinuities are common in remote
+sensing data and may be caused by combinations of the instrument scan
+motion, the motion of the sensor platform and changes in the
+instrument scan mode. When discontinuities are present, the domain is
+first divided into multiple __interpolation areas__, each of which is
+free of discontinuities. When no discontinuities are present, the
+whole domain is a single interpolation area. Following this step, each
+interpolation area is segmented into interpolation zones. The
+processes of generating interpolation zones for a domain without
+discontinuities and for a domain with discontinuities is illustrated
+in <<interpolation_zone_generation>>.
 
 Within an interpolation area, interpolation zones must share tie points with neighbouring interpolation zones. Between interpolation areas, interpolation zones are not permitted to share tie points. This results in a different number of tie points in the two cases shown in <<interpolation_zone_generation>>.
 
