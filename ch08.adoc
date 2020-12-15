@@ -319,28 +319,28 @@ dimensions :
   zone_scan= 200 ;    // scan interpolation zone 
 
   // Time, stored at scan-start and scan-end of each scan
-  time_scan = 2;
+  tp_time_scan = 2;
 
 variables:
   // VIIRS M-Band 
   float m_radiance(m_track, m_scan, m_channel) ;
     m_radiance:tie_points = "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    m_radiance:tie_point_dimensions = "m_track: tp_track  zone_track  m_scan: tp_scan  zone_scan"  ;
-    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan:  m_scan_indices  time_scan: m_time_scan_indices" ;
+    m_radiance:tie_point_dimensions = "m_track: tp_track  zone_track  m_scan: tp_scan  zone_scan  m_scan: tp_time_scan"  ;
+    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan:  m_scan_indices  m_scan: m_time_scan_indices" ;
 
   // VIIRS I-Band 
   float i_radiance(i_track, i_scan, i_channel) ;
     i_radiance:tie_points = "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    m_radiance:tie_point_dimensions = "i_track: tp_track  zone_track  i_scan: tp_scan  zone_scan"  ;
-    i_radiance:tie_point_indices = "i_track: zone_track: i_track_indices  i_scan: zone_scan: i_scan_indices  time_scan: i_time_scan_indices" ;
+    i_radiance:tie_point_dimensions = "i_track: tp_track  zone_track  i_scan: tp_scan  zone_scan  i_scan: tp_time_scan"  ;
+    i_radiance:tie_point_indices = "i_track: zone_track: i_track_indices  i_scan: zone_scan: i_scan_indices  i_scan: i_time_scan_indices" ;
 
   // Tie point index variables
   int m_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
   int m_scan_indices(tp_scan) ;     
-  int m_time_scan_indices(time_scan) 
+  int m_time_scan_indices(tp_time_scan) 
   int i_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
   int i_scan_indices(tp_scan) ;     
-  int i_time_scan_indices(time_scan) 
+  int i_time_scan_indices(tp_time_scan) 
 
   // Tie points
   float m_lat(tp_track, tp_scan) ;
@@ -398,11 +398,11 @@ variables:
     interpolation_zone_flags : flag_meanings = "location_use_cartesian  sensor_direction_use_cartesian  solar_direction_use_cartesian" ;
 
   // Time tie points
-  double t(tp_track, time_scan) ;
+  double t(tp_track, tp_time_scan) ;
     t : long_name = "time" ;
     t : units = "days since 1990-1-1 0:0:0" ;
 
-  // Time interploation variable
+  // Time interpolation variable
   char time_interpolation ;
     time_interpolation : interpolation_name = "bi_linear" ;
 ----
