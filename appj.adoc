@@ -3,6 +3,8 @@
 [appendix]
 == Coordinate Sampling
 
+=== Steps for Generation of Tie Points
+
 
 [[compression-by-coordinate-sampling-generation-of-tie-points]]
 .Generation of Tie Point Variables and Interpolation Variables
@@ -54,6 +56,8 @@
 |===============
 
 
+=== Steps for Reconstitution of Coordinate and Auxillary Coordinate Variables
+
 
 [[compression-by-coordinate-sampling-reconstitution-of-coordinates]]
 .Reconstitution of Coordinate and Auxillary Coordinate Variables
@@ -100,37 +104,39 @@
 | <<compression-by-coordinate-sampling-bounds>>
 
 | 10
-| If auxiliary coordinate variables have been reconstituted, then add a **`coordinates`** attribute to the data variable, if not already present, and add to the attribute the list of the names of the reconstituted auxiliary coordinate variables.
+| If auxiliary coordinate variables have been reconstituted, then, if not already present, add a **`coordinates`** attribute to the data variable and add to the attribute the list of the names of the reconstituted auxiliary coordinate variables.
 | <<coordinate-system>>
-
 
 |===============
 
 
-Each recognized coordinate interpolation is described in one of the sections below.
-Each section contains: the valid name that is used with the
-**`tie_point`** attribute; 
 
+=== Interpolation Methods
 
+==== General definitions
 
-a list of the specific attributes
-that may be used to assign values to the mapping's parameters; the
-standard names used to identify the coordinate variables that contain
-the mapping's independent variables; and references to the mapping's
-definition or other information that may help in using the mapping.
-Since the attributes used to set a mapping's parameters may be shared
-among several mappings, their definitions are contained in a table in
-the final section.
-The attributes which describe the ellipsoid and prime meridian may be included, when applicable, with any grid mapping.
-These are:
+[[interpolation, figure J.1]]
+[.text-center]
+.Interpolation indices and interpolation parameter s
+image::images/ci_interpolation.svg[,100%,pdfwidth=50vw,align="center"] 
 
-- `earth_radius`
-- `inverse_flattening`
-- `longitude_of_prime_meridian`
-- `prime_meridian_name`
-- `reference_ellipsoid_name`
-- `semi_major_axis`
-- `semi_minor_axis`
+Two Tie Points, A and B, and a reconstituted point P, are shown in In he Figure J.1. The indices of A nd B in the tie point interpolation dimension are n and n+1 respectively. The corresponding indices in the interpolation dimension, i~A~ and i~B~, are stored in the tie point index variable, index(n) and index(n+1).
 
-We have used the FGDC "Content Standard for Digital Geospatial Metadata" <<FGDC>> as a guide in choosing the values for **`grid_mapping_name`** and the attribute names for the parameters describing map projections.
+A real number interpolation parameter s, running from 0.0 to 1.0 between tie point A and B, is introduced for the purpose of teh interpolation calculations. For the point P to be reconstituted, the interpolation parameter is 
+
+s~P~ = (i~P~ - i~A~)/(i~B~ - i~A~)
+
+The coordinate values at the tie points A and B are c~A~ and c~B~ and are stored in the tie point coordinate variables. For the   point P, the coordinate value can be reconstituted as c~P~ applying the selected interpolation method.  
+
+==== Linear
+
+[cols="6,15"]
+|===============
+| Name | **`interpolation_name = "linear"`** 
+| Description/Features | General purpose one dimensional linear interpolation 
+| Definition | c~P~ = (1 - s~P~) c~A~ + s~P~ c~B~
+| Interpolation Coefficients | None
+| Interpolation Configuration | None
+|===============
+
 
