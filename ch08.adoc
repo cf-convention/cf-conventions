@@ -114,7 +114,8 @@ whole domain is a single interpolation area. Following this step, each
 interpolation area is segmented into interpolation zones. The
 processes of generating interpolation zones for a domain without
 discontinuities and for a domain with discontinuities is illustrated
-in <<interpolation_zone_generation>>.
+in <<interpolation_zone_generation>>, and described in more detail in
+<<Appendix J>>.
 
 Within an interpolation area, interpolation zones must share tie points with neighbouring interpolation zones. Between interpolation areas, interpolation zones are not permitted to share tie points. This results in a different number of tie points in the two cases shown in <<interpolation_zone_generation>>.
 
@@ -155,6 +156,29 @@ Note that an interpolation zone dimension has, by definition, the same size as t
 [.text-center]
 .Overview of the different dimensions for coordinate interpolation.
 image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
+
+A single interpolation dimension may be associated with multiple tie
+point interpolation dimensions by repeating the interpolation
+dimension in the **`tie_point_dimensions`** attribute. For instance,
+interpolation dimension `dimension1` could be mapped to two different
+tie point interpolation dimensions with `dimension1: tp_dimension1
+dimension1: tp_dimension2`. This is necssary when different tie point
+variables for a particular interpolation dimension do not contain the
+same number of tie points, and therefore have different numbers of
+interpolation zones, as is the case in <<example VIRRS>>. A tie point
+variable must span at most one of the tie point interpolation
+dimensions associated with a given interpolation dimension. Since all
+tie point variables for a given interpolation variable must span the
+same set of dimensions (see
+<<compression-by-coordinate-sampling-dimensions>>), the tie point
+variables corresponding to a particular interpolation dimension
+spanning must be separately associated with the corresponding
+interpolation variable, even if that interpolation variable is the
+same in each case. For instance, if tie point variables `lat` and
+`lon` span dimension `tp_dimension1` and `time` spans dimension
+`tp_dimension2`, and all three are to interpolated according to
+interpolation variable `linear`, then the **`tie_points`** attribute
+could be `lat: lon: linear time: linear`.
 
 [[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
 ==== Tie Point Indices
