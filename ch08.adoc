@@ -184,7 +184,7 @@ linear time: linear`.
 [[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
 ==== Tie Point Indices
 
-The relationship between a tie point interpolation dimension and its corresponding interpolation dimension is defined with a __tie point index variable__. This contains zero-based indices that relate each element of a tie point interpolation dimension to its related location in the corresponding interpolation dimension. The tie point index variable is a one-dimensional integer variable that must span the tie point interpolation dimension specified by the  **`tie_point_dimensions`** attribute. The values must be strictly monotonically increasing within interpolation areas, and two adjacent indices that are equal, or differ by one, indicates the location of an interpolation area boundary relating to an grid discontinuity (<<compression-by-coordinate-sampling-tie-points>>).
+The relationship between a tie point interpolation dimension and its corresponding interpolation dimension is defined with a __tie point index variable__. This contains zero-based indices that relate each element of a tie point interpolation dimension to its related location in the corresponding interpolation dimension. The tie point index variable is a one-dimensional integer variable that must span the tie point interpolation dimension specified by the  **`tie_point_dimensions`** attribute. The values must be strictly monotonically increasing within interpolation areas, and two adjacent indices where the value of the second is the equal to the value of the first incremented by one, indicates the location of an interpolation area boundary relating to an grid discontinuity (<<compression-by-coordinate-sampling-tie-points>>).
 
 When tie point variables represent a subset of the uncompressed coordinates, each value of the tie point index variable is the index of the interpolation dimension that corresponds to the corresponding tie point interpolation dimension.
 
@@ -193,8 +193,6 @@ Conversely, when tie point variables represent a superset of the uncompressed co
 For instance, in example <<Two-dimensional-tie-point-interpolation>> the tie point variables represent a subset of the target domain and tie point index variable **`int x_indices(tp_xc)`** contains the indices **`x_indices = 0, 9, 19, 29`** that identify location of the interpolation dimension **`xc`** of size 30. However, in example <<??> the tie point index variables represent a superset of the target domain and so in this case the same indices are identifying locations of the tie point interpolation dimension.
 
 To indicate which tie point index variable applies to each interpolation dimension, a **`tie_point_indices`** attribute must be defined for the data variable. This is a string attribute that maps the interpolation dimensions to the corresponding tie point index variables. It is a blank-separated list of words of the form "__interpolation_dimension: tie_point_index_variable [interpolation_dimension: tie_point_index_variable ...]__". Continuing the above example, specifying that the target dimension **`xc`** and **`yc`** are associated with the tie point index variables **`x_indices`** and **`y_indices`** respectively, could be indicated with **`xc: x_indices yc: y_indices`**.
-
-The **`tie_point_indices`** attribute also serves to identify the corresponding tie point interpolation dimensions, as each tie point index variable spans a unique tie point interpolation dimension. In the example, interpolation dimension **`xc`** references tie point index variable **`x_indices`**, which in turn identifies tie point interpolation dimension **`tp_xc`**.
 
 [[Two-dimensional-tie-point-interpolation]]
 [caption="Example 8.3. "]
@@ -346,28 +344,28 @@ dimensions :
   zone_scan= 200 ;    // scan interpolation zone 
 
   // Time, stored at scan-start and scan-end of each scan
-  time_scan = 2;
+  tp_time_scan = 2;
 
 variables:
   // VIIRS M-Band 
   float m_radiance(m_track, m_scan, m_channel) ;
     m_radiance:tie_points = "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    m_radiance:tie_point_dimensions = "m_track: tp_track  zone_track  m_scan: tp_scan  zone_scan"  ;
-    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan:  m_scan_indices  time_scan: m_time_scan_indices" ;
+    m_radiance:tie_point_dimensions = "m_track: tp_track  zone_track  m_scan: tp_scan  zone_scan  m_scan: tp_time_scan"  ;
+    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan:  m_scan_indices  m_scan: m_time_scan_indices" ;
 
   // VIIRS I-Band 
   float i_radiance(i_track, i_scan, i_channel) ;
     i_radiance:tie_points = "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    m_radiance:tie_point_dimensions = "i_track: tp_track  zone_track  i_scan: tp_scan  zone_scan"  ;
-    i_radiance:tie_point_indices = "i_track: zone_track: i_track_indices  i_scan: zone_scan: i_scan_indices  time_scan: i_time_scan_indices" ;
+    i_radiance:tie_point_dimensions = "i_track: tp_track  zone_track  i_scan: tp_scan  zone_scan  i_scan: tp_time_scan"  ;
+    i_radiance:tie_point_indices = "i_track: zone_track: i_track_indices  i_scan: zone_scan: i_scan_indices  i_scan: i_time_scan_indices" ;
 
   // Tie point index variables
   int m_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
   int m_scan_indices(tp_scan) ;     
-  int m_time_scan_indices(time_scan) 
+  int m_time_scan_indices(tp_time_scan) 
   int i_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
   int i_scan_indices(tp_scan) ;     
-  int i_time_scan_indices(time_scan) 
+  int i_time_scan_indices(tp_time_scan) 
 
   // Tie points
   float m_lat(tp_track, tp_scan) ;
@@ -425,11 +423,11 @@ variables:
     interpolation_zone_flags : flag_meanings = "location_use_cartesian  sensor_direction_use_cartesian  solar_direction_use_cartesian" ;
 
   // Time tie points
-  double t(tp_track, time_scan) ;
+  double t(tp_track, tp_time_scan) ;
     t : long_name = "time" ;
     t : units = "days since 1990-1-1 0:0:0" ;
 
-  // Time interploation variable
+  // Time interpolation variable
   char time_interpolation ;
     time_interpolation : interpolation_name = "bi_linear" ;
 ----
