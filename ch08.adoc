@@ -184,18 +184,7 @@ linear time: linear`.
 [[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
 ==== Tie Point Indices
 
-The relationship between a tie point interpolation dimension and its
-corresponding interpolation dimension is defined with a __tie point
-index variable__. This contains zero-based indices that relate each
-element of a tie point interpolation dimension to its related location
-in the corresponding interpolation dimension. The tie point index
-variable is a one-dimensional integer variable that must span the tie
-point interpolation dimension specified by the
-**`tie_point_dimensions`** attribute. The values must be strictly
-monotonically increasing within interpolation areas. When two adjacent
-values are equal, or differ by one, it indicates the location (in
-index space) of an interpolation area boundary relating to an grid
-discontinuity (<<compression-by-coordinate-sampling-tie-points>>).
+The relationship between a tie point interpolation dimension and its corresponding interpolation dimension is defined with a __tie point index variable__. This contains zero-based indices that relate each element of a tie point interpolation dimension to its related location in the corresponding interpolation dimension. The tie point index variable is a one-dimensional integer variable that must span the tie point interpolation dimension specified by the **`tie_point_dimensions`** attribute. The values must be strictly monotonically increasing within interpolation areas. When two adjacent values are equal, or differ by one, it indicates the location (in index space) of an interpolation area boundary relating to an grid discontinuity (<<compression-by-coordinate-sampling-tie-points>>).
 
 When tie point variables represent a subset of the uncompressed coordinates, each value of the tie point index variable is the index of the interpolation dimension that corresponds to the corresponding tie point interpolation dimension.
 
@@ -300,19 +289,7 @@ If a standardized interpolation name is not given, the interpolation variable mu
 
 The definition of the interpolation method, however it is specified, may include instructions to treat groups of physically related coordinates simultaneously, if such tie points are present. For example, there are cases where longitudes cannot be interpolated without considering the corresponding latitudes. It is up to the interpolation description to describe how such coordinates are to be identified (e.g. it may be that such tie point variables require particular units or standard names).
 
-An interpolation method may require __interpolation coefficient
-variables__ that provide values for interpolation equation terms that
-are not satisfied by the tie points. Such terms in the interpolation
-equations are associated with interpolation coefficient variables by
-the **`interpolation_coefficients`** attribute that takes a string
-value, the string being comprised of blank-separated elements of the
-form `"term: variable"`, where `term` is a case-insensitive keyword
-that defines one of the terms in the interpolation method's
-definition, and `variable` is the name of the interpolation
-coefficient variable that contains the values for that term. The order
-of elements is not significant. A term that is omitted from the
-**`interpolation_coefficients`** attribute should be assumed to be
-zero.
+An interpolation method may require __interpolation coefficient variables__ that provide values for interpolation equation terms that are not satisfied by the tie points. Such terms in the interpolation equations are associated with interpolation coefficient variables by the **`interpolation_coefficients`** attribute that takes a string value, the string being comprised of blank-separated elements of the form `"term: variable"`, where `term` is a case-insensitive keyword that defines one of the terms in the interpolation method's definition, and `variable` is the name of the interpolation coefficient variable that contains the values for that term. The order of elements is not significant. A term that is omitted from the **`interpolation_coefficients`** attribute should be assumed to be zero.
 
 The interpolation variable attribute **`interpolation_configuration`** may be used to configure the interpolation process. This attribute names other __interpolation configuration variables__ that contain parameters needed to correctly configure the interpolation process. The **`interpolation_configuration`** attribute takes a string value, the string being comprised of blank-separated elements of the form `"item: variable"`, where `item` is a case-insensitive keyword that identies a configuration item defined in the interpolations method's definition, and `variable` is the name of the interpolation configuration variable that contains the values for that item. The order of elements is not significant.
 
@@ -339,25 +316,9 @@ image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="cente
 [[compression-by-coordinate-sampling-bounds, Section 8.3.6, "Interpolation of Tie Point Bounds"]]
 ==== Interpolation of Tie Point Bounds
 
-If reconstituted coordinates have cell boundaries, then the
-corresponding tie point variable must also have cell boundaries,
-specified by the **`bounds`** attribute that names the variable that
-contains the vertices of the cell boundaries. The bounds of a tie
-point must be the same as the bounds of the corresponding target grid
-cells. It is thereforefore likely that tie point cells will be
-non-contiguous.
+If reconstituted coordinates have cell boundaries, then the corresponding tie point variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. The bounds of a tie point must be the same as the bounds of the corresponding target grid cells. It is thereforefore likely that tie point cells will be non-contiguous.
 
-The target domain cell bounds are calculated by interpolating each
-cell bound position independently of the others, using the same
-interpolation method and tie point index variables as used for the
-cell coordinates. In this case, though, the tie point index variables
-are the indentifying target domain cells to which the bounds apply,
-rather than bounds values themselves. For instance, in the case of a
-two-dimensionsal tie point variable with four-sided cells, the target
-domain cell bounds would be calculated with four separate
-interpolations, one for each of the bounds positions (following the
-notation of <<cell-boundaries>>) `(j-1,i-1)`, `(j-1,i+1)`,
-`(j+1,i+1)`, `(j+1,i-1)`.
+The target domain cell bounds are calculated by interpolating each cell bound position independently of the others, using the same interpolation method and tie point index variables as used for the cell coordinates. In this case, though, the tie point index variables are the indentifying target domain cells to which the bounds apply, rather than bounds values themselves. For instance, in the case of a two-dimensionsal tie point variable with four-sided cells, the target domain cell bounds would be calculated with four separate interpolations, one for each of the bounds positions (following the notation of <<cell-boundaries>>) `(j-1,i-1)`, `(j-1,i+1)`, `(j+1,i+1)`, `(j+1,i-1)`.
 
 Note that an implementation of the interpolation method is free to calculate the uncompressed bounds locations in the manner of its choosing, as a long as the result is formally equivalent to each bounds position being treated independently.
 
