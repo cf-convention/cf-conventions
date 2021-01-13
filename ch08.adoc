@@ -73,7 +73,7 @@ This information implies that the salinity field should be uncompressed to an ar
 [[compression-by-coordinate-sampling, Section 8.3, "Lossy Compression by Coordinate Sampling"]]
 === Lossy Compression by Coordinate Sampling
 
-For some applications the coordinates of a data variable can require considerably more storage than the data itself. Space may be saved in the netCDF file by the storing coordinates at a lower resolution than the data which they describe. The uncompressed coordinate and auxiliary coordinate variables can be reconstituted by interpolation, from the lower resolution coordinate values to the domain of the data (i.e. the target domain). This process will likely result in a loss in accuracy (as opposed to precision) in the uncompressed variables, due to rounding and approximation errors in the interpolation calculations, but it is assumed that these errors will be small enough to not be of concern to users of the uncompressed dataset. The creator of the compressed data set can control the accuracy of the reconstituted coordinates through the degree of subsambling and the choice of interploation method, see <<Appendix J>>.
+For some applications the coordinates of a data variable can require considerably more storage than the data itself. Space may be saved in the netCDF file by the storing coordinates at a lower resolution than the data which they describe. The uncompressed coordinate and auxiliary coordinate variables can be reconstituted by interpolation, from the lower resolution coordinate values to the domain of the data (i.e. the target domain). This process will likely result in a loss in accuracy (as opposed to precision) in the uncompressed variables, due to rounding and approximation errors in the interpolation calculations, but it is assumed that these errors will be small enough to not be of concern to users of the uncompressed dataset. The creator of the compressed dataset can control the accuracy of the reconstituted coordinates through the degree of subsambling and the choice of interpolation method, see <<Appendix J>>.
 
 The lower resolution coordinates are called __tie points__ and are stored in __tie point variables__.
 
@@ -131,21 +131,21 @@ image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,a
 [[compression-by-coordinate-sampling-tie-points-attribute, Section 8.3.2, "Tie Points Attribute"]]
 ==== Tie Points Attribute
 
-To indicate that coordinate interpolation is required, a **`tie_points`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables **`lat`** and **`lon`** are to be interpolated according to the interpolation variable **`bi_linear`** could be indicated with **`lat: lon: bi_linear`**.
+To indicate that coordinate interpolation is required, a **`tie_points`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables `lat` and `lon` are to be interpolated according to the interpolation variable `bi_linear` could be indicated with `lat: lon: bi_linear`.
 
 [[compression-by-coordinate-sampling-dimensions,Section 8.3.3, "Interpolation and Non-Interpolation Dimensions"]]
 ==== Interpolation and Non-Interpolation Dimensions
 
 For each interpolation variable identified in the **`tie_points`** attribute, all corresponding tie point variables must share the same set of one or more dimensions. This set of dimensions must contain at least one __tie point interpolation dimension__ that corresponds to an __interpolation dimension__, i.e. a target domain dimension for which coordinate interpolation is required; and may additionally contain one or more __non-interpolation dimensions__, i.e. those of the target domain for which no coordinate interpolation is required. The size of a tie point interpolation dimension must be less than or equal to the size of its corresponding interpolation dimension. 
 
-An interpolation dimension typically differs in size from the corresponding tie point interpolation dimension. For example, if the target domain dimensions are **`xc = 30`** and **`yc = 10`**,  interpolation could be applied in both of these dimensions, based on tie point variables of the dimensions **`tp_xc = 4`** and **`tp_yc = 2`**. Here, **`tp_xc`** is the tie point interpolation dimension related to the interpolation dimension **`xc`**, and **`tp_yc`** is the tie point interpolation dimension related to the interpolation dimension **`yc`**.
+An interpolation dimension typically differs in size from the corresponding tie point interpolation dimension. For example, if the target domain dimensions are `xc = 30` and `yc = 10`,  interpolation could be applied in both of these dimensions, based on tie point variables of the dimensions `tp_xc = 4` and `tp_yc = 2`. Here, `tp_xc` is the tie point interpolation dimension related to the interpolation dimension `xc`, and `tp_yc` is the tie point interpolation dimension related to the interpolation dimension `yc`.
 
-The presence of non-interpolation dimensions in the tie point variable impacts the interpolation process in that there must be a separate application of the interpolation method for each combination of indices of the non-interpolation dimensions. For example, if the target domain dimensions are **`xc = 30`** and **`yc = 10`**, interpolation could be applied in the **`xc`** dimension only, based on tie point variables of the dimensions **`tp_xc = 4`** and **`yc = 10`**. The interpolation in the **`xc`** dimension would then be repeated for each of the 10 indices of the **`yc`** dimension.
+The presence of non-interpolation dimensions in the tie point variable impacts the interpolation process in that there must be a separate application of the interpolation method for each combination of indices of the non-interpolation dimensions. For example, if the target domain dimensions are `xc = 30` and `yc = 10`, interpolation could be applied in the `xc` dimension only, based on tie point variables of the dimensions `tp_xc = 4` and `yc = 10`. The interpolation in the `xc` dimension would then be repeated for each of the 10 indices of the `yc` dimension.
 
 [[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.4, "Tie Point Dimensions Attribute"]]
 ==== Tie Point Dimensions Attribute
 
-Each interpolation dimension must be associated with its corresponding tie point interpolation dimension and, if required, its corresponding __interpolation zone dimension__ that defines the number of interpolation zones which partition the interpolation dimension. Regardless of its size, an interpolation zone dimension is only required if it is spanned by one or more interpolation coefficients or configuation variables, as described in <<compression-by-coordinate-sampling-interpolation-variable>>. The association is stored in the data variable's **`tie_point_dimensions`** attribute that contains a blank-separated list of words of the form __"interpolation_dimension: tie_point_interpolation_dimension [interpolation_zone_dimension] [interpolation_dimension: ...]"__. If an interpolation zone dimension is provided then it must be the second of the two named dimensions following the interpolation dimension.
+Each interpolation dimension must be associated with its corresponding tie point interpolation dimension and, if required, its corresponding __interpolation zone dimension__ that defines the number of interpolation zones which partition the interpolation dimension. Regardless of its size, an interpolation zone dimension is only required if it is spanned by one or more interpolation coefficients or configuration variables, as described in <<compression-by-coordinate-sampling-interpolation-variable>>. The association is stored in the data variable's **`tie_point_dimensions`** attribute that contains a blank-separated list of words of the form __"interpolation_dimension: tie_point_interpolation_dimension [interpolation_zone_dimension] [interpolation_dimension: ...]"__. If an interpolation zone dimension is provided then it must be the second of the two named dimensions following the interpolation dimension.
 
 An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
 
@@ -163,61 +163,61 @@ point interpolation dimensions by repeating the interpolation
 dimension in the **`tie_point_dimensions`** attribute. For instance,
 interpolation dimension `dimension1` could be mapped to two different
 tie point interpolation dimensions with `dimension1: tp_dimension1
-dimension1: tp_dimension2`. This is necssary when different tie point
+dimension1: tp_dimension2`. This is necessary when different tie point
 variables for a particular interpolation dimension do not contain the
 same number of tie points, and therefore define different numbers of
-interpolation zones, as is the case in <<example VIRRS>>. A tie point
+interpolation zones, as is the case in <<example-VIIRS>>. A tie point
 variable must span at most one of the tie point interpolation
-dimensions associated with a given interpolation dimension. 
+dimensions associated with a given interpolation dimension.
 
-The same interpolation variable may be multiply mapped from the 
-different sets of tie point variables. For instance, if tie point 
-variables lat and lon span dimension **`tp_dimension1`** and time spans 
-dimension **`tp_dimension2`**, and all three are to interpolated according 
-to interpolation variable linear, then the **`tie_points`** attribute could 
-be **`lat: lon: linear time: linear`**. In this case is not possible to
-simultaneously map all three tie point variables to the linear 
+The same interpolation variable may be multiply mapped from the
+different sets of tie point variables. For instance, if tie point
+variables lat and lon span dimension `tp_dimension1` and time spans
+dimension `tp_dimension2`, and all three are to interpolated according
+to interpolation variable linear, then the **`tie_points`** attribute
+could be `lat: lon: linear time: linear`. In this case is not possible
+to simultaneously map all three tie point variables to the linear
 interpolation variable because they do not all span the same axes.
 
 [[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
 ==== Tie Point Indices
 
-The relationship between a tie point interpolation dimension and its 
-corresponding interpolation dimension is defined with a __tie point 
-index variable__. This contains zero-based indices that relate each 
-element of a tie point interpolation dimension to its related 
-location in the corresponding interpolation dimension. The tie point 
-index variable is a one-dimensional integer variable that must span 
-the tie point interpolation dimension specified by the 
-**`tie_point_dimensions`** attribute. The values must be strictly 
-monotonically increasing within interpolation areas. When two adjacent 
-values are equal, or differ by one, it indicates the location 
-(in index space) of an interpolation area boundary relating to a 
-grid discontinuity (<<compression-by-coordinate-sampling-tie-points>>).
+The relationship between a tie point interpolation dimension and its
+corresponding interpolation dimension is defined with a __tie point
+index variable__. This contains zero-based indices that relate each
+element of a tie point interpolation dimension to its related location
+in the corresponding interpolation dimension. The tie point index
+variable is a one-dimensional integer variable that must span the tie
+point interpolation dimension specified by the
+**`tie_point_dimensions`** attribute. The values must be strictly
+monotonically increasing within interpolation areas. When two adjacent
+values are equal, or differ by one, it indicates the location (in
+index space) of an interpolation area boundary relating to a grid
+discontinuity (<<compression-by-coordinate-sampling-tie-points>>).
 
 Each value of the tie point index variable is the index of the 
 interpolation dimension that corresponds to the corresponding 
 tie point interpolation dimension.
 
-For instance, in example <<Two-dimensional-tie-point-interpolation>> 
-the tie point variables represent a subset of the target domain 
-and the tie point index variable **`int x_indices(tp_xc)`** contains 
-the indices **`x_indices = 0, 9, 19, 29`** that identify the location 
-in the interpolation dimension **`xc`** of size 30.
+For instance, in example <<example-Two-dimensional-tie-point-interpolation>>
+the tie point variables represent a subset of the target domain and
+the tie point index variable `int x_indices(tp_xc)` contains the
+indices `x_indices = 0, 9, 19, 29` that identify the location in the
+interpolation dimension `xc` of size 30.
 
-To indicate which tie point index variable applies to each 
-interpolation dimension, a **`tie_point_indices`** attribute must 
-be defined for the data variable. This is a string attribute that 
-maps the interpolation dimensions to the corresponding tie point 
-index variables. It is a blank-separated list of words of the form 
-"__interpolation_dimension: tie_point_index_variable 
-[interpolation_dimension: tie_point_index_variable ...]__". 
-Continuing the above example, specifying that the target dimension 
-**`xc`** and **`yc`** are associated with the tie point index 
-variables **`x_indices`** and **`y_indices`** respectively, could 
-be indicated with **`xc: x_indices yc: y_indices`**.
+To indicate which tie point index variable applies to each
+interpolation dimension, a **`tie_point_indices`** attribute must be
+defined for the data variable. This is a string attribute that maps
+the interpolation dimensions to the corresponding tie point index
+variables. It is a blank-separated list of words of the form
+"__interpolation_dimension: tie_point_index_variable
+[interpolation_dimension: tie_point_index_variable ...]__".
+Continuing the above example, specifying that the target dimension
+`xc` and `yc` are associated with the tie point index variables
+`x_indices` and `y_indices` respectively, could be indicated with `xc:
+x_indices yc: y_indices`.
 
-[[Two-dimensional-tie-point-interpolation]]
+[[example-Two-dimensional-tie-point-interpolation]]
 [caption="Example 8.3. "]
 .Two-dimensional tie point interpolation
 ====
@@ -260,6 +260,7 @@ data:
 ----
 ====
 
+[[example-1d-interpolation-of-2d-domain]]
 [caption="Example 8.4. "]
 .One-dimensional tie point interpolation of two-dimensional domain.
 ====
@@ -314,39 +315,41 @@ The definition of the interpolation method, however it is specified, may include
 
 An interpolation method may require __interpolation coefficient variables__ that provide values for interpolation equation terms that are not satisfied by the tie points. Such terms in the interpolation equations are associated with interpolation coefficient variables by the **`interpolation_coefficients`** attribute that takes a string value, the string being comprised of blank-separated elements of the form `"term: variable"`, where `term` is a case-insensitive keyword that defines one of the terms in the interpolation method's definition, and `variable` is the name of the interpolation coefficient variable that contains the values for that term. The order of elements is not significant. A term that is omitted from the **`interpolation_coefficients`** attribute should be assumed to be zero.
 
-The interpolation variable attribute **`interpolation_configuration`** may be used to configure the interpolation process. This attribute names other __interpolation configuration variables__ that contain parameters needed to correctly configure the interpolation process. The **`interpolation_configuration`** attribute takes a string value, the string being comprised of blank-separated elements of the form `"item: variable"`, where `item` is a case-insensitive keyword that identies a configuration item defined in the interpolations method's definition, and `variable` is the name of the interpolation configuration variable that contains the values for that item. The order of elements is not significant.
+The interpolation variable attribute **`interpolation_configuration`** may be used to configure the interpolation process. This attribute names other __interpolation configuration variables__ that contain parameters needed to correctly configure the interpolation process. The **`interpolation_configuration`** attribute takes a string value, the string being comprised of blank-separated elements of the form `"item: variable"`, where `item` is a case-insensitive keyword that identifies a configuration item defined in the interpolations method's definition, and `variable` is the name of the interpolation configuration variable that contains the values for that item. The order of elements is not significant.
 
 The **`interpolation_coefficient`** and **`interpolation_configuration`** attributes may only be provided if allowed by the definition of the interpolation method.
 
 The variables named by the **`interpolation_coefficients`** and **`interpolation_configuration`** attributes must either be scalar, or else their dimensions may include, for each interpolation dimension, either the corresponding tie point interpolation dimension or the corresponding interpolation zone dimension, but not both, and may include any of the non-interpolation dimensions.
 
-The interpretation of interpolation coefficent and configuration variables depends on the nature of the dimensions that they span:
+The interpretation of interpolation coefficient and configuration variables depends on the nature of the dimensions that they span:
 
 * If no tie point interpolation dimensions are spanned, then the variable provides a value for every interpolation zone. This case is akin to values being defined at the centre of interpolation zones.
   
 * If at least one dimension is a tie point interpolation dimension, then each of the variable's values is to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary (<<ci_interpolation_coefficients>>).
 
-In both cases, the implementation of the interpolation method should broadcast an interpolation coefficent or configuration variable along any interpolation zone dimensions that it does not span.
+In both cases, the implementation of the interpolation method should broadcast an interpolation coefficient or configuration variable along any interpolation zone dimensions that it does not span.
 
 Note that the interpolation method is always applied on a per interpolation zone basis, for which the construction of the uncompressed coordinates may only access the tie point that define the extent of the of the interpolation zone, as well as any interpolation coefficient and configuration variables defined for the interpolation zone, including its boundaries.
 
 [[ci_interpolation_coefficients, figure 3]]
 [.text-center]
-.Through combination of dimensions, interpolation coefficient and interpolation configuration variables may provide values for each interpolation zone, for couples of neighboring interpolation zones or for multiple interpolation zones sharing a boundary.
+.Through combination of dimensions, interpolation coefficient and interpolation configuration variables may provide values for each interpolation zone, for couples of neighbouring interpolation zones or for multiple interpolation zones sharing a boundary.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
 [[compression-by-coordinate-sampling-bounds, Section 8.3.6, "Interpolation of Tie Point Bounds"]]
 ==== Interpolation of Tie Point Bounds
 
-If reconstituted coordinates have cell boundaries, then the corresponding tie point variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. The bounds of a tie point must be the same as the bounds of the corresponding target grid cells. It is thereforefore likely that tie point cells will be non-contiguous.
+If reconstituted coordinates have cell boundaries, then the corresponding tie point variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. The bounds of a tie point must be the same as the bounds of the corresponding target grid cells. It is therefore likely that tie point cells will be non-contiguous.
 
-The target domain cell bounds are calculated by interpolating each cell bound position independently of the others, using the same interpolation method and tie point index variables as used for the cell coordinates. In this case, though, the tie point index variables are the indentifying target domain cells to which the bounds apply, rather than bounds values themselves. For instance, in the case of a two-dimensionsal tie point variable with four-sided cells, the target domain cell bounds would be calculated with four separate interpolations, one for each of the bounds positions (following the notation of <<cell-boundaries>>) `(j-1,i-1)`, `(j-1,i+1)`, `(j+1,i+1)`, `(j+1,i-1)`.
+The target domain cell bounds are calculated by interpolating each cell bound position independently of the others, using the same interpolation method and tie point index variables as used for the cell coordinates. In this case, though, the tie point index variables are the identifying target domain cells to which the bounds apply, rather than bounds values themselves. For instance, in the case of a two-dimensional tie point variable with four-sided cells, the target domain cell bounds would be calculated with four separate interpolations, one for each of the bounds positions (following the notation of <<cell-boundaries>>) `(j-1,i-1)`, `(j-1,i+1)`, `(j+1,i+1)`, `(j+1,i-1)`.
 
 Note that an implementation of the interpolation method is free to calculate the uncompressed bounds locations in the manner of its choosing, as a long as the result is formally equivalent to each bounds position being treated independently.
 
+[[example-VIIRS]]
 [caption="Example 8.5. "]
-.Example demonstrating the use of multiple interpolation variables, the reusability of the interpolation variable between data variables of different dimensions and the use of the interpolation coefficients and interpolation configuration attributes.
+.Multiple interpolation variables with interpolation coefficients and
+configuration attributes.
 ====
 ----
 dimensions :
@@ -454,10 +457,17 @@ variables:
   char time_interpolation ;
     time_interpolation : interpolation_name = "bi_linear" ;
 ----
+
+This example demonstrates the use of multiple interpolation variables,
+the reusability of the interpolation variable between data variables
+of different dimensions and the use of the interpolation coefficients
+and interpolation configuration attributes.
+
 ====
 
+[[example-grid-mapping-and-interpolation-with-time-not-interpolated]]
 [caption="Example 8.6. "]
-.Example demonstrating the combination of grid mapping and coordinate interpolation with time as a non-interpolation dimension. The projection coordinates are 2-D, but are only linearly interpolated in one of their dimensions - the one which is given by the tie_point_indices attribute.
+.Combining a grid mapping and coordinate interpolation, with time as a non-interpolation dimension.
 ====
 ----
 dimensions:
@@ -515,5 +525,10 @@ variables:
     Temperature:tie_points = "lat: lon: spherical_bilinear y: x: linear" ;
     Temperature:tie_point_indices = "y: y_indices x: x_indices" ;
 ----
+
+In this the projection coordinates are two-dimensional, but are only
+linearly interpolated in one of their dimensions - the one which is
+given by the **`tie_point_indices`** attribute.
+
 ====
 
