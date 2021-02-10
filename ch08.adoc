@@ -314,23 +314,56 @@ If a standardized interpolation name is not given, the interpolation variable mu
 
 The definition of the interpolation method, however it is specified, may include instructions to treat groups of physically related coordinates simultaneously, if such tie points are present. For example, there are cases where longitudes cannot be interpolated without considering the corresponding latitudes. It is up to the interpolation description to describe how such coordinates are to be identified (e.g. it may be that such tie point variables require particular units or standard names).
 
-An interpolation method may require __interpolation coefficient variables__ that provide values for interpolation equation terms that are not satisfied by the tie points. Such terms in the interpolation equations are associated with interpolation coefficient variables by the **`interpolation_coefficients`** attribute that takes a string value, the string being comprised of blank-separated elements of the form `"term: variable"`, where `term` is a case-insensitive keyword that defines one of the terms in the interpolation method's definition, and `variable` is the name of the interpolation coefficient variable that contains the values for that term. The order of elements is not significant. A term that is omitted from the **`interpolation_coefficients`** attribute should be assumed to be zero.
+The interpolation variable attribute **`interpolation_parameters`**
+may be used to provide extra information to the interpolation
+process. This attribute names __interpolation parameter variables__
+that provide values for coefficent terms in the interpolation
+equation, or for non-equation terms that configure the interpolation
+process. The **`interpolation_parameters`** attribute takes a string
+value, the string being comprised of blank-separated elements of the
+form `"term: variable"`, where `term` is a case-insensitive keyword
+that defines one of the terms in the interpolation method's definition
+given in <<Appendix J>>, and `variable` is the name of the
+interpolation parameter variable that contains the values for that
+term. The order of elements is not significant. A numerical term that
+is omitted from the **`interpolation_parameters`** attribute should be
+assumed to be zero.
 
-The interpolation variable attribute **`interpolation_configuration`** may be used to configure the interpolation process. This attribute names other __interpolation configuration variables__ that contain parameters needed to correctly configure the interpolation process. The **`interpolation_configuration`** attribute takes a string value, the string being comprised of blank-separated elements of the form `"item: variable"`, where `item` is a case-insensitive keyword that identifies a configuration item defined in the interpolations method's definition, and `variable` is the name of the interpolation configuration variable that contains the values for that item. The order of elements is not significant.
+The **`interpolation_parameters`** attribute may only be provided if
+allowed by the definition of the interpolation method.
 
-The **`interpolation_coefficient`** and **`interpolation_configuration`** attributes may only be provided if allowed by the definition of the interpolation method.
+The variables named by the **`interpolation_parameters`** attribute
+must either be scalar, or else their dimensions may include, for each
+interpolation dimension, either the corresponding tie point
+interpolation dimension or the corresponding interpolation zone
+dimension, but not both, and may include any of the non-interpolation
+dimensions.
 
-The variables named by the **`interpolation_coefficients`** and **`interpolation_configuration`** attributes must either be scalar, or else their dimensions may include, for each interpolation dimension, either the corresponding tie point interpolation dimension or the corresponding interpolation zone dimension, but not both, and may include any of the non-interpolation dimensions.
+The interpretation of interpolation coefficient and configuration
+variables depends on the nature of the dimensions that they span:
 
-The interpretation of interpolation coefficient and configuration variables depends on the nature of the dimensions that they span:
-
-* If no tie point interpolation dimensions are spanned, then the variable provides a value for every interpolation zone. This case is akin to values being defined at the centre of interpolation zones.
+* If no tie point interpolation dimensions are spanned, then the
+  variable provides values for every interpolation zone. This case is
+  akin to values being defined at the centre of interpolation zones.
   
-* If at least one dimension is a tie point interpolation dimension, then each of the variable's values is to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary (<<ci_interpolation_coefficients>>).
+* If at least one dimension is a tie point interpolation dimension,
+  then the variable's values are to be shared by the interpolation
+  zones that are adjacent along each of the specified tie point
+  interpolation dimensions. This case is akin to the values being
+  defined at interpolation zone boundaries, and therefore equally
+  applicable to the interpolation zones that share that boundary
+  (<<ci_interpolation_coefficients>>).
 
-In both cases, the implementation of the interpolation method should broadcast an interpolation coefficient or configuration variable along any interpolation zone dimensions that it does not span.
+In both cases, the implementation of the interpolation method should
+broadcast an interpolation coefficient or configuration variable along
+any interpolation zone dimensions that it does not span.
 
-Note that the interpolation method is always applied on a per interpolation zone basis, for which the construction of the uncompressed coordinates may only access the tie point that define the extent of the of the interpolation zone, as well as any interpolation coefficient and configuration variables defined for the interpolation zone, including its boundaries.
+Note that the interpolation method is always applied on a per
+interpolation zone basis, for which the construction of the
+uncompressed coordinates may only access the tie point that define the
+extent of the of the interpolation zone, as well as any interpolation
+coefficient and configuration variables defined for the interpolation
+zone, including its boundaries.
 
 [[ci_interpolation_coefficients, figure 3]]
 [.text-center]
