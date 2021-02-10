@@ -1,10 +1,255 @@
-
 [[appendix-coordinate-sampling, Appendix J, Coordinate Sampling]] 
 [appendix]
 == Coordinate Sampling
 
-=== Steps for Generation of Tie Points
+The definitions and guidance given here allow an application to compress an existing data set using coordinate sampling, while letting the creator of the compressed dataset control the accuracy of the reconstituted coordinates through the degree of subsambling and the choice of interpolation method.
 
+Futhermore, the definitions given here allow an application to uncompress coordinate and auxiliary coordinate variables that have been compressed using coordinate sampling. The key element of this process is the reconstitution of the full resolution coordinates in the domain of the data by interpolation between the lower resolution coordinates, the tie points, stored in the compressed dataset.
+
+=== Common Definitions and Notation
+
+The target domain is segmented into smaller interpolation zones as described in <<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>.
+
+For one-dimensional interpolation, an interpolation zone is defined by two tie points, one at each end of the interpolation zone; for two-dimensional interpolation, an interpolation zone is defined by four tie points, one at each corner of a rectangular area aligned with the domain axes; etc. Examples of one-dimensional and two-dimensional interpolation zones are shown in <<interpolation>>.
+
+
+[[interpolation, figure 1]]
+[.text-center]
+.Tie Points A, B, C and D, interpolation indices i, interpolation variables s and coordinate values c for one and two dimensional interpolation.
+image::images/ci_interpolation.svg[,100%,pdfwidth=50vw,align="center"] 
+
+
+The coordinate interpolation methods are named to indicate the number of dimensions they interpolate as well as the type of interpolation provided. For example, the interpolation method named `linear` provides linear interpolation in one dimension and the method named `bi_linear` provides linear interpolation in two dimensions. Equivalently, the interpolation method named `quadratic` provides quadratic interpolation in one dimension and the interpolation method named `bi_quadratic` provides quadratic interpolation in two dimensions.
+
+When an interpolation method is referred to as linear or quadratic, it means that the method is linear or quadratic in the indices of the interpolation dimensions. 
+
+For convenience, an interpolation variable `s` is introduced, calculated as a function of the index in the target domain of the coordinate value to be reconstituted. In the case of one dimensional interpolation the interpolation variable is computed as 
+
+`s = s(i) = (i - ia)/(ib - ia)`
+
+where `ia` and `ib` are the indices in the target domain of the tie points `A` and `B` and `i` is the index in the target domain of the coordinate value to be reconstituted. 
+
+Note that the value of `s` varies from `0.0` at the tie point `A` to `1.0` at tie point `B`. For example, if `ia = 100` and `ib = 110` and the index in the target domain of the coordinate value to be reconstituted is `i = 105`, then `s = (105 - 100)/(110 - 100) = 0.5`.
+
+In the case of two dimensional interpolation, the two interpolation variables are equivalently computed as
+
+`s1 = s1(i) = (i1 - ia1)/(ib1 - ia1)`  +
+`s2 = s2(i) = (i2 - ia2)/(id2 - ia2)`
+
+where `ia1` and `ib1` are the first dimension indices in the target domain of the tie points `A` and `B` respectively, `ia2` and `id2` are the second dimension indices in the target domain of the tie points `A` and `D respectively and the indices `i1` and `i2` are the first and second dimension indices respectively in the target domain of the coordinate value to be reconstituted. 
+
+For the reconstitution of the uncompressed coordinate and auxiliary coordinate variables the interpolation method can be applied independently for each interpolation zone, making it possible to parallelize the computational process.
+
+The following notation is used: +  
+For a vector `v`,  `v.x` , `x.y` and `v.z` refer to the three coordinates of that vector. +
+For a coordinate pair `ll`, `ll.lat` and `ll.lon` refer to the latitude and longitude coordinates. +
+
+[[coordinate_conversion]]
+==== Common conversions and formulas
+
+[cols="8,12"] 
+|=============== 
+| Description | Formula
+
+| Conversion from geocentric `(latitude, longitude)` to cartesian vector `(x, y, z)` | `(x, y, z) = fll2xyz(ll) = (cos⁡(ll.lat)*cos⁡(ll.lon), cos⁡(ll.lat)*sin⁡(ll.lon), sin⁡(ll.lat))` +
+| Conversion from cartesian vector `(x, y, z)` to geocentric `(latitude, longitude)`| `(lat, lon) = fxyz2ll(v) = (atan2(v.y, v.x), atan2(z, sqrt(v.x * v.x + v.y * v.y))` +
+ 
+| Conversion from `(azimuth, zenith)` angles to cartesian vector `(x, y, z)` | `(x, y, z) = faz2xyz(az) = (sin⁡(az.zenith) * sin⁡(az.azimuth), sin⁡(az.zenith) * cos⁡(az.azimuth), cos⁡(az.zenith))` +
+| Conversion from cartesian vector `(x, y, z)` to `(azimuth, zenith)` angles | `(azimuth, zenith) = fxyz2az(v) = (atan2(y, x), atan2(sqrt(x * x + y * y), z)` +
+
+| Calculate the interpolation coefficient `c` for quadratic interpolation of one coordinate in one dimension between tie points `a` and `b` from given coordinate value `u` at `s` | `c = fc1(ua, ub, u, s) = ((u - (1 - s)*ua - s*ub)/((1 - s)*s)` + 
+| Calculate the interpolation coefficients `(c.1, c.2)` for quadratic interpolation of two coordinates in one dimension between tie points `a` and `b` from given coordinate values `(u.1, u.2)` at `s` | `(c.1, c.2) = fc2(ua, ub, u, s) = (fc1(ua.1, ub.1, u.1, s), fc1(ua.2, ub.2, u.2, s))` + 
+| Calculate the interpolation coefficients `(c.1, c.2, c.3)` for quadratic interpolation of three coordinates in one dimension between tie points `a` and `b` from given coordinate values `(u.1, u.2, u.3)` at `s` | `(c.1, c.2, c.3) = fc3(ua, ub, u, s) = (fc1(ua.1, ub.1, u.1, s), fc1(ua.2, ub.2, u.2, s), fc1(ua.3, ub.3, u.3, s))` + 
+
+| Calculate the linear interpolation value of one coordinate `u` in one dimension between tie points `a` and `b`   | `u = fl1(ua, ub, s) = (1 - s)*ua + s*u2`; + 
+
+| Calculate the quadratic interpolation value of one coordinate `u` in one dimension between tie points `a` and `b` with interpolation coefficient `c`   | `u = fq1(ua, ub, c, s) = (1 - s)*ua + (1 - s)*s1*c + s*u2`; + 
+
+| Calculate the quadratic interpolation values of two coordinates `(u.1, u.2)` in one dimension between tie points `a` and `b` with interpolation coefficients `(c.1, c.2)`  | `(u.1, u.2) = fq2(ua, ub, c, s) = (fq1(ua.1, ua.2, c.1, s), fq1(ua.1, ua.2, c.1, s))``; +
+
+| Calculate the quadratic interpolation values of three coordinates `(u.1, u.2, u.3)` in one dimension between tie points `a` and `b` with interpolation coefficients `(c.1, c.2, c.3)`  | `(u.1, u.2, u.3) = fq3(ua, ub, c, s) = (fq1(ua.1, ub.1, c.1, s), fq1(ua.2, ub.2, c.2, s), fq1(ua.3 ub.3, c.3, s))`; +
+
+| Vector Sum | `(x, y, z) = va + vb = (va.x + vb.x, va.y + vb.y, va.z + vb.z)` + 
+| Vector Difference | `(x, y, z) = va - vb = (va.x - vb.x, va.y - vb.y, va.z - vb.z)` + 
+ 
+| Vector Cross Product | `(x, y, z) = fcross(va, vb) = (va.y*vb.z - va.z*vb.y, va.z*vb.x - vva.zx*b.z, va.x*vb.y - va.y*vb.x)` + 
+
+| Normalised Vector | `(x, y, z) = norm(v) = (v.x, v.y, v.z) / sqrt (v.x*v.x + v.y*v.y + v.z*v.z)` + 
+
+| Vector Dot Product | `d = fdot(va, vb) = va.x*vb.x + va.y*vb.y, va.z*vb.z`
+
+| Vector from ce, ca  | `(x, y, z) = fp(va, vb, ce, ca) = norm(0.5*fplus(va, vb) + ce*fminus(vb, va) + ca*fcross(vb, va))`
+
+| ce, ca from vector | `(ce, ca) = fceca(va, vb, vp) = (r/(f*f) * fdot(ve, vf), r/(m*m) * fdot(ve, vm))` +
+where +
+`vn = 0.5*(va + vb); n*n = fdot(n, n)`; +
+`ve = vp - vn`; +
+`r = 1/(1 + fdot(ve, vn)/(n*n))`; +
+`vf = vb - va; f*f = 4*(1- n*n)`; +
+`vm = fcross(vb, va); m*m = 8*n*n*(1 - n*n)`; +
+|===============  
+
+[[interpolation_methods]]
+=== Interpolation Methods
+
+In the following `i1` and `i2` are indices in the interpolation dimensions, `tp1` and `tp2` are indices in the tie point interpolation dimensions and `iz1` and `iz2` are indices in the interpolation zone dimensions, see <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>. +
+
+
+==== Linear Interpolation
+
+[cols="6,15"]
+|===============
+| Name | **`interpolation_name = "linear"`** 
+| Description | General purpose one dimensional linear interpolation method 
+| Interpolation Coefficient terms | None
+| Interpolation Configuration terms | None
+| Coordinate Compression Calculations | None
+| Coordinate Uncompression Calculations | 
+  Calculation of interpolated coordinate `u` at `s = s(i)` + 
+ `u = fl1(u(tp1), u(tp1+1), s(i))`
+|===============
+
+==== Bilinear Interpolation 
+
+[cols="6,15"]
+|===============
+| Name | **`interpolation_name = "bi_linear"`** 
+| Description | General purpose two dimensional linear interpolation method
+| Interpolation Coefficient terms | None
+| Interpolation Configuration terms | None
+| Coordinate Compression Calculations | None
+| Coordinate Uncompression Calculations | 
+  Calculation of interpolated coordinate `u` at `(s1, s2) = (s1(i1), s2(i2))` + 
+`uab = fl1(u(tp2, tp1), u(tp2, tp1+1), s1(i);` +
+`ucd = fl1(u(tp2+1, tp1), u(tp2+1, tp1+1), s1(i));` +
+`u = fl1(uab, ucd, s2(i));` +
+
+
+|===============
+
+
+==== Quadratic Interpolation
+
+[cols="6,15"]
+|===============
+| Name | **`interpolation_name = "quadratic"`** 
+| Description | General purpose one dimensional quadratic interpolation method for one coordinate
+| Interpolation Coefficient terms | `c1` of dimension (interpolation_zone_1) 
+| Interpolation Configuration terms | None
+| Coordinate Compression Calculations | Calculate interpolation coefficient `c1` +
+TO BE WRITTEN (main element is use of c = fc1(ua, ub, u, s), see <<coordinate_conversion>> ) 
+| Coordinate Uncompression Calculations | 
+ Calculation of interpolated coordinate `u` at `s = s(i)`: +
+`u = fq2(x(tp1), x(tp1+1), c1(iz1), s(i));` 
+|===============
+
+==== Quadratic Interpolation of geographic coordinates
+
+[cols="6,15"]
+|===============
+| Name | **`interpolation_name = "quadratic_geo"`** 
+| Description | A one dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude. + 
+Requires a coordinate pair with `standard_name` `latitude` and `longitude`.
+
+Support to be added for coordinate pairs with `standard_name`: + 
+`(sensor_azimuth_angle, sensor_zenith_angle)` +
+`(solar_azimuth_angle, solar_zenith_angle)`  +
+`(lunar_azimuth_angle, lunar_zenith_angle)` (TO DO: propose as standard name) +
+`(platform_azimuth_angle, platform_zenith_angle)`
+
+
+Support to be added for coordinate pairs with `standard_name`: + 
+`(sensor_azimuth_angle, sensor_zenith_angle)` +
+`(solar_azimuth_angle, solar_zenith_angle)`  +
+`(lunar_azimuth_angle, lunar_zenith_angle)` (TO DO: propose as standard name) +
+`(platform_azimuth_angle, platform_zenith_angle)`
+ 
+| Interpolation Coefficient terms | 
+`c11, c12` of dimension `(tie_point_interpolation_2, interpolation_zone_1)` TBC +
+| Interpolation Configuration terms | `interpolation_zone_flags` of dimension `(tie_point_interpolation_2, interpolation_zone_1)` and `flag_meanings = "location_use_cartesian  sensor_direction_use_cartesian  solar_direction_use_cartesian lunar_direction_use_cartesian"`  
+| Coordinate Compression Calculations | 
+Calculate interpolation coefficients `(c11, c12)` +
+TO BE WRITTEN (main element is use of function (ce, ca) = fceca(va, vb, vp), see <<coordinate_conversion>> ) +
+Calculate `interpolation_zone_flags` +
+TO BE WRITTEN (main element is check for proximity to North Pole or South Pole where interpolation must be done in cartesian coordinates) +
+| Coordinate Uncompression Calculations |
+For each tie point, calculate from the latitude and longitude coordinates `ll` the position vector `vtp`:  +
+`vtp(tp2, tp1) = fll2xyz(ll(tp2, tp1));` + 
+For each interpolation coefficient pair `(c11, c12)` with its two neighbouring position vectors, calculate the the vector v1   +
+`v1(tp2, iz1) = fp( vtp(tp2, tp1), vtp(tp2, tp1+1), c11(tp2, iz1), c12(tp2, iz1));`  + 
+Convert the vector to latitude, longitude: +
+`ll1(tp2, iz1) = fxyz2ll(v1(tp2, iz1));` +
+Calculate the interpolation coefficients for use when interpolating directly in (lat, lon): +
+`llc1(tp2, iz1) = fc2(ll(tp2, tp1), ll1(tp2, iz1), ll(tp2, tp1+1));` +
+Calculate the interpolation coefficients for use when interpolating in (x, y, z): +
+`vc1(tp2, iz1) = fc3(vtp(tp2, tp1), x1(tp2, iz1), vtp(tp2, tp1+1));` +
+For each point `(s1, s2) = (s1(i1), s2(i2))` in interpolation zone (iz2, iz1) with tie point A at (tp2, tp1), calculate interpolated coordinate value `ll(i2, i1) = (lat(i2, i1), lon(i2, i1)):` + 
+If `interpolation_zone_flags(tp2, iz1)` is equal to `location_use_cartesian`: +
+`v = fq3(vtp(tp2, tp1), vtp(tp2, tp1+1), vc1(tp2, iz1), s1(i);` +
+`ll(i2, i1) = fxyz2ll(v(i2, i1));`  +
+else: +
+`ll = fq2(ll(tp2, tp1), ll(tp2, tp1+1), llc1(tp2, iz1), s1(i);` +
+|===============   
+ 
+
+==== Biquadratic Interpolation of geographic coordinates
+
+[cols="6,15"]
+|===============
+| Name | **`interpolation_name = "bi_quadratic_geo"`** 
+| Description | A two dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude. +
+Requires a coordinate pair with `standard_name` `latitude` and `longitude`.
+
+Support to be added for coordinate pairs with `standard_name`: + 
+`(sensor_azimuth_angle, sensor_zenith_angle)` +
+`(solar_azimuth_angle, solar_zenith_angle)`  +
+`(lunar_azimuth_angle, lunar_zenith_angle)` (TO DO: propose as standard name) +
+`(platform_azimuth_angle, platform_zenith_angle)`
+
+| Interpolation Coefficient terms | 
+`c11, c12` of dimension `(tie_point_interpolation_2, interpolation_zone_1)` +
+`c21, c22` of dimension `(interpolation_zone_2, tie_point_interpolation_1)` +
+`c31, c32` of dimension `(interpolation_zone_2, interpolation_zone_1)`  + 
+| Interpolation Configuration terms | `interpolation_zone_flags` of dimension `(iz2, iz1)` and `flag_meanings = "location_use_cartesian  sensor_direction_use_cartesian  solar_direction_use_cartesian lunar_direction_use_cartesian"`  
+| Coordinate Compression Calculations | 
+Calculate interpolation coefficients `(c11, c12)`, `(c21, c22)`, `(c31, c32)` +
+TO BE WRITTEN (main element is use of function (ce, ca) = fceca(va, vb, vp), see <<coordinate_conversion>> ) +
+Calculate `interpolation_zone_flags` +
+TO BE WRITTEN (main element is check for proximity to North Pole or South Pole where interpolation must be done in cartesian coordinates) +
+| Coordinate Uncompression Calculations |
+For each tie point, calculate from the latitude and longitude coordinates `ll` the position vector `vtp`:  +
+`vtp(tp2, tp1) = fll2xyz(ll(tp2, tp1));` + 
+For each interpolation coefficient pair `(c11, c12)`, `(c21, c22)`, `(c31, c32)` with its two neighbouring position vectors, calculate the the vector v1, v2, v3 respectively   +
+`v1(tp2, iz1) = fp( vtp(tp2, tp1), vtp(tp2, tp1+1), c11(tp2, iz1), c12(tp2, iz1));`  + 
+`v2(iz2, tp1) = fp( vtp(tp2, tp1), vtp(tp2+1, tp1), c21(iz2, tp1), c22(iz2, tp1));` + 
+`v3(iz2, iz1) = fp( v2(iz2, tp1), v2(iz2, tp1+1), c31(iz2, iz1), c32(iz2, iz1));` + 
+Convert the three vectors to latitude, longitude: +
+`ll1(tp2, iz1) = fxyz2ll(v1(tp2, iz1));` +
+`ll2(iz2, tp1) = fxyz2ll(x2(iz2, tp1));` +
+`ll3(iz2, iz1) = fxyz2ll(x3(iz2, iz1));` +
+Calculate the interpolation coefficients for use when interpolating directly in (lat, lon): +
+`llc1(tp2, iz1) = fc2(ll(tp2, tp1), ll1(tp2, iz1), ll(tp2, tp1+1));` +
+`llc2(iz2, tp1) = fc2(ll(tp2, tp1), ll2(iz2, tp1), ll(tp2+1, tp1));` +
+`llc3(iz2, iz1) = fc2(ll(tp2, tp1), ll3(iz2, iz1), ll(tp2, tp1+1));` +
+Calculate the interpolation coefficients for use when interpolating in (x, y, z): +
+`vc1(tp2, iz1) = fc3(vtp(tp2, tp1), x1(tp2, iz1), vtp(tp2, tp1+1));` +
+`vc2(iz2, tp1) = fc3(vtp(tp2, tp1), x2(iz2, tp1), vtp(tp2+1, tp1));` +
+`vc3(tp2, iz1) = fc3(v2(tp2, tp1), v3(tp2, iz1), v2(tp2, tp1+1));` +
+For each point `(s1, s2) = (s1(i1), s2(i2))` in interpolation zone (iz2, iz1) with tie point A at (tp2, tp1), calculate interpolated coordinate value `ll(i2, i1) = (lat(i2, i1), lon(i2, i1)):` + 
+If `interpolation_zone_flags(iz2, iz1)` is equal to `location_use_cartesian`: +
+`vab = fq3(vtp(tp2, tp1), vtp(tp2, tp1+1), vc1(tp2, iz1), s1(i);` +
+`vcd = fq3(vtp(tp2+1, tp1), vtp(tp2+1, tp1+1), vc1(tp2+1, iz1), s1(i));` +
+`vc = fq3(vc2(iz2, tp1), vc2(iz2, tp1+1), vc3(iz2, iz1), s1(i));` +
+`v = fq3(vab, vcd, vc, s2(i));` +
+`ll(i2, i1) = fxyz2ll(v(i2, i1));`  +
+else: +
+`llab = fq2(ll(tp2, tp1), ll(tp2, tp1+1), llc1(tp2, iz1), s1(i);` +
+`llcd = fq2(ll(tp2+1, tp1), ll(tp2+1, tp1+1), llc1(tp2+1, iz1), s1(i));` +
+`llc = fq2(llc2(iz2, tp1), llc2(iz2, tp1+1), llc3(iz2, iz1), s1(i));` +
+`ll = fq2(llab, llcd, llc, s2(i));` +
+|===============   
+
+=== Coordinate Compression Steps
 
 [[compression-by-coordinate-sampling-generation-of-tie-points]]
 .Generation of Tie Point Variables and Interpolation Variables
@@ -31,7 +276,7 @@
 
 | 5
 | For each set of the interpolation dimensions, identify the interpolation areas and select the interpolation zones and the tie points, taking into account the required coordinate reconstitution accuracy when selecting the density of tie points.
-| <<compression-by-coordinate-sampling-tie-points>>
+| <<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>
 
 | 6
 | For each of the interpolation dimensions, add the interpolation dimension, the corresponding tie point interpolation dimension and, if required by the selected interpolation method, its corresponding interpolation zone dimension to the **`tie_point_dimensions`** attribute of the data variable.
@@ -50,13 +295,14 @@
 | <<compression-by-coordinate-sampling-bounds>>
 
 | 10
-| Finally, if required by the selected interpolation method, follow the steps defined for the method in Appendix J to create any required interpolation coefficients variables and interpolation configuration variables. As relevant, create the  **`interpolation_coefficients`** and **`interpolation_configuration`** attributes and populate them with the interpolation coefficients variables and interpolation configuration variables respectively.
-| <<compression-by-coordinate-sampling-interpolation-variable>>
+| Finally, if required by the selected interpolation method, follow the steps defined for the method in <<interpolation_methods>> to create any required interpolation coefficients variables and interpolation configuration variables. As relevant, create the  **`interpolation_coefficients`** and **`interpolation_configuration`** attributes and populate them with the interpolation coefficients variables and interpolation configuration variables respectively.
+| <<compression-by-coordinate-sampling-interpolation-variable>> +
+<<interpolation_methods>> 
 
 |===============
 
 
-=== Steps for Reconstitution of Coordinate and Auxillary Coordinate Variables
+=== Coordinate Uncompression Steps
 
 
 [[compression-by-coordinate-sampling-reconstitution-of-coordinates]]
@@ -85,7 +331,7 @@
 
 | 5
 | For each of the interpolation dimensions, identify pairs of adjacent indices in the tie point index variable with index values differing by more than one, each index pair defining the extend of an interpolation zone in that dimension. A full interpolation zone is defined by one such index pair per interpolation dimension, with combinations of one index from each pair defining the interpolation zone tie points.
-| <<compression-by-coordinate-sampling-tie-points>>
+| <<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>
 
 | 6
 | From the **`tie_points`** attribute of the data variable, identify the interpolation variable for the coordinate and auxillary coordinate variable subset. From the **`interpolation_name`** attribute of the interpolation variable, identify the interpolation method. 
@@ -96,47 +342,16 @@
 | <<compression-by-coordinate-sampling-interpolation-variable>>
 
 | 8
-| For each of the tie point coordinate and auxillary coordinate variables, create the corresponding target coordinate variable. For each interpolation zone, apply the interpolation method to reconstitute the target domain coordinate values and store these in the target domain coordinate variables. Repeat this step for each combination of indices of the non-interpolation dimensions.
-| <<compression-by-coordinate-sampling-tie-point-indices>>
+| For each of the tie point coordinate and auxillary coordinate variables, create the corresponding target coordinate variable. For each interpolation zone, apply the interpolation method, as described in <<interpolation_methods>>, to reconstitute the target domain coordinate values and store these in the target domain coordinate variables. Repeat this step for each combination of indices of the non-interpolation dimensions.
+| <<compression-by-coordinate-sampling-tie-point-indices>> +
+<<interpolation_methods>>  
 
 | 9
 | For each of the tie point coordinate and auxillary coordinate variables having a **`bounds`** attribute, add the **`bounds`** attribute to the target coordinate variable and create the target domain bounds variable. For each interpolation zone, apply the interpolation method to reconstitute the target domain bound values and store these in the target domain bound variables. Repeat this step for each combination of indices of the non-interpolation dimensions.
 | <<compression-by-coordinate-sampling-bounds>>
-
+ 
 | 10
 | If auxiliary coordinate variables have been reconstituted, then, if not already present, add a **`coordinates`** attribute to the data variable and add to the attribute the list of the names of the reconstituted auxiliary coordinate variables.
 | <<coordinate-system>>
 
 |===============
-
-
-
-=== Interpolation Methods
-
-==== General definitions
-
-[[interpolation, figure J.1]]
-[.text-center]
-.Interpolation indices and interpolation parameter s
-image::images/ci_interpolation.svg[,100%,pdfwidth=50vw,align="center"] 
-
-Two Tie Points, A and B, and a reconstituted point P, are shown in In he Figure J.1. The indices of A nd B in the tie point interpolation dimension are n and n+1 respectively. The corresponding indices in the interpolation dimension, i~A~ and i~B~, are stored in the tie point index variable, index(n) and index(n+1).
-
-A real number interpolation parameter s, running from 0.0 to 1.0 between tie point A and B, is introduced for the purpose of teh interpolation calculations. For the point P to be reconstituted, the interpolation parameter is 
-
-s~P~ = (i~P~ - i~A~)/(i~B~ - i~A~)
-
-The coordinate values at the tie points A and B are c~A~ and c~B~ and are stored in the tie point coordinate variables. For the   point P, the coordinate value can be reconstituted as c~P~ applying the selected interpolation method.  
-
-==== Linear
-
-[cols="6,15"]
-|===============
-| Name | **`interpolation_name = "linear"`** 
-| Description/Features | General purpose one dimensional linear interpolation 
-| Definition | c~P~ = (1 - s~P~) c~A~ + s~P~ c~B~
-| Interpolation Coefficients | None
-| Interpolation Configuration | None
-|===============
-
-
