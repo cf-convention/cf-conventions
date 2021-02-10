@@ -314,6 +314,11 @@ If a standardized interpolation name is not given, the interpolation variable mu
 
 The definition of the interpolation method, however it is specified, may include instructions to treat groups of physically related coordinates simultaneously, if such tie points are present. For example, there are cases where longitudes cannot be interpolated without considering the corresponding latitudes. It is up to the interpolation description to describe how such coordinates are to be identified (e.g. it may be that such tie point variables require particular units or standard names).
 
+Note that the interpolation method is always applied on a per
+interpolation zone basis, for which the construction of the
+uncompressed coordinates may only access those tie points that define
+the extent of the of the interpolation zone.
+
 The interpolation variable attribute **`interpolation_parameters`**
 may be used to provide extra information to the interpolation
 process. This attribute names __interpolation parameter variables__
@@ -339,23 +344,13 @@ interpolation dimension or the corresponding interpolation zone
 dimension, but not both, and may include any of the non-interpolation
 dimensions.
 
-The dimensions spanned by an interpolation parameter variable are
-constrained by the interpolation method's definition, which will which if the dimensions 
-
-The variables named by the **`interpolation_parameters`** attribute
-may be scalar, or else their dimensions must correspond to those of
-the tie point variablesmay include, for each interpolation dimension,
-either the corresponding tie point interpolation dimension or the
-corresponding interpolation zone dimension, but not both, and may
-include any of the non-interpolation dimensions.
-
 The dimensions of an interpolation parameter variable must be a subset
 of zero or more the tie point variable dimensions, with the
 possibility of a tie point interpolation dimension being replaced with
 the corresponding interpolation zone dimension. The interpretation of
-an interpolation parameter variable depends on which of its dimensions
-are tie point interpolation dimensions, and which are interpolation
-zone dimensions:
+an interpolation parameter variable depends on which, if any, of its
+dimensions are tie point interpolation dimensions, and which are
+interpolation zone dimensions:
 
 * If no tie point interpolation dimensions are spanned, then the
   variable provides values for every interpolation zone. This case is
@@ -365,20 +360,13 @@ zone dimensions:
   then the variable's values are to be shared by the interpolation
   zones that are adjacent along each of the specified tie point
   interpolation dimensions. This case is akin to the values being
-  defined at interpolation zone boundaries, and therefore equally
+  defined at the interpolation zone boundaries, and therefore equally
   applicable to the interpolation zones that share that boundary
   (<<ci_interpolation_coefficients>>).
 
 In both cases, the implementation of the interpolation method should
-broadcast an interpolation coefficient or configuration variable along
-any interpolation zone dimensions that it does not span.
-
-Note that the interpolation method is always applied on a per
-interpolation zone basis, for which the construction of the
-uncompressed coordinates may only access the tie point that define the
-extent of the of the interpolation zone, as well as any interpolation
-coefficient and configuration variables defined for the interpolation
-zone, including its boundaries.
+assume that an interpolation parameter variable is broadcast to any
+interpolation zones that it does not span.
 
 [[ci_interpolation_coefficients, figure 3]]
 [.text-center]
