@@ -145,7 +145,21 @@ The presence of non-interpolation dimensions in the tie point variable impacts t
 [[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.4, "Tie Point Dimensions Attribute"]]
 ==== Tie Point Dimensions Attribute
 
-Each interpolation dimension must be associated with its corresponding tie point interpolation dimension and, if required, its corresponding __interpolation zone dimension__ that defines the number of interpolation zones which partition the interpolation dimension. Regardless of its size, an interpolation zone dimension is only required if it is spanned by one or more interpolation coefficients or configuration variables, as described in <<compression-by-coordinate-sampling-interpolation-variable>>. The association is stored in the data variable's **`tie_point_dimensions`** attribute that contains a blank-separated list of words of the form __"interpolation_dimension: tie_point_interpolation_dimension [interpolation_zone_dimension] [interpolation_dimension: ...]"__. If an interpolation zone dimension is provided then it must be the second of the two named dimensions following the interpolation dimension.
+Each interpolation dimension must be associated with its corresponding
+tie point interpolation dimension and, if required, its corresponding
+__interpolation zone dimension__ that defines the number of
+interpolation zones which partition the interpolation
+dimension. Regardless of its size, an interpolation zone dimension is
+only required if it is spanned by an interpolation parameter variable,
+as described in
+<<compression-by-coordinate-sampling-interpolation-variable>>. The
+association is stored in the data variable's
+**`tie_point_dimensions`** attribute that contains a blank-separated
+list of words of the form __"interpolation_dimension:
+tie_point_interpolation_dimension [interpolation_zone_dimension]
+[interpolation_dimension: ...]"__. If an interpolation zone dimension
+is provided then it must be the second of the two named dimensions
+following the interpolation dimension.
 
 An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
 
@@ -385,15 +399,15 @@ interpolation zone dimensions:
   interpolation dimensions. This case is akin to the values being
   defined at the interpolation zone boundaries, and therefore equally
   applicable to the interpolation zones that share that boundary
-  (<<ci_interpolation_coefficients>>).
+  (<<ci_interpolation_parameters>>).
 
 In both cases, the implementation of the interpolation method should
 assume that an interpolation parameter variable is broadcast to any
 interpolation zones that it does not span.
 
-[[ci_interpolation_coefficients, figure 3]]
+[[ci_interpolation_parameters, figure 3]]
 [.text-center]
-.Through combination of dimensions, interpolation coefficient and interpolation configuration variables may provide values for each interpolation zone, for couples of neighbouring interpolation zones or for multiple interpolation zones sharing a boundary.
+.Through combination of dimensions, interpolation parameter variables may provide values for each interpolation zone, for couples of neighbouring interpolation zones or for multiple interpolation zones sharing a boundary.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
@@ -408,7 +422,7 @@ Note that an implementation of the interpolation method is free to calculate the
 
 [[example-VIIRS]]
 [caption="Example 8.5. "]
-.Multiple interpolation variables with interpolation coefficients and configuration attributes.
+.Multiple interpolation variables with interpolation parameter attributes.
 ====
 ----
 dimensions :
@@ -434,15 +448,27 @@ dimensions :
 variables:
   // VIIRS M-Band 
   float m_radiance(m_track, m_scan, m_channel) ;
-    m_radiance:tie_points = "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    m_radiance:tie_point_dimensions = "m_track: tp_track  zone_track  m_scan: tp_scan  zone_scan  m_scan: tp_time_scan"  ;
-    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan:  m_scan_indices  m_scan: m_time_scan_indices" ;
+    m_radiance:tie_points =
+         "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation
+          t: time_interpolation" ;
+    m_radiance:tie_point_dimensions = "m_track: tp_track zone_track
+                                       m_scan: tp_scan zone_scan
+                                       m_scan: tp_time_scan"  ;
+    m_radiance:tie_point_indices = "m_track: m_track_indices
+                                    m_scan: m_scan_indices
+                                    m_scan: m_time_scan_indices" ;
 
   // VIIRS I-Band 
   float i_radiance(i_track, i_scan, i_channel) ;
-    i_radiance:tie_points = "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    i_radiance:tie_point_dimensions = "i_track: tp_track  zone_track  i_scan: tp_scan  zone_scan  i_scan: tp_time_scan"  ;
-    i_radiance:tie_point_indices = "i_track: zone_track: i_track_indices  i_scan: zone_scan: i_scan_indices  i_scan: i_time_scan_indices" ;
+    i_radiance:tie_points =
+         "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation
+          t: time_interpolation" ;
+    i_radiance:tie_point_dimensions = "i_track: tp_track zone_track
+                                       i_scan: tp_scan zone_scan
+                                       i_scan: tp_time_scan"  ;
+    i_radiance:tie_point_indices = "i_track: i_track_indices zone_track
+                                    i_scan: i_scan_indices zone_scan
+                                    i_scan: i_time_scan_indices" ;
 
   // Tie point index variables
   int m_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
@@ -494,8 +520,12 @@ variables:
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_1" ;
-    tp_interpolation:interpolation_coefficients = "exp1: expansion1  align1: alignment1  exp2: expansion2  align2:alignment2" ;
-    tp_interpolation:interpolation_configuration = "flags: interpolation_zone_flags" ;
+    tp_interpolation:interpolation_parameters =
+         "exp1: expansion1
+          align1: alignment1
+          exp2: expansion2
+          align2:alignment2 
+          flags: interpolation_zone_flags" ;
 
   // Interpolation coefficient and configuration variables
   short expansion1(zone_track , tp_scan) ;
@@ -505,7 +535,10 @@ variables:
   byte interpolation_zone_flags(zone_track , zone_scan) ;
     interpolation_zone_flags : valid_range = "1b, 7b" ;
     interpolation_zone_flags : flag_masks = "1b, 2b, 4b" ;
-    interpolation_zone_flags : flag_meanings = "location_use_cartesian  sensor_direction_use_cartesian  solar_direction_use_cartesian" ;
+    interpolation_zone_flags : flag_meanings =
+         "location_use_cartesian
+          sensor_direction_use_cartesian
+          solar_direction_use_cartesian" ;
 
   // Time tie points
   double t(tp_track, tp_time_scan) ;
@@ -519,8 +552,8 @@ variables:
 
 This example demonstrates the use of multiple interpolation variables,
 the reusability of the interpolation variable between data variables
-of different dimensions and the use of the interpolation coefficients
-and interpolation configuration attributes.
+of different dimensions and the use of the interpolation parameter
+attribute.
 
 ====
 
