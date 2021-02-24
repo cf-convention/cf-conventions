@@ -651,55 +651,59 @@ sizes minus 1 (CDL index conventions).
 
 *Requirements:*
 
-* When attached to a data or domain variable, the type of the
+* When attached to a data variable, the type of the
   **`tie_point_dimensions`** attribute is a string whose value is list
   of blank separated word groups of the following form, in which
   brackets indicate optional text: **`interpolation_dimension:
   tie_point_interpolation_dimension [interpolation_zone_dimension]`**.
   Each **`interpolation_dimension** token specifies a unique
-  interpolation dimension of the parent data or domain variable, each
+  interpolation dimension of the parent data variable, each
   **`tie_point_interpolation_dimension`** token specifies the tie
   point interpolation dimension of a unique tie point index variable,
   and each **`interpolation_zone_dimension`** token specifies a unique
-  interpolation zone dimension.
+  interpolation zone dimension. The tie point interpolation dimensions
+  and interpolation zone dimensions must not be dimensions of the
+  parent data variable.
   
-* When attached to a data or domain variable, the type of the
-  `tie_point_indices`** attribute is a string whose value is list of
-  blank separated word groups of the following form:
+* When attached to a data variable, the type of the
+  **`tie_point_indices`** attribute is a string whose value is list of
+  blank separated word pairs of the following form:
   **`interpolation_dimension: tie_point_index_variable`**. The
-  **`interpolation_dimension** tokens specify the interpolation
-  dimensions of the parent data or domain variable and must match the
-  same tokens in the **`tie_point_dimensions`** attribute, and each
+  **`interpolation_dimension** tokens specify the same interpolation
+  dimensions as the **`tie_point_dimensions`**, and each
   **`tie_point_index_variable`** token specifies a tie point index
   variable that must exist in the file.
 
 * A tie point index variable must be a one-dimensional variable with
-  an integer data type. The dimension of the tie point index variable
-  must be a tie point interpolation dimension identified by the
-  **`tie_point_dimensions`** attribute.
+  an integer data type.
+
+* The dimension of a tie point index variable must be a tie point
+  interpolation dimension identified by the **`tie_point_dimensions`**
+  attribute.
 
 * The values of a tie point index variable must be non-negative
   integers. The first value must be zero, and each subsequent value
   must be greater than or equal to the previous value. If a value
   differs by zero or one from its previous value, then it must differ
-  by two or more from the subsequent value.
+  by two or more from its subsequent value.
 
-* When attached to a data or domain variable, the type of the
-  **`tie_points`** attribute is a string whose value is list of blank
-  separated word groups of the following form, in which brackets
-  indicate optional text: **`tie_point_variable: [tie_point_variable:
-  ...] interpolation_variable`**. Each **`interpolation_variable`**
-  token specifies an interpolation variable that must exist in the
-  file, and each **`tie_point_variable** token specifies a tie point
+* When attached to a data variable, the type of the **`tie_points`**
+  attribute is a string whose value is list of blank separated word
+  groups of the following form, in which brackets indicate optional
+  text: **`tie_point_variable: [tie_point_variable: ...]
+  interpolation_variable`**. Each **`tie_point_variable** token
+  specifies a tie point variable that must exist in the file, and each
+  **`interpolation_variable`** token specifies an interpolation
   variable that must exist in the file.
 
 * The tie point variables associated with each
   **`interpolation_variable`** token must all span the same dimensions,
   which comprise a subset of zero or more dimensions of the parent
-  data or domain variable with at least one tie point interpolation
-  dimension. A tie point variable must not span both a tie point
-  interpolation dimension and its corresponding interpolation
-  dimension as defined by the **`tie_point_dimensions`** mapping.
+  data variable with at least one tie point interpolation dimension
+  identified by the **`tie_point_dimensions`** attribute. A tie point
+  variable must not span both a tie point interpolation dimension and
+  its corresponding interpolation dimension defined by the
+  **`tie_point_dimensions`** mapping.
 
 * An interpolation variable must have one of the string-valued
   attributes **`interpolation_name`** or
@@ -713,14 +717,15 @@ sizes minus 1 (CDL index conventions).
   **`interpolation_name`**. The values of **`var`** must be
   interpolation parameter variables that exist in the file.
 
-* Each dimension of an interpolation parameter variable must either be
-  a non-interpolation dimension of the parent data or domain variable,
-  or else a tie point interpolation dimension or interpolation zone
-  dimension corresponding to an interpolation dimension. In the latter
-  case, the corresponding interpolation dimension must also be spanned
-  by all of the tie point variables that use this interpolation
-  variable.
+* The dimensions of an interpolation parameter variable must either be
+  a subset of zero or more of the dimensions of the corresponding tie
+  point variables, with the exception that a tie point interpolation
+  dimension may be replaced with its corresponding interpolation zone
+  dimension.
 
+*Recommendations:*
+
+* An interpolation variable should have 0 dimensions.
 
 
  
