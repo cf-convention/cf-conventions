@@ -67,46 +67,26 @@ metadata in a netCDF file. The virtue of this is that should netCDF
 ever fail to meet the community needs, the groundwork for applying CF
 to other file formats will already exist.
 
-===  The netCDF data model
-
-The existing CF conventions are for use with netCDF files following
-the netCDF "classic" data model (<<img-netCDF>>). We first give a
-brief summary of this explicit data model, since the CF conventions
-cannot be described without reference to the components of netCDF.
-
-NetCDF classic files contain data in named variables, which can be
-single numbers (with no dimensions), one-dimensional arrays (vectors),
-or multidimensional arrays, and the dimensions are declared by name in
-the file. Variables can be of integer, floating point or character
-data types. Variables may have attributes attached, of any data type.
-Attributes can have a single value or consist of a one-dimensional
-array. NetCDF files also have "global" file attributes which provide
-information about the dataset as a whole. NetCDF library software has
-functions to define dimensions, variables and attributes, and write
-and read data.
-
-[[img-netCDF, figure 3]]
-[.text-center]
-.Key components of the netCDF classic data model. Files consist of global attributes, dimensions and variables. Variables contain attributes and data, and attributes also contain data. Variables, attributes and dimensions all contain properties, such as a "name" which identifies them in the file. A data array has a data type for all of its elements (e.g. "double" for 64-bit floating point numbers).
-image::images/cfdm_netcdf_classic_data_model.png[,50%,pdfwidth=50vw,align="center"]
-
 === Elements of CF-netCDF
 
-The CF-netCDF elements are listed in <<table-cf-concepts>> and shown
-(in blue) with their interrelationships in <<img-cf-concepts>>. The CF
-data model has been derived from these CF-netCDF elements and
-relationships with the aims of removing aspects specific to the netCDF
-encoding, and reducing the number of elements, whilst retaining the
-ability to describe the CF conventions fully, in order to meet the
-design criteria.
+The CF-netCDF elements are listed in <<table-cf-concepts, Table I.1>>
+and shown (in blue) with their interrelationships in
+<<figure-cf-concepts, Figure I.1>>. The CF data model has been derived
+from these CF-netCDF elements and relationships with the aims of
+removing aspects specific to the netCDF encoding, and reducing the
+number of elements, whilst retaining the ability to describe the CF
+conventions fully, in order to meet the design criteria.
 
-[[table-cf-concepts, table 1]]
-.The elements of the CF-netCDF conventions. The relationships to netCDF entities are shown in <<img-cf-concepts>>.
-[options="header",cols="2",caption="Table 1. "]
+[[table-cf-concepts]]
+.Table I.1. The elements of the CF-netCDF conventions. The relationships to netCDF entities are shown in <<figure-cf-concepts, Figure I.1>>.
+[options="header",cols="2",caption=""]
 |===============
 |{set:cellbgcolor!}
 CF-netCDF element
 | Description
+
+| Domain variable
+| Discrete locations in multi-dimensional space
 
 | Data variable
 | Scientific data discretised within a domain
@@ -146,35 +126,37 @@ CF-netCDF element
 |===============
 
 
-[[img-cf-concepts, figure 2]]
+[[figure-cf-concepts]]
+[caption=""]
 [.text-center]
-.The relationships between CF-netCDF elements and their corresponding netCDF variables, dimensions and attributes (defined in <<img-netCDF>> and identified here with the "NC" prefix). It is useful to define an abstract generic coordinate variable that can be used to refer to coordinates when the their type (coordinate, auxiliary or scalar coordinate variable) is not an issue. The CF convention details the mechanisms which are used in the netCDF file to express the relationships among the CF-netCDF elements, but these are not shown.
-image::images/cfdm_cf_concepts.png[,75%,pdfwidth=75vw,align="center"]
+.Figure I.1. The relationships between CF-netCDF elements and their corresponding netCDF variables, dimensions and attributes (identified here with the "NC" prefix). It is useful to define an abstract generic coordinate variable that can be used to refer to coordinates when the their type (coordinate, auxiliary or scalar coordinate variable) is not an issue.
+image::images/cfdm_cf_concepts.png[,60%,pdfwidth=50vw,align="center"]
 
 
 == The CF data model
 
-The elements of the CF data model (<<img-field>>, <<img-dim-aux>> and
-<<img-coordinate-reference>>) are called "constructs", a term chosen
-to differentiate from the CF-netCDF entities previously defined and to
-be programming language-neutral (i.e. as opposed to "object" or
-"structure"). The constructs, listed in <<table-cf-constructs>>, are
-related to CF-netCDF entities (<<img-cf-concepts>>), which in turn
-relate to the components of netCDF file (<<img-netCDF>>).
+The elements of the CF data model (<<figure-field, Figure I.2>>,
+<<figure-dim-aux, Figure I.3>> and <<figure-coordinate-reference,
+Figure I.4>>) are called "constructs", a term chosen to differentiate
+from the CF-netCDF entities previously defined and to be programming
+language-neutral (i.e. as opposed to "object" or "structure"). The
+constructs, listed in <<table-cf-constructs, Table I.2>>, are related
+to CF-netCDF entities (<<figure-cf-concepts, Figure I.1>>), which in
+turn relate to the components of netCDF file.
 
-[[table-cf-constructs, table 2]]
-.The constructs of the CF data model. The relationships between the constructs and CF-netCDF entities are shown in in <<img-field>>, <<img-dim-aux>> and <<img-coordinate-reference>>.
-[options="header",cols="2",caption="Table 2. "]
+[[table-cf-constructs]]
+.Table I.2. The constructs of the CF data model. The relationships between the constructs and CF-netCDF entities are shown in in <<figure-field, Figure I.2>>, <<figure-dim-aux, Figure I.3>> and <<figure-coordinate-reference, Figure I.4>>.
+[options="header",cols="2",caption=""]
 |===============
 |{set:cellbgcolor!}
 CF construct
 | Description
 
+| Domain
+| Discrete locations in multi-dimensional space
+
 | Field
 | Scientific data discretised within a domain
-
-| Domain
-| Describes a domain
 
 | Domain axis
 | Independent axes of the domain
@@ -203,24 +185,27 @@ CF construct
 
 The field construct and domain construct are central to the CF data
 model in that all the other constructs are included in one or other of
-them (<<img-field>>). The constructs contained by the field and domain
-constructs cannot exist independently, with the exception of the
-domain construct itself that may be part of a field construct or exist
-on its own, as is indicated by the nature of the class associations
-shown in <<img-field>>. All CF-netCDF elements are mapped to field
-constructs, domain constructs or their components; and the field and
-domain constructs completely contain all the data and metadata which
-can be extracted from the file using the CF conventions.
+them (<<figure-field, Figure I.2>>). The constructs contained by the
+field and domain constructs cannot exist independently, with the
+exception of the domain construct itself that may be part of a field
+construct or exist on its own, as is indicated by the nature of the
+class associations shown in <<figure-field, Figure I.2>>. All
+CF-netCDF elements are mapped to field constructs, domain constructs
+or their components; and the field and domain constructs completely
+contain all the data and metadata which can be extracted from the file
+using the CF conventions.
 
-[[img-field, figure 3]]
+[[figure-field]]
+[caption=""]
 [.text-center]
-.The constructs of the CF data model. The field construct corresponds to a CF-netCDF data variable (defined in <<img-cf-concepts>> and identified here with the "CN" prefix). Relationships between other constructs and CF-netCDF are given in <<img-dim-aux>> and <<img-coordinate-reference>>. The domain construct provides the linkage between the field construct and the constructs which describe measurement locations and cell properties. It is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.
-image::images/cfdm_field.png[,50%,pdfwidth=50vw,align="center"]
+.Figure I.2. The constructs of the CF data model. The field and domain constructs correspond to CF-netCDF data and domain variables respectively (defined in <<figure-cf-concepts, Figure I.1>> and identified here with the "CN" prefix). Relationships between the other constructs and CF-netCDF are given in <<figure-dim-aux, Figure I.3>> and <<figure-coordinate-reference, Figure I.4>>. It is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.
+image::images/cfdm_field.png[,40%,pdfwidth=50vw,align="center"]
 
 === Field construct
 
-A field construct (<<img-field>>) corresponds to a CF-netCDF data
-variable with all of its metadata. The field construct consists of
+A field construct (<<figure-field, Figure I.2>>) corresponds to a
+CF-netCDF data variable with all of its metadata. The field construct
+consists of
 
 * A data array.
 
@@ -238,12 +223,12 @@ variable with all of its metadata. The field construct consists of
   the domain.
 
 All of the constructs contained by the field construct are optional
-(as indicated by "0.." in <<img-field>>). The only component of the
-field which is mandatory is the data array.
+(as indicated by "0.." in <<figure-field, Figure I.2>>). The only
+component of the field which is mandatory is the data array.
 
 The properties of the field construct correspond to some netCDF
 attributes of variables (e.g. the **`units`**, **`long_name`**, and
-**`standard_name`**), and some netCDF global file attributes
+**`standard_name`**), and some netCDF group attributes, including
 (e.g. **`history`** and **`institution`**). The term "property" is
 used, rather than "attribute", because not all CF-netCDF attributes
 are properties in this sense--some CF-netCDF attributes are used to
@@ -252,16 +237,16 @@ the data indirectly (e.g. the coordinates attribute), and others have
 structural functions in the CF-netCDF file (e.g. the Conventions
 attribute).
 
-In the data model, netCDF global file attributes apply to every data
+In the data model, netCDF group attributes apply to every data
 variable in the file, except where they are overridden by netCDF data
-variable attributes with the same name. This interpretation of global
-file attributes is not stated in the CF conventions, but for the data
-model it is necessary because there is no notion of a file. Hence,
-metadata stored in attributes of the file as a whole have to be
-transferred to the field construct. If present, the global file
-attribute **`featureType`** applies to every data variable in the file
-with a discrete sampling geometry. Hence, the feature type is regarded
-as a property of the field construct.
+variable attributes with the same name. This interpretation of group
+attributes is not stated in the CF conventions, but for the data model
+it is necessary because there is no notion of a group. Hence, metadata
+stored in attributes of the group as a whole have to be transferred to
+the field construct. If present, the global file attribute (i.e. root
+group attribute) **`featureType`** applies to every data variable in
+the file with a discrete sampling geometry. Hence, the feature type is
+regarded as a property of the field construct.
 
 The **`standard_name`** property constrains the **`units`** property
 (i.e. only certain units are consistent with each standard name) and
@@ -276,12 +261,12 @@ construct for their interpretation.
 
 === Domain construct
 
-The domain construct (<<img-field>>) describes a domain comprising
-measurement locations and cell properties. The domain construct is the
-only metadata construct that may also exist independently of a field
-construct. The domain construct contains properties to describe the
-domain (in the same sense as for the field construct) and relates the
-following metadata constructs
+The domain construct (<<figure-field, Figure I.2>>) describes a domain
+comprising measurement locations and cell properties. The domain
+construct is the only metadata construct that may also exist
+independently of a field construct. The domain construct contains
+properties to describe the domain (in the same sense as for the field
+construct) and relates the following metadata constructs
 
 * Domain axis constructs.
 
@@ -294,7 +279,7 @@ following metadata constructs
 * Cell measure constructs.
 
 All of the constructs contained by the domain construct are optional
-(as indicated by "0.." in <<img-field>>).
+(as indicated by "0.." in <<figure-field, Figure I.2>>).
 
 In CF-netCDF, domain information is stored either implicitly via data
 variable attributes (such as `coordinates`), or explicitly in a domain
@@ -303,16 +288,16 @@ data array.
 
 === Domain axis construct and the data array
 
-A domain axis construct (<<img-dim-aux>>) comprises a positive integer
-which specifies the number of cells lying along an independent axis of
-the domain. In CF-netCDF, it is usually defined either by a netCDF
-dimension or by a scalar coordinate variable, which implies a domain
-axis of size one. The field construct's data array spans the domain
-axis constructs of the domain, except that the size-one axes may
-optionally be omitted, because their presence makes no difference to
-the order of the elements. Hence, the data array may be
-zero-dimensional (i.e. scalar) if there are no domain axis constructs
-of size greater than one.
+A domain axis construct (<<figure-dim-aux, Figure I.3>>) comprises a
+positive integer which specifies the number of cells lying along an
+independent axis of the domain. In CF-netCDF, it is usually defined
+either by a netCDF dimension or by a scalar coordinate variable, which
+implies a domain axis of size one. The field construct's data array
+spans the domain axis constructs of the domain, except that the
+size-one axes may optionally be omitted, because their presence makes
+no difference to the order of the elements. Hence, the data array may
+be zero-dimensional (i.e. scalar) if there are no domain axis
+constructs of size greater than one.
 
 When a collection of discrete sampling geometry (DSG) features has
 been combined in a data variable using the incomplete orthogonal or
@@ -327,15 +312,16 @@ corresponding to a different field construct.
 
 === Coordinates: dimension coordinate and auxiliary constructs
 
-Coordinate constructs (<<img-dim-aux>>) provide information which
-locate the cells of the domain and which depend on a subset of the
-domain axis constructs. A coordinate construct consists of an optional
-data array of the coordinate values spanning the subset of the domain
-axis constructs, properties to describe the coordinates (in the same
-sense as for the field construct), an optional data array of cell
-bounds recording the extents of each cell, and any extra arrays needed
-to interpret the cell bounds values. The data array of the coordinate
-values is required, execpt for the special cases described below.
+Coordinate constructs (<<figure-dim-aux, Figure I.3>>) provide
+information which locate the cells of the domain and which depend on a
+subset of the domain axis constructs. A coordinate construct consists
+of an optional data array of the coordinate values spanning the subset
+of the domain axis constructs, properties to describe the coordinates
+(in the same sense as for the field construct), an optional data array
+of cell bounds recording the extents of each cell, and any extra
+arrays needed to interpret the cell bounds values. The data array of
+the coordinate values is required, execpt for the special cases
+described below.
 
 There are two distinct types of coordinate construct: dimension
 coordinate constructs unambiguously describe cell locations for a
@@ -425,10 +411,11 @@ the individual months over which the original data was minimised; and
 all of the implied parts taken together define the exact temporal
 extent of the average of the monthly minima.
 
-[[img-dim-aux, figure 4]]
+[[figure-dim-aux]]
+[caption=""]
 [.text-center]
-.The relationship between domain axis, dimension coordinate and auxiliary coordinate constructs and CF-netCDF (defined in <<img-cf-concepts>> and identified here with the "CN" prefix). A dimension or auxiliary coordinate construct is defined by a CF-netCDF coordinate, scalar coordinate or auxiliary coordinate variable, and the associated CF-netCDF boundary variable if it exists. A generic coordinate construct spans one or more domain axis constructs, but the mapping of which ones is only held by the parent field construct.
-image::images/cfdm_coordinates.png[,75%,pdfwidth=50vw,align="center"]
+.Figure I.3. The relationship between domain axis, dimension coordinate and auxiliary coordinate constructs and CF-netCDF (defined in <<figure-cf-concepts, Figure I.1>> and identified here with the "CN" prefix). A dimension or auxiliary coordinate construct is defined by a CF-netCDF coordinate, scalar coordinate or auxiliary coordinate variable, and the associated CF-netCDF boundary variable if it exists. A generic coordinate construct spans one or more domain axis constructs, but the mapping of which ones is only held by the parent field construct.
+image::images/cfdm_coordinates.png[,50%,pdfwidth=50vw,align="center"]
 
 === Coordinate reference construct
 
@@ -445,9 +432,9 @@ A coordinate system may be constructed _implicitly_ from any subset of
 the coordinate constructs, yet a coordinate construct does not need to
 be explicitly or exclusively associated with any coordinate system.  A
 coordinate system of the field construct can be _explicitly_ defined
-by a coordinate reference construct (<<img-coordinate-reference>>)
-which relates the coordinate values of the coordinate system to
-locations in a planetary reference frame and consists of the
+by a coordinate reference construct (<<figure-coordinate-reference,
+Figure I.4>>) which relates the coordinate values of the coordinate
+system to locations in a planetary reference frame and consists of the
 following:
 
 * The dimension coordinate and auxiliary coordinate constructs that
@@ -490,10 +477,10 @@ Some parts of the coordinate reference construct may not be relevant
 to a given coordinate construct which it contains. The relevant parts
 are determined by an application using the coordinate reference
 construct. For example, for a coordinate reference construct which
-contained coordinate constructs for __y__-__x__ projection and latitude
-and longitude coordinates, a datum comprising a reference ellipsoid
-would apply to all of them, but projection parameters would only apply
-to the projection coordinates.
+contained coordinate constructs for __y__-__x__ projection and
+latitude and longitude coordinates, a datum comprising a reference
+ellipsoid would apply to all of them, but projection parameters would
+only apply to the projection coordinates.
 
 In CF-netCDF, coordinate system information that is not found in
 coordinate or auxiliary coordinate variables is stored in a grid
@@ -512,19 +499,20 @@ referenced by a formula_terms attribute corresponds to the term of a
 coordinate conversion formula--either a domain ancillary construct or,
 if it is zero-dimensional, a scalar parameter.
 
-[[img-coordinate-reference, figure 5]]
+[[figure-coordinate-reference]]
+[caption=""]
 [.text-center]
-.The relationship between coordinate reference and domain ancillary constructs and CF-netCDF (defined in <<img-cf-concepts>> and identified here with the "CN" prefix). A coordinate reference construct is defined either by a grid mapping variable, or a **`formula_terms`** attribute of a CF-netCDF coordinate variable. The coordinate reference construct is composed of generic coordinate constructs, a datum, and a coordinate conversion formula. The coordinate conversion formula is usually defined by a named formula in the CF conventions. A domain ancillary construct term of a coordinate conversion formula is defined by a CF-netCDF data variable or a CF-netCDF generic coordinate variable.
-image::images/cfdm_coordinate_reference.png[,75%,pdfwidth=75vw,align="center"]
+.Figure I.4. The relationship between coordinate reference and domain ancillary constructs and CF-netCDF (defined in <<figure-cf-concepts, Figure I.1>> and identified here with the "CN" prefix). A coordinate reference construct is defined either by a grid mapping variable, or a **`formula_terms`** attribute of a CF-netCDF coordinate variable. The coordinate reference construct is composed of generic coordinate constructs, a datum, and a coordinate conversion formula. The coordinate conversion formula is usually defined by a named formula in the CF conventions. A domain ancillary construct term of a coordinate conversion formula is defined by a CF-netCDF data variable or a CF-netCDF generic coordinate variable.
+image::images/cfdm_coordinate_reference.png[,50%,pdfwidth=50vw,align="center"]
 
 === Domain ancillary construct
 
-A domain ancillary construct (<<img-coordinate-reference>>) provides
-information which is needed for computing the location of cells in an
-alternative coordinate system. It is the value of a term of a
-coordinate conversion formula that contains a data array which is
-either scalar or which depends on one, more or all of the domain axis
-constructs.
+A domain ancillary construct (<<figure-coordinate-reference, Figure
+I.4>>) provides information which is needed for computing the location
+of cells in an alternative coordinate system. It is the value of a
+term of a coordinate conversion formula that contains a data array
+which is either scalar or which depends on one, more or all of the
+domain axis constructs.
 
 It also contains an optional array of cell bounds recording the
 extents of each cell (only applicable if the array contains coordinate
@@ -544,14 +532,13 @@ floor would correspond to a domain ancillary construct. In the case of
 a named term being a type of coordinate variable, that variable will
 correspond to an independent domain ancillary construct in addition to
 the coordinate construct; that is, a single CF-netCDF variable is
-translated into two constructs (see <<cdl-domain-anc-coordinate>>).
+translated into two constructs (see <<cdl-domain-anc-coordinate,
+Example I.1>>).
 
-[[cdl-domain-anc-coordinate, example 1]]
-[caption="Example 1. "]
-.A single CF-netCDF variable corresponding to two data model constructs. The netCDF variable **`A`** corresponds to an auxiliary coordinate construct (since it is referenced by the **`coordinates`** attribute) as well as a domain ancillary construct (since it is referenced by the **`formula_terms`** attribute). Similarly for the netCDF variable **`B`**.
- 
+[[cdl-domain-anc-coordinate]]
+[caption=""]
+.Example I.1 A single CF-netCDF variable corresponding to two data model constructs.
 ====
-
 ----
 float eta(eta) ;
   eta:long_name = "eta at full levels" ;
@@ -572,16 +559,22 @@ float temp(eta, lat, lon) ;
   temp:coordinates = "A B" ;
 ----
 
+The netCDF variable **`A`** corresponds to an auxiliary coordinate
+construct (since it is referenced by the **`coordinates`** attribute)
+as well as a domain ancillary construct (since it is referenced by the
+**`formula_terms`** attribute). Similarly for the netCDF variable
+**`B`**.
+
 ====
 
 === Cell measure construct
 
-A cell measure (<<img-field>>) construct provides information about
-the size or shape of the cells and depending on one, more or all of
-the domain axis constructs. Cell measure constructs have to be used
-when the size or shape of the cells cannot be deduced from the
-dimension or auxiliary coordinate constructs without special knowledge
-that a generic application cannot be expected to have.
+A cell measure (<<figure-field, Figure I.2>>) construct provides
+information about the size or shape of the cells and depending on one,
+more or all of the domain axis constructs. Cell measure constructs
+have to be used when the size or shape of the cells cannot be deduced
+from the dimension or auxiliary coordinate constructs without special
+knowledge that a generic application cannot be expected to have.
 
 The cell measure construct consists of a numeric array of the metric
 data which span one, more or all of the domain axis constructs, and
@@ -596,12 +589,12 @@ cell measure constructs.
 
 === Field ancillary constructs
 
-The field ancillary construct (<<img-field>>) provides metadata which
-are distributed over the same sampling domain as the field itself. For
-example, if a data variable holds a variable retrieved from a
-satellite instrument, a related ancillary data variable might provide
-the uncertainty estimates for those retrievals (varying over the same
-spatiotemporal domain).
+The field ancillary construct (<<figure-field, Figure I.2>>) provides
+metadata which are distributed over the same sampling domain as the
+field itself. For example, if a data variable holds a variable
+retrieved from a satellite instrument, a related ancillary data
+variable might provide the uncertainty estimates for those retrievals
+(varying over the same spatiotemporal domain).
 
 The field ancillary construct consists of an array of the ancillary
 data which is either scalar or which depends on one, more or all of
@@ -617,13 +610,13 @@ auxiliary coordinate construct or domain ancillary construct.
 
 === Cell method construct
 
-The cell method constructs (<<img-field>>) describe how the cell
-values represent the variation of the physical quantity within its
-cells--the structure of the data at a higher resolution. A single cell
-method construct consists of a set of axes (see below), a "method"
-property which describes how a value of the field construct's data
-array describes the variation of the quantity within a cell over those
-axes (e.g. a value might represent the cell area average), and
+The cell method constructs (<<figure-field, Figure I.2>>) describe how
+the cell values represent the variation of the physical quantity
+within its cells--the structure of the data at a higher resolution. A
+single cell method construct consists of a set of axes (see below), a
+"method" property which describes how a value of the field construct's
+data array describes the variation of the quantity within a cell over
+those axes (e.g. a value might represent the cell area average), and
 properties serving to indicate more precisely how the method was
 applied (e.g. recording the spacing of the original data, or the fact
 the method was applied only over El Niño years).
