@@ -60,20 +60,20 @@ Datum [
 		    label="Datum"	
 		    ]
 
-# --------------------------------------------------------------------
-# Notes
-# --------------------------------------------------------------------
-Note [
-               style=filled
-	       fillcolor=white
-	       label="A Coordinate Conversion
-can only be associated
-with one of
-Grid Mapping Variable
-or Formula Terms"
-	       fontsize="11.0"
-	       fontname="Arial italic"
-	       ]
+## --------------------------------------------------------------------
+## Notes
+## --------------------------------------------------------------------
+#Note [
+#               style=filled
+#	       fillcolor=white
+#	       label="A Coordinate Conversion
+#can only be associated
+#with one of
+#Grid Mapping Variable
+#or Formula Terms"
+#	       fontsize="11.0"
+#	       fontname="Arial italic"
+#	       ]
 
 # --------------------------------------------------------------------
 # Invisible nodes used to aid in layout
@@ -91,6 +91,8 @@ route3
 route4
 route5
 route6
+route7
+route8
 
 edge [arrowtail=none
       arrowhead=vee
@@ -114,26 +116,34 @@ GenericCoordinateConstruct -> CoordinateConversion [arrowhead=none
 			                            arrowtail=vee
 						    taillabel="   0..*"
 						    labeldistance=2.0]
-DomainAncillary -> DataVariable [taillabel="   either/or" minlen=5
-                                 labeldistance=2]
+DomainAncillary -> DataVariable [taillabel=" either/or" minlen=5]
 DomainAncillary -> GenericCoordinateVariable [taillabel="                  either/or"
                                               labeldistance=1.1]
 
 Datum -> GenericCoordinateConstruct [headlabel="0..*   "]
 Datum -> GridMappingVariable [minlen=2 headlabel="0..1    "]
 GridMappingVariable -> NamedFormula [minlen=2]
-NamedFormula -> FormulaTerms [arrowtail=vee arrowhead=none minlen=4]
+NamedFormula -> FormulaTerms [arrowtail=vee arrowhead=none minlen=5]
 GenericCoordinateVariable -> FormulaTerms [weight=100
 			                   arrowtail=vee
 					   arrowhead=none]
 
-CoordinateConversion -> GridMappingVariable [headlabel="0..1  "]
-CoordinateConversion -> FormulaTerms [headlabel="0..1    "]
+CoordinateConversion -> route7 [weight=100
+		                arrowhead=none	     
+                                taillabel="either/or           "
+				labeldistance=1.1]
+route7 -> GridMappingVariable []
+CoordinateConversion -> route8 [weight=100
+		                arrowhead=none	     
+                                taillabel="                 either/or"
+				labeldistance=1.1]
+route8 -> FormulaTerms []
 
 {rank=same; CoordinateReference, DomainAncillary, DataVariable}
 {rank=same; GenericCoordinateConstruct, CoordinateConversion,
 	    GenericCoordinateVariable}
-{rank=same; Datum, GridMappingVariable, NamedFormula, FormulaTerms, Note}
+{rank=same; Datum, GridMappingVariable, NamedFormula, FormulaTerms}
+{rank=same; route7, route8}
 
 
 # --------------------------------------------------------------------
