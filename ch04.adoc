@@ -216,7 +216,11 @@ and minutes).
 
  
 
-The acceptable units for time are listed in the link:$$http://www.unidata.ucar.edu/software/udunits/$$[`udunits.dat`] file. The most commonly used of these strings (and their abbreviations) includes **`day (d)`**, **`hour (hr, h)`**, **`minute (min)`** and **`second (sec, s)`**. Plural forms are also acceptable. The reference time string (appearing after the identifier **`since`**) may include date alone; date and time; or date, time, and time zone. The reference time is required. A reference time in year 0 has a special meaning (see <<climatological-statistics>>).
+The acceptable units for time are listed in the link:$$http://www.unidata.ucar.edu/software/udunits/$$[`udunits.dat`] file. The most commonly used of these strings (and their abbreviations) includes **`day (d)`**, **`hour (hr, h)`**, **`minute (min)`** and **`second (sec, s)`**. Plural forms are also acceptable. The reference date/time string (appearing after the identifier **`since`**) may include date alone; date and time; or date, time, and time zone. The reference date/time string is required.
+
+The year number in the reference date/time may be zero or negative, except where prohibited for certain calendars, as noted below.  A negative year number is indicated with a preceeding minus sign.  When year zero is allowed, year numbering is algebraic; i.e., year zero is included in the counting.  The interpretation for historical year numbering is consistent with link:$$https://en.wikipedia.org/wiki/ISO_8601$$[ISO 8601] (modern revisions); by convention, year zero = 1 BC, year -1 = 2 BC, and so on.
+
+There is a deprecated special meaning for year zero, that should not be used for new work.  See <<climatological-statistics>>.
 
 __Note: if the time zone is omitted the default is UTC, and if both time and time zone are omitted the default is 00:00:00 UTC.__ 
 
@@ -251,7 +255,7 @@ Optionally, the time coordinate may be indicated additionally by providing the *
 ==== Calendar
 In order to calculate a new date and time given a base date, base time and a time increment one must know what calendar to use. For this purpose we recommend that the calendar be specified by the attribute **`calendar`** which is assigned to the time coordinate variable. The values currently defined for **`calendar`** are:
 
-**`gregorian`** or **`standard`**:: Mixed Gregorian/Julian calendar as defined by Udunits. __This is the default.__
+**`gregorian`** or **`standard`**:: Mixed Gregorian/Julian calendar as defined by Udunits. __This is the default.__  Date/times earlier than 1-1-1 0:0:0 are prohibited.
 
 **`proleptic_gregorian`**:: A Gregorian calendar extended to dates before 1582-10-15. That is, a year is a leap year if either (i) it is divisible by 4 but not by 100 or (ii) it is divisible by 400.
 
@@ -261,13 +265,15 @@ In order to calculate a new date and time given a base date, base time and a tim
 
 **`360_day`**:: All years are 360 days divided into 30 day months.
 
-**`julian`**:: Julian calendar.
+**`julian`**:: Julian calendar.  Date/times earlier than 1-1-1 0:0:0 are prohibited.
 
 **`none`**:: No calendar.
 
 
 
-The **`calendar`** attribute may be set to **`none`** in climate experiments that simulate a fixed time of year. The time of year is indicated by the date in the reference time of the **`units`** attribute. The time coordinate that might apply in a perpetual July experiment are given in the following example.
+Some calendars have a restricted time range, as noted, to avoid multiple interpretations.  These restrictions apply to both the reference date/time string, and to encoded time values. 
+
+The **`calendar`** attribute may be set to **`none`** in climate experiments that simulate a fixed time of year. The time of year is indicated by the date in the reference date/time of the **`units`** attribute. The time coordinate that might apply in a perpetual July experiment are given in the following example.
 
 [[perpetual-time-axis-ex]]
 [caption="Example 4.5. "]
