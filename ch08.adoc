@@ -145,7 +145,21 @@ The presence of non-interpolation dimensions in the tie point variable impacts t
 [[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.4, "Tie Point Dimensions Attribute"]]
 ==== Tie Point Dimensions Attribute
 
-Each interpolation dimension must be associated with its corresponding tie point interpolation dimension and, if required, its corresponding __interpolation zone dimension__ that defines the number of interpolation zones which partition the interpolation dimension. Regardless of its size, an interpolation zone dimension is only required if it is spanned by one or more interpolation coefficients or configuration variables, as described in <<compression-by-coordinate-sampling-interpolation-variable>>. The association is stored in the data variable's **`tie_point_dimensions`** attribute that contains a blank-separated list of words of the form __"interpolation_dimension: tie_point_interpolation_dimension [interpolation_zone_dimension] [interpolation_dimension: ...]"__. If an interpolation zone dimension is provided then it must be the second of the two named dimensions following the interpolation dimension.
+Each interpolation dimension must be associated with its corresponding
+tie point interpolation dimension and, if required, its corresponding
+__interpolation zone dimension__ that defines the number of
+interpolation zones which partition the interpolation
+dimension. Regardless of its size, an interpolation zone dimension is
+only required if it is spanned by an interpolation parameter variable,
+as described in
+<<compression-by-coordinate-sampling-interpolation-variable>>. The
+association is stored in the data variable's
+**`tie_point_dimensions`** attribute that contains a blank-separated
+list of words of the form __"interpolation_dimension:
+tie_point_interpolation_dimension [interpolation_zone_dimension]
+[interpolation_dimension: ...]"__. If an interpolation zone dimension
+is provided then it must be the second of the two named dimensions
+following the interpolation dimension.
 
 An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
 
@@ -190,11 +204,15 @@ element of a tie point interpolation dimension to its related location
 in the corresponding interpolation dimension. The tie point index
 variable is a one-dimensional integer variable that must span the tie
 point interpolation dimension specified by the
-**`tie_point_dimensions`** attribute. The values must be strictly
-monotonically increasing within interpolation areas. When two adjacent
-values are equal, or differ by one, it indicates the location (in
-index space) of an interpolation area boundary relating to a grid
-discontinuity (<<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>).
+**`tie_point_dimensions`** attribute. The tie point index values must
+be strictly monotonically increasing within interpolation areas. An
+interpolation zone must span at least two points of each of its
+corresponding interpolation dimensions, therefore the tie point
+indices that define an interpolation zone must all be different. When
+two adjacent values are equal, or differ by one, it indicates the
+location (in index space) of an interpolation area boundary relating
+to a grid discontinuity
+(<<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>).
 
 Each value of the tie point index variable is the index of the 
 interpolation dimension that corresponds to the corresponding 
@@ -304,37 +322,96 @@ data:
 [[compression-by-coordinate-sampling-interpolation-variable, Section 8.3.6, "Interpolation Variable"]]
 ==== Interpolation Variable
 
-The method used to uncompress the tie point variables is described by an interpolation variable that acts as a container for the attributes that define the interpolation technique and the parameters that should be used. The variable should be a scalar (i.e. it has no dimensions) of arbitrary type, and the value of its single element is immaterial.
+The method used to uncompress the tie point variables is described by
+an interpolation variable that acts as a container for the attributes
+that define the interpolation technique and the parameters that should
+be used. The variable should be a scalar (i.e. it has no dimensions)
+of arbitrary type, and the value of its single element is immaterial.
 
-The interpolation method must be identified in one of two ways. Either by the **`interpolation_name`** attribute, which takes a string value that contains the method's name, or else by the **`interpolation_description`** attribute, which takes a string value that contains a non-standardized description of the method. These attributes must not be both set.
+The interpolation method must be identified in one of two ways. Either
+by the **`interpolation_name`** attribute, which takes a string value
+that contains the method's name, or else by the
+**`interpolation_description`** attribute, which takes a string value
+that contains a non-standardized description of the method. These
+attributes must not be both set.
 
-The valid values of **`interpolation_name`** are given in <<Appendix J>>. This appendix describes the interpolation technique for each method, and optional interpolation variable attributes for configuring the interpolation process.
+The valid values of **`interpolation_name`** are given in <<Appendix
+J>>. This appendix describes the interpolation technique for each
+method, and optional interpolation variable attributes for configuring
+the interpolation process.
 
-If a standardized interpolation name is not given, the interpolation variable must have a **`interpolation_description`** attribute defined instead, containing a description of the non-standardised interpolation (in a similar manner to a long name being used instead of a standard name). This description is free text that can take any form (including a URI, for example). Whilst it is recommended that a standardised interpolation is provided, the alternative is provided to promote interoperability in cases where a well defined user community needs to use sophisticated interpolation techniques that may also be under development.
+If a standardized interpolation name is not given, the interpolation
+variable must have a **`interpolation_description`** attribute defined
+instead, containing a description of the non-standardised
+interpolation (in a similar manner to a long name being used instead
+of a standard name). This description is free text that can take any
+form (including a URI, for example). Whilst it is recommended that a
+standardised interpolation is provided, the alternative is provided to
+promote interoperability in cases where a well defined user community
+needs to use sophisticated interpolation techniques that may also be
+under development.
 
-The definition of the interpolation method, however it is specified, may include instructions to treat groups of physically related coordinates simultaneously, if such tie points are present. For example, there are cases where longitudes cannot be interpolated without considering the corresponding latitudes. It is up to the interpolation description to describe how such coordinates are to be identified (e.g. it may be that such tie point variables require particular units or standard names).
+The definition of the interpolation method, however it is specified,
+may include instructions to treat groups of physically related
+coordinates simultaneously, if such tie points are present. For
+example, there are cases where longitudes cannot be interpolated
+without considering the corresponding latitudes. It is up to the
+interpolation description to describe how such coordinates are to be
+identified (e.g. it may be that such tie point variables require
+particular units or standard names).
 
-An interpolation method may require __interpolation coefficient variables__ that provide values for interpolation equation terms that are not satisfied by the tie points. Such terms in the interpolation equations are associated with interpolation coefficient variables by the **`interpolation_coefficients`** attribute that takes a string value, the string being comprised of blank-separated elements of the form `"term: variable"`, where `term` is a case-insensitive keyword that defines one of the terms in the interpolation method's definition, and `variable` is the name of the interpolation coefficient variable that contains the values for that term. The order of elements is not significant. A term that is omitted from the **`interpolation_coefficients`** attribute should be assumed to be zero.
+Note that the interpolation method is always applied on a per
+interpolation zone basis, for which the construction of the
+uncompressed coordinates may only access those tie points that define
+the extent of the of the interpolation zone.
 
-The interpolation variable attribute **`interpolation_configuration`** may be used to configure the interpolation process. This attribute names other __interpolation configuration variables__ that contain parameters needed to correctly configure the interpolation process. The **`interpolation_configuration`** attribute takes a string value, the string being comprised of blank-separated elements of the form `"item: variable"`, where `item` is a case-insensitive keyword that identifies a configuration item defined in the interpolations method's definition, and `variable` is the name of the interpolation configuration variable that contains the values for that item. The order of elements is not significant.
+The interpolation variable attribute **`interpolation_parameters`**
+may be used to provide extra information to the interpolation
+process. This attribute names __interpolation parameter variables__
+that provide values for coefficent terms in the interpolation
+equation, or for any other terms that configure the interpolation
+process. The **`interpolation_parameters`** attribute takes a string
+value, the string comprising blank-separated elements of the form
+`"term: variable"`, where `term` is a case-insensitive keyword that
+defines one of the terms in the interpolation method's definition
+given in <<Appendix J>>, and `variable` is the name of the
+interpolation parameter variable that contains the values for that
+term. The order of elements is not significant. A numerical term that
+is omitted from the **`interpolation_parameters`** attribute should be
+assumed to be zero.
 
-The **`interpolation_coefficient`** and **`interpolation_configuration`** attributes may only be provided if allowed by the definition of the interpolation method.
+The **`interpolation_parameters`** attribute may only be provided if
+allowed by the definition of the interpolation method. Interplation
+parameters may always be provided to non-standardized interpolation
+methods.
 
-The variables named by the **`interpolation_coefficients`** and **`interpolation_configuration`** attributes must either be scalar, or else their dimensions may include, for each interpolation dimension, either the corresponding tie point interpolation dimension or the corresponding interpolation zone dimension, but not both, and may include any of the non-interpolation dimensions.
+The dimensions of an interpolation parameter variable must be a subset
+of zero or more the tie point variable dimensions, with the
+possibility of a tie point interpolation dimension being replaced with
+the corresponding interpolation zone dimension. The interpretation of
+an interpolation parameter variable depends on which of its dimensions
+are tie point interpolation dimensions, and which are interpolation
+zone dimensions:
 
-The interpretation of interpolation coefficient and configuration variables depends on the nature of the dimensions that they span:
-
-* If no tie point interpolation dimensions are spanned, then the variable provides a value for every interpolation zone. This case is akin to values being defined at the centre of interpolation zones.
+* If no tie point interpolation dimensions are spanned, then the
+  variable provides values for every interpolation zone. This case is
+  akin to values being defined at the centre of interpolation zones.
   
-* If at least one dimension is a tie point interpolation dimension, then each of the variable's values is to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary (<<ci_interpolation_coefficients>>).
+* If at least one dimension is a tie point interpolation dimension,
+  then the variable's values are to be shared by the interpolation
+  zones that are adjacent along each of the specified tie point
+  interpolation dimensions. This case is akin to the values being
+  defined at the interpolation zone boundaries, and therefore equally
+  applicable to the interpolation zones that share that boundary
+  (<<ci_interpolation_parameters>>).
 
-In both cases, the implementation of the interpolation method should broadcast an interpolation coefficient or configuration variable along any interpolation zone dimensions that it does not span.
+In both cases, the implementation of the interpolation method should
+assume that an interpolation parameter variable is broadcast to any
+interpolation zones that it does not span.
 
-Note that the interpolation method is always applied on a per interpolation zone basis, for which the construction of the uncompressed coordinates may only access the tie point that define the extent of the of the interpolation zone, as well as any interpolation coefficient and configuration variables defined for the interpolation zone, including its boundaries.
-
-[[ci_interpolation_coefficients, figure 3]]
+[[ci_interpolation_parameters, figure 3]]
 [.text-center]
-.Through combination of dimensions, interpolation coefficient and interpolation configuration variables may provide values for each interpolation zone, for couples of neighbouring interpolation zones or for multiple interpolation zones sharing a boundary.
+.Through combination of dimensions, interpolation parameter variables may provide values for each interpolation zone, for couples of neighbouring interpolation zones or for multiple interpolation zones sharing a boundary.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
@@ -349,7 +426,7 @@ Note that an implementation of the interpolation method is free to calculate the
 
 [[example-VIIRS]]
 [caption="Example 8.5. "]
-.Multiple interpolation variables with interpolation coefficients and configuration attributes.
+.Multiple interpolation variables with interpolation parameter attributes.
 ====
 ----
 dimensions :
@@ -375,15 +452,27 @@ dimensions :
 variables:
   // VIIRS M-Band 
   float m_radiance(m_track, m_scan, m_channel) ;
-    m_radiance:tie_points = "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    m_radiance:tie_point_dimensions = "m_track: tp_track  zone_track  m_scan: tp_scan  zone_scan  m_scan: tp_time_scan"  ;
-    m_radiance:tie_point_indices = "m_track: m_track_indices  m_scan:  m_scan_indices  m_scan: m_time_scan_indices" ;
+    m_radiance:tie_points =
+         "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation
+          t: time_interpolation" ;
+    m_radiance:tie_point_dimensions = "m_track: tp_track zone_track
+                                       m_scan: tp_scan zone_scan
+                                       m_scan: tp_time_scan"  ;
+    m_radiance:tie_point_indices = "m_track: m_track_indices
+                                    m_scan: m_scan_indices
+                                    m_scan: m_time_scan_indices" ;
 
   // VIIRS I-Band 
   float i_radiance(i_track, i_scan, i_channel) ;
-    i_radiance:tie_points = "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation  t: time_interpolation" ;
-    i_radiance:tie_point_dimensions = "i_track: tp_track  zone_track  i_scan: tp_scan  zone_scan  i_scan: tp_time_scan"  ;
-    i_radiance:tie_point_indices = "i_track: zone_track: i_track_indices  i_scan: zone_scan: i_scan_indices  i_scan: i_time_scan_indices" ;
+    i_radiance:tie_points =
+         "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation
+          t: time_interpolation" ;
+    i_radiance:tie_point_dimensions = "i_track: tp_track zone_track
+                                       i_scan: tp_scan zone_scan
+                                       i_scan: tp_time_scan"  ;
+    i_radiance:tie_point_indices = "i_track: i_track_indices zone_track
+                                    i_scan: i_scan_indices zone_scan
+                                    i_scan: i_time_scan_indices" ;
 
   // Tie point index variables
   int m_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
@@ -435,8 +524,12 @@ variables:
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_1" ;
-    tp_interpolation:interpolation_coefficients = "exp1: expansion1  align1: alignment1  exp2: expansion2  align2:alignment2" ;
-    tp_interpolation:interpolation_configuration = "flags: interpolation_zone_flags" ;
+    tp_interpolation:interpolation_parameters =
+         "exp1: expansion1
+          align1: alignment1
+          exp2: expansion2
+          align2:alignment2 
+          flags: interpolation_zone_flags" ;
 
   // Interpolation coefficient and configuration variables
   short expansion1(zone_track , tp_scan) ;
@@ -446,7 +539,10 @@ variables:
   byte interpolation_zone_flags(zone_track , zone_scan) ;
     interpolation_zone_flags : valid_range = "1b, 7b" ;
     interpolation_zone_flags : flag_masks = "1b, 2b, 4b" ;
-    interpolation_zone_flags : flag_meanings = "location_use_cartesian  sensor_direction_use_cartesian  solar_direction_use_cartesian" ;
+    interpolation_zone_flags : flag_meanings =
+         "location_use_cartesian
+          sensor_direction_use_cartesian
+          solar_direction_use_cartesian" ;
 
   // Time tie points
   double t(tp_track, tp_time_scan) ;
@@ -460,8 +556,8 @@ variables:
 
 This example demonstrates the use of multiple interpolation variables,
 the reusability of the interpolation variable between data variables
-of different dimensions and the use of the interpolation coefficients
-and interpolation configuration attributes.
+of different dimensions and the use of the interpolation parameter
+attribute.
 
 ====
 
