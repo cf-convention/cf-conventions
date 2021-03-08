@@ -1,11 +1,16 @@
 [[appendix-coordinate-sampling, Appendix J, Coordinate Sampling]] 
 [appendix]
-== Coordinate Sampling
+== Coordinate Sampling Methods
+
+The general description of  of the compression by coordinate sampling is given in section <<compression-by-coordinate-sampling>>. This appendix provides details on the available methods for compression by coordinate sampling.
 
 The definitions and guidance given here allow an application to compress an existing data set using coordinate sampling, while letting the creator of the compressed dataset control the accuracy of the reconstituted coordinates through the degree of subsampling and the choice of interpolation method.
 
 Futhermore, the definitions given here allow an application to uncompress coordinate and auxiliary coordinate variables that have been compressed using coordinate sampling. The key element of this process is the reconstitution of the full resolution coordinates in the domain of the data by interpolation between the lower resolution coordinates, the tie points, stored in the compressed dataset.
 
+The appendix is organised in a sections on <<common_definitions_and_notation>>, <<common_conversions_and_formulas>>, <<interpolation_methods>> and finally two sections with step procedures <<coordinate_compression_steps>> and <<coordinate_uncompression_steps>>.
+
+[[common_definitions_and_notation]]
 === Common Definitions and Notation
 
 The target domain is segmented into smaller interpolation zones as described in <<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>.
@@ -48,6 +53,7 @@ For two dimensional interpolation, `i1` and `i2` are indices in the interpolatio
 
 Note that, for simplicity of notation, the descriptions of the interpolation methods in most places leave out the indices of tie point related variables and refers to these with `a` and `b` in the one dimensional case and with `a`, `b`, `c` and `d` in the two dimensional case. If, in the two dimensional case, `a = tp(tp2, tp1)` then  `b = tp(tp2, tp1+1)`, `c = tp(tp2+1, tp1)` and `d = tp(tp2+1, tp1+1)`, reflecting the way the tie point data would be stored in the data set, see also <<interpolation>>.
 
+[[interpolation_methods]]
 === Interpolation Methods
 
 ==== Linear Interpolation
@@ -106,40 +112,55 @@ where `ua` and `ub` are the coordinate values at tie points `a` and `b` respecti
 [[quadratic_geo]]
 ==== Quadratic Interpolation of geographic coordinates latitude and longitude
 
+[[quadratic1, figure 2]]
+[.text-center]
+.With the expansion coefficient ce = 0 and the alignment coefficient ca = 0, the method reconstitutes the points at regular intervals along a great circle between tie points A and B.
+image::images/ci_quadratic1.svg[,100%,pdfwidth=50vw,align="center"] 
+
+[[quadratic2, figure 3]]
+[.text-center]
+.With the expansion coefficient ce > 0 and the alignment coefficient ca > 0, the method reconstitutes the points at intervals of expanding size (ce) along an arc with an alignment offset (ca) from the great circle between tie points A and B.
+image::images/ci_quadratic2.svg[,100%,pdfwidth=50vw,align="center"]  
+
+
 [cols="6,15"]
 |===============
 | Name | **`interpolation_name = "quadratic_geo"`** 
-| Description | A one dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude. Requires a coordinate pair with `standard_name` `latitude` and `longitude`. +
+| Description | A one dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used for remote sensing products with geographic coordinates on the reference ellipsoid. Requires a coordinate pair with `standard_name` `latitude` and `longitude`. +
   + 
 By default, interpolation is performed directly in the latitude and longitude coordinates, but may be performed in cartesian coordinates where required for achieving the desired accuracy. This must be indicated by setting the `location_use_cartesian` flag within the interpolation parameter `interpolation_zone_flags` for each interpolation zone where interpolation in cartesian coordinates is required.  
 
-The coefficients of the quadratic interpolation term express the offset of the interpolated point at `s=0.5` relative to a geometric midpoint between the tie points `a` and `b`. The coefficients may be represented in three different ways:
+The quadratic interpolation coefficients `ce` and `ca`, stored as interpolation parameters in the product, describes a point `P` between the tie points `A` and `B`, which is equivalent of an additional tie point in the sense that the method will accurately reconstitute the point `P` in the same way as it accurately reconstitutes the tie points `A` and `B`. See <<quadratic1>> and <<quadratic2>>.
 
-For storage in the dataset as the coefficients `(ce, ca)`, referred to as the dimensional representation. The component `ce` is the offset projected on the line from tie point `b` to tie point `a`. The component `ca` is the offset projected on the line perpendicular to the line from tie point `b` to tie point `a` and  perpendicular to the plane spanned `va` and `vb`, the vector representations of the two tie points. +
+Although equivalent to a tie point, the coefficients `ce` and `ca` have two advantages over tie points. Firstly, they can often be stored as a lower precision floating point number compared to the tie points, as `ce` and `ca` only describes the position of P relative to the midpoint `M` between the tie points `A` and `B`. Secondly, if any of `ce` and `ca` do not contribute significantly to the accuracy of the reconstituted points, it can be left out of the data set and its value will default to zero during uncompression. 
 
-For interpolation in cartesian coordinates as the coefficients `vcxyz = (cx, cy, cz)`, expressing the offset components along the cartesian axes x, y and z respectively.
+The coefficients may be represented in three different ways:
+
+For storage in the dataset as the non-dimensional coefficients `(ce, ca)`, referred to as the parametric representation. The component `ce` is the offset projected on the line from tie point `b` to tie point `a` and expressed as a fraction of the distance between `A` and `B`. The component `ca` is the offset projected on the line perpendicular to the line from tie point `b` to tie point `a` and  perpendicular to the plane spanned `va` and `vb`, the vector representations of the two tie points, and expressed as a fraction of the distance between `A` an `B`. +
+
+For interpolation in cartesian coordinates as the coefficients `vcxyz = (cx, cy, cz)`, expressing the offset components along the cartesian axes X, Y and Z respectively.
 
 For interpolation in geographic coordinates latitude and longitude as the coefficients `vcll = (clat, clon)`, expressing the offset components along the longitude and latitude directions respectively.
 
-The functions fq() and fc() referenced in the following are defined in <<quadratic>>. 
+The functions `fq() `and `fc()` referenced in the following are defined in <<quadratic>>. 
 
-Note that in the following, conversions between the latitude-longitude representation of a point, `p = (p.lat, p.lon)`, and its cartesian representation, `vp = (vp.x, vp.y, vp.z)`, are not explicitly stated. Where required they shall be performed using `fll2xyz()` and `fxyz2ll()` defined in <<coordinate_conversion>>.
+Note that in the following, conversions between the latitude-longitude representation of a point, `p = (p.lat, p.lon)`, and its cartesian representation, `vp = (vp.x, vp.y, vp.z)`, are not explicitly stated. Where required they shall be performed using `fll2xyz()` and `fxyz2ll()` defined in <<common_conversions_and_formulas>>.
  
 | Interpolation Parameter terms | Any subset of interpolation coefficients `ce, ca`, which must each span the interpolation_zone dimension. +
-Optionally the flag variable `interpolation_zone_flags`, which must span the interpolation_zone dimension and must include `location_use_cartesian` in the `flag_meanings` attribute. 
+Optionally the flag variable `interpolation_zone_flags`, which must span the `interpolation_zone` dimension and must include `location_use_cartesian` in the `flag_meanings` attribute. 
 
 | Coordinate Compression Calculations | 
 First calculate the cartesian representation of the interpolation coefficients from the tie points `a` and `b` as well as the point `p(i)` at index `i` between the tie points `a` and `b`. If the size of the interpolation zone `(ib - ia)` is an even number, then the data point at index `i = (ib - ia)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib - ia - 1)/2` shall be selected. +
 The cartesian interpolation coefficients are found from +
 `vcxyz = fcxyz(va, vb, vp(i), s(i)) = (fc(va.x, vb.x, vp(i).x, s(i)), fc(va.y, vb.y, vp(i).y, s(i)), fc(va.z, vb.z, vp(i).z, s(i)))` +
-Finally, for storage in the dataset, convert the coefficients to the dimensional representation + 
+Finally, for storage in the dataset, convert the coefficients to the parametric representation + 
 `(ce(iz), ca(iz)) = fcxyz2cea(va, vb, vcxyz) = (fdot(vcxyz, fminus(va, vb))/ (4*(1-rsqr)), fdot(vcxyz, fcross(va, vb))/(2*rsqr*(1-rsqr))` + 
 where `vr = fmultiply(0.5, fplus(va, vb))` and `rsqr = fdot(vr, vr)`. +
 `vf = fminus(va, vb)`;  + 
 `vn = fcross(va, vb)`;  +  
 The interpolation parameter term `interpolation_zone_flags(iz)` shall have the flag `location_use_cartesian` set if the interpolation zone intersects the `longitude = 180.0` or if the interpolation zone extends into `latitude > latitude_limit` or `latitude < -latitude_limit`, where the choice of `latitude_limit` will impact the coordinate reconstitution accuracy. 
 | Coordinate Uncompression Calculations | 
-First calculate the cartesian representation of the interpolation coefficients from the dimensional representation stored in the dataset using + 
+First calculate the cartesian representation of the interpolation coefficients from the parametric representation stored in the dataset using + 
 `vcxyz = fcea2cxyz(va, vb, ce(iz), ca(iz)) = fplus(fmultiply(ce, fminus(va, vb)), fmultiply(ca, fcross(va, vb)), fmultiply(cr, vr))` +
 where +
 `vr = fmultiply(0.5, fplus(va, vb))`; + 
@@ -158,14 +179,22 @@ Then use the following expression to reconstitute any point `p(i)` between the t
 [[bi_quadratic_geo]]
 ==== Biquadratic Interpolation of geographic coordinates
 
+[[quadratic3, figure 4]]
+[.text-center]
+.With the expansion coefficient ce = 0 and the alignment coefficient ca = 0, the method reconstitutes the points at regular intervals along a great circle between tie points A and B.
+image::images/ci_quadratic3.svg[,50%,pdfwidth=50vw,align="center"] 
+
+
 [cols="6,15"]
 |===============
 | Name | **`interpolation_name = "bi_quadratic_geo"`** 
-| Description | A two dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude. Requires a coordinate pair with `standard_name` `latitude` and `longitude`. +
+| Description | A two dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used fro remote sensing products with geographic coordinates on the reference ellipsoid. Requires a coordinate pair with `standard_name` `latitude` and `longitude`. +
 
-The functions fcxyz(), fcxyz2cea(), fcea2cxyz(), fcxyz2cll(), fqxyz() and fqll() referenced in the following are defined in <<quadratic_geo>>. As for this method interpolation is performed directly in the latitude and longitude coordinates or in cartesian coordinates, where required for achieving the desired accuracy. Similarly, it shares the three different representations of the quadratic interpolation coefficients, the dimensional representation `(ce, ca)` for storage in the dataset, `vcll = (clat, clon)` for interpolation in geographic coordinates latitude and longitude and `vcxyz = (cx, cy, cz)` for cartesian interpolation. 
+The functions `fcxyz()`, `fcxyz2cea()`, `fcea2cxyz()`, `fcxyz2cll()`, `fqxyz()` and `fqll()` referenced in the following are defined in <<quadratic_geo>>. As for that method, interpolation is performed directly in the latitude and longitude coordinates or in cartesian coordinates, where required for achieving the desired accuracy. Similarly, it shares the three different representations of the quadratic interpolation coefficients, the parametric representation `(ce, ca)` for storage in the dataset, `vcll = (clat, clon)` for interpolation in geographic coordinates latitude and longitude and `vcxyz = (cx, cy, cz)` for cartesian interpolation. 
 
-Note that in the following, conversions between the latitude-longitude representation of a point, `p = (p.lat, p.lon)`, and its cartesian representation, `vp = (vp.x, vp.y, vp.z)`, are not explicitly stated. Where required they shall be performed using `fll2xyz()` and `fxyz2ll()` defined in <<coordinate_conversion>>.
+The the parametric representation of the interpolation coefficients are store in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3` equivalent to five additional tie points for the interpolation zone as shown in <<quadratic3>>, which also shows the orientation and indices of the parameters.  
+
+Note that in the following, conversions between the latitude-longitude representation of a point, `p = (p.lat, p.lon)`, and its cartesian representation, `vp = (vp.x, vp.y, vp.z)`, are not explicitly stated. Where required they shall be performed using `fll2xyz()` and `fxyz2ll()` defined in <<common_conversions_and_formulas>>.
 
 | Interpolation Parameter terms  | 
 Any subset of interpolation coefficients `ce1, ca1`, which must each span the `tie_point_interpolation_2` and `interpolation_zone_1` dimensions; +
@@ -181,7 +210,7 @@ Using the selected `(i2, i1)`, the cartesian interpolation coefficients are foun
 `vcxyz_ab  = fcxyz( va, vb, vp(ia2, i1), s(i1));`   `vcxyz_cd  = fcxyz( vc, vd, vp(ic2, i1), s(i1));` + 
 `vcxyz_ac  = fcxyz( va, vc, vp(i2, ia1), s(i2));`   `vcxyz_bd  = fcxyz( vb, vd, vp(i2, ib1), s(i2));` + 
 `vcxyz_z  = fcxyz( fqxyz(va, vc, vcxyz_ac, 0.5), fqxyz(vb, vd, vcxyz_bd, 0.5), vp(i2, i1), s(i1));` +
-Finally, for storage in the interpolation parameter datasets, convert the coefficients to the dimensional representation + 
+Finally, for storage in the interpolation parameter datasets, convert the coefficients to the parametric representation + 
 `(ce1(tp2, iz1), ca1(tp2, iz1))  = fcxyz2cea( va, vb, vcxyz_ab);` +
 `(ce1(tp2+1, iz1), ca1(tp2+1, iz1))  = fcxyz2cea( vc, vd, vcxyz_cd);` + 
 `(ce2(iz2, tp1), ca2(iz2, tp1))  = fcxyz2cea( va, vc, vcxyz_ac);` +
@@ -189,7 +218,7 @@ Finally, for storage in the interpolation parameter datasets, convert the coeffi
 `(ce3(iz2, iz1), ca3(iz2, iz1))  = fcxyz2cea( fqxyz(va, vc, vcxyz_ac, 0.5), fqxyz(vb, vd, vcxyz_bd, 0.5), vcxyz_z);` +
 The interpolation parameter term `interpolation_zone_flags(iz2, iz1)` shall have the flag `location_use_cartesian` set if the interpolation zone intersects the `longitude = 180.0` or if the interpolation zone extends into `latitude > latitude_limit` or `latitude < -latitude_limit`, where the choice of `latitude_limit` will impact the coordinate reconstitution accuracy. 
 | Coordinate Uncompression Calculations |
-First calculate the cartesian representation of the interpolation coefficient sets from the dimensional representation stored in the dataset +
+First calculate the cartesian representation of the interpolation coefficient sets from the parametric representation stored in the dataset +
 `vcxyz_ab  = fcea2cxyz( va, vb, ce1(tp2, iz1), ca1(tp2, iz1));` + 
 `vcxyz_cd  = fcea2cxyz( vc, vd, ce1(tp2+1, iz1), ca1(tp2+1, iz1));` + 
 `vcxyz_ac  = fcea2cxyz( va, vc, ce2(iz2, tp1), ca2(iz2, tp1));` +
@@ -214,7 +243,7 @@ where +
 |===============   
 
 
-[[coordinate_conversion]]
+[[common_conversions_and_formulas]]
 ==== Common conversions and formulas
 
 [cols="1, 8, 8"]  
@@ -246,9 +275,9 @@ where +
 
 |===============  
 
-[[interpolation_methods]]
 
 
+[[coordinate_compression_steps]]
 === Coordinate Compression Steps
 
 [[compression-by-coordinate-sampling-generation-of-tie-points]]
@@ -301,7 +330,7 @@ where +
 
 |===============
 
-
+[[coordinate_uncompression_steps]]
 === Coordinate Uncompression Steps
 
 
