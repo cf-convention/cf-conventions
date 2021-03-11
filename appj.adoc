@@ -181,7 +181,7 @@ Then use the following expression to reconstitute any point `p(i)` between the t
 
 [[quadratic3, figure 4]]
 [.text-center]
-.The the parametric representation of the interpolation coefficients `(ce, ca)`, stored in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3`, are equivalent to five additional tie points for the interpolation zone. Shown with parameter orientation and indices.  
+.The the parametric representation of the interpolation coefficients `(ce, ca)`, stored in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3`, is equivalent to five additional tie points for the interpolation zone. Shown with parameter orientation and indices.  
 
 image::images/ci_quadratic3.svg[,50%,pdfwidth=50vw,align="center"] 
 
@@ -226,11 +226,14 @@ First calculate the cartesian representation of the interpolation coefficient se
 `vcxyz_bd  = fcea2cxyz( vb, vd, ce2(iz2, tp1+1), ca2(iz2, tp1+1));` + 
 `vcxyz_z  = fcea2cxyz( fqxyz(va, vc, vcxyz_ac, 0.5), fqxyz(vb, vd, vcxyz_bd, 0.5), ce3(iz2, iz1), ca3(iz2, iz1));` +
 If the flag `location_use_cartesian` of the interpolation parameter term `interpolation_zone_flags` is set, use the following expression to reconstitute any point `p(i2, i1)` between the tie points `a` and `b` using interpolation in cartesian coordinates + 
-`vp(i2, i1) = fqxyz(vab, vcd, vz, s2(i2));` + 
+`vp(i2, i1) = fqxyz(vab, vcd, vcz, s2(i2));` + 
 where +
 `vab = fqxyz(va, vb, vcxyz_ab, s1(i1))`; + 
 `vcd = fqxyz(vc, vd, vcxyz_cd, s1(i1))`; + 
-`vz = fqxyz(vcxyz_ac, vcxyz_bd, vcxyz_z, s1(i1))`. +
+`vac = fqxyz(va, vc, vcxyz_ac, 0.5)`; + 
+`vbd = fqxyz(vb, vd, vcxyz_bd, 0.5)`; + 
+`vz = fqxyz(vac, vbd, vcxyz_z, s1(i1))`. +
+`vcz = fcxyz( vab, vcd, vz, 0.5)` +
 Otherwise, first calculate latitude-longitude representation of the interpolation coefficients + 
 `vcll_ab  = fcxyz2cll( va, vb, vcxyz_ab);`   `vcll_cd  = fcxyz2cll( vc, vd, vcxyz_cd);` + 
 `vcll_ac  = fcxyz2cll( va, vc, vcxyz_ac);`   `vcll_bd  = fcxyz2cll( vb, vd, vcxyz_bd);` + 
@@ -240,7 +243,12 @@ Then use the following expression to reconstitute any point `p(i2, i1)` in the t
 where +
 `ab = fqll(a, b, vcll_ab, s1(i1))`; + 
 `cd = fqll(c, d, vcll_cd, s1(i1))`; + 
-`z = fqll(vcll_ac, vcll_bd, vcll_z, s1(i1))`. 
+`ac = fqll(a, c, vcll_ac, 0.5`; + 
+`bd = fqll(b, d, vcll_bd, 0.5`; + 
+
+
+`z = fqll(vcll_ac, vcll_bd, vcll_z, s1(i1))`
+. 
 |===============   
 
 
