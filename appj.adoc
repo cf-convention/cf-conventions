@@ -80,7 +80,7 @@ where `ua` and `ub` are the coordinate values at tie points `a` and `b` respecti
 | Interpolation Parameter terms | None
 | Coordinate Compression Calculations | None
 | Coordinate Uncompression Calculations | 
-The interpolation function fl() defined for linear interpolation above is first applied twice in the interpolation dimension 1, once between between tie points `a` and `b` and once between tie point `c` and `d`. It is then applied once in the interpolation dimension 2, between the two resulting coordinate points, yielding the interpolated coordinate value `u(i1, i2)`:  +  
+The interpolation function fl() defined for linear interpolation above is first applied twice in the interpolation dimension 1, once between tie points `a` and `b` and once between tie points `c` and `d`. It is then applied once in the interpolation dimension 2, between the two resulting coordinate points, yielding the interpolated coordinate value `u(i1, i2)`:  +  
 `uab = fl(ua, ub, s1(i1))`; +
 `ucd = fl(uc, ud, s1(i1))`; +
 `u(i1, i2) = fl(uab, ucd, s2(i2))`; +
@@ -130,13 +130,13 @@ image::images/ci_quadratic2.svg[,100%,pdfwidth=50vw,align="center"]
   + 
 By default, interpolation is performed directly in the latitude and longitude coordinates, but may be performed in cartesian coordinates where required for achieving the desired accuracy. This must be indicated by setting the `location_use_cartesian` flag within the interpolation parameter `interpolation_zone_flags` for each interpolation zone where interpolation in cartesian coordinates is required.  
 
-The quadratic interpolation coefficients `ce` and `ca`, stored as interpolation parameters in the product, describes a point `P` between the tie points `A` and `B`, which is equivalent of an additional tie point in the sense that the method will accurately reconstitute the point `P` in the same way as it accurately reconstitutes the tie points `A` and `B`. See <<quadratic1>> and <<quadratic2>>.
+The quadratic interpolation coefficients `ce` and `ca`, stored as interpolation parameters in the product, describe a point `P` between the tie points `A` and `B`, which is equivalent of an additional tie point in the sense that the method will accurately reconstitute the point `P` in the same way as it accurately reconstitutes the tie points `A` and `B`. See <<quadratic1>> and <<quadratic2>>.
 
 Although equivalent to a tie point, the coefficients `ce` and `ca` have two advantages over tie points. Firstly, they can often be stored as a lower precision floating point number compared to the tie points, as `ce` and `ca` only describes the position of P relative to the midpoint `M` between the tie points `A` and `B`. Secondly, if any of `ce` and `ca` do not contribute significantly to the accuracy of the reconstituted points, it can be left out of the data set and its value will default to zero during uncompression. 
 
 The coefficients may be represented in three different ways:
 
-For storage in the dataset as the non-dimensional coefficients `(ce, ca)`, referred to as the parametric representation. The component `ce` is the offset projected on the line from tie point `b` to tie point `a` and expressed as a fraction of the distance between `A` and `B`. The component `ca` is the offset projected on the line perpendicular to the line from tie point `b` to tie point `a` and  perpendicular to the plane spanned `va` and `vb`, the vector representations of the two tie points, and expressed as a fraction of the distance between `A` an `B`. +
+For storage in the dataset as the non-dimensional coefficients `(ce, ca)`, referred to as the parametric representation. The component `ce` is the offset projected on the line from tie point `b` to tie point `a` and expressed as a fraction of the distance between `A` and `B`. The component `ca` is the offset projected on the line perpendicular to the line from tie point `b` to tie point `a` and  perpendicular to the plane spanned by `va` and `vb`, the vector representations of the two tie points, and expressed as a fraction of the distance between `A` and `B`. +
 
 For interpolation in cartesian coordinates as the coefficients `vcxyz = (cx, cy, cz)`, expressing the offset components along the cartesian axes X, Y and Z respectively.
 
@@ -181,7 +181,7 @@ Then use the following expression to reconstitute any point `p(i)` between the t
 
 [[quadratic3, figure 4]]
 [.text-center]
-.The the parametric representation of the interpolation coefficients `(ce, ca)`, stored in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3`, is equivalent to five additional tie points for the interpolation zone. Shown with parameter orientation and indices.  
+.The parametric representation of the interpolation coefficients `(ce, ca)`, stored in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3`, is equivalent to five additional tie points for the interpolation zone. Shown with parameter orientation and indices.  
 
 image::images/ci_quadratic3.svg[,50%,pdfwidth=50vw,align="center"] 
 
@@ -189,11 +189,11 @@ image::images/ci_quadratic3.svg[,50%,pdfwidth=50vw,align="center"]
 [cols="6,15"]
 |===============
 | Name | **`interpolation_name = "bi_quadratic_geo"`** 
-| Description | A two dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used fro remote sensing products with geographic coordinates on the reference ellipsoid. Requires a coordinate pair with `standard_name` `latitude` and `longitude`. +
+| Description | A two dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used for remote sensing products with geographic coordinates on the reference ellipsoid. Requires a coordinate pair with `standard_name` `latitude` and `longitude`. +
 
 The functions `fcxyz()`, `fcxyz2cea()`, `fcea2cxyz()`, `fcxyz2cll()`, `fqxyz()` and `fqll()` referenced in the following are defined in <<quadratic_geo>>. As for that method, interpolation is performed directly in the latitude and longitude coordinates or in cartesian coordinates, where required for achieving the desired accuracy. Similarly, it shares the three different representations of the quadratic interpolation coefficients, the parametric representation `(ce, ca)` for storage in the dataset, `vcll = (clat, clon)` for interpolation in geographic coordinates latitude and longitude and `vcxyz = (cx, cy, cz)` for cartesian interpolation. 
 
-The the parametric representation of the interpolation coefficients are store in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3` equivalent to five additional tie points for the interpolation zone as shown in <<quadratic3>>, which also shows the orientation and indices of the parameters.  
+The parametric representation of the interpolation coefficients, stored in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3`, is equivalent to five additional tie points for the interpolation zone as shown in <<quadratic3>>, which also shows the orientation and indices of the parameters.  
 
 Note that in the following, conversions between the latitude-longitude representation of a point, `p = (p.lat, p.lon)`, and its cartesian representation, `vp = (vp.x, vp.y, vp.z)`, are not explicitly stated. Where required they shall be performed using `fll2xyz()` and `fxyz2ll()` defined in <<common_conversions_and_formulas>>.
 
@@ -211,7 +211,7 @@ Using the selected `(i2, i1)`, the cartesian interpolation coefficients are foun
 `vcxyz_ab  = fcxyz( va, vb, vp(ia2, i1), s(i1));`   `vcxyz_cd  = fcxyz( vc, vd, vp(ic2, i1), s(i1));` + 
 `vcxyz_ac  = fcxyz( va, vc, vp(i2, ia1), s(i2));`   `vcxyz_bd  = fcxyz( vb, vd, vp(i2, ib1), s(i2));` + 
 `vcxyz_z  = fcxyz( fqxyz(va, vc, vcxyz_ac, 0.5), fqxyz(vb, vd, vcxyz_bd, 0.5), vp(i2, i1), s(i1));` +
-Finally, for storage in the interpolation parameter datasets, convert the coefficients to the parametric representation + 
+Finally, before storing them in the dataset's interpolation parameters, convert the coefficients to the parametric representation + 
 `(ce1(tp2, iz1), ca1(tp2, iz1))  = fcxyz2cea( va, vb, vcxyz_ab);` +
 `(ce1(tp2+1, iz1), ca1(tp2+1, iz1))  = fcxyz2cea( vc, vd, vcxyz_cd);` + 
 `(ce2(iz2, tp1), ca2(iz2, tp1))  = fcxyz2cea( va, vc, vcxyz_ac);` +
