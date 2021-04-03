@@ -880,6 +880,9 @@ H.22. <a href="#example-h.22">Time series of atmospheric sounding profiles along
 <li>
 <p>Alan D. Snow, Corteva Agriscience</p>
 </li>
+<li>
+<p>Tobias Kölling, MPIM</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -2304,7 +2307,35 @@ and minutes).</pre>
 <div class="sect3">
 <h4 id="calendar"><a class="anchor" href="#calendar"></a>4.4.1. Calendar</h4>
 <div class="paragraph">
-<p>In order to calculate a new date and time given a base date, base time and a time increment one must know what calendar to use. For this purpose we recommend that the calendar be specified by the attribute <strong><code>calendar</code></strong> which is assigned to the time coordinate variable. The values currently defined for <strong><code>calendar</code></strong> are:</p>
+<p>A date/time is the set of numbers which together identify an instant of time, namely its year, month, day, hour, minute and second, where the second may have a fraction but the others are all integer.
+A time coordinate value represents a date/time.
+In order to calculate a time coordinate value from a date/time, or the reverse, one must know the <strong><code>units</code></strong> attribute of the time coordinate variable (containing the time unit of the coordinate values and the reference date/time) and the calendar.
+The choice of calendar defines the set of dates (year-month-day combinations) which are permitted, and therefore it specifies the number of days between the times of <strong><code>0:0:0</code></strong> (midnight) on any two dates.</p>
+</div>
+<div class="paragraph">
+<p>When a time coordinate value is calculated from a date/time, or the reverse, it is assumed that the coordinate value increases by exactly 60 seconds from the start of any minute (identified by year, month, day, hour, minute, all being integers) to the start of the next minute, with no leap seconds, in all CF calendars.
+This assumption has various consequences when real-world date/times from calendars which do contain leap seconds (such as UTC) are stored in time coordinate variables:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Any date/times between the end of the 60th second of the last minute of one hour and the start of the first second of the next hour cannot be represented by time coordinates e.g. <strong><code>2016-12-31 23:59:60.5</code></strong> cannot be represented.</p>
+</li>
+<li>
+<p>A time coordinate value must not be interpreted as representing a date/time in the excluded range.
+For instance, <strong><code>60 seconds after 23:59</code></strong> means <strong><code>00:00</code></strong> on the next day.</p>
+</li>
+<li>
+<p>A date/time in the excluded range must not be used as a reference date/time e.g. <strong><code>seconds since 2016-12-31 23:59:60</code></strong> is not a permitted value for <strong><code>units</code></strong>.</p>
+</li>
+<li>
+<p>It is important to realise that a time coordinate value does not necessarily exactly equal the actual length of the interval of time between the reference date/time and the date/time it represents.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>It is recommended that the calendar be specified by the <strong><code>calendar</code></strong> attribute of the time coordinate variable.
+The values currently defined for <strong><code>calendar</code></strong> are:</p>
 </div>
 <div class="dlist">
 <dl>
@@ -10697,6 +10728,14 @@ node coordinate variables to be one of the dimensions of the data variable.</p>
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">10 March 2021</div>
+<ol class="arabic">
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/313">Issue #313</a>: Clarification of the handling of leap seconds</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -10765,7 +10804,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-06 10:48:35 UTC
+Last updated 2021-04-03 09:00:19 UTC
 </div>
 </div>
 </body>
