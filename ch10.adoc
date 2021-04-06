@@ -1,0 +1,232 @@
+
+[[reporting-data-uncertainty, Reporting Data Uncertainty]]
+
+== Reporting Data Uncertainty
+
+This chapter explains the method for reporting **data uncertainty**. It does not describe how to derive the uncertainty value, only how the values are reported.
+
+=== Uncertainty Variable
+
+Uncertainty values are reported in an ancillary variable linked to the data variable via the required __ancillary_variables__ variable attribute. A reported uncertainty value is a number expected to be added to the data to define the uncertainty range for the data value. This standard does not have a method to describe absolute uncertainty values. The uncertainty variable data type should match the data variable type (e.g. float type data links to float type uncertainty) to aid the data user in addion. Every uncertainty variable must include a __standard_name__ attribute set to the appropriate standard name. The existence of the uncertainty standard name in the __standard_name__ variable attribute is the minimum requirement and the indicator the variable is an uncertainty value that should be added to the data values. The uncertainty variable follows all other CF conventions for other attributes including __long_name__, __units__, ___FillValue__, __missing_value__, __references__, and __cell_method__. If the __units__ attribute is omitted, the uncertainty units are assumed to equal the linked data units. Uncertainty variables are often dimensioned the same as the data variable, but that is not a requirement. Scalar uncertainty values are allowed and are added to the data values for upper values and subtracted for lower values. If the uncertainty variable has an additional trailing dimension of length two, it is assumed the two values are the upper and lower uncertainty. The lower uncertainty value (first value) should be a negative value and upper value (second value) positive. This enables the user to simply add uncertainty values to the data value. Multiple data variables linking to a single uncertainty variable is allowed.
+
+[[minimum-uncertainty-ex]]
+[caption="Example 10.1. "]
+.Minimum requirements for an uncertainty varible
+====
+Example of the minimum metadata required to define an uncertainty variable.
+----
+float temp(time)
+  temp:long_name = "Atmospheric air temperature"
+  temp:units = "degC"
+  temp:ancillary_variables = "temp_u"
+
+float temp_u
+  temp_u:standard_name = "total_uncertainty" 
+----
+====
+
+=== Uncertainty Classifications
+
+The general classifications of uncertainty are categorized as __total__, __random__, and __systematic__. Typically a data user will want the uncertainty presented in one of these three categories, or may need all three presented independently. The required __standard_name__ variable attribute must be set to include one of the standard names defining the data as uncertainty. The standard name should end with {rdquo}_uncertainty{rdquo} to clearly indicate the values are uncertainty values.
+
+* **total_uncertainty** = Uncertainty including values from all sources including random and systematic. This may be necessary even with random and systematic uncertainty presented in the file since the square root of the sum of squares assumes independence which is not true in all instances.
+* **random_uncertainty** = Uncertainty including all values associated with random processes only.
+* **systematic_uncertainty** = Uncertainty including all values from systematic (i.e. bias) processes only.
+* **specific_total_uncertainty** = Uncertainty from a specific process that is a component of the total uncertainty including values from both random and systematic. An example is sun glare in retrieving sea surface temperature which is only one component of the total sea surface temperature uncertainty.
+* **specific_random_uncertainty** = Uncertainty from a specific process that is a component of the total random uncertainty calculated from the errors associated with random processes only.
+* **specific_systematic_uncertainty** = Uncertainty from a specific process that is a component of the total systematic uncertainty calculated from the errors associated with systematic processes only.
+* **computed_uncertainty** = The uncertainty values need to be computed using the method described in the __formula__ attribute or document linked with __references__ attribute. The uncertainty standard name is listed under attribute __computed_standard_name__.
+
+This standard does not require all uncertainty classifications to be present in the file, only that the __standard_name__ indicating the variable is an uncertainty be indicated for each uncertainty variable presented. The general method used to calculate the uncertainty may be explained with the __cell_methods__ attribute. A __references__ variable attribute may provide a link to external documentation about how the values were calculated. The external references should follow the __references__ attribute definition in <<description-of-file-contents>>. The preferred method is a reference that will not break, as opposed to a basic URL that may become unlinked with domain changes. A DOI is the best option.
+
+[[qualitative-uncertainty-ex]]
+[caption="Example 10.2 "]
+.Qualitative uncertainty using flag variable methods
+====
+A qualititive uncertainty uses the flag variable method to store a numeric indexing number defined with __flag_values__, __flag_masks__, and __flag_meanings__ variable attributes as described in <<flags>>.
+----
+short tree_spacing_uncertainty (species):
+  tree_spacing_uncertainty:long_name = "The qualitative uncertainty in tree spacing"
+  tree_spacing_uncertainty:standard_name = total_uncertainty"
+  tree_spacing_uncertainty:flag_values = 0, 1, 2, 3
+  tree_spacing_uncertainty:flag_meanings = "no_confidence low_confidence medium_confidence high_confidence"
+----
+====
+
+=== Describing uncertainty method with cell_methods
+
+Uncertainties are grouped into two types as defined by the <<GUM>> documentation. Type A indicates "method of evaluation of uncertainty by the statistical analysis of series of observations," while Type B is defined as a "method of evaluation of uncertainty by means other than the statistical analysis of series of observations". Most of the typical Type A methods are listed under __cell_methods__. Type B methods are too numerous to produce a comprehensive list. To allow for Type B uncertainties without the requirement of adding a large number of new methods to __cell_methods__, use __other_than_statistical_analysis__. The method used to derive the uncertainty value should be listed in a __comment__ attribute or in a document linked using the __reference__ attribute.
+
+Cell Methods typically used to derive uncertainty
+
+* **standard_error** = Standard deviation divided by the square root of number of observations.
+* **confidence_interval** = Interval containing the set of true quantity values of a measurand with a stated probability. For varying confidence intervals along a dimension use __ancillary_variables__ under the uncertainty variable to link to a variable providing confidence intervals.
+* **full_width_half_maximum** = Interval measured between points of the distribution which are half the maximum amplitude.
+* **other_than_statistical_analysis** = A catch-all for the remaining types of methods used to represent the uncertainty considered to be part of Type B uncertainties. A full description of the method should be linked with the __references__ attribute or described in a __comment__ attribute.
+
+[[cell_methods-standard-deviation-uncertainty-ex]]
+[caption="Example 10.3. "]
+.Standard deviation multiplier in the cell_methods
+====
+Normally standard deviation is provided with no multiplier, but some analyses do use multipliers. If a multiplier was applied to the standard deviation the multiplier value should be provided in __cell_methods__ using the standard parenthetical metadata.
+----
+float atmospheric_temperature_uncertainty:
+  atmospheric_temperature_uncertainty:long_name = "Total uncertainty of atmospheric temperature"
+  atmospheric_temperature_uncertainty:units = "degC"
+  atmospheric_temperature_uncertainty:standard_name = "total_uncertainty"
+  atmospheric_temperature_uncertainty:cell_methods = "time: standard_deviation (multiplier 2)"
+----
+====
+[[confidence-interval-uncertainty-ex]]
+[caption="Example 10.4. "]
+.Confidence intervals
+====
+Since the confidence interval requires a defined interval, the interval is provided in the __cell_methods__ attribute using standard parenthetical metadata.
+
+.Consistent confidence interval example
+----
+float relative_humidity_uncert:
+  relative_humidity_uncert:long_name = "Relative humidity uncertainty"
+  relative_humidity_uncert:units = "%"
+  relative_humidity_uncert:standard_name = "random_uncertainty"
+  relative_humidity_uncert:cell_methods = "time: height: confidence_interval (at 95%)"
+----
+
+For varying confidence interval the interval is provided in a separate variable linked to the uncertainty with __ancillary_variables__ attribute.
+
+.Varying confidence interval example
+----
+float atmos_temp_uncert (time):
+  atmos_temp_uncert:long_name = "Surface atmospheric temperature uncertainty"
+  atmos_temp_uncert:units = "degC"
+  atmos_temp_uncert:standard_name = "random_uncertainty"
+  atmos_temp_uncert:cell_methods = "time: confidence_interval"
+  atmos_temp_uncert:ancillary_variables = "confidence_interval"
+
+float confidence_interval (time):
+  confidence_interval:long_name = "Confidence interval for each time step of uncertainty"
+  confidence_interval:units = "%"
+----
+====
+
+[[non-symmetrical-uncertainty-ex]]
+[caption="Example 10.5. "]
+.Non-symmetrical uncertainties
+====
+Non-symmetrical uncertainties are indicated with the additional dimension of length two. The additional dimension follows the same format as the cell boundaries dimension (<<cell-boundaries>>) where the first value is the lower uncertainty value and second is upper value. This requires the first uncertainty value(s) to be a negative value to correctly add and produce a lower value.
+----
+dimensions:
+  time: unlimited
+  asym: 2
+
+variables:
+  float precipitation (time):
+    precipitation:long_name = "Precipitation amount"
+    precipitation:units = "mm"
+    precipitation:standard_name = "precipitation_amount"
+    precipitation:ancillary_variables = "precipitation_uncertainty_sys precipitation_uncertainty_ran"
+  float precipitation_uncertainty_sys (asym): // Note this is treated like a scalar across all values in time
+    precipitation_uncertainty_sys:long_name = "Systematic uncertainty of precipitation amount"
+    precipitation_uncertainty_sys:standard_name = "systematic_uncertainty"
+  float precipitation_uncertainty_ran (time, asym):
+    precipitation_uncertainty_ran:long_name = "Uncertainty of precipitation amount"
+    precipitation_uncertainty_ran:standard_name = "random_uncertainty"
+
+data:
+  precipitation = [0, 0, 1.2, 2.3, 0, …]
+  precipitation_uncertainty_sys = [-0.04, 0.1]
+  precipitation_uncertainty_ran = [-0.01, -0.01, -0.241, -0.145, -0.01, …
+                                    0.02, 0.02, 0.21, 0.27, 0.02, …]
+----
+====
+
+=== Computed uncertainty value
+
+In some cases the absolute uncertainty values are more easily computed from a data value than added to the file as a variable. The derivation of values follows the <<parametric-vertical-coordinate>> methodology of providing a formula for the user to compute the values. Contrary to the __Parametric Vertical Coordinate__ method, the equation is not part of the CF-conventions document, rather is listed in the __formula__ attribute under the uncertainty variable or listed in an external document linked by __references__ attribute.
+
+The computation requirement is indicated by the __standard_name__ set to **__computed_uncertainty__**. The uncertainty type is indicated by the additional required attribute **__computed_standard_name__** set to the correct uncertainty standard name. There is currently no automated method of reading the __formula__ attribute. More complicated uncertainty formula are described in a linked document provided through the __references__ attribute. The __formula_terms__ attribute is used to associate terms in the __formula__ definitions or __references__ document with variables in a NetCDF file.
+
+[[computed-uncertainty-ex]]
+[caption="Example 10.6. "]
+.Computed uncertainty
+====
+For computed uncertainty values, the linked uncertainty variable __standard_name__ attribute is set to __computed_uncertainty__. The equation used to compute uncertainty values is listed in variable attribute __formula__ with formula term variables listed in the __formula_terms__ attribute. If a single formula is listed the computed values are assumed to be symmetrical and should be added for upper and subtracted for lower uncertainty values. If more than one formula is listed, the __formula__ attribute indicate which value is upper and lower uncertainty. For formula description outside of the NetCDF file, the formula attribute is omitted in favor of a __references__ attribute.
+----
+float atmospheric_temperature(time) 
+  atmospheric_temperature:long_name = "Atmospheric temperature" 
+  atmospheric_temperature:units = "degC"
+  atmospheric_temperature:ancillary_variables = "atmospheric_temperature_uncertainty_ran atmospheric_temperature_uncertainty_bias atmospheric_temperature_uncertainty_total"
+
+float instrument_temperature(time) 
+  atmospheric_temperature:long_name = "Instrument temperature" 
+  atmospheric_temperature:units = "degC"
+
+float atmospheric_temperature_uncertainty_ran
+  atmospheric_temperature_uncertainty_ran:long_name = "Atmospheric temperature random uncertainty"
+  atmospheric_temperature_uncertainty_ran:standard_name = "computed_uncertainty"
+  atmospheric_temperature_uncertainty_ran:computed_standard_name = "random_uncertainty"
+  atmospheric_temperature_uncertainty_ran:formula = "U(k) = A(k) * 0.02 + T(k) * 0.001"
+  atmospheric_temperature_uncertainty_ran:formula_terms = "A: atmospheric_temperature T: instrument_temperature"
+
+float atmospheric_temperature_uncertainty_bias
+  atmospheric_temperature_uncertainty_bias:long_name = "Atmospheric temperature bias uncertainty"
+  atmospheric_temperature_uncertainty_bias:comment = "The systematic uncertainty is the difference between the mean of values calculated from a standard calculated value."
+  atmospheric_temperature_uncertainty_bias:standard_name = "computed_uncertainty"
+  atmospheric_temperature_uncertainty_bias:computed_standard_name = "systematic_uncertainty"
+  atmospheric_temperature_uncertainty_bias:formula = "
+    U_upper = atmospheric_temperature + 0.01
+    U_lower = atmospheric_temperature - 0.005"
+
+float atmospheric_temperature_uncertainty_total
+  atmospheric_temperature_uncertainty_total:long_name = "Atmospheric temperature total uncertainty"
+  atmospheric_temperature_uncertainty_total:standard_name = "computed_uncertainty"
+  atmospheric_temperature_uncertainty_total:computed_standard_name = "total_uncertainty"
+  atmospheric_temperature_uncertainty_total:references = "doi:10.1088/0026-1394/47/3/003"
+  atmospheric_temperature_uncertainty_total:formula_terms = "A: atmospheric_temperature T: instrument_temperature"
+----
+====
+
+=== External file uncertainty
+
+Uncertainty values are often derived from data after collection and processing. This could result in asynchronous data and uncertainty files. For these data files the uncertainty may be provided in a separate NetCDF file using the __external_variables__ method (<<external-variables>>). In additon, as more data are collected the uncertainty value may evolve over time. For these scalar uncertainties, the uncertainty values can be set to an applicable range by assuming the value applies until a new uncertainty value is provided. To determining if the scalar uncertainty value applies to a range of values, compare the length of the data variable dimension to the length of the uncertainty variable dimention. If the uncertainty dimension length is greater than one and less than the data dimension length the uncertainty is assumed to be a scalar value that applies to the appropriate range.
+
+[[external-file-uncertainty-ex]]
+[caption="Example 10.6. "]
+.External file uncertainty applying to time blocks
+====
+For a scalar uncertainty applying to a specific time range, the scalar value can be assumed to apply to all time step values until a new time step value matching or greater to the time is available.
+----
+Data File:
+  dimensions:
+    time = UNLIMITED // (120,000 currently)
+
+  variables:
+    float wave_height (time) // 
+      wave_height:long_name = "Wave height"
+      wave_height:units = "m"
+      wave_height:ancillary_variables = "wave_height_uncertainty"
+
+  global attributes:
+    external_variables = "wave_height_uncertainty"
+
+  data:
+    time = "2019-09-11 19:35", "2019-09-11 19:45", "2019-09-11 19:55", …
+    wave_height = 1.1, 1.24, 0.9, ...
+
+Uncertainty File:
+  dimensions:
+    time = UNLIMITED // (2 currently)
+
+  variables:
+    float wave_height_uncertainty (time)
+      wave_height_uncertainty:long_name = "Uncertainty in wave height"
+      wave_height_uncertainty:units = "m"
+      wave_height_uncertainty:standard_name = "total_uncertainty"
+      wave_height_uncertainty:cell_methods = "time: standard_error"
+
+  data:
+    time = "2019-09-11 19:45:30", "2020-03-01 01:00:00",
+    wave_height_uncertainty = 0.01, 0.008
+  
+----
+====
