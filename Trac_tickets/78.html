@@ -1,0 +1,591 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #78 (CF aggregation rules)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./77.html" title="ticket #77" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./78?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./78?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./78?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./79.html" title="ticket #79" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./77.html" title="ticket #77">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./79.html" title="ticket #79">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2012-02-20T08%3A44%3A31-08%3A00&amp;precision=second" title="See timeline at 02/20/12 08:44:31">9 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2015-12-09T10%3A47%3A22-08%3A00&amp;precision=second" title="See timeline at 12/09/15 10:47:22">5 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./78.html" class="trac-id">#78</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">CF aggregation rules</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=davidhassell">davidhassell</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+In this ticket we propose a
+<a class="ext-link" href="http://www.met.reading.ac.uk/~david/cf_aggregation_rules.html"><span class="icon">​</span>set rules</a>, based on CF metadata, for deciding whether or not two
+arbitrary CF field constructs may be aggregated into one, larger field
+construct. A field construct (hereafter a <strong>field</strong>) is as defined
+in the proposed
+<a class="ext-link" href="http://www.met.rdg.ac.uk/~jonathan/CF_metadata/cfdm.html"><span class="icon">​</span>CF data model</a> (see <a class="ext-link" href="https://cf-pcmdi.llnl.gov./68"><span class="icon">​</span>ticket #68</a>), as
+are all other terms written in <strong>bold</strong>.  In terms of CF-netCDF
+files, a field corresponds to a data variable, with all its
+attributes, coordinate variables, auxiliary coordinate variables, etc.
+</p>
+<p>
+Aggregation may be thought of as the combination of one field with
+another to create a new field that occupies a larger <strong>space</strong>. In
+practice, this means combining two fields so that their <strong>data
+arrays</strong> are concatenated along exactly one dimension, as are their
+<strong>coordinate arrays</strong> which span that dimension, in such a way that
+the aggregated field conforms to the CF data model (and is therefore
+CF-netCDF compliant).
+</p>
+<p>
+The CF-netCDF convention at present applies only to individual files,
+but there is a common and increasing need to be able to treat a
+collection files as a single dataset, and the CF standard does not
+define how this should be done.  Like the
+<a class="ext-link" href="https://cf-pcmdi.llnl.gov./68"><span class="icon">​</span>ticket for the CF data model</a>, this ticket does not propose any change to the CF
+standard. Our purpose is to write down general abstract rules for CF
+field aggregation which are consistent with the abstract CF data
+model.
+</p>
+<p>
+These proposed CF aggregation rules make no reference to netCDF file
+format. They are built solely on the abstract CF data model. As such,
+they may be applied equally to fields stored in CF-netCDF files or to
+fields contained in a memory representation of the CF data model. To
+support the CF data model, we produced the <a class="ext-link" href="http://code.google.com/p/cf-python"><span class="icon">​</span>cf-python</a> software, and
+the latest version of that software includes an aggregation function
+based on these aggregation rules.  This function can be used to
+combine CF-netCDF files by aggregating the fields they contain.
+</p>
+<p>
+Our proposed rules are more flexible than the existing schemes that we
+are aware of.  They are similar to the
+<a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf/ncml/v2.2/Aggregation.html"><span class="icon">​</span>NcML aggregation</a> types <em>JoinExisting</em> and <em>JoinNew</em>, but are more
+general in various ways, such as that the aggregating dimension need
+not be the outer dimension, nor be in the same position in different
+fields. Also, if combining fields from various netCDF files, the
+netCDF variable names need not match, because the variables are
+identified by their metadata instead of by their names. Any number of
+fields may ultimately be aggregated along more one or more dimensions
+by repeated aggregations between pairs of fields.  Our software can
+handle this general approach, but it needs optimisation.
+</p>
+<p>
+This proposal is closely related to the CF data model
+(<a class="ext-link" href="https://cf-pcmdi.llnl.gov./68"><span class="icon">​</span>ticket #68</a>), and we would
+welcome comments on that ticket as well as the present one.
+</p>
+<p>
+David Hassell (d.c.hassell at reading.ac.uk)
+<br />
+Jonathan Gregory (j.m.gregory at reading.ac.uk)
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(4)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1341582327000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+        in reply to:
+    <a href="#comment:description">↑ description</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:2" class="follow-up">↓ 2</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-07-06T06%3A45%3A27-07%3A00&amp;precision=second" title="See timeline at 07/06/12 06:45:27">9 years ago</a> by mgschultz
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="new ticket" href="./78.html" title="enhancement: CF aggregation rules (new)">davidhassell</a>:
+</p>
+<p>
+The CF data model, cf-python, and these aggregation rules are all very useful. Yet, I have a hard time understanding these rules. They look like the result of a hard thinking process condensed into semi-formal language, and this makes them difficult to understand. It would be great if they were "documented" from a user perspective. Here, I suggest the following structure (and maybe this could lead to identifying aggregations that are not possible yet or not possible in principle). I adopt the ncml terminology where possible:
+</p>
+<ol><li><a class="missing wiki">SimpleUnion?</a>:
+</li></ol><p>
+Add variables from different sources into one dataset
+Requirements: where coordinates are the same (based on what? axis attribute, standard_name?), they must have the same values
+</p>
+<p>
+1b. <a class="missing wiki">SupersetUnion?</a>:
+A variant from 1. where overlapping data would be possible. Example: merging of several time series from individual stations into one file with ragged time series format, allowing for missing values in the individual time series. In this case, the "superset" of all time values needs to be created and missing_value has to be inserted where needed.
+[perhaps this example should be considered a different operation altogether, because one also needs to reformat individual longitude and latitude values into longitude and latitude arrays keyed on the station id]
+</p>
+<ol start="2"><li>Join (new or existing):
+</li></ol><p>
+ncml states "along their [existing|new], outer dimension". Is this the same as "unlimited" dimension? Or does it mean the "slowest varying dimension"? In an abstract data model, this shoudln't matter, and a Join should be possible along any dimension. However, certain rules must apply, and these may be specific for certain dimensions (in particular of axis type "T"). If I understand correctly, then most of the aggregation rules you spell out deal with this type of Join operation. Life would be much easier if certain attributes for coordinate variables at least would be mandatory rather than optional.
+Requirements: both files must have the same variables [again, one could think of automatic filling with missing_value if one of the files contains only a subset of the variables from the other one -- this is a real use case]. Coordinate requirements are described separately for different types of coordinates below.
+</p>
+<p>
+2a) Join along time axis (probably most common):
+Requirements (probably incomplete: you thought about this more than I): time should not overlap [you actually allow for this in the case of running averages, but I think that even then the actual time values shouldn't overlap, whereas bounds may], the calendar attribute must be mappable [this is less strict then "the same": either one could use a synonym, or even a 1:1 translation rule which of course must be specified somehow], the time resolution must be the same [really? perhaps accept for numerical rounding errors? I had such a case when I worked with station data from different sources: one gave 4 decimals, the other 6. I knew that both were hourly resolution, so I had to provide a tolerance criterion to sort the data correctly. Should this be left to the user to decide? In any case a warning should appear in any application if the delta-time is not the same; then again: if there are irregular time intervals, this can become quite tricky]
+</p>
+<p>
+2b) join along lon or lat axis (more generally "X" and "Y"):
+Requirements: no overlap. Simple case: the other dimension must be identical in size and values (then one can "simply" paste the two chnks together). More complicated: if two regions are defined, one can define the outer bounding_box and fill everything outside regions A and B with missing_values. [again: a real use case, for example when pasting data &#34;tiles&#34; from continental land surface models into one global grid] -- in an extended view, one can even think about a "Join operator" for overlapping regions (e.g. "useA", "useB", "add", "subtract", "average").
+</p>
+<p>
+2c) join along vertical coordinate:
+(Ouch!) rather than listing requirements, one can write down what can go wrong. For example: one is positive="up", the other is positive="down"; One is in units of pressure, the other in units of length (= height); One is irregular (e.g. hybrid sigma), the other regular (e.g. fixed pressure grid). In all of the above cases, one may wish to be able to combine records...
+</p>
+<p>
+3) collection (in ncml "forecastmodelruncollection"):
+Haven't thought about this one much. Could call for adoption of a "group" concept, similar to netcdf4 data model?
+</p>
+<p>
+4) numerical aggregation (not in ncml):
+perform arithmetic operations on two variables from one file or two variables from separate files. I guess, in this case one can require all dimensions to be the same. Although it would be nice if one can, for example, multiply a 2D field with all levels of a 3D field, ...
+</p>
+<p>
+Best regards,
+</p>
+<p>
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1341916028000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+        in reply to:
+    <a href="#comment:1">↑ 1</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-07-10T03%3A27%3A08-07%3A00&amp;precision=second" title="See timeline at 07/10/12 03:27:08">9 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./78#comment:1" title="Comment 1">mgschultz</a>:
+</p>
+<blockquote class="citation">
+<p>
+The CF data model, cf-python, and these aggregation rules are all very useful. Yet, I have a hard time understanding these rules. They look like the result of a hard thinking process condensed into semi-formal language, and this makes them difficult to understand. It would be great if they were "documented" from a user perspective. Here, I suggest the following structure (and maybe this could lead to identifying aggregations that are not possible yet or not possible in principle). I adopt the ncml terminology where possible:
+</p>
+</blockquote>
+<p>
+ 
+Thank you for looking at this and for your support. Jonathan and I do appreciate that the rules we have presented require some thought to get to grips with. (Just to tie in with the data model discussions, I would like to stress that, like the data model, these rules are file format and file structure independent, and so are equally applicable to data stored in memory and on disk.)
+</p>
+<p>
+I think that we ended up with a description that is perhaps more useful to someone who wants to code up the process rather than an end-user who wants to understand if, how or why their data have been aggregated. This is deliberate, as the idea of the rules is that they merely formalize your existing, intuitive idea of whether or not two fields are aggregatable. That is you (a human) know already whether or not two fields logically form a single larger field, but a computer needs more formal and entirely general rules to do the same job and to save you inspecting each and every one of your fields. As a consequence, I'm not sure that I agree that a more user orientated description would be useful, or even possible.
+</p>
+<p>
+From your suggestions, you raise some good use cases which are not catered for by the aggregation rules ("merging of several time series from individual stations into one file with ragged time series format" and "pasting data tiles from continental land surface models into one
+global grid"). However, whether or not such collections of fields do form a single, larger field is a user choice, and one which may required extra preprocessing. It is not possible for that choice to be informed by the metadata - hence their exclusion from the general rules. That said, any software implementation of these rules could quite happily include extensions to cover situations such as these.
+</p>
+<p>
+I'm not in favour of singling out certain named axes for special treatment, purely because I don't think it necessary. Again, your software may, as an option, restrict the rules to on a particular axis (for example, to disallow box average time filters with strictly monotonic coordinate values but overlapping bounds), but if the operation is 'safe' (i.e. unambiguous), then it should be allowed in the rules.
+</p>
+<blockquote class="citation">
+<p>
+2c) join along vertical coordinate:
+(Ouch!) rather than listing requirements, one can write down what can go wrong. For example: one is positive="up", the other is positive="down"; One is in units of pressure, the other in units of length (= height); One is irregular (e.g. hybrid sigma), the other regular (e.g. fixed pressure grid). In all of the above cases, one may wish to be able to combine records...
+</p>
+</blockquote>
+<p>
+The 'direction' of an dimension, and the order of a variable's dimension and the variable's units, should be purely the worry of the implementing software. The rules assume that any such mismatches may be reconciled, where possible. In the example you give of 'hybrid sigma' and 'fixed pressure', these fields are not aggregatable, in just the same way as 'hybrid sigma' and 'time' axes are not aggregatable.
+</p>
+<blockquote class="citation">
+<p>
+4) numerical aggregation (not in ncml):
+perform arithmetic operations on two variables from one file or two variables from separate files. I guess, in this case one can require all dimensions to be the same. Although it would be nice if one can, for example, multiply a 2D field with all levels of a 3D field, ...
+</p>
+</blockquote>
+<p>
+I was very interested to see that you mentioned this. We have separately developed similar (combination) rules for when this should be allowed, which include the use case you give of <em>broadcasting</em> (for example, multiply a 2D field with all levels of a 3D field), and are currently implementing these in cf-python. Our original intention was to document these rules in this software, but if there is interest we'd be happy to discuss them openly. Do they belong with the aggregation rules? My initial thought is not, since the aggregation rules are all about determining if two CF data model <em>spaces</em> differ only in one dimension and are merely part of a larger one, whereas the combination rules are all about determining if two spaces are comparible where they overlap, and they may not even overlap at all. I'll write up the combination rules and post a link on the e-mail forum if anyone wants to see more. 
+</p>
+<p>
+Many thanks again and all the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1342127122000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-07-12T14%3A05%3A22-07%3A00&amp;precision=second" title="See timeline at 07/12/12 14:05:22">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+Like David, I appreciate that our document is not an easy read. Like you, I think that it would be useful for us to provide more of a user guide as well. This would be quite hard work to write, but hopefully easier to read! I can imagine providing a discursive description, with diagrams, of some of our use cases, showing why they can or cannot be aggregated. This would help the user understand why the software implementing these rules behaved as it did.
+</p>
+<p>
+Another thing which it might help to say, by way of explanation, is this: We are thinking about a situation in which one or more multidimensional data variables, each containing a single quantity (identified by a standard name and other CF metadata), have been chopped/sliced up in index space (each part of each original data variable having a range of the indices along each original axis). Then dimensions which are reduced to a size of one by the slicing might, or might not, be discarded, the order of dimensions in the new smaller data variables might be changed, and any of the dimensions might be reversed. Finally these new data variables are distributed arbitrarily among various files. Our aggregation rules are designed to reassemble the original variables from the disordered fragments, using CF metadata only, like a data archaeologist. Like a very intolerant archaeologist, the rules will refuse to allow fragments to be stuck together if there appears to be a gap between them. However they do support the possibility of the fragments of the whole having been made to somewhat different standards in the first place (such as order of dimensions being different) so long as this doesn't make a logical difference to the whole.
+</p>
+<p>
+To describe it as above might seem contrived, but this is the situation you are in if you download CMIP5 data, for instance. Only the time dimension has been chopped up in that case, so it's quite easy, although duplicate times need to be detected, as these rules would do. The rules would also allow 3D xyz fields to be reassembled from 2D xy fields. This is always necessary with data from the Met Office Unified Model, so of particular interest to us. The rules would not aggregate your "complicated 2b" or 2c cases, which could not have arisen from chopping up one variable and keeping all the bits. The rules are more tolerant than some of your requirements and more stringent than others. There are some criteria which are debatable, obviously, and might be implementation choices, such as what "equality" means.
+</p>
+<p>
+The CF convention applies to individual netCDF files. It may equally well be regarded as applying to any single dataset, in any file format, especially if we agree a data model. However, in practice, some datasets are distributed over files, and for a long time there has been a need to deal with such collections of files. There are several ways to do this. Our proposed aggregation rules are one way. Another way is to write a metafile which contains instructions on how to do the aggregation, like NcML, or in the Gridspec-F proposal. This file needs to be written by hand or to make some assumptions if it's going to be generated automatically. Our rules are more general than the aggregations that can be described by NcML or Gridspec-F, I think. It is useful to be able to do it automatically, using rules like ours, because a dataset might be assembled from any arbitrary collection of files; new files might be added at any time, or files removed. At the moment, I tend to think that aggregation rules are something which should be considered as accessories to the CF convention, rather than part of it. In that case, various alternatives could all be advertised, and supported by different software.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1449686842280053">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-09T10%3A47%3A22-08%3A00&amp;precision=second" title="See timeline at 12/09/15 10:47:22">5 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Jonathan and David,
+</p>
+<p>
+At your suggestion I'm picking up a thread from trac <a class="closed ticket" href="./145.html" title="enhancement: Subconvention for associated files, proposed for use in CMIP6 (closed: fixed)">#145</a> here.
+</p>
+<p>
+The rules contained in this ticket (<a class="new ticket" href="./78.html" title="enhancement: CF aggregation rules (new)">#78</a>) provide guidance on when it is <strong>ok</strong> for a client application to merge fields.  This is fine as far as this goes, but it does not provide the right level of information to coach a client on which files should be considered as candidates for aggregation.
+</p>
+<p>
+Lets consider modelers' needs as our example.  Say the model outputs 1 year of time steps per file, with each variable (temp, u, v, ...) in separate files.  For a single model run it creates a matrix of <a class="missing wiki">NtimePeriods?</a> x Mvariables files.  Lets say that at the client end we are confronted with a directory containing the outputs of 5 such model runs.  CF does not currently provide a simple mechanism that would permit an application to scan this directory and infer what the file creator knew -- that these files represent 5 model outputs, when suitably aggregated.
+</p>
+<p>
+CMIP has formalized a set of CF attribute conventions that address this problem in the full glory of CMIP models: multiple institutions, model names, scenarios, time periods, etc.  CF needs analogous machinery -- simpler and more general.  Here's a straw man:
+</p>
+<ol><li>define a new CF global attribute
+<pre class="wiki">    aggregation_key = "some string";
+</pre></li></ol><ol start="2"><li>Offer guidance on the creation of the aggregation key string such as: "It is important that the string that is generated be unique to this dataset.  We suggest generating an MD5 hash from a list of metadata items -- to be decided on by the file creator -- that guarantees uniqueness. For example the list may contain following pieces of information"
+</li></ol><ul><li>institution
+</li><li>project/scenario
+</li><li>name of code generating files
+</li><li>creation date
+</li></ul><p>
+The end result will be a global attribute such as
+</p>
+<pre class="wiki">    aggregation_key = "d131dd02c5e6eec4";
+</pre><p>
+that will be found in common among all of the files needed in this aggregation.
+</p>
+<p>
+===
+</p>
+<p>
+What needs to be added to this straw man, is a strategy to handle files that may be shared in common by multiple model runs.  For example, the cell_measures field that was the topic of <a class="closed ticket" href="./145.html" title="enhancement: Subconvention for associated files, proposed for use in CMIP6 (closed: fixed)">#145</a>, might be shared among all model runs that use a particular gridded coordinate system.  A solution to this problem might be simply to allow multiple aggregation keys.
+</p>
+<p>
+In all model outputs from a single run we find
+</p>
+<pre class="wiki">    aggregation_key = "d131dd02c5e6eec4 c69821bcb6a88393";
+</pre><p>
+where the first key identifies the model run and the second identifies the grid geometry.  The grid-geometry files would contain only the single identifying key
+</p>
+<pre class="wiki">    aggregation_key = "c69821bcb6a88393";
+</pre><p>
+From this information a client application can quickly scan a directory and infer which files the data creator intended to be aggregated.
+</p>
+<p>
+ 
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./78?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./78?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./78?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

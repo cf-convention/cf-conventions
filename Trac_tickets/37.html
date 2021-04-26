@@ -1,0 +1,3895 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #37 (Conventions for Point Observation Data)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./36.html" title="ticket #36" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./37?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./37?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./37?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./38.html" title="ticket #38" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./36.html" title="ticket #36">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./38.html" title="ticket #38">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2008-10-20T17%3A04%3A20-07%3A00&amp;precision=second" title="See timeline at 10/20/08 17:04:20">13 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2011-05-10T10%3A20%3A50-07%3A00&amp;precision=second" title="See timeline at 05/10/11 10:20:50">10 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./37.html" class="trac-id">#37</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Conventions for Point Observation Data</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=caron">caron</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner"><a href="/trac/query?status=!closed&amp;owner=stevehankin">stevehankin</a></td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~point">point</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+      <a href="./37?action=diff&amp;version=76" class="lastmod trac-diff" title="2011-05-04 22:24:40+00:00">
+        (last modified by painter1)
+      </a>
+    </h3>
+    <div class="searchable">
+      <h2 id="a1.Title">1. Title</h2>
+<p>
+Conventions for Point Observation Data
+</p>
+<h2 id="a2.Moderator">2. Moderator</h2>
+<p>
+Steve Hankin
+</p>
+<h2 id="a3.Requirement">3. Requirement</h2>
+<p>
+Current conventions are oriented towards gridded data. This proposal extends the framework to specify how to encode "point observation" data.
+</p>
+<h2 id="a4.InitialStatementofTechnicalProposal">4. Initial Statement of Technical Proposal</h2>
+<p>
+We show six types of point observational data, and describe a general way to encode many variations. The main technical extension is a simple way to describe ragged arrays, for the case when rectangular arrays are too inefficient.
+</p>
+<h2 id="a5.Benefits">5. Benefits</h2>
+<ul><li>Many data providers would like to use CF conventions when storing their observational data.
+</li></ul><ul><li>This will allow a standard for converting things like BUFR data into netCDF.
+</li></ul><h2 id="a6.StatusQuo">6. Status Quo</h2>
+<p>
+Currently sections 5.4 and 5.5 describe 2 examples of point observations (station time series and trajectories). This proposal generalizes those.
+</p>
+<h2 id="a7.DetailedProposal">7. Detailed Proposal</h2>
+<p>
+Because of the length of this, I have written it as a <a class="ext-link" href="https://cf-pcmdi.llnl.gov/trac/attachment/ticket/37/CFch9-may4.docx"><span class="icon">​</span>Microsoft Word file</a> to make it easy to edit. I can reformat later when it is close to being finished.
+</p>
+<p>
+Some background docs and earlier drafts:
+</p>
+<ul><li><a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/CDM/CDMfeatures.doc"><span class="icon">​</span>CDM Feature Types</a>
+</li></ul><ul><li><a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/CDM/CDMpoints.doc"><span class="icon">​</span>CDM Point Feature Types</a>
+</li></ul><ul><li><a class="ext-link" href="http://www.unidata.ucar.edu/staff/caron/papers/obs2.pdf"><span class="icon">​</span>Draft 2 of proposed spec for Point Observation netCDF encoding</a>
+</li></ul><ul><li><a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/PointObservationConventions"><span class="icon">​</span>Another draft of the proposed spec, last revision was October 2010</a>
+</li></ul>
+    </div>
+  </div>
+</div>
+          
+    <div id="attachments">
+        <h3 class="foldable">Attachments <span class="trac-count">(2)</span></h3>
+        <div class="attachments">
+          <dl class="attachments">
+              <dt>
+    <a href="/trac/attachment/ticket/37/CFch9-feb25_jg.docx" title="View attachment">CFch9-feb25_jg.docx</a><a href="/trac/raw-attachment/ticket/37/CFch9-feb25_jg.docx" class="trac-rawlink" title="Download">​</a>
+       (<span title="100516 bytes">98.2 KB</span>) -
+      added by <em>caron</em> <a class="timeline" href="/trac/timeline?from=2011-02-28T08%3A24%3A29-08%3A00&amp;precision=second" title="See timeline at 02/28/11 08:24:29">10 years ago</a>.
+  </dt>
+              <dd>
+                Draft Feb 25 (docx)
+              </dd>
+              <dt>
+    <a href="/trac/attachment/ticket/37/CFch9-may4.docx" title="View attachment">CFch9-may4.docx</a><a href="/trac/raw-attachment/ticket/37/CFch9-may4.docx" class="trac-rawlink" title="Download">​</a>
+       (<span title="116237 bytes">113.5 KB</span>) -
+      added by <em>painter1</em> <a class="timeline" href="/trac/timeline?from=2011-05-04T15%3A19%3A11-07%3A00&amp;precision=second" title="See timeline at 05/04/11 15:19:11">10 years ago</a>.
+  </dt>
+          </dl>
+          <p>
+            Download all attachments as: <a rel="nofollow" href="/trac/zip-attachment/ticket/37/">.zip</a>
+          </p>
+          
+        </div>
+    </div>
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(80)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1224626698000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-21T15%3A04%3A58-07%3A00&amp;precision=second" title="See timeline at 10/21/08 15:04:58">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+As you say, the main technical addition which is needed is a way to represent ragged array, for instance so that timeseries of different lengths from various stations can be contained in one data variable. You propose two ways to do this
+</p>
+<ul><li>a contiguous way, in which the timeseries are adjacent and accessed by arrays of start and length.
+</li></ul><ul><li>a non-contiguous way, in which an index array identifies which timeseries each elements belongs to.
+</li></ul><p>
+The second method is more general. It's quite easy to use: it's like a "select" with "where" in SQL. It takes more space because the index array has the same dimension as the data array. However that is no more than a doubling of space, and so it's still likely to be more economical than not using a ragged array, if there is a large spread in the length of the timeseries. So could we just adopt the second method, for the sake of simplicity?
+</p>
+<p>
+You also propose a <a class="missing wiki">PointFeature?</a> attribute. What is the need for this? The cases are formally similar. Why do they need to be distinguished, other than by the metadata which describes the coordinate and data variables, from which one can deduce the intended purpose (as station, trajectory, etc.)?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1224630632000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-21T16%3A10%3A32-07%3A00&amp;precision=second" title="See timeline at 10/21/08 16:10:32">13 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan:
+</p>
+<p>
+These are both good points.
+</p>
+<p>
+The two methods (contiguous and non-contiguous) have different trade-offs for both reading and writing. The contiguous proposal has better space utilization, and optimizes the common case of reading all children for a given parent (eg all observation for a given time). The non-contiguous case is easier to write because it allows data to be written in any order, but will be rather inefficient for the use cases of reading all children when using the unlimited dimension, since you will have to scan the entire file to satisfy that request. 
+</p>
+<p>
+I did eliminate another method (linked lists) that are being used by at least one important data provider (FSL MADIS), in the interests of simplicity, but I was trying to satisfy what I think is the minimum that real data providers will need. 
+</p>
+<p>
+Having said that, I would be happy if some proportion of real data providers told me that they could live with the single non-contiguous case. So anyone reading this who falls into that category, please give your thoughts.
+</p>
+<p>
+As for the <a class="missing wiki">PointFeature?</a> attribute, I dont think that its possible for software to reliably distinguish all cases without this. For example, 5.8.3.1 (trajectory) looks the same as 5.8.1 (point). In any case, its absence makes generic client software that much harder to write. I feel like forcing the provider to classify their data is a reasonable burden, and is very valuable metadata that can be used in discovery and digital libraries by systems that will not be capable of computing it themselves. I also expect the classification to be the basis of future "feature services", but that is more speculative.
+</p>
+<p>
+Regards,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1224651302000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-21T21%3A55%3A02-07%3A00&amp;precision=second" title="See timeline at 10/21/08 21:55:02">13 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello Jonathan,
+</p>
+<p>
+Just to say that I agree with John on the value of the <a class="missing wiki">PointFeature?</a> attribute.
+</p>
+<p>
+Cheers, Roy.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1224801925000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-23T15%3A45%3A25-07%3A00&amp;precision=second" title="See timeline at 10/23/08 15:45:25">13 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I have changed the proposal to live at
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/PointObservationConventions"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/PointObservationConventions</a>
+</p>
+<p>
+and asked Velemir to modify the original proposal above to reflect that, to eliminate confusion.
+</p>
+<p>
+This will allow versions of the proposal to coexist. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1224802658000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-23T15%3A57%3A38-07%3A00&amp;precision=second" title="See timeline at 10/23/08 15:57:38">13 years ago</a> by mlaker1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./37?action=diff&amp;version=5">diff</a>)
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Per John's request, changed the link to Detailed Proposal in the ticket description.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1225152811000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-27T17%3A13%3A31-07%3A00&amp;precision=second" title="See timeline at 10/27/08 17:13:31">12 years ago</a> by mlaker1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./37?action=diff&amp;version=6">diff</a>)
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Steve Hankin volunteered to be the moderator.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1227301923000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:8" class="follow-up">↓ 8</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-11-21T13%3A12%3A03-08%3A00&amp;precision=second" title="See timeline at 11/21/08 13:12:03">12 years ago</a> by dmurray
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks, John for getting this discussion going.  We have long awaited
+an expanded convention for point data.
+</p>
+<ul><li>In synoptic meteorology, I would say that the predominant access
+</li></ul><p>
+of station data is to access many stations over a time range to
+produce a map.  In that case, the station information is really part
+of the data and breaking it out as station obs doesn't gain
+you much.  If you are primarily accessing a single station for
+a time range, then indexing on station makes sense.  Having
+the station variables (id, lat,lon, alt) for each observation
+(essentially always treating them as point data) doesn't seem
+like a lot of overhead especially if you have 50 variables that
+you are measuring at each point.  Also, station locations may
+change through time. For example, the location of Pacific Tsunameter station 46413 changed yesterday at 18:15 UTC.  If the station info
+is stored once in the file, that change will not be reflected.
+</p>
+<ul><li>categorizing data into station/point or trajectory seems arbitrary.
+</li></ul><p>
+Take synoptic ship observations for example.  I would want to access
+them as above (plot a time animation of ship observations over
+an area).  However, I would also want to create a trajectory of
+a particular ship (or several ships) and view that over time.
+In this case, I want to access the point observations either as
+points or as trajectories.  Since the ships are moving, they are
+not really stations in sense used here.  As a user, I want to
+access them sometimes as points, but other times want to be
+able to link the points of  a particular ship as a trajectory.
+One person's points is another person's trajectory.
+</p>
+<ul><li>for radiosonde observations, there are several profiles at
+</li></ul><p>
+one point (mandatory, significant levels, troposphere, etc).  I'm
+not sure how that would fit into this proposal.
+</p>
+<p>
+Don Murray 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1229099816000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+        in reply to:
+    <a href="#comment:7">↑ 7</a>
+        ;
+          <span>follow-ups:</span>
+    <a href="#comment:10" class="follow-up">↓ 10</a>
+    <a href="#comment:11" class="follow-up">↓ 11</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T08%3A36%3A56-08%3A00&amp;precision=second" title="See timeline at 12/12/08 08:36:56">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:7" title="Comment 7">dmurray</a>:
+</p>
+<blockquote class="citation">
+<p>
+Thanks, John for getting this discussion going.  We have long awaited
+an expanded convention for point data.
+</p>
+<ul><li>In synoptic meteorology, I would say that the predominant access
+</li></ul><p>
+of station data is to access many stations over a time range to
+produce a map.  In that case, the station information is really part
+of the data and breaking it out as station obs doesn't gain
+you much.  If you are primarily accessing a single station for
+a time range, then indexing on station makes sense.  Having
+the station variables (id, lat,lon, alt) for each observation
+(essentially always treating them as point data) doesn't seem
+like a lot of overhead especially if you have 50 variables that
+you are measuring at each point.  Also, station locations may
+change through time. For example, the location of Pacific Tsunameter station 46413 changed yesterday at 18:15 UTC.  If the station info
+is stored once in the file, that change will not be reflected.
+</p>
+</blockquote>
+<p>
+It seems to me that the use case that you want to cover is when a data provider wants to write station data, but doesnt want to factor out the station information, ie wants to repeat it in the observation. (this is analogous to unnormalized tables in an RDBMS). Of course, they could always just make it plain point data, but they prefer station feature type so that they can ask for a time series at a particular station. I agree this is something to allow, so let me think about a proposal that would cover it.
+</p>
+<p>
+The spec is about giving data providers a standard encoding for doing whatever they need to. Because you might have 1000s of observations for every station, the efficiency of factoring out the station info will be important sometimes. 
+</p>
+<p>
+The issue of stations moving is a tricky one. If it happens often enough, its a good reason to put lat,lon info into the observation, in addition / instead of factoring out the station info. I will add some words about this and see what you think.
+</p>
+<blockquote class="citation">
+<ul><li>categorizing data into station/point or trajectory seems arbitrary.
+</li></ul><p>
+Take synoptic ship observations for example.  I would want to access
+them as above (plot a time animation of ship observations over
+an area).  However, I would also want to create a trajectory of
+a particular ship (or several ships) and view that over time.
+In this case, I want to access the point observations either as
+points or as trajectories.  Since the ships are moving, they are
+not really stations in sense used here.  As a user, I want to
+access them sometimes as points, but other times want to be
+able to link the points of  a particular ship as a trajectory.
+One person's points is another person's trajectory.
+</p>
+</blockquote>
+<p>
+there's not a lot to do about the fact that different data consumers will want to view data differently. this spec is about letting data providers encode the data in the way that they want. perhaps some best practices can evolve to futher guide them to satisfy consumer needs.
+</p>
+<blockquote class="citation">
+<ul><li>for radiosonde observations, there are several profiles at
+</li></ul><p>
+one point (mandatory, significant levels, troposphere, etc).  I'm
+not sure how that would fit into this proposal.
+</p>
+</blockquote>
+<p>
+yes, that use case looks rather complicated. let me create a sample CDL for it.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1229099920000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:13" class="follow-up">↓ 13</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T08%3A38%3A40-08%3A00&amp;precision=second" title="See timeline at 12/12/08 08:38:40">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+braeckel@… sent me these comments:
+</p>
+<p>
+Why are stationTimeSeries and stationProfileTimeSeries specific to a
+station?  The optional use of a station name is useful to include in some
+cases, but I can see running into other cases where several data points
+are gathered in a time series but there is no associated station.  In a
+couple of documents the stationTimeSeries is likened to the CSML
+<a class="missing wiki">PointSeriesFeature?</a>, but <a class="missing wiki">PointSeriesFeature?</a> does not include a station name
+or related terminology.
+</p>
+<p>
+The ":CF\:pointFeature" name could be generalized to ":CF\:cdmFeature" or
+":CF\:featureType", assuming that there is no additional and necessary
+semantics to these identifiers being point types vs general types.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1229100247000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+        in reply to:
+    <a href="#comment:8">↑ 8</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:12" class="follow-up">↓ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T08%3A44%3A07-08%3A00&amp;precision=second" title="See timeline at 12/12/08 08:44:07">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <blockquote class="citation">
+<p>
+Don Murray wrote:
+</p>
+<blockquote class="citation">
+<ul><li>categorizing data into station/point or trajectory seems arbitrary.
+</li></ul><p>
+Take synoptic ship observations for example.  I would want to access
+them as above (plot a time animation of ship observations over
+an area).  However, I would also want to create a trajectory of
+a particular ship (or several ships) and view that over time.
+In this case, I want to access the point observations either as
+points or as trajectories.  Since the ships are moving, they are
+not really stations in sense used here.  As a user, I want to
+access them sometimes as points, but other times want to be
+able to link the points of  a particular ship as a trajectory.
+One person's points is another person's trajectory.
+</p>
+</blockquote>
+</blockquote>
+<p>
+BTW, your example of the moving ship would be a "section: a collection of profiles which originate along a trajectory." not a "stationProfileTimeSeries: a time-series of profiles at a named location ". i wasnt sure if that was clear.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1229101309000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+        in reply to:
+    <a href="#comment:8">↑ 8</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:16" class="follow-up">↓ 16</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T09%3A01%3A49-08%3A00&amp;precision=second" title="See timeline at 12/12/08 09:01:49">12 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:8" title="Comment 8">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:7" title="Comment 7">dmurray</a>:
+</p>
+</blockquote>
+<blockquote class="citation">
+<blockquote class="citation">
+<ul><li>categorizing data into station/point or trajectory seems arbitrary.
+</li></ul><p>
+Take synoptic ship observations for example.  I would want to access
+them as above (plot a time animation of ship observations over
+an area).  However, I would also want to create a trajectory of
+a particular ship (or several ships) and view that over time.
+In this case, I want to access the point observations either as
+points or as trajectories.  Since the ships are moving, they are
+not really stations in sense used here.  As a user, I want to
+access them sometimes as points, but other times want to be
+able to link the points of  a particular ship as a trajectory.
+One person's points is another person's trajectory.
+</p>
+</blockquote>
+<p>
+there's not a lot to do about the fact that different data consumers will want to view data differently. this spec is about letting data providers encode the data in the way that they want. perhaps some best practices can evolve to futher guide them to satisfy consumer needs.
+</p>
+</blockquote>
+<p>
+My hope for this is that the data model for these feature types (and the software that implements it) will support both subsetting and feature type conversion. So, for example, a grid could be asked for a time series at a particular point and a trajectory could be asked for itself as a collection of points.
+</p>
+<p>
+In which case, data providers may be inclined to try to capture as much of the sematics of the data as possible by specifying the highest level feature type available that fits the dataset.
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1229109846000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+        in reply to:
+    <a href="#comment:10">↑ 10</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:14" class="follow-up">↓ 14</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T11%3A24%3A06-08%3A00&amp;precision=second" title="See timeline at 12/12/08 11:24:06">12 years ago</a> by dmurray
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:10" title="Comment 10">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+BTW, your example of the moving ship would be a "section: a collection of profiles which originate along a trajectory." not a "stationProfileTimeSeries: a time-series of profiles at a named location ". i wasnt sure if that was clear.
+</p>
+</blockquote>
+<p>
+In this case it's not a profile.  It's a single synoptic surface observation at a point.
+</p>
+<p>
+Don
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1229109977000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+        in reply to:
+    <a href="#comment:9">↑ 9</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T11%3A26%3A17-08%3A00&amp;precision=second" title="See timeline at 12/12/08 11:26:17">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:9" title="Comment 9">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+braeckel@… sent me these comments:
+</p>
+<p>
+Why are stationTimeSeries and stationProfileTimeSeries specific to a
+station?  The optional use of a station name is useful to include in some
+cases, but I can see running into other cases where several data points
+are gathered in a time series but there is no associated station.  In a
+couple of documents the stationTimeSeries is likened to the CSML
+<a class="missing wiki">PointSeriesFeature?</a>, but <a class="missing wiki">PointSeriesFeature?</a> does not include a station name
+or related terminology.
+</p>
+</blockquote>
+<p>
+If the observations are not at the same location, then you would use a point or profile collection, respectively. if you have collections of observation at the same location, then it becomes a time series. the common case is that the location is named, which i call a station. If there is no real name, then you would make one up ("loc1", "loc2", "loc3", ...). The name is needed so that you can refer to that time series by name.
+</p>
+<p>
+A single stationTimeSeries corresponds to a CSML <a class="missing wiki">PointSeriesFeature?</a>. But when you have a collection of multiple stationTimeSeries/PointSeriesFeature, you will need a name in order to distinguish them.
+</p>
+<blockquote class="citation">
+<p>
+The ":CF\:pointFeature" name could be generalized to ":CF\:cdmFeature" or
+":CF\:featureType", assuming that there is no additional and necessary
+semantics to these identifiers being point types vs general types.
+</p>
+</blockquote>
+<p>
+Yes, CF:featureType is probably a better name, so that this attribute could be used for types other points. I will propose to change. 
+</p>
+<p>
+Its important that the values be from a controlled vocabulary. I will list the proposed set of values.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1229110337000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+        in reply to:
+    <a href="#comment:12">↑ 12</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:15" class="follow-up">↓ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T11%3A32%3A17-08%3A00&amp;precision=second" title="See timeline at 12/12/08 11:32:17">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:12" title="Comment 12">dmurray</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:10" title="Comment 10">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+BTW, your example of the moving ship would be a "section: a collection of profiles which originate along a trajectory." not a "stationProfileTimeSeries: a time-series of profiles at a named location ". i wasnt sure if that was clear.
+</p>
+</blockquote>
+<p>
+In this case it's not a profile.  It's a single synoptic surface observation at a point.
+</p>
+</blockquote>
+<p>
+Sorry, I misread your post. A writer could encode as a point or a trajectory. If they encode as a trajectory, it could also be automatically processed as a point collection, but if they encode as points, it could not easily and automatically be processed as a trajectory. I think this is Ethan's point.
+</p>
+<p>
+As you will see in the new <a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/reference/FeatureDatasets/PointFeatures.html"><span class="icon">​</span>proposed CDM API</a>, a trajectory feature can be flattened into a point collection.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1229112237000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+        in reply to:
+    <a href="#comment:14">↑ 14</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:17" class="follow-up">↓ 17</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T12%3A03%3A57-08%3A00&amp;precision=second" title="See timeline at 12/12/08 12:03:57">12 years ago</a> by dmurray
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <blockquote class="citation">
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+BTW, your example of the moving ship would be a "section: a collection of profiles which originate along a trajectory." not a "stationProfileTimeSeries: a time-series of profiles at a named location ". i wasnt sure if that was clear.
+</p>
+</blockquote>
+<p>
+In this case it's not a profile.  It's a single synoptic surface observation at a point.
+</p>
+</blockquote>
+<p>
+Sorry, I misread your post. A writer could encode as a point or a trajectory. If they encode as a trajectory, it could also be automatically processed as a point collection, but if they encode as points, it could not easily and automatically be processed as a trajectory. I think this is Ethan's point.
+</p>
+</blockquote>
+<p>
+While it may be difficult, I think it would be useful to be able to turn
+a point dataset into a set of trajectories based on the value of a particular
+variable (e.g. station name).
+ 
+</p>
+<blockquote class="citation">
+<p>
+As you will see in the new <a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/reference/FeatureDatasets/PointFeatures.html"><span class="icon">​</span>proposed CDM API</a>, a trajectory feature can be flattened into a point collection.
+</p>
+</blockquote>
+<p>
+Yes, that is useful. We use that in the existing netCDF-Java trajectory
+code for displaying aircraft tracks as both trajectories and points.
+</p>
+<p>
+My use case is to take a set of point ship observations and create trajectories
+based on the station id.
+</p>
+<p>
+Don
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1229112335000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+        in reply to:
+    <a href="#comment:11">↑ 11</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T12%3A05%3A35-08%3A00&amp;precision=second" title="See timeline at 12/12/08 12:05:35">12 years ago</a> by dmurray
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <blockquote class="citation">
+<blockquote class="citation">
+<blockquote class="citation">
+<ul><li>categorizing data into station/point or trajectory seems arbitrary.
+</li></ul><p>
+Take synoptic ship observations for example.  I would want to access
+them as above (plot a time animation of ship observations over
+an area).  However, I would also want to create a trajectory of
+a particular ship (or several ships) and view that over time.
+In this case, I want to access the point observations either as
+points or as trajectories.  Since the ships are moving, they are
+not really stations in sense used here.  As a user, I want to
+access them sometimes as points, but other times want to be
+able to link the points of  a particular ship as a trajectory.
+One person's points is another person's trajectory.
+</p>
+</blockquote>
+<p>
+there's not a lot to do about the fact that different data consumers will want to view data differently. this spec is about letting data providers encode the data in the way that they want. perhaps some best practices can evolve to futher guide them to satisfy consumer needs.
+</p>
+</blockquote>
+<p>
+My hope for this is that the data model for these feature types (and the software that implements it) will support both subsetting and feature type conversion. So, for example, a grid could be asked for a time series at a particular point and a trajectory could be asked for itself as a collection of points.
+</p>
+</blockquote>
+<p>
+I agree completely.  This was the design behind ADDE in McIDAS.
+</p>
+<blockquote class="citation">
+<p>
+In which case, data providers may be inclined to try to capture as much of the sematics of the data as possible by specifying the highest level feature type available that fits the dataset.
+</p>
+</blockquote>
+<p>
+The trick is to anticipate other ways people might want to look at your data,
+not just how you are used to looking at it.
+</p>
+<p>
+Don
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1229116677000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+        in reply to:
+    <a href="#comment:15">↑ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T13%3A17%3A57-08%3A00&amp;precision=second" title="See timeline at 12/12/08 13:17:57">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:15" title="Comment 15">dmurray</a>:
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+BTW, your example of the moving ship would be a "section: a collection of profiles which originate along a trajectory." not a "stationProfileTimeSeries: a time-series of profiles at a named location ". i wasnt sure if that was clear.
+</p>
+</blockquote>
+<p>
+In this case it's not a profile.  It's a single synoptic surface observation at a point.
+</p>
+</blockquote>
+<p>
+Sorry, I misread your post. A writer could encode as a point or a trajectory. If they encode as a trajectory, it could also be automatically processed as a point collection, but if they encode as points, it could not easily and automatically be processed as a trajectory. I think this is Ethan's point.
+</p>
+</blockquote>
+<p>
+While it may be difficult, I think it would be useful to be able to turn
+a point dataset into a set of trajectories based on the value of a particular
+variable (e.g. station name).
+ 
+</p>
+<blockquote class="citation">
+<p>
+As you will see in the new <a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/reference/FeatureDatasets/PointFeatures.html"><span class="icon">​</span>proposed CDM API</a>, a trajectory feature can be flattened into a point collection.
+</p>
+</blockquote>
+<p>
+Yes, that is useful. We use that in the existing netCDF-Java trajectory
+code for displaying aircraft tracks as both trajectories and points.
+</p>
+<p>
+My use case is to take a set of point ship observations and create trajectories
+based on the station id.
+</p>
+<p>
+Don
+</p>
+</blockquote>
+<p>
+this would be a good feature for the CDM API. i dont think theres anything to be done in this CF convention, other than to encourage, as you say, providers to "anticipate other ways people might want to look at your data, not just how you are used to looking at it".
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1229116914000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-12T13%3A21%3A54-08%3A00&amp;precision=second" title="See timeline at 12/12/08 13:21:54">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I have made changes to the <a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/PointObservationConventions"><span class="icon">​</span>proposal</a>, specifically:
+</p>
+<ol><li>change attribute name pointFeature to featureType 
+</li><li>add section 5.8.2.5 "flattened representation" for station data 
+</li><li>in overview: clarify what coordinates are required 
+</li><li>add standard_name on station id - otherwise theres no way to identify the station id
+</li></ol>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1230664318000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:20" class="follow-up">↓ 20</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-30T11%3A11%3A58-08%3A00&amp;precision=second" title="See timeline at 12/30/08 11:11:58">12 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Quick question on this definition - "trajectory: a connected set of data points along a 1D curve in time and space."
+</p>
+<p>
+For drifting buoys, there can be a depth dimension as well as time, with multiple sensors deployed at different depths under the buoy; it's not clear to me if the specification will allow that. I guess the term "1D curve in time and space" is confusing me, and I'm not sure why it's in the definition. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1230664861000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+        in reply to:
+    <a href="#comment:19">↑ 19</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-12-30T11%3A21%3A01-08%3A00&amp;precision=second" title="See timeline at 12/30/08 11:21:01">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:19" title="Comment 19">ngalbraith</a>:
+</p>
+<blockquote class="citation">
+<p>
+Quick question on this definition - "trajectory: a connected set of data points along a 1D curve in time and space."
+</p>
+<p>
+For drifting buoys, there can be a depth dimension as well as time, with multiple sensors deployed at different depths under the buoy; it's not clear to me if the specification will allow that. I guess the term "1D curve in time and space" is confusing me, and I'm not sure why it's in the definition. 
+</p>
+</blockquote>
+<p>
+Hi Nan:
+</p>
+<p>
+A trajectory is intended to deal with the case where there is no depth dimension, eg an aircraft track or drifting surface buoy. For your case, you want a "section" datatype, see section 5.8.6.
+</p>
+<p>
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1231233801000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:22" class="follow-up">↓ 22</a>
+    <a href="#comment:24" class="follow-up">↓ 24</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-06T01%3A23%3A21-08%3A00&amp;precision=second" title="See timeline at 01/06/09 01:23:21">12 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi John,
+</p>
+<p>
+I'm a little concerned about your response to Nan. I would see an aircraft track as analogous to a drifting buoy (or AUV) and therefore also a section and not a trajectory.
+</p>
+<p>
+What you're proposing is that 'section' is data at one or more z values for each (x,y,t) value in the coverage.  This makes a 'trajectory' a special case of a 'section' in which there is only one z values, which has (by implication) a value of zero. This challenges some of my prejudices about what constitutes a 'section', but they're open to challenge.  Is everybody else comfortable with single-depth dections?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1231258975000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+        in reply to:
+    <a href="#comment:21">↑ 21</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:23" class="follow-up">↓ 23</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-06T08%3A22%3A55-08%3A00&amp;precision=second" title="See timeline at 01/06/09 08:22:55">12 years ago</a> by mccann
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:21" title="Comment 21">lowry</a>:
+</p>
+<blockquote class="citation">
+<p>
+Hi John,
+</p>
+<p>
+I'm a little concerned about your response to Nan. I would see an aircraft track as analogous to a drifting buoy (or AUV) and therefore also a section and not a trajectory.
+</p>
+</blockquote>
+<p>
+I think a drifting buoy is more analogous to a neutrally buoyant balloon than to an aircraft.  The difference is whether the measuring platform is traveling through the fluid or drifting with it.  Though both ways of measurement will yield a x,y,z,t collection of data (with z=0 for the drifting buoy, unless it has a string of instruments below it) the interpretation s different for these two types of measurements.  'Trajectory' applies to the measurement platform moving through the fluid (aircraft, AUV).  Do we have an appropriate word for measurements produced from a drifting measurement platform?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-23-1231262164000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+        in reply to:
+    <a href="#comment:22">↑ 22</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-06T09%3A16%3A04-08%3A00&amp;precision=second" title="See timeline at 01/06/09 09:16:04">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:22" title="Comment 22">mccann</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:21" title="Comment 21">lowry</a>:
+</p>
+<blockquote class="citation">
+<p>
+Hi John,
+</p>
+<p>
+I'm a little concerned about your response to Nan. I would see an aircraft track as analogous to a drifting buoy (or AUV) and therefore also a section and not a trajectory.
+</p>
+</blockquote>
+<p>
+I think a drifting buoy is more analogous to a neutrally buoyant balloon than to an aircraft.  The difference is whether the measuring platform is traveling through the fluid or drifting with it.  Though both ways of measurement will yield a x,y,z,t collection of data (with z=0 for the drifting buoy, unless it has a string of instruments below it) the interpretation s different for these two types of measurements.  'Trajectory' applies to the measurement platform moving through the fluid (aircraft, AUV).  Do we have an appropriate word for measurements produced from a drifting measurement platform?
+</p>
+</blockquote>
+<p>
+Hi Mike: 
+</p>
+<p>
+Let me just emphasize that the proposed "feature types" are based mostly on topological properties of the data (dimensionality, connectivity). A trajectory is a smooth 1D line in space/time. A section is a trajectory with hair, ie vertical lines attached along the trajectory.
+</p>
+<p>
+A more sophisticated categorization using standard names or other mechanism could be added, but is not currently a part of this proposal.
+</p>
+<p>
+So this proposal would allow a drifting buoy, balloon track (neutrally buoyant or not), and an aircraft track to all be classified as a trajectory. The case where the z value remains constant is not explicitly called out. However, by factoring the z out of the "<a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/CDM/CDMpoints.doc"><span class="icon">​</span>nested table</a>", one could clearly indicate that z is constant, which is a lot better than having to examine a coordinate variable to see if all the values are identical. However, if that case is extremely important, we might want to consider it as a separate type.
+</p>
+<p>
+The choice of data type is not completely rigid. A balloon sounding, eg, might be classified as a profile, when the horizontal drift of the balloon is not important.
+</p>
+<p>
+The data types are influenced pragmatically by actual files mostly from atmospheric/ocean data. Interestingly, Andrew Wolf came up with remarkably similar types as part of CSML. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-24-1231262569000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:24" class="cnum">
+    <a href="#comment:24">comment:24</a>
+  </span>
+        in reply to:
+    <a href="#comment:21">↑ 21</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-06T09%3A22%3A49-08%3A00&amp;precision=second" title="See timeline at 01/06/09 09:22:49">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:21" title="Comment 21">lowry</a>:
+</p>
+<blockquote class="citation">
+<p>
+Hi John,
+</p>
+<p>
+I'm a little concerned about your response to Nan. I would see an aircraft track as analogous to a drifting buoy (or AUV) and therefore also a section and not a trajectory.
+</p>
+<p>
+What you're proposing is that 'section' is data at one or more z values for each (x,y,t) value in the coverage.  This makes a 'trajectory' a special case of a 'section' in which there is only one z values, which has (by implication) a value of zero. This challenges some of my prejudices about what constitutes a 'section', but they're open to challenge.  Is everybody else comfortable with single-depth dections?
+</p>
+</blockquote>
+<p>
+Hi Roy:
+</p>
+<p>
+Just to clarify: a good example of a trajectory is an aircraft track, which has x,y,z,t all varying in the general case. Z may be constant, and only t must be monotonic.
+</p>
+<p>
+A trajectory could be a degenerate section, but making it so would be more complex than I think most data writers would prefer, without any gain. Theres a fair amount of extra complexity to represent the section, as you can see from comparing 5.8.3 and 5.8.6.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-25-1231272761000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:25" class="cnum">
+    <a href="#comment:25">comment:25</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:26" class="follow-up">↓ 26</a>
+    <a href="#comment:27" class="follow-up">↓ 27</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-06T12%3A12%3A41-08%3A00&amp;precision=second" title="See timeline at 01/06/09 12:12:41">12 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi John,
+</p>
+<p>
+I'm 100% with you on Mike's comment: it's the spatio-temporal shape of the data co-ordinates that governs feature type and not the means by which that shape has been attained.
+</p>
+<p>
+My point - which may have not been expressed that clearly - is whether a trajectory is 3-D or 2-D.  Your answer to Nan seemed to me to be contradictory. On the one hand you were saying that a sub-surface buoy series was a 'section' but on the other you were saying that a an aircraft flight - to me the mirror image of a sub-surface buoy track on the other side of the air-sea interface - was a trajectory.
+</p>
+<p>
+There may be a muddying of the thinking here brought about by Argos buoys, which I would definitely treat as sections because they are a series of profiles at varying x, y, z.  However, there are other sub-surface buoys that drift around on an isopycnal measuring temperature (either logging the data for access on recovery or transmitting it acoustically) at that particular depth as a function of x,y,z,t.
+</p>
+<p>
+So, let's forget about buoys and think about AUVs such as Autosub and aircraft flights.  Both cases have monotonic t with consequential x,y,z.  Are these trajectories (my preference) or sections?  If they are trajectories, why is the data from a simple logging ALACE float also not a trajectory?
+</p>
+<p>
+I'm totally comfortable with a trajectory definition of monotonic t with associated x, y, z but not with the the idea that a trajectory is 2-D, which was 50% implied by your reply to Nan. Am I right in assuming that this trajectory definition is your intention (it's certainly my take on CSML) and that buoys mapping to multiple feature types has created a red herring?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-26-1231275404000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:26" class="cnum">
+    <a href="#comment:26">comment:26</a>
+  </span>
+        in reply to:
+    <a href="#comment:25">↑ 25</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-06T12%3A56%3A44-08%3A00&amp;precision=second" title="See timeline at 01/06/09 12:56:44">12 years ago</a> by dmurray
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:25" title="Comment 25">lowry</a>:
+</p>
+<blockquote class="citation">
+<p>
+I'm 100% with you on Mike's comment: it's the spatio-temporal shape of the data co-ordinates that governs feature type and not the means by which that shape has been attained.
+</p>
+<p>
+My point - which may have not been expressed that clearly - is whether a trajectory is 3-D or 2-D.  Your answer to Nan seemed to me to be contradictory. On the one hand you were saying that a sub-surface buoy series was a 'section' but on the other you were saying that a an aircraft flight - to me the mirror image of a sub-surface buoy track on the other side of the air-sea interface - was a trajectory.
+</p>
+</blockquote>
+<p>
+The section would be when the buoy is measuring parameters at multiple depths for any
+given txy of the bouy itself (maybe that's the Argos case below).  For a drifting 
+buoy that is measuring data at only one z position for every txy, then that would
+be a trajectory.
+</p>
+<blockquote class="citation">
+<p>
+There may be a muddying of the thinking here brought about by Argos buoys, which I would definitely treat as sections because they are a series of profiles at varying x, y, z.  However, there are other sub-surface buoys that drift around on an isopycnal measuring temperature (either logging the data for access on recovery or transmitting it acoustically) at that particular depth as a function of x,y,z,t.
+</p>
+<p>
+So, let's forget about buoys and think about AUVs such as Autosub and aircraft flights.  Both cases have monotonic t with consequential x,y,z.  Are these trajectories (my preference) or sections?  If they are trajectories, why is the data from a simple logging ALACE float also not a trajectory?
+</p>
+</blockquote>
+<p>
+I think they would also be trajectories if they are just measuring parameters at
+a particular txyz.  Z can vary, but if you had multiple Z at each txy, then it
+would be a section.
+</p>
+<blockquote class="citation">
+<p>
+I'm totally comfortable with a trajectory definition of monotonic t with associated x, y, z but not with the the idea that a trajectory is 2-D, which was 50% implied by your reply to Nan. Am I right in assuming that this trajectory definition is your intention (it's certainly my take on CSML) and that buoys mapping to multiple feature types has created a red herring?
+</p>
+</blockquote>
+<p>
+In general, trajectories would be 3D spatial on a 1D manifold (time).  However a
+hurricane track is an example of a trajectory that conventionally has no
+z dimension.  Values are assumed to be at sea level (unless otherwise
+specified), so we should allow for storing a trajectory without having
+to specify the Z dimension (2D spatial on a 1D manifold).
+</p>
+<p>
+Don
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-27-1231294405000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:27" class="cnum">
+    <a href="#comment:27">comment:27</a>
+  </span>
+        in reply to:
+    <a href="#comment:25">↑ 25</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-06T18%3A13%3A25-08%3A00&amp;precision=second" title="See timeline at 01/06/09 18:13:25">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:25" title="Comment 25">lowry</a>:
+</p>
+<blockquote class="citation">
+<p>
+Hi John,
+</p>
+<p>
+I'm 100% with you on Mike's comment: it's the spatio-temporal shape of the data co-ordinates that governs feature type and not the means by which that shape has been attained.
+</p>
+<p>
+My point - which may have not been expressed that clearly - is whether a trajectory is 3-D or 2-D.  Your answer to Nan seemed to me to be contradictory. On the one hand you were saying that a sub-surface buoy series was a 'section' but on the other you were saying that a an aircraft flight - to me the mirror image of a sub-surface buoy track on the other side of the air-sea interface - was a trajectory.
+</p>
+<p>
+There may be a muddying of the thinking here brought about by Argos buoys, which I would definitely treat as sections because they are a series of profiles at varying x, y, z.  However, there are other sub-surface buoys that drift around on an isopycnal measuring temperature (either logging the data for access on recovery or transmitting it acoustically) at that particular depth as a function of x,y,z,t.
+</p>
+<p>
+So, let's forget about buoys and think about AUVs such as Autosub and aircraft flights.  Both cases have monotonic t with consequential x,y,z.  Are these trajectories (my preference) or sections?  If they are trajectories, why is the data from a simple logging ALACE float also not a trajectory?
+</p>
+<p>
+I'm totally comfortable with a trajectory definition of monotonic t with associated x, y, z but not with the the idea that a trajectory is 2-D, which was 50% implied by your reply to Nan. Am I right in assuming that this trajectory definition is your intention (it's certainly my take on CSML) and that buoys mapping to multiple feature types has created a red herring?
+</p>
+</blockquote>
+<p>
+Hi Roy:
+</p>
+<p>
+Yes, I agree with you, and I probably misunderstood Nan's example. An Autosub would be a trajectory, not a section, unless it was measuring at multiple depths at the same time. I think Don also has clarified this. 
+</p>
+<p>
+thanks for clearing this example up.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-28-1231318713000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:28" class="cnum">
+    <a href="#comment:28">comment:28</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:29" class="follow-up">↓ 29</a>
+    <a href="#comment:30" class="follow-up">↓ 30</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-07T00%3A58%3A33-08%3A00&amp;precision=second" title="See timeline at 01/07/09 00:58:33">12 years ago</a> by bnl
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Can I just sort of summarise this discussion and see if I've understood you all? I think we've come to the CSML+MOLES position, but I want to be sure:
+</p>
+<p>
+The key issue seems to be that there is a confusion between the path taken by the platform from which (or at which) measurements are taken, and the measurements themselves. The feature type of a path taken by a platform would always seem to be a trajectory (whether one dimension is collapsed - so it's 2D+t - or not, 3D+t). In some cases there is a "sampling" at or on the platform, in which case the feature type of the data is also a trajectory, or, there are measurements taken in <em>profiles</em> from the platform, in which case the feature type <em>of the set</em> is <em>section</em>.
+</p>
+<p>
+(To spell this out, the path taken by the platform is trajectory data, where the parameter measured is the actual location of the platform, data collected <em>on, or a</em>t, the platform is trajectory data where the parameter measured is whatever ... data measured <em>from</em> the platform may have different feature types.)
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-29-1231344678000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:29" class="cnum">
+    <a href="#comment:29">comment:29</a>
+  </span>
+        in reply to:
+    <a href="#comment:28">↑ 28</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:31" class="follow-up">↓ 31</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-07T08%3A11%3A18-08%3A00&amp;precision=second" title="See timeline at 01/07/09 08:11:18">12 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:28" title="Comment 28">bnl</a>:
+ 
+</p>
+<blockquote class="citation">
+<p>
+The key issue seems to be that there is a confusion between the path taken by the platform from which (or at which) measurements are taken, and the measurements themselves. The feature type of a path taken by a platform would always seem to be a trajectory (whether one dimension is collapsed - so it's 2D+t - or not, 3D+t). In some cases there is a "sampling" at or on the platform, in which case the feature type of the data is also a trajectory, or, there are measurements taken in <em>profiles</em> from the platform, in which case the feature type <em>of the set</em> is <em>section</em>.
+</p>
+</blockquote>
+<p>
+By definition, trajectories may have x, y, and z all varying with time, though it is also reasonable to allow a depth dimension of 1 - I can't see the point of using a more constricted definition in the convention.
+</p>
+<p>
+I'd like to be able to distinguish between the kind of data from something like an Argo float, with profiles along a track (where you clearly can think of the data as a section) and the kind of drifting surface buoy we sometimes deploy, with a few instruments at a constant depth. The dimensions might be 
+</p>
+<pre class="wiki">time (unlimited)
+lon (time) 
+lat (time) 
+depth (3)
+
+temp (time,depth)
+</pre><p>
+To describe this as a 'section' seems misleading, especially given the definition provided in the Point Observation document: a 'series of profiles.'
+</p>
+<p>
+The document shows a mechanism for storing multiple trajectories together, in section 5.8.3.2; however the dimensions indicate that these are not adjacent, parallel trajectories. Maybe it would be useful to generalize that description to include this type of data - I can't think of another practical use for "storing multiple trajectories in the same file, and the number of observations in each trajectory is the same" other than this one (although I suppose somebody has that sort of data).
+ 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-30-1231354242000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:30" class="cnum">
+    <a href="#comment:30">comment:30</a>
+  </span>
+        in reply to:
+    <a href="#comment:28">↑ 28</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-07T10%3A50%3A42-08%3A00&amp;precision=second" title="See timeline at 01/07/09 10:50:42">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:28" title="Comment 28">bnl</a>:
+</p>
+<blockquote class="citation">
+<p>
+Can I just sort of summarise this discussion and see if I've understood you all? I think we've come to the CSML+MOLES position, but I want to be sure:
+</p>
+<p>
+The key issue seems to be that there is a confusion between the path taken by the platform from which (or at which) measurements are taken, and the measurements themselves. The feature type of a path taken by a platform would always seem to be a trajectory (whether one dimension is collapsed - so it's 2D+t - or not, 3D+t). In some cases there is a "sampling" at or on the platform, in which case the feature type of the data is also a trajectory, or, there are measurements taken in <em>profiles</em> from the platform, in which case the feature type <em>of the set</em> is <em>section</em>.
+</p>
+<p>
+(To spell this out, the path taken by the platform is trajectory data, where the parameter measured is the actual location of the platform, data collected <em>on, or a</em>t, the platform is trajectory data where the parameter measured is whatever ... data measured <em>from</em> the platform may have different feature types.)
+</p>
+</blockquote>
+<p>
+Hi Brian:
+</p>
+<p>
+since i stare at netcdf files all day, not "measuring platforms", i dont actually use that terminology, but i think that your description would be equivilent in actual practice. 
+</p>
+<p>
+note that the idea of a trajectoryFeature is that the point measurements are "connected", which probably means that it may make sense to interpolate between the points. If the platform was measuring sporadically, one might decide to classify as pointFeature, which are not connected. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-31-1231354836000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:31" class="cnum">
+    <a href="#comment:31">comment:31</a>
+  </span>
+        in reply to:
+    <a href="#comment:29">↑ 29</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-01-07T11%3A00%3A36-08%3A00&amp;precision=second" title="See timeline at 01/07/09 11:00:36">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Nan, comments are embedded:
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:29" title="Comment 29">ngalbraith</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:28" title="Comment 28">bnl</a>:
+ 
+</p>
+<blockquote class="citation">
+<p>
+The key issue seems to be that there is a confusion between the path taken by the platform from which (or at which) measurements are taken, and the measurements themselves. The feature type of a path taken by a platform would always seem to be a trajectory (whether one dimension is collapsed - so it's 2D+t - or not, 3D+t). In some cases there is a "sampling" at or on the platform, in which case the feature type of the data is also a trajectory, or, there are measurements taken in <em>profiles</em> from the platform, in which case the feature type <em>of the set</em> is <em>section</em>.
+</p>
+</blockquote>
+<p>
+By definition, trajectories may have x, y, and z all varying with time, though it is also reasonable to allow a depth dimension of 1 - I can't see the point of using a more constricted definition in the convention.
+</p>
+<p>
+I'd like to be able to distinguish between the kind of data from something like an Argo float, with profiles along a track (where you clearly can think of the data as a section) and the kind of drifting surface buoy we sometimes deploy, with a few instruments at a constant depth. The dimensions might be 
+</p>
+<pre class="wiki">time (unlimited)
+lon (time) 
+lat (time) 
+depth (3)
+
+temp (time,depth)
+</pre><p>
+To describe this as a 'section' seems misleading, especially given the definition provided in the Point Observation document: a 'series of profiles.'
+</p>
+</blockquote>
+<p>
+technically, it could be described as a section, since it has multiple depths. Or one could call it a trajectory with constant z = surface, and consider temp as a vector, ie treat the depth as internal to the "point observation". 
+</p>
+<blockquote class="citation">
+<p>
+The document shows a mechanism for storing multiple trajectories together, in section 5.8.3.2; however the dimensions indicate that these are not adjacent, parallel trajectories. Maybe it would be useful to generalize that description to include this type of data - I can't think of another practical use for "storing multiple trajectories in the same file, and the number of observations in each trajectory is the same" other than this one (although I suppose somebody has that sort of data).
+ 
+</p>
+</blockquote>
+<p>
+yes, that representation would probably not be very common.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-32-1247557393000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:32" class="cnum">
+    <a href="#comment:32">comment:32</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:33" class="follow-up">↓ 33</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-07-14T00%3A43%3A13-07%3A00&amp;precision=second" title="See timeline at 07/14/09 00:43:13">12 years ago</a> by Heinke
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all,
+</p>
+<p>
+we are on the way to include point observation data into the WDCC repository.
+Your proposal is very welcome to us. We are working together with the
+University of Bonn. Andreas Hense has some remarks to the feature types:
+</p>
+<p>
+profile is now restricted to a vertical line.
+Could we expand this to a more general definition:
+profile: a set of data points along a vertical or horizontal line.
+or
+profile: a set of data points along a straight, linear measurement line to be 
+described / parametrized by a single coordinate
+</p>
+<p>
+We need it in the COPS Project for scintillometer measurements along a
+horizontal line.
+</p>
+<p>
+section is restricted to a trajectory.
+Could we expand this for example to include
+ppi-scans of a radar (conical section) and rhi-scans of radar (triangular section).
+</p>
+<p>
+A suggestion: section: a collection of profiles in an orthogonal direction to the measurement line
+(orthogonal not only in the cartesian sense)
+</p>
+<p>
+Best wishes
+Heinke
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-33-1247571713000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:33" class="cnum">
+    <a href="#comment:33">comment:33</a>
+  </span>
+        in reply to:
+    <a href="#comment:32">↑ 32</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-07-14T04%3A41%3A53-07%3A00&amp;precision=second" title="See timeline at 07/14/09 04:41:53">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Heinke:
+</p>
+<p>
+We are balancing the complexity of possible "data types" with the practicality of stuffing this kind of data into a rather simple storage format. The various data types are intended to be categories of data with which one can take advantage of some regularity to store the data more simply or efficiently.
+</p>
+<p>
+The generalization of a profile currently is a trajectory, which is parametrized by a single coordinate, but we dont have a way to represent in CDL that the data is along a straight line. A profile, OTOH, fixes x and y to be a constant, which is easily expressible in CDL, eg:
+</p>
+<pre class="wiki">  float x;
+  float y;
+  float z(z);
+</pre><p>
+Profile data is fairly common (at least in met data) and because the regularity is expressible in CDL, is a good candidate for a special data type. I havent seen scintillometer data before, but if others think we need a special case for it, we could add another data type.
+</p>
+<p>
+Scanning radar data, i believe, falls outside the scope of this proposal. Because its so common and large, it deserves careful attention. There is a current effort at NCAR to define a CF Convention for radial data. I can put you in touch with this group offline if you like.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-34-1253655007000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:34" class="cnum">
+    <a href="#comment:34">comment:34</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:35" class="follow-up">↓ 35</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-09-22T14%3A30%3A07-07%3A00&amp;precision=second" title="See timeline at 09/22/09 14:30:07">12 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-priority">
+      <strong class="trac-field-priority">Priority</strong>
+        changed from <em>high</em> to <em>medium</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+We're using NetCDf (CF) for station data from surface moorings, and one of the most annoying limitations of NetCDF for this purpose could probably be addressed in this proposal, but doesn't seem to be.
+ 
+The problem, for stations at which multiple instruments at different depths produce a 2-d time series data set, is the lack of structure in the variable attributes. We may have several types of instruments at various depths, all producing  sea_water_temperature but with different instrument attributes (model number, serial number, accuracy, resolution, etc). 
+</p>
+<p>
+There are some workarounds, but they're messy; making attribute names like SN_1, SN_2, or comma-separating the values for different bins (instrument_resolution: .01, 0001 ...). These would not easily translate into a more structured metadata language like sensorml, and, since there is no standard approach, there are not likely to be tools built to accommodate any of these workarounds.
+</p>
+<p>
+It would be great to decide on a standard way to define attributes for different depth bins. Is this something that could be covered in the stationTimeSeries proposal?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-35-1253796771000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:35" class="cnum">
+    <a href="#comment:35">comment:35</a>
+  </span>
+        in reply to:
+    <a href="#comment:34">↑ 34</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-09-24T05%3A52%3A51-07%3A00&amp;precision=second" title="See timeline at 09/24/09 05:52:51">12 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Nan
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:34" title="Comment 34">ngalbraith</a>:
+</p>
+<blockquote class="citation">
+<p>
+The problem, for stations at which multiple instruments at different depths produce a 2-d time series data set, is the lack of structure in the variable attributes. We may have several types of instruments at various depths, all producing  sea_water_temperature but with different instrument attributes (model number, serial number, accuracy, resolution, etc).
+</p>
+</blockquote>
+<p>
+I would say that the natural CF way to handle this would be to record the sensor information not in an attribute but in a string-valued auxiliary coordinate variable, as described in CF 6.1 (though there it doesn't have this purpose). That's a 2D char array. One dimension is the max string length, the other would be (in this case) the depth dimension. The variable is pointed to by a coordinates attribute of the data variable. This gives you a way to supply a different string for each depth level. An auxiliary coordinate variable, like any coordinate variable, can have attributes such as standard name to identify what it contains.
+</p>
+<p>
+In the single-level case, you could use a string-valued scalar coordinate variable to supply sensor information. Scalar coordinate variables can have metadata to describe them in just the same way as data variables, and they may be a better mechanism because (exactly as you point out) there always exists the possibility of wanting to generalise them into multivalued things that correspond to dimensions of the data.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-36-1253805384000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:36" class="cnum">
+    <a href="#comment:36">comment:36</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:37" class="follow-up">↓ 37</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-09-24T08%3A16%3A24-07%3A00&amp;precision=second" title="See timeline at 09/24/09 08:16:24">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I agree with Jonathan, this kind of metadata should be in a variable, not an attribute, so that you can use the shared depth dimension.
+</p>
+<p>
+One can also make it into an auxiliary coordinate variable by placing it in an :coordinates attribute. As Jonathan says, these should be on the data variables, not the depth coordinate. I would say that this part is optional, since probably only your software would know what to do with that.
+</p>
+<p>
+As an aside, these kinds of auxiliary coordinates have the danger that generic software might confuse them with georeferencing coordinates. Eg if an auxiliary coordinate had units of "degrees_north", it might be impossible to distinguish it from the latitude coordinate. So in general i would advocate that CF move away from the use of units to distinguish coordinate types. We already have other mechanisms, so its probably mostly a matter of best practices.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-37-1253805750000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:37" class="cnum">
+    <a href="#comment:37">comment:37</a>
+  </span>
+        in reply to:
+    <a href="#comment:36">↑ 36</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-09-24T08%3A22%3A30-07%3A00&amp;precision=second" title="See timeline at 09/24/09 08:22:30">12 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:36" title="Comment 36">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+As an aside, these kinds of auxiliary coordinates have the danger that generic software might confuse them with georeferencing coordinates. Eg if an auxiliary coordinate had units of "degrees_north", it might be impossible to distinguish it from the latitude coordinate. So in general i would advocate that CF move away from the use of units to distinguish coordinate types. We already have other mechanisms, so its probably mostly a matter of best practices.
+</p>
+</blockquote>
+<p>
+I completely agree with this comment of John's. Units are not the right way to distinguish quantities. Other metadata, such as standard names, are intended for that purpose. CF supports distinction by units in special cases for COARDS compatibility.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-38-1253895453000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:38" class="cnum">
+    <a href="#comment:38">comment:38</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-09-25T09%3A17%3A33-07%3A00&amp;precision=second" title="See timeline at 09/25/09 09:17:33">12 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks, all - using a variable instead of an attribute is clearly the way to go - for some reason I just hadn't thought of it as an option.
+</p>
+<p>
+Actually, using the attribute name "ancillary_variables" instead of "auxiliary coordinates" to tie these to the appropriate metadata variable would be more clear and would prevent the possible mis-construction of these fields as alternate spatial coordinates.  
+</p>
+<p>
+This attribute name was listed in the Conventions document (in Appendix A, which I've apparently never read before) and says "ancillary_variables : Identifies a variable that contains closely associated data, e.g., the measurement uncertainties of instrument data."  
+</p>
+<p>
+This will be particularly useful to us because we are allowing several QA/QC related fields to be provided either with dimensions (Z) or (T,Z).  So ... unless I misunderstand the documentation, this problem seems to be solved. It might be useful to record it in the station section of the point obs specification, in any case.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-39-1253901715000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:39" class="cnum">
+    <a href="#comment:39">comment:39</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-09-25T11%3A01%3A55-07%3A00&amp;precision=second" title="See timeline at 09/25/09 11:01:55">12 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Nan
+</p>
+<p>
+The ancillary_variables attribute is intended to point from one data variable to another data variable which supplies point-by-point metadata. I agree that is appropriate for quality data; that is indeed one of the intentions of it, and it might be possible to use one of the standard name modifiers to identify it (CF 3.3 and Appendix C). It would be exactly as intended for quality data (T,Z) i.e. the same dimensions as the data variable. I agree that it seems natural to allow it also for metadata which has a subset of the dimensions of the data variable, and it doesn't appear to be excluded by the standard or the conformance requirements. If there is any possibility of the variable being useful as a coordinate, I think it would be fine and helpful to point to it with both the coordinates and the ancillary_variables attributes.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-40-1257761445000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:40" class="cnum">
+    <a href="#comment:40">comment:40</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:42" class="follow-up">↓ 42</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-11-09T02%3A10%3A45-08%3A00&amp;precision=second" title="See timeline at 11/09/09 02:10:45">11 years ago</a> by Heinke
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John,
+</p>
+<p>
+I like to make some comments about the new version.
+You have changed the definition of 'point':
+</p>
+<p>
+old: * 'point': one or more parameters measured at one point in time
+and space
+</p>
+<p>
+new: * 'point': one or more parameters measured at a set of 'point'
+in time and space
+</p>
+<p>
+I think with the new definition, every observation data has the feature type 'point'.
+Every feature type is a subset of 'point'. Is this your intention?
+</p>
+<p>
+'point' looks like a timeseries of an unstructured  grid.
+</p>
+<p>
+The second I like to mention is the semantic concerning '<a class="missing wiki">TimeSeries?</a>'.
+If you expect every 'observation data' has a time dimension then you don't need '<a class="missing wiki">TimeSeries?</a>' in
+the feature type name. 'stationTimeSeries' should be named with 'station'.
+If not stationProfile should be named with 'stationProfileTimeSeries'...
+</p>
+<p>
+Best wishes
+Heinke
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-41-1257882983000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:41" class="cnum">
+    <a href="#comment:41">comment:41</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:43" class="follow-up">↓ 43</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-11-10T11%3A56%3A23-08%3A00&amp;precision=second" title="See timeline at 11/10/09 11:56:23">11 years ago</a> by dmurray
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+John-
+</p>
+<p>
+Thanks for the update and the work on this.  Just a couple of comments:
+</p>
+<ul><li>If there is only one trajectory in a file, is it really necessary to have a trajectory_id?
+</li></ul><ul><li>I would like to take a point dataset (say ship tracks, or airplane reports) and look at it as a set of trajectories identified by a particular variable.  The data for a particular trajectory might not be continuous, but it seems like I could easily just add the trajectory_id to the variable that I'd like to use as the identifier.  It would be up to the reader to synthesize the coordinate variable and trajectory_index, but would allow the flexibility of using NcML to arbitrarily change the variable used for the trajectory without it being hardcoded in the file.
+</li></ul><p>
+Regarding Heinke's comment, perhaps point could be defined as:
+</p>
+<p>
+one or more parameters measured at an arbitrary set of locations in time and space 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-42-1257953005000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:42" class="cnum">
+    <a href="#comment:42">comment:42</a>
+  </span>
+        in reply to:
+    <a href="#comment:40">↑ 40</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-11-11T07%3A23%3A25-08%3A00&amp;precision=second" title="See timeline at 11/11/09 07:23:25">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Heinke:
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:40" title="Comment 40">Heinke</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John,
+</p>
+<p>
+I like to make some comments about the new version.
+You have changed the definition of 'point':
+</p>
+<p>
+old: * 'point': one or more parameters measured at one point in time
+and space
+</p>
+<p>
+new: * 'point': one or more parameters measured at a set of 'point'
+in time and space
+</p>
+<p>
+I think with the new definition, every observation data has the feature type 'point'.
+Every feature type is a subset of 'point'. Is this your intention?
+</p>
+</blockquote>
+<p>
+actually, yes. All point feature types are collection of points. They differ in their connectivity. A point feature collection is an unconnected collection. A reviewer suggested changing to the plural in the definition of point feature.
+ 
+</p>
+<blockquote class="citation">
+<p>
+'point' looks like a timeseries of an unstructured  grid.
+</p>
+<p>
+The second I like to mention is the semantic concerning '<a class="missing wiki">TimeSeries?</a>'.
+If you expect every 'observation data' has a time dimension then you don't need '<a class="missing wiki">TimeSeries?</a>' in
+the feature type name. 'stationTimeSeries' should be named with 'station'.
+If not stationProfile should be named with 'stationProfileTimeSeries'...
+</p>
+</blockquote>
+<p>
+A time series of points all must have the same lat/lon. we call this the stationTimeSeries feature type, though just station would be fine also.
+</p>
+<p>
+this is an important case because the number of stations is typically fixed, while the number of observations is unbounded. One can thus use much simpler techniques for finding all the data in a bounding box than the general case.
+</p>
+<p>
+thanks for your comments.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-43-1257954289000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:43" class="cnum">
+    <a href="#comment:43">comment:43</a>
+  </span>
+        in reply to:
+    <a href="#comment:41">↑ 41</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-11-11T07%3A44%3A49-08%3A00&amp;precision=second" title="See timeline at 11/11/09 07:44:49">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:41" title="Comment 41">dmurray</a>:
+</p>
+<blockquote class="citation">
+<p>
+John-
+</p>
+<p>
+Thanks for the update and the work on this.  Just a couple of comments:
+</p>
+<ul><li>If there is only one trajectory in a file, is it really necessary to have a trajectory_id?
+</li></ul></blockquote>
+<p>
+good question, i also thought about that. one of my hidden agendas is to deal with aggregations of multiple files. one often sees a bunch of files with one trajectory in each file. i need a trajectory id for each. I could use the filename if i had to, but the data provider can often give a much better name, and i thought it would be better to force her to do so. 
+</p>
+<blockquote class="citation">
+<ul><li>I would like to take a point dataset (say ship tracks, or airplane reports) and look at it as a set of trajectories identified by a particular variable.  The data for a particular trajectory might not be continuous, but it seems like I could easily just add the trajectory_id to the variable that I'd like to use as the identifier.  It would be up to the reader to synthesize the coordinate variable and trajectory_index, but would allow the flexibility of using NcML to arbitrarily change the variable used for the trajectory without it being hardcoded in the file.
+</li></ul></blockquote>
+<p>
+i know what you mean, this is a request for a client-side library like the CDM. This spec is for data writers, to give them a framework for defining their view of the data. So at the moment, I dont think your request would affect any of these conventions, do you?
+</p>
+<blockquote class="citation">
+<p>
+Regarding Heinke's comment, perhaps point could be defined as:
+</p>
+<p>
+one or more parameters measured at an arbitrary set of locations in time and space
+</p>
+</blockquote>
+<p>
+or perhaps "unconnected set of locations" ?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-44-1262127098000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:44" class="cnum">
+    <a href="#comment:44">comment:44</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:61" class="follow-up">↓ 61</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-29T14%3A51%3A38-08%3A00&amp;precision=second" title="See timeline at 12/29/09 14:51:38">11 years ago</a> by rsignell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Are there example NetCDF files or (preferably) OpenDAP data URLs for the various types of Point Feature datasets described here?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-45-1262173499000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:45" class="cnum">
+    <a href="#comment:45">comment:45</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:48" class="follow-up">↓ 48</a>
+    <a href="#comment:50" class="follow-up">↓ 50</a>
+    <a href="#comment:51" class="follow-up">↓ 51</a>
+    <a href="#comment:52" class="follow-up">↓ 52</a>
+    <a href="#comment:53" class="follow-up">↓ 53</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T03%3A44%3A59-08%3A00&amp;precision=second" title="See timeline at 12/30/09 03:44:59">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+It's taken me a couple of months to make time to look at this again - sorry.
+</p>
+<ol><li>It is evidently welcome to have this clarity about the representation of these data types. You start by saying that the existing 5.4 and 5.5 should be deprecated. Actually I think they are consistent with your representation, aren't they? Perhaps the right thing would be to replace those sections by new ones, based on your proposal, since data written in accordance with 5.4 and 5.5 would still be acceptable.
+</li></ol><ol start="2"><li>In practice netCDF files are often single-quantity datasets (all those in CMIP3 are, for instance), but why do you want to prohibit mixing feature types in a file? There doesn't appear to be a structural limitation preventing more than one type being in the file. You could make the <tt>featureType</tt> attribute either global (if there was only one feature type in the file) or an attribute of the data variable (to permit more than one type).
+</li></ol><ol start="3"><li>I would suggest that <tt>featureType</tt> attribute should be optional (like nearly all CF features), but <em>if</em> it is present, it implies various requirements, which you could tabulate for each <tt>featureType</tt>. These are mainly requirements for which aux coord variables must be present for each type, as that's what distinguishes the types. Is it really necessary to require an <em>order</em> of dimensions (station on the outside, for instance)? Elsewhere in CF we have relaxed ordering restrictions (that COARDS imposed). Software should be able to work out which dimension is which from the metadata; it's less robust to depend on an order.
+</li></ol><ol start="4"><li>Missing data in coordinate variables is not allowed generally. I can't see why you want to allow it. Where does this need arise? It's not allowed because it violates the requirement that coordinate variables must be monotonic; I think that's a Unidata rule. Missing data would be OK in auxiliary coordinate variables.
+</li></ol><ol start="5"><li><tt>station_name</tt> and <tt>station_id</tt> should also be auxiliary coordinate variables i.e. named by the <tt>coordinates</tt> attribute. They are labels, as described by CF section 6.
+</li></ol><ol start="6"><li>As in my previous comment in this ticket, I much prefer the index representation to the contiguous representation of ragged arrays. No-one replied to your remark on this, I think.
+</li></ol><ul><li>The contiguous representation is a bit more efficient of space, but both of them are vastly more efficient than a sparsely filled rectangular array.
+</li><li>The contiguous representation has auxiliary coordinate variables with a dimension (station) which is not a dimension of the data variable; that is not allowed by the CF definition of aux coord vars, which would have to be modified.
+</li><li>The index representation is more flexible.
+</li><li>It would be better to have only one of them, on grounds of simplicity.
+</li><li>The index representation is rather similar to the existing mechanism of "compression by gathering" in CF 8.2. That is for a rather different purpose, but it's the same kind of indirection. Your example is
+</li></ul><pre class="wiki">dimensions:
+  station = 23 ;
+  obs = UNLIMITED ;
+variables:
+  float lon(station) ;
+    lon:units = "degrees_east";
+  int stationIndex(obs) ;
+    stationIndex:long_name = "which station this obs is for" ;
+  float temp(obs) ;
+    temp:long_name = "temperature" ;
+    temp:units = "Celsius" ;
+    temp:coordinates = "time lat lon alt" ;
+</pre><p>
+According to CF 8.2, this would be
+</p>
+<pre class="wiki">dimensions:
+  station = 23 ;
+  obs = UNLIMITED ;
+variables:
+  float lon(station) ;
+    lon:units = "degrees_east";
+  int obs(obs) ;
+    obs:long_name = "which station this obs is for" ;
+    obs:compress="station";
+  float temp(obs) ;
+    temp:long_name = "temperature" ;
+    temp:units = "Celsius" ;
+    temp:coordinates = "time lat lon alt" ;
+</pre><p>
+The <tt>compress</tt> attribute indicates that the variable is an index into the named dimension. In CF 8.2, it's used for compressing a sparsely filled combination of dimensions into 1D. Here it would be used to expand, by repetition, a 1D dimension into another 1D dimension. But the machinery would be rather similar. Since this already exists in CF, I'd say that's another point in its favour over the contiguous representation.
+</p>
+<ol start="7"><li><tt>station_altitude</tt> could be just <tt>altitude</tt>, which is an existing standard name.
+</li></ol><p>
+Best wishes for 2010
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-46-1262179196000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:46" class="cnum">
+    <a href="#comment:46">comment:46</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:49" class="follow-up">↓ 49</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T05%3A19%3A56-08%3A00&amp;precision=second" title="See timeline at 12/30/09 05:19:56">11 years ago</a> by rsignell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Jonathan,
+</p>
+<p>
+Regarding your point 2: I agree with you that it would be very useful to allow mixing feature types in the same dataset. We often have NetCDF files such as ADCP data that contain both "stationProfile" (the velocity time series at different depth bins) with "station" data (the single time series of temperature and other variables near the transducer). 
+</p>
+<p>
+Regarding your point 4: I think it WOULD be useful to have CF allow missing_data in coordinate variables, as in coastal ocean modeling we often have curvilinear but logically rectangular grids where the lon/lat values (or x,y values) that constitute the grid have been created on the water side only.  This is the case for Delft3D grids, for example.  So in the masked land regions the coordinate values do not exist and are therefore written as masked values.  This currently causes these datasets to be non-CF compliant with no good reason. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-47-1262184573000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:47" class="cnum">
+    <a href="#comment:47">comment:47</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T06%3A49%3A33-08%3A00&amp;precision=second" title="See timeline at 12/30/09 06:49:33">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Rich
+</p>
+<p>
+Do you mean that there is missing data in the 2D lat-lon coordinates? I think that is OK, because they are auxiliary coordinate variables. It is the 1D coordinate variables (in the Unidata sense) which must be monotonic with no missing data.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-48-1262192821000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:48" class="cnum">
+    <a href="#comment:48">comment:48</a>
+  </span>
+        in reply to:
+    <a href="#comment:45">↑ 45</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:55" class="follow-up">↓ 55</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T09%3A07%3A01-08%3A00&amp;precision=second" title="See timeline at 12/30/09 09:07:01">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan:
+</p>
+<p>
+Thanks for your thorough review and comments. I will break these into pieces so each can be discussed.
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+It's taken me a couple of months to make time to look at this again - sorry.
+</p>
+<ol><li>It is evidently welcome to have this clarity about the representation of these data types. You start by saying that the existing 5.4 and 5.5 should be deprecated. Actually I think they are consistent with your representation, aren't they? Perhaps the right thing would be to replace those sections by new ones, based on your proposal, since data written in accordance with 5.4 and 5.5 would still be acceptable.
+</li></ol></blockquote>
+<p>
+yes, that would be fine, ill look to see what minor modifications would be needed.
+</p>
+<blockquote class="citation">
+<ol start="2"><li>In practice netCDF files are often single-quantity datasets (all those in CMIP3 are, for instance), but why do you want to prohibit mixing feature types in a file? There doesn't appear to be a structural limitation preventing more than one type being in the file. You could make the <tt>featureType</tt> attribute either global (if there was only one feature type in the file) or an attribute of the data variable (to permit more than one type).
+</li></ol><ol start="3"><li>I would suggest that <tt>featureType</tt> attribute should be optional (like nearly all CF features), but <em>if</em> it is present, it implies various requirements, which you could tabulate for each <tt>featureType</tt>. These are mainly requirements for which aux coord variables must be present for each type, as that's what distinguishes the types. Is it really necessary to require an <em>order</em> of dimensions (station on the outside, for instance)? Elsewhere in CF we have relaxed ordering restrictions (that COARDS imposed). Software should be able to work out which dimension is which from the metadata; it's less robust to depend on an order.
+</li></ol></blockquote>
+<p>
+My feeling is that the featureType attribute cannot be optional. The problem is that one cannot in a general way figure out the feature type by examining the file. Further, without knowing the feature type, one cannot correctly figure out how to read the data and map it to things like CDM Feature Types and the OGC WFS. Of course, one can always write specialized software that knows what kind of data is in the file, but for a general purpose library like the CDM, this would be impossible.
+</p>
+<p>
+Im quite concerned about how complex it is already to decode all the possibilities in this proposal. (A summary of the possibilities is at  <a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/reference/FeatureDatasets/CFencodingTable.html"><span class="icon">​</span>http://www.unidata.ucar.edu/software/netcdf-java/reference/FeatureDatasets/CFencodingTable.html</a>). I have implemented decoding these in the latest CDM 4.1 library. Im quite sure that I could not do so without knowing the featureType explicitly. Further, it would be much harder if I had to deal with the possibility of multiple featureTypes in a file. My feeling is that the right way to proceed is to get this working, and if there is a compelling real-life need for multiple feature types in a file, to figure out how to extend this later.
+</p>
+<p>
+I agree in principle that "Software should be able to work out which dimension is which from the metadata", but in this case there is a combinatorial explosion of possibilities that makes the client implementation on the edge of infeasible. I will have a look at relaxing the dimension ordering, but for now I would again advocate starting with this simpler and more restricted case, which I know is possible. Better to relax this later if needed, than to allow something now which makes it all but impossible to handle in generic software.
+</p>
+<p>
+(ill respond to rest in separate posts).
+</p>
+<p>
+Regards,
+</p>
+<p>
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-49-1262193016000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:49" class="cnum">
+    <a href="#comment:49">comment:49</a>
+  </span>
+        in reply to:
+    <a href="#comment:46">↑ 46</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T09%3A10%3A16-08%3A00&amp;precision=second" title="See timeline at 12/30/09 09:10:16">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Rich:
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:46" title="Comment 46">rsignell</a>:
+</p>
+<blockquote class="citation">
+<p>
+Jonathan,
+</p>
+<p>
+Regarding your point 2: I agree with you that it would be very useful to allow mixing feature types in the same dataset. We often have NetCDF files such as ADCP data that contain both "stationProfile" (the velocity time series at different depth bins) with "station" data (the single time series of temperature and other variables near the transducer). 
+</p>
+</blockquote>
+<p>
+<a class="missing wiki">StationProfile?</a> data is allowed to have data that doesnt have a z dimension. Im hoping this would cover your use case.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-50-1262211849000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:50" class="cnum">
+    <a href="#comment:50">comment:50</a>
+  </span>
+        in reply to:
+    <a href="#comment:45">↑ 45</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T14%3A24%3A09-08%3A00&amp;precision=second" title="See timeline at 12/30/09 14:24:09">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<ol start="4"><li>Missing data in coordinate variables is not allowed generally. I can't see why you want to allow it. Where does this need arise? It's not allowed because it violates the requirement that coordinate variables must be monotonic; I think that's a Unidata rule. Missing data would be OK in auxiliary coordinate variables.
+</li></ol></blockquote>
+<p>
+This situation comes up most obviously when you use the multidimensional representation, which creates rectangular arrays out of ragged arrays. For example you have 100 stations, all with 100 time points, except for some with less. So you have
+</p>
+<pre class="wiki">float data1(station, obs);
+float data2(station, obs);
+float data3(station, obs);
+...
+float time(station, obs);
+</pre><p>
+and place missing data in the time coordinates where needed, so the application can read just the time coordinate to find out where the data lies, instead of examining all the data arrays.
+</p>
+<p>
+Note that time is an auxiliary coordinate. I beleive all such cases are (or could be) auxiliary coordinates, so Im being a bit sloppy when i talk about coordinates having missing values. I can clarify that in the wording.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-51-1262213105000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:51" class="cnum">
+    <a href="#comment:51">comment:51</a>
+  </span>
+        in reply to:
+    <a href="#comment:45">↑ 45</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:56" class="follow-up">↓ 56</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T14%3A45%3A05-08%3A00&amp;precision=second" title="See timeline at 12/30/09 14:45:05">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<ol start="5"><li><tt>station_name</tt> and <tt>station_id</tt> should also be auxiliary coordinate variables i.e. named by the <tt>coordinates</tt> attribute. They are labels, as described by CF section 6.
+</li></ol></blockquote>
+<blockquote class="citation">
+<ul><li>The contiguous representation has auxiliary coordinate variables with a dimension (station) which is not a dimension of the data variable; that is not allowed by the CF definition of aux coord vars, which would have to be modified.
+</li></ul></blockquote>
+<p>
+Yes, both the contiguous and the indexed representation refer to auxiliary coordinate variables with a dimension which is not a dimension of the data variable. This is needed to be able to not repeat those values for every observation. Essentially we "factor out" the common information into the station "table", then "join" the station to the data using the contiguous or indexed method. This is a new way of indicating coordinates that has not been used in CF previously. So it sounds like we would need to extend the definition of aux coord vars for this case.
+</p>
+<p>
+<tt>station_name</tt> and <tt>station_id</tt> could be auxiliary coordinate variables, although they share this same issue of having a dimension not used by the data variable. My feeling is that the semantics of the contiguous and the indexed representation is clearer without adding the <tt>station_name</tt> and <tt>station_id</tt> as auxiliary coordinates.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-52-1262214488000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:52" class="cnum">
+    <a href="#comment:52">comment:52</a>
+  </span>
+        in reply to:
+    <a href="#comment:45">↑ 45</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T15%3A08%3A08-08%3A00&amp;precision=second" title="See timeline at 12/30/09 15:08:08">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<ol start="6"><li>As in my previous comment in this ticket, I much prefer the index representation to the contiguous representation of ragged arrays. No-one replied to your remark on this, I think.
+</li></ol><ul><li>The contiguous representation is a bit more efficient of space, but both of them are vastly more efficient than a sparsely filled rectangular array.
+</li><li>The index representation is more flexible.
+</li><li>It would be better to have only one of them, on grounds of simplicity.
+</li><li>The index representation is rather similar to the existing mechanism of "compression by gathering" in CF 8.2. That is for a rather different purpose, but it's the same kind of indirection. Your example is
+</li></ul><pre class="wiki">dimensions:
+  station = 23 ;
+  obs = UNLIMITED ;
+variables:
+  float lon(station) ;
+    lon:units = "degrees_east";
+  int stationIndex(obs) ;
+    stationIndex:long_name = "which station this obs is for" ;
+  float temp(obs) ;
+    temp:long_name = "temperature" ;
+    temp:units = "Celsius" ;
+    temp:coordinates = "time lat lon alt" ;
+</pre><p>
+According to CF 8.2, this would be
+</p>
+<pre class="wiki">dimensions:
+  station = 23 ;
+  obs = UNLIMITED ;
+variables:
+  float lon(station) ;
+    lon:units = "degrees_east";
+  int obs(obs) ;
+    obs:long_name = "which station this obs is for" ;
+    obs:compress="station";
+  float temp(obs) ;
+    temp:long_name = "temperature" ;
+    temp:units = "Celsius" ;
+    temp:coordinates = "time lat lon alt" ;
+</pre><p>
+The <tt>compress</tt> attribute indicates that the variable is an index into the named dimension. In CF 8.2, it's used for compressing a sparsely filled combination of dimensions into 1D. Here it would be used to expand, by repetition, a 1D dimension into another 1D dimension. But the machinery would be rather similar. Since this already exists in CF, I'd say that's another point in its favour over the contiguous representation.
+</p>
+</blockquote>
+<p>
+The advantage of the contiguous representation is that it can be much more efficient for the reader to extract all of the observations for a particular station/profile/trajectory, in the case where you are storing large numbers of station/profile/trajectories in the same file. The contiguous representation requires reading the size array and then reading the contiguously-stored observations. The indexed representation requires that the reader read the entire index array, which if it is stored along the unlimited dimension, can be very costly, then reading observations possibly scattered throughout the file.
+</p>
+<p>
+The indexed representation is more general and easier for the writer, and the contiguous representation is easier and potentially much more efficient for the reader. I've experimented with writing these files a lot in the context of using CF as a transfer format, subsetting large datasets (possibly not stored in netcdf) and returning CF-compliant files. I think its a reasonable tradeoff in complexity for efficient reading. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-53-1262214884000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:53" class="cnum">
+    <a href="#comment:53">comment:53</a>
+  </span>
+        in reply to:
+    <a href="#comment:45">↑ 45</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:54" class="follow-up">↓ 54</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-30T15%3A14%3A44-08%3A00&amp;precision=second" title="See timeline at 12/30/09 15:14:44">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<ol start="7"><li><tt>station_altitude</tt> could be just <tt>altitude</tt>, which is an existing standard name.
+</li></ol></blockquote>
+<p>
+Thanks for pointing this issue out. The problem is that theres a lot of data, eg profile data, whose z coordinate is relative to the ground, i.e. the altitude of the station. So we need two coordinates: "altitude"  and "station_altitude".
+</p>
+<p>
+This is part of the larger problem of specifying the reference surface of z coordinates. Id be happy to discuss that in more detail, but for this proposal, adding "station_altitude" probably would suffice for now.
+</p>
+<p>
+Best wishes for the new year,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-54-1262251002000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:54" class="cnum">
+    <a href="#comment:54">comment:54</a>
+  </span>
+        in reply to:
+    <a href="#comment:53">↑ 53</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:57" class="follow-up">↓ 57</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-31T01%3A16%3A42-08%3A00&amp;precision=second" title="See timeline at 12/31/09 01:16:42">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:53" title="Comment 53">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<ol start="7"><li><tt>station_altitude</tt> could be just <tt>altitude</tt>, which is an existing standard name.
+</li></ol></blockquote>
+<p>
+Thanks for pointing this issue out. The problem is that theres a lot of data, eg profile data, whose z coordinate is relative to the ground, i.e. the altitude of the station. So we need two coordinates: "altitude"  and "station_altitude".
+</p>
+</blockquote>
+<p>
+The existing standard name for "vertical distance above the ground" is <tt>height</tt>. The standard_name of <tt>altitude</tt> means "vertical distance above the geoid".
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-55-1262251818000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:55" class="cnum">
+    <a href="#comment:55">comment:55</a>
+  </span>
+        in reply to:
+    <a href="#comment:48">↑ 48</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:58" class="follow-up">↓ 58</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-31T01%3A30%3A18-08%3A00&amp;precision=second" title="See timeline at 12/31/09 01:30:18">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:48" title="Comment 48">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+My feeling is that the featureType attribute cannot be optional.
+</p>
+</blockquote>
+<p>
+It seems to me that it must be optional in some sense, because nothing prevents me from writing these kinds of data variable without including a <tt>featureType</tt> attribute, does it? They can mostly be decoded according to the existing CF conventions. I think the <tt>featureType</tt> attribute is a clue to the data-reader about the interpretation of the data.
+</p>
+<blockquote class="citation">
+<p>
+The problem is that one cannot in a general way figure out the feature type by examining the file.
+</p>
+</blockquote>
+<p>
+That seems to imply that some of the feature types are really degenerate. If   a human can't tell which it is by looking at the file, is there really a distinction? You say you could not decode the data without the <tt>featureType</tt>. What extra essential information does it give you?
+</p>
+<p>
+Is there anything in principle that prevents <tt>featureType</tt> being used as an attribute of a data variable, rather than a global attribute? That would be useful flexibility. Again, you could write data of several "structures" in one file anyway, without declaring a <tt>featureType</tt> variable. If you don't want to support files with several <tt>featureType</tt>s in your software initially, that's fine. It could just give an error if presented with the <tt>featureType</tt> as an attribute of a data variable.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-56-1262252363000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:56" class="cnum">
+    <a href="#comment:56">comment:56</a>
+  </span>
+        in reply to:
+    <a href="#comment:51">↑ 51</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:59" class="follow-up">↓ 59</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-31T01%3A39%3A23-08%3A00&amp;precision=second" title="See timeline at 12/31/09 01:39:23">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:51" title="Comment 51">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Yes, both the contiguous and the indexed representation refer to auxiliary coordinate variables with a dimension which is not a dimension of the data variable.
+</p>
+</blockquote>
+<p>
+You're right, this is a problem with the indexed representation too, and it is also not dealt with by CF 8.2 on compression by gathering, as it should be. I think we need to add some rules to deal with the dimensions of auxiliary coord variables in these situations.
+</p>
+<blockquote class="citation">
+<p>
+<tt>station_name</tt> and <tt>station_id</tt> could be auxiliary coordinate variables, although they share this same issue of having a dimension not used by the data variable. My feeling is that the semantics of the contiguous and the indexed representation is clearer without adding the <tt>station_name</tt> and <tt>station_id</tt> as auxiliary coordinates.
+</p>
+</blockquote>
+<p>
+We should sort out the first issue. I don't agree with the second point; they seem just like the other aux coord vars to me. If they are not listed by the <tt>coordinates</tt> attribute, they are not formally associated with the data variable. In the existing CF conventions about station data etc., these kinds of variable are named as auxiliary coord variables, and they're the same kind of variable in your proposal.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-57-1262275912000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:57" class="cnum">
+    <a href="#comment:57">comment:57</a>
+  </span>
+        in reply to:
+    <a href="#comment:54">↑ 54</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:60" class="follow-up">↓ 60</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-31T08%3A11%3A52-08%3A00&amp;precision=second" title="See timeline at 12/31/09 08:11:52">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:54" title="Comment 54">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:53" title="Comment 53">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<ol start="7"><li><tt>station_altitude</tt> could be just <tt>altitude</tt>, which is an existing standard name.
+</li></ol></blockquote>
+<p>
+Thanks for pointing this issue out. The problem is that theres a lot of data, eg profile data, whose z coordinate is relative to the ground, i.e. the altitude of the station. So we need two coordinates: "altitude"  and "station_altitude".
+</p>
+</blockquote>
+<p>
+The existing standard name for "vertical distance above the ground" is <tt>height</tt>. The standard_name of <tt>altitude</tt> means "vertical distance above the geoid".
+</p>
+</blockquote>
+<p>
+Ah, very good to know, i will incorporate that. Is there anything for "height of ground at this location", or do you think "station_altitude" is appropriate?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-58-1262277425000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:58" class="cnum">
+    <a href="#comment:58">comment:58</a>
+  </span>
+        in reply to:
+    <a href="#comment:55">↑ 55</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-31T08%3A37%3A05-08%3A00&amp;precision=second" title="See timeline at 12/31/09 08:37:05">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:55" title="Comment 55">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:48" title="Comment 48">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+My feeling is that the featureType attribute cannot be optional.
+</p>
+</blockquote>
+<p>
+It seems to me that it must be optional in some sense, because nothing prevents me from writing these kinds of data variable without including a <tt>featureType</tt> attribute, does it? They can mostly be decoded according to the existing CF conventions. I think the <tt>featureType</tt> attribute is a clue to the data-reader about the interpretation of the data.
+</p>
+</blockquote>
+<p>
+I would put it this way: the existence of the featureType attribute implies that the file is written in conformance to the CF Point Observation Conventions (chap 9 of the standard). Software can use that fact to do conformance checking.
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+The problem is that one cannot in a general way figure out the feature type by examining the file.
+</p>
+</blockquote>
+<p>
+That seems to imply that some of the feature types are really degenerate. If   a human can't tell which it is by looking at the file, is there really a distinction? You say you could not decode the data without the <tt>featureType</tt>. What extra essential information does it give you?
+</p>
+</blockquote>
+<p>
+The featureType attribute gives you topological connectivity information, not discoverable by examining the file's metadata. For example, a collection of points (9.2) and a single station timeseries (9.3.4) look identical. A collection of profiles (9.5.2) and a single section of profiles along a trajectory (9.7.2) look identical. Such connectivity is implicit in gridded data, but must be explicitly specified in point data.
+</p>
+<blockquote class="citation">
+<p>
+Is there anything in principle that prevents <tt>featureType</tt> being used as an attribute of a data variable, rather than a global attribute? That would be useful flexibility. Again, you could write data of several "structures" in one file anyway, without declaring a <tt>featureType</tt> variable. If you don't want to support files with several <tt>featureType</tt>s in your software initially, that's fine. It could just give an error if presented with the <tt>featureType</tt> as an attribute of a data variable.
+</p>
+</blockquote>
+<p>
+In principle, I think not, although most "features" need to be represented by multiple data variables, so the possibility of confusion is much greater. I would prefer to add this later if it proves to be important and feasible to implement. I think its essential that there be implementations of conventions before accepting them.
+</p>
+<blockquote class="citation">
+<p>
+Jonathan
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-59-1262278883000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:59" class="cnum">
+    <a href="#comment:59">comment:59</a>
+  </span>
+        in reply to:
+    <a href="#comment:56">↑ 56</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-12-31T09%3A01%3A23-08%3A00&amp;precision=second" title="See timeline at 12/31/09 09:01:23">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:56" title="Comment 56">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:51" title="Comment 51">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Yes, both the contiguous and the indexed representation refer to auxiliary coordinate variables with a dimension which is not a dimension of the data variable.
+</p>
+</blockquote>
+<p>
+You're right, this is a problem with the indexed representation too, and it is also not dealt with by CF 8.2 on compression by gathering, as it should be. I think we need to add some rules to deal with the dimensions of auxiliary coord variables in these situations.
+</p>
+</blockquote>
+<p>
+Ive added this wording as part of the proposal:
+</p>
+<p>
+In section 5, first paragraph, change:
+</p>
+<p>
+"The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated (an exception is label coordinates (Section 6.1, “Labels”) which contain a dimension for maximum string length)"
+</p>
+<p>
+to
+</p>
+<p>
+"The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated (with two exceptions: 1) label coordinates (see Section 6.1, “Labels”) contain a dimension for maximum string length, and 2) the Point Observation indexed and contiguous representations (see Section 9, “Point Observations”) allow special kinds of coordinates which are connected in a differrent way than by the dimension)"
+</p>
+<p>
+what do you think?
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+<tt>station_name</tt> and <tt>station_id</tt> could be auxiliary coordinate variables, although they share this same issue of having a dimension not used by the data variable. My feeling is that the semantics of the contiguous and the indexed representation is clearer without adding the <tt>station_name</tt> and <tt>station_id</tt> as auxiliary coordinates.
+</p>
+</blockquote>
+<p>
+We should sort out the first issue. I don't agree with the second point; they seem just like the other aux coord vars to me. If they are not listed by the <tt>coordinates</tt> attribute, they are not formally associated with the data variable. In the existing CF conventions about station data etc., these kinds of variable are named as auxiliary coord variables, and they're the same kind of variable in your proposal.
+</p>
+</blockquote>
+<p>
+The proposal uses a new convention for this situation, eg for station data:
+</p>
+<p>
+"All variables that have the station dimension as their outer dimension are considered to be station information, and are called 'station variables'."
+</p>
+<p>
+I think that this is a fairly natural way to express that a collection of data variables should be treated collectively. If we were using Netcdf-4, we could put this into a Structure, so this is a substitute for that.
+</p>
+<p>
+Anyway, all the "station information" is associated with the observational data which has that station through the various mechanisms (indexed, contiguous, multdim, etc). Listing all the station variables in the coordinates attribute seems unneeded and cluttered.
+</p>
+<p>
+This pattern of associating sets of data variables into these "psuedo-structures" is used in many places in the proposal, wherever factoring out information is desired.
+</p>
+<p>
+Warm regards,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-60-1262616581000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:60" class="cnum">
+    <a href="#comment:60">comment:60</a>
+  </span>
+        in reply to:
+    <a href="#comment:57">↑ 57</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-04T06%3A49%3A41-08%3A00&amp;precision=second" title="See timeline at 01/04/10 06:49:41">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:57" title="Comment 57">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:54" title="Comment 54">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:53" title="Comment 53">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<ol start="7"><li><tt>station_altitude</tt> could be just <tt>altitude</tt>, which is an existing standard name.
+</li></ol></blockquote>
+<p>
+Thanks for pointing this issue out. The problem is that theres a lot of data, eg profile data, whose z coordinate is relative to the ground, i.e. the altitude of the station. So we need two coordinates: "altitude"  and "station_altitude".
+</p>
+</blockquote>
+<p>
+The existing standard name for "vertical distance above the ground" is <tt>height</tt>. The standard_name of <tt>altitude</tt> means "vertical distance above the geoid".
+</p>
+</blockquote>
+<p>
+Ah, very good to know, i will incorporate that. Is there anything for "height of ground at this location", or do you think "station_altitude" is appropriate?
+</p>
+</blockquote>
+<p>
+The standard name for the altitude of the ground is <tt>surface_altitude</tt>.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-61-1262628911000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:61" class="cnum">
+    <a href="#comment:61">comment:61</a>
+  </span>
+        in reply to:
+    <a href="#comment:44">↑ 44</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-04T10%3A15%3A11-08%3A00&amp;precision=second" title="See timeline at 01/04/10 10:15:11">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:44" title="Comment 44">rsignell</a>:
+</p>
+<blockquote class="citation">
+<p>
+Are there example NetCDF files or (preferably) OpenDAP data URLs for the various types of Point Feature datasets described here?
+</p>
+</blockquote>
+<p>
+I have a bunch of synthetic (NcML) datasets for testing. Do you want me to make them available?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-62-1262689417000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:62" class="cnum">
+    <a href="#comment:62">comment:62</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:63" class="follow-up">↓ 63</a>
+    <a href="#comment:64" class="follow-up">↓ 64</a>
+    <a href="#comment:65" class="follow-up">↓ 65</a>
+    <a href="#comment:68" class="follow-up">↓ 68</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T03%3A03%3A37-08%3A00&amp;precision=second" title="See timeline at 01/05/10 03:03:37">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Since the proposal is complicated and detailed, I feel it would be helpful put more in the overview. At present, the proposal is mainly demonstrated through the many examples, which are valuable. People wanting to do a certain thing can look for the appropriate example to find out how to do it, and I expect that is how it will be mainly used. However the overview could help by setting out the intentions, the meaning of the classifications, and the structures used in general.
+</p>
+<p>
+Starting at the top, I think it could have a clearer title than <em>point observation data</em>. As some comments show, <em>point</em> is confusing because these structures are not for unconnected points, and also because one of the <tt>featureTypes</tt> proposed is itself called <tt>point</tt>. <em>Observation</em> is too restrictive. Although you are dealing with observational data, the same structures are applicable to model data, which may in fact want to use them with the aim of emulating observational data. I think the defining characteristic of these datasets is that they have one or more dimensions which are arbitrary and discrete, rather than continuous and geophysical; these dimensions are used to aggregate/collect/bundle/concatenate data which would otherwise be stored in separate data variables. The motivation for doing this is to save space in the file and limit the number of dimensions and coordinate variables required, isn't it. The motivation is not principally one of providing descriptive metadata, although the <tt>featureType</tt> is useful as a description; the proposal is made to address the practical inconvenience of having numerous data variables and dimensions. If that's right, it would be useful to state this at the outset, saying that this is mainly a concern for observational data measured in-situ and model data which emulates observational sampling. I am not sure what title would describe this purpose - does any of the words aggregate, collect, bundle or concatenate sound right to you?
+</p>
+<p>
+Then you describe the <tt>featureType</tt>s. I think it could be helpful for the reader to be more explicit about the structures implied. I think they are as follows:
+</p>
+<table class="wiki">
+<tr><td> <tt>featureType</tt> </td><td> data </td><td> auxiliary coordinates 
+</td></tr><tr><td> point </td><td> data(o) </td><td> x(o) y(o) z(o) t(o) n(o) 
+</td></tr><tr><td> stationTimeSeries </td><td> data(s,o) </td><td> x(s) y(s) z(s) t(s,o) n(s) 
+</td></tr><tr><td> trajectory </td><td> data(s,o) </td><td> x(s,o) y(s,o) z(s,o) t(s,o) n(s) 
+</td></tr><tr><td> profile </td><td> data(s,o) </td><td> x(s) y(s) z(s,o) t(s) n(s) 
+</td></tr><tr><td> stationProfile </td><td> data(s,p,o) </td><td> x(s) y(s) z(s,p,o) t(s,p) n(s) 
+</td></tr><tr><td> section </td><td> data(s,p,o) </td><td> x(s,o) y(s,o) z(s,p,o) t(s,p) n(s) 
+</td></tr></table>
+<p>
+where o s p are index dimensions, x y z t are spatiotemporal coordinates and n is a string-valued coordinate (a label). It seems to me, as we have discussed before, that you can deduce what kind of data you have by examining the dimensions of the data and auxiliary coordinates. Therefore <tt>featureType</tt> is really redundant. I understand that it could be helpful if it can be relied on, but if it is going to be included than it must be possible to verify that it is correct, and for that we need the above rules to be stated. The CF checker will have to be able to work out what <tt>featureType</tt> describes the data by examining the data and auxiliary coordinates. Any program <em>could</em> do that.
+</p>
+<p>
+I have not clarified above which auxiliary coordinate variables are optional. You say x y t are mandatory but z is sometimes optional. I think the rules for this should be explicitly stated too, so the presence of coordinate variables can be checked.
+</p>
+<p>
+Next, you could describe the flattened representation. This is not included in all your subsections, but it is applicable to all of them except <tt>point</tt>. Also, it is not entirely "flat" in 9.6.4 and it would perhaps make a simpler convention if it was flat. I think "flattening" means combining all the index dimensions into one index dimension, and repeating values as often as necessary in the auxiliary coordinates. That means making any kind of data look like the <tt>point</tt> type.
+</p>
+<p>
+Then the overview can describe, in general terms, the three structures proposed to contain these data: multidimensional, ragged contiguous, and ragged indexed. Multidimensional is straightforward: it means having the dimensions in the above table. Ragged representations are not needed for the <tt>point</tt> type, but they are for the others, which have more than one index dimension. Apart from describing the intention of the data, the presence of the <tt>featureType</tt> attribute means that the ragged representations are allowed. The flattened and multidimensional representations are existing CF structures, so they would be allowed without this proposal.
+</p>
+<p>
+I'd like to suggest a small change to the ragged contiguous representation. It could be described generically like this for a 2D case:
+</p>
+<pre class="wiki">
+float A(s);
+float N(s,strlen); // or N(o,strlen)
+int s(s);
+  s:count="o";
+float B(o);
+float D(o);
+  D:coordinates="A B N";
+
+</pre><p>
+where A and B are (examples of) numerical auxiliary coordinate variables, N is a string-valued auxiliary coordinate variable (as in CF 6) and D is a data variable. The coordinate variable s is what you have called <tt>row_size</tt>. That is, I am proposing making this a coordinate variable in the Unidata sense, instead of depending on the name <tt>row_size</tt>. To assign a "special" variable name would be un-CF-like, since nothing in CF depends on the names of variables (as it says in CF 2.3, third para). To indicate that it has a special role, I propose above the new <tt>count</tt> attribute, which indicates the dimension whose entries s counts. (Actually my s(s) is not legally a coordinate variable, because its values are not monotonic. The presence of the <tt>count</tt> attribute can be used to exempt it from that requirement.) In your proposal, you have no formal link between D and s; presumably you depend on their being only one s-like dimension in the file. Making an explicit link could simplify the software which is decoding the data, and also means that the proposal could be generalised to have more than one s-like and o-like dimension, and more than one <tt>featureType</tt>.
+</p>
+<p>
+As you see, I still think N should be named as an auxiliary coordinate variable. These string-valued coordinates were included in CF for precisely the reason you want to use them. Listing them in <tt>coordinates</tt> makes the link between the data variable and its string-valued coordinates.
+</p>
+<p>
+The 3D case for the ragged contiguous representation is more complicated, of course. It seems that your example in 9.7.3 is actually a combination of the ragged contiguous and ragged indexed structures, one for each of the dimensions. Wold it not be better to use one or the other purely? I find it rather mind-bending to be honest. I do think the ragged indexed representation has the advantage in terms of clarity.
+</p>
+<p>
+I propose that the ragged indexed representation should look generically like this in 2D:
+</p>
+<pre class="wiki">
+float A(s);
+float N(s,strlen); // or N(o,strlen)
+int o(o);
+  o:expand="s";
+float B(o);
+float D(o);
+  D:coordinates="A B N";
+
+</pre><p>
+where again I am using a (Unidata) coordinate variable o(o) instead of a variable with a special name - you say <tt>parent_index</tt> in the description. As I said before, this structure is just like the compression by gathering described in CF 8.2, except I have called the attribute <tt>expand</tt> instead of <tt>compress</tt> because it doesn't have the same role. Whereas a compressed index never repeats values, a ragged one usually does. (Hence o(o) is not a legal coordinate variable, because it's not monotonic; again, <tt>expand</tt> can exempt it from that requirement.) The <tt>expand</tt> attribute indicates that the o coordinate specifies which s coordinate applies to each entry along the o dimension. This is easier than the contiguous representation to extend to 3D, and in fact CF 8.2 is mainly intended for the case where more than one dimension is compressed. You just have <tt>o:expand="s p"</tt>, for instance, which means that o is indices into the combination of the (s,p) dimensions, collapsed into 1D.
+</p>
+<p>
+All the above does look rather complicated, and it certainly is! That's why your explicit examples of all the cases are useful. Nonetheless I think it should also be described in general terms how these structures work.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-63-1262697403000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:63" class="cnum">
+    <a href="#comment:63">comment:63</a>
+  </span>
+        in reply to:
+    <a href="#comment:62">↑ 62</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T05%3A16%3A43-08%3A00&amp;precision=second" title="See timeline at 01/05/10 05:16:43">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan:
+</p>
+<p>
+I will again break mt replies into several parts:
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:62" title="Comment 62">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+Since the proposal is complicated and detailed, I feel it would be helpful put more in the overview. At present, the proposal is mainly demonstrated through the many examples, which are valuable. People wanting to do a certain thing can look for the appropriate example to find out how to do it, and I expect that is how it will be mainly used. However the overview could help by setting out the intentions, the meaning of the classifications, and the structures used in general.
+</p>
+</blockquote>
+<p>
+That would be useful.
+</p>
+<blockquote class="citation">
+<p>
+Starting at the top, I think it could have a clearer title than <em>point observation data</em>. As some comments show, <em>point</em> is confusing because these structures are not for unconnected points, and also because one of the <tt>featureTypes</tt> proposed is itself called <tt>point</tt>. <em>Observation</em> is too restrictive. Although you are dealing with observational data, the same structures are applicable to model data, which may in fact want to use them with the aim of emulating observational data. I think the defining characteristic of these datasets is that they have one or more dimensions which are arbitrary and discrete, rather than continuous and geophysical; these dimensions are used to aggregate/collect/bundle/concatenate data which would otherwise be stored in separate data variables. The motivation for doing this is to save space in the file and limit the number of dimensions and coordinate variables required, isn't it. The motivation is not principally one of providing descriptive metadata, although the <tt>featureType</tt> is useful as a description; the proposal is made to address the practical inconvenience of having numerous data variables and dimensions. If that's right, it would be useful to state this at the outset, saying that this is mainly a concern for observational data measured in-situ and model data which emulates observational sampling. I am not sure what title would describe this purpose - does any of the words aggregate, collect, bundle or concatenate sound right to you?
+</p>
+</blockquote>
+<p>
+For me, the motivation is to describe collections of data collocated at specified space/time locations. The underlying data fields are continuous and geophysical. The difference between this proposal and gridded data is the sampling topology, which leads to differing representations than gridded data. However, I think it would be misleading to name the proposal by the representations. Ive thought about "in-situ" data, but it also covers profile data taken from satellites. Perhaps others could chime in on what vocabulary they use in their domain for these data.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-64-1262698015000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:64" class="cnum">
+    <a href="#comment:64">comment:64</a>
+  </span>
+        in reply to:
+    <a href="#comment:62">↑ 62</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T05%3A26%3A55-08%3A00&amp;precision=second" title="See timeline at 01/05/10 05:26:55">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:62" title="Comment 62">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Then you describe the <tt>featureType</tt>s. I think it could be helpful for the reader to be more explicit about the structures implied. I think they are as follows:
+</p>
+<table class="wiki">
+<tr><td> <tt>featureType</tt> </td><td> data </td><td> auxiliary coordinates 
+</td></tr><tr><td> point </td><td> data(o) </td><td> x(o) y(o) z(o) t(o) n(o) 
+</td></tr><tr><td> stationTimeSeries </td><td> data(s,o) </td><td> x(s) y(s) z(s) t(s,o) n(s) 
+</td></tr><tr><td> trajectory </td><td> data(s,o) </td><td> x(s,o) y(s,o) z(s,o) t(s,o) n(s) 
+</td></tr><tr><td> profile </td><td> data(s,o) </td><td> x(s) y(s) z(s,o) t(s) n(s) 
+</td></tr><tr><td> stationProfile </td><td> data(s,p,o) </td><td> x(s) y(s) z(s,p,o) t(s,p) n(s) 
+</td></tr><tr><td> section </td><td> data(s,p,o) </td><td> x(s,o) y(s,o) z(s,p,o) t(s,p) n(s) 
+</td></tr></table>
+<p>
+where o s p are index dimensions, x y z t are spatiotemporal coordinates and n is a string-valued coordinate (a label). It seems to me, as we have discussed before, that you can deduce what kind of data you have by examining the dimensions of the data and auxiliary coordinates. Therefore <tt>featureType</tt> is really redundant. I understand that it could be helpful if it can be relied on, but if it is going to be included than it must be possible to verify that it is correct, and for that we need the above rules to be stated. The CF checker will have to be able to work out what <tt>featureType</tt> describes the data by examining the data and auxiliary coordinates. Any program <em>could</em> do that.
+</p>
+</blockquote>
+<p>
+It might be possible using your representation above, but once you add the variants as shown <a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf-java/reference/FeatureDatasets/CFencodingTable.html"><span class="icon">​</span>here</a>, you can see that its quite impossible.
+</p>
+<p>
+Im not sure why you think its important to be able to eliminate the featureType attribute. Its extremely useful metadata.
+</p>
+<blockquote class="citation">
+<p>
+I have not clarified above which auxiliary coordinate variables are optional. You say x y t are mandatory but z is sometimes optional. I think the rules for this should be explicitly stated too, so the presence of coordinate variables can be checked.
+</p>
+</blockquote>
+<p>
+This depends on the representation, and I intended to clarified them in each of the examples. If you see one thats unclear, can you point it out?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-65-1262699175000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:65" class="cnum">
+    <a href="#comment:65">comment:65</a>
+  </span>
+        in reply to:
+    <a href="#comment:62">↑ 62</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T05%3A46%3A15-08%3A00&amp;precision=second" title="See timeline at 01/05/10 05:46:15">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <blockquote class="citation">
+<p>
+I'd like to suggest a small change to the ragged contiguous representation. It could be described generically like this for a 2D case:
+</p>
+<pre class="wiki">
+float A(s);
+float N(s,strlen); // or N(o,strlen)
+int s(s);
+  s:count="o";
+float B(o);
+float D(o);
+  D:coordinates="A B N";
+
+</pre><p>
+where A and B are (examples of) numerical auxiliary coordinate variables, N is a string-valued auxiliary coordinate variable (as in CF 6) and D is a data variable. The coordinate variable s is what you have called <tt>row_size</tt>. That is, I am proposing making this a coordinate variable in the Unidata sense, instead of depending on the name <tt>row_size</tt>. To assign a "special" variable name would be un-CF-like, since nothing in CF depends on the names of variables (as it says in CF 2.3, third para).
+</p>
+</blockquote>
+<p>
+The proposal is to use a standard name to identify the row_size variable:
+</p>
+<p>
+"The row_size variable contains the number of observations for each station, and is identified by having a standard_name of "ragged_row_size"." 
+</p>
+<p>
+I dont depend on variable naming anywhere in this proposal.
+</p>
+<blockquote class="citation">
+<p>
+To indicate that it has a special role, I propose above the new <tt>count</tt> attribute, which indicates the dimension whose entries s counts. (Actually my s(s) is not legally a coordinate variable, because its values are not monotonic. The presence of the <tt>count</tt> attribute can be used to exempt it from that requirement.) In your proposal, you have no formal link between D and s; presumably you depend on their being only one s-like dimension in the file. Making an explicit link could simplify the software which is decoding the data, and also means that the proposal could be generalised to have more than one s-like and o-like dimension, and more than one <tt>featureType</tt>.
+</p>
+</blockquote>
+<p>
+Currently the observation dimension is identified by examining the coordinates. I like your idea of explicitly naming the observation dimension. In fact, naming the parent dimension would be helpful also. I will consider that.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-66-1262699338000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:66" class="cnum">
+    <a href="#comment:66">comment:66</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:67" class="follow-up">↓ 67</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T05%3A48%3A58-08%3A00&amp;precision=second" title="See timeline at 01/05/10 05:48:58">11 years ago</a> by bnl
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:64" title="Comment 64">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:62" title="Comment 62">jonathan</a>:
+</p>
+</blockquote>
+<blockquote class="citation">
+<p>
+Im not sure why you think its important to be able to eliminate the featureType attribute. Its extremely useful metadata.
+</p>
+</blockquote>
+<p>
+Extremely, and it's so totally pervasive folk don't know when they're depending on it ...
+e.g. "gridded" data carries all the baggage of a feature type ... one knows exactly what is meant <em>in this context</em>, and one can build software to handle it, but it's built on the knowledge of the relationships between the coordinate variables and the grid which is implicit in this contextural knowledge as to what "grid" means ... if one only meant gridded in the mathematical/algorithmic sense, then grids cover all these "observational" types too ... 
+</p>
+<p>
+We have found it <strong>necessary</strong> to use the feature type concept in much of our work at BADC, and explicitly by name to help software exactly as John proposes here.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-67-1262700820000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:67" class="cnum">
+    <a href="#comment:67">comment:67</a>
+  </span>
+        in reply to:
+    <a href="#comment:66">↑ 66</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:69" class="follow-up">↓ 69</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T06%3A13%3A40-08%3A00&amp;precision=second" title="See timeline at 01/05/10 06:13:40">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:66" title="Comment 66">bnl</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:64" title="Comment 64">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:62" title="Comment 62">jonathan</a>:
+</p>
+</blockquote>
+<blockquote class="citation">
+<p>
+Im not sure why you think its important to be able to eliminate the featureType attribute. Its extremely useful metadata.
+</p>
+</blockquote>
+<p>
+Extremely, and it's so totally pervasive folk don't know when they're depending on it ...
+</p>
+</blockquote>
+<p>
+I didn't say I wanted to eliminate it. I said I could see it would be useful even though it is redundant (in the sense of duplicating information which is already present in other ways).
+</p>
+<p>
+I said that I think the structures associated with each <tt>featureType</tt> should be written down, so they can be checked, and because it could be helpful to a potential user to see them tabulated. Personally, I find it much more helpful to be given a list of things like that, than to have to work them out from examples, which I find rather unsettling, in case I miss something or misunderstand something. No doubt this has to do with learning styles, and we all have different ways of doing it.
+</p>
+<p>
+John's useful table, which probably I should have read before, is comfortingly similar to what I deduced from the examples. However, it also shows that some <tt>featureTypes</tt> have more than one structure associated with them. I don't think it's "impossible" to write these down - in fact, John's done it! - but I would say that the <tt>featureType</tt>s which actually correspond to more than one structure should be separated into more than one distinct <tt>featureType</tt>.
+</p>
+<p>
+There are two motivations for the proposal, then. One is to label featureTypes, and the other is to provide ragged representations for them, to save space and variables. OK. It would be good to be able to say what the different structures have in common that means they need the featureType description. Is it that they have zero or one <em>independent</em> continuously varying geophysical coordinate, and any other coordinates are dependent on this? Again, that is a structural description, and not easily comprehensible, I'm afraid.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-68-1262702176000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:68" class="cnum">
+    <a href="#comment:68">comment:68</a>
+  </span>
+        in reply to:
+    <a href="#comment:62">↑ 62</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:70" class="follow-up">↓ 70</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T06%3A36%3A16-08%3A00&amp;precision=second" title="See timeline at 01/05/10 06:36:16">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:62" title="Comment 62">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+The 3D case for the ragged contiguous representation is more complicated, of course. It seems that your example in 9.7.3 is actually a combination of the ragged contiguous and ragged indexed structures, one for each of the dimensions. Wold it not be better to use one or the other purely? I find it rather mind-bending to be honest. I do think the ragged indexed representation has the advantage in terms of clarity.
+</p>
+<p>
+I propose that the ragged indexed representation should look generically like this in 2D:
+</p>
+<pre class="wiki">
+float A(s);
+float N(s,strlen); // or N(o,strlen)
+int o(o);
+  o:expand="s";
+float B(o);
+float D(o);
+  D:coordinates="A B N";
+
+</pre><p>
+where again I am using a (Unidata) coordinate variable o(o) instead of a variable with a special name - you say <tt>parent_index</tt> in the description. As I said before, this structure is just like the compression by gathering described in CF 8.2, except I have called the attribute <tt>expand</tt> instead of <tt>compress</tt> because it doesn't have the same role. Whereas a compressed index never repeats values, a ragged one usually does. (Hence o(o) is not a legal coordinate variable, because it's not monotonic; again, <tt>expand</tt> can exempt it from that requirement.) The <tt>expand</tt> attribute indicates that the o coordinate specifies which s coordinate applies to each entry along the o dimension. This is easier than the contiguous representation to extend to 3D, and in fact CF 8.2 is mainly intended for the case where more than one dimension is compressed. You just have <tt>o:expand="s p"</tt>, for instance, which means that o is indices into the combination of the (s,p) dimensions, collapsed into 1D.
+</p>
+</blockquote>
+<p>
+The "compression by gathering" feature is for sparse rectangular arrays. This is for ragged arrays, and the meaning of the values needed are different. I dont think we can use expand = "s p" if I understand that since that would require a rectangular array.
+</p>
+<p>
+I originally tried to allow any combination of representations, but it proved too difficult, so I decided to choose one. The indexed representation would require that the reader read the entire file to extract a single profile. So I made the assumption that the writer would have all the obs for a profile, and so could write them contiguously. Choosing the indexed representation to associate profiles with sections was fairly arbitrary, but I chose it because its more general, and allows profiles for multiple sections to be written in any order. Reading section_index(profile) is pretty fast, since probably profile wont be the unlimited dimension. However, one does have to choose a profile dimension size ahead of time, but thats a generic weakness in netcdf-3 (only one unlimited dimension).
+</p>
+<p>
+I do acknowlege the complexity here, it one of my main concerns. However, in my experience many data writers are happy to be given a template to use, as long as it meets their needs, so Im hoping their minds wont be as boggled as ours.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-69-1262703420000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:69" class="cnum">
+    <a href="#comment:69">comment:69</a>
+  </span>
+        in reply to:
+    <a href="#comment:67">↑ 67</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T06%3A57%3A00-08%3A00&amp;precision=second" title="See timeline at 01/05/10 06:57:00">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./37#comment:67" title="Comment 67">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:66" title="Comment 66">bnl</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:64" title="Comment 64">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./37#comment:62" title="Comment 62">jonathan</a>:
+</p>
+</blockquote>
+<blockquote class="citation">
+<p>
+Im not sure why you think its important to be able to eliminate the featureType attribute. Its extremely useful metadata.
+</p>
+</blockquote>
+<p>
+Extremely, and it's so totally pervasive folk don't know when they're depending on it ...
+</p>
+</blockquote>
+<p>
+I didn't say I wanted to eliminate it. I said I could see it would be useful even though it is redundant (in the sense of duplicating information which is already present in other ways).
+</p>
+<p>
+I said that I think the structures associated with each <tt>featureType</tt> should be written down, so they can be checked, and because it could be helpful to a potential user to see them tabulated. Personally, I find it much more helpful to be given a list of things like that, than to have to work them out from examples, which I find rather unsettling, in case I miss something or misunderstand something. No doubt this has to do with learning styles, and we all have different ways of doing it.
+</p>
+<p>
+John's useful table, which probably I should have read before, is comfortingly similar to what I deduced from the examples. However, it also shows that some <tt>featureTypes</tt> have more than one structure associated with them. I don't think it's "impossible" to write these down - in fact, John's done it! - but I would say that the <tt>featureType</tt>s which actually correspond to more than one structure should be separated into more than one distinct <tt>featureType</tt>.
+</p>
+<p>
+There are two motivations for the proposal, then. One is to label featureTypes, and the other is to provide ragged representations for them, to save space and variables. OK. It would be good to be able to say what the different structures have in common that means they need the featureType description. Is it that they have zero or one <em>independent</em> continuously varying geophysical coordinate, and any other coordinates are dependent on this? Again, that is a structural description, and not easily comprehensible, I'm afraid.
+</p>
+<p>
+Jonathan
+</p>
+</blockquote>
+<p>
+One of the ways that I think of this (Id love to hear from others) is that the canonical representation of this kind of data is:
+</p>
+<pre class="wiki">float data(obs);
+float lat(obs);
+float lon(obs);
+float alt(obs);
+float time(obs);
+</pre><p>
+as opposed to gridded data:
+</p>
+<pre class="wiki">float data(t,z,y,x);
+float t(t);
+float z(z);
+float y(y);
+float x(x);
+</pre><p>
+the first says that the data is on a one-dimensional manifold (subset) embedded in 4 dimensional space/time, the second is that the data is a four-dimensional manifold embedded in 4 dimensional space/time.
+</p>
+<p>
+OTOH, looking at dimensions like this isnt generally that clear, since dimensions in netcdf are used for data layout as well, so its pretty much impossible to examine the data structures in a file and figure out what the meaning is.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-70-1262709912000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:70" class="cnum">
+    <a href="#comment:70">comment:70</a>
+  </span>
+        in reply to:
+    <a href="#comment:68">↑ 68</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-01-05T08%3A45%3A12-08%3A00&amp;precision=second" title="See timeline at 01/05/10 08:45:12">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Replying to <a class="ticket" href="./37#comment:68" title="Comment 68">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+The "compression by gathering" feature is for sparse rectangular arrays. This is for ragged arrays, and the meaning of the values needed are different. I dont think we can use expand = "s p" if I understand that since that would require a rectangular array.
+</p>
+</blockquote>
+<p>
+(s,p) is an implied rectangular array (in CDL dimension order); they are independent dimensions in the multidimensional representation. For instance, in 9.7.1 you have s=22 p=33. Collapsing (s,p) into 1D (as in compression by gathering), index 0 means s-index 0 p-index 0; index 1 means s-index 0 p-index 1, ..., index 33 means s-index 1 pindex-0, ... If the o-variable with <tt>expand="s p"</tt> includes 33,33,33,33 that indicates station 1 profile 0 has four observations. This is like compression by gathering, except the indices are repeated, so the data of dimension o is mapped onto a smaller array (s,p), with several elements of (o) being assigned to each element of (s,p). In gathering, there are fewer elements in (o) than in (s,p), which is only sparsely populated by the mapping. I think the same attribute <tt>compress</tt> could be used formally but I suggested a different one because (a) the routine to do the mapping would be quite different (b) in compression, o can be strictly monotonic, whereas it generally will not be in expansion because of the repeated elements.
+</p>
+<p>
+Bottom line: the ragged indexed representation looks formally similar to compression by gathering, which CF supports already, so it would be logical and parsimonious to use the existing kind of machinery.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-71-1272468241000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:71" class="cnum">
+    <a href="#comment:71">comment:71</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:73" class="follow-up">↓ 73</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-04-28T08%3A24%3A01-07%3A00&amp;precision=second" title="See timeline at 04/28/10 08:24:01">11 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Here is a question about the scope of this ticket. Is the main goal to define the structure of NetCDF files for in situ and other observational data using feature types, or is there a broader aim to provide mechanisms (and vocabularies) to help make CF-NetCDF meet the needs of observational oceanography?
+</p>
+<p>
+I'm thinking about ways to describe instruments and non-geophysical "instrument variables" within NetCDF and CF, and I'm looking for some kind of consensus (if that's possible; I'll settle for a conversation and/or community guidelines) about what really needs to be standardized and, therefore, potentially, interoperable. 
+</p>
+<ul><li>Do we want or need to have standard vocabularies for all variables we carry along with a dataset, or just for geophysical quantities? 
+</li></ul><ul><li>What is the best way to encode information on sensors, such as  
+<ul><li> sample schemes (beyond what's available via cell methods) 
+</li><li> complete precision/accuracy 
+</li><li> important sensor deployment info (mount, orientation)
+</li><li> relevant set-up information
+</li></ul></li></ul><p>
+I think a lot of people are inserting this info into NetCDF, but relegating it to the status of a comment, by using free-field names for these concepts and processes. Conversely, the OceanSITES project is planning to put this kind of information in
+separate metadata files (SensorML or other); but it seems like we should be able to  include it in the NetCDF, since that is supposed to be self-describing.
+</p>
+<p>
+I'm using ancillary variables to encode instrument information, such as:
+sensor_vendor, sensor_name, sensor_mount, sensor_orientation, sensor_depth (e.g. for adcp), sensor_sampling_period, sensor_sampling_frequency, sensor_reporting_time,
+sensor_serial_number, and providing setup commands verbatim where they're needed to document the data (e.g. for ADCPs).
+</p>
+<p>
+My question is whether the people who worked on the point obs specification are also working on other means of making NetCDF and CF more useful for in situ data. Or, is there another group working on this? Any resources you know of where guidelines for including instrument metadata have been developed?
+</p>
+<p>
+Thanks for any ideas on this - 
+Nan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-72-1272471358000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:72" class="cnum">
+    <a href="#comment:72">comment:72</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-04-28T09%3A15%3A58-07%3A00&amp;precision=second" title="See timeline at 04/28/10 09:15:58">11 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Nan,
+</p>
+<p>
+It is an important subtlety that you've raised:  defining a general structure for in situ data versus meeting the needs of operational oceanography.  I'd argue that the role of CF, per se, should be limited to the former -- to define the structures needed to carry in situ data collections.  It would then be the task of the oceanography community to define a more detailed profile that builds upon CF and requires the specific metadata elements that operational oceanographers need.  (In the satellite community the GHRSST data standards documents (the 'GDS') provide an excellent example of this approach.  Ocean-Sites is doing this, too, isn't it?)
+</p>
+<p>
+The boundary between these two goals, however, is a gray area.  It would be a positive contribution to CF if we can add those attributes (metadata content) into it that are generally applicable to many types of in situ observations.  I'd argue, though, that those discussions should take place in a *separate* trac ticket from this one.  This ticket already has a very full plate in dealing with the general in situ data structure issues.
+</p>
+<p>
+Care to start a new trac ticket?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-73-1272484199000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:73" class="cnum">
+    <a href="#comment:73">comment:73</a>
+  </span>
+        in reply to:
+    <a href="#comment:71">↑ 71</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-04-28T12%3A49%3A59-07%3A00&amp;precision=second" title="See timeline at 04/28/10 12:49:59">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Nan:
+</p>
+<p>
+As Steve suggests, this would be a good new topic, as we are not trying to deal with this kind of "domain metadata" in this ticket.
+</p>
+<p>
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-02-28T08%3A24%3A29-08%3A00&amp;precision=second" title="See timeline at 02/28/11 08:24:29">10 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/37/CFch9-feb25_jg.docx"><em>CFch9-feb25_jg.docx</em></a><a href="/trac/raw-attachment/ticket/37/CFch9-feb25_jg.docx" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Draft Feb 25 (docx)
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-74-1298910615000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:74" class="cnum">
+    <a href="#comment:74">comment:74</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-02-28T08%3A30%3A15-08%3A00&amp;precision=second" title="See timeline at 02/28/11 08:30:15">10 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+We have a new draft of this proposal ready for your comments. Its available at:
+</p>
+<p>
+<a class="ext-link" href="http://www.unidata.ucar.edu/staff/caron/public/CFch9-feb25_jg.pdf"><span class="icon">​</span>http://www.unidata.ucar.edu/staff/caron/public/CFch9-feb25_jg.pdf</a>
+<a class="ext-link" href="http://www.unidata.ucar.edu/staff/caron/public/CFch9-feb25_jg.docx"><span class="icon">​</span>http://www.unidata.ucar.edu/staff/caron/public/CFch9-feb25_jg.docx</a>
+</p>
+<p>
+Ive attached the docx file to this trac page, but the pdf is too big (450K - can we increase the limit on the Trac site) ?
+</p>
+<p>
+thanks for your patience for this process,
+</p>
+<p>
+John Caron, Jonathan Gregory, Steve Hankin 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-75-1299624396000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:75" class="cnum">
+    <a href="#comment:75">comment:75</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-03-08T14%3A46%3A36-08%3A00&amp;precision=second" title="See timeline at 03/08/11 14:46:36">10 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./37?action=diff&amp;version=75">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-05-04T15%3A19%3A11-07%3A00&amp;precision=second" title="See timeline at 05/04/11 15:19:11">10 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/37/CFch9-may4.docx"><em>CFch9-may4.docx</em></a><a href="/trac/raw-attachment/ticket/37/CFch9-may4.docx" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-76-1304547880000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:76" class="cnum">
+    <a href="#comment:76">comment:76</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-05-04T15%3A24%3A40-07%3A00&amp;precision=second" title="See timeline at 05/04/11 15:24:40">10 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./37?action=diff&amp;version=76">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-77-1305047877000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:77" class="cnum">
+    <a href="#comment:77">comment:77</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-05-10T10%3A17%3A57-07%3A00&amp;precision=second" title="See timeline at 05/10/11 10:17:57">10 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-conventions@…</em> to <em>stevehankin</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>assigned</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+The comments that have been received on this ticket have been discussed and incorporated into the latest Word version of this chapter. (Final editorial changes to be posted on-line shortly.)  Within a few weeks the chapter will be posted in an HTML and PDF format that is consistent with the main body of CF.
+</p>
+<p>
+As there haven't been any further objections or comments for more than three weeks, in my capacity as the moderator of this ticket, I declare this chapter -- Chapter 9, Discrete Sampling Geometries -- to be accepted according to the rules of the CF standards process.
+</p>
+<blockquote>
+<p>
+Steve Hankin
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-78-1305048050000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:78" class="cnum">
+    <a href="#comment:78">comment:78</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-05-10T10%3A20%3A50-07%3A00&amp;precision=second" title="See timeline at 05/10/11 10:20:50">10 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>assigned</em> to <em>closed</em>
+    </li>
+  </ul>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./37?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./37?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./37?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

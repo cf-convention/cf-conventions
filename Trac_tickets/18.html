@@ -1,0 +1,1802 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #18 (Additions and Revisions to CF Grid Mapping Attributes (v2.0))
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./17.html" title="ticket #17" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./18?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./18?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./18?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./19.html" title="ticket #19" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./17.html" title="ticket #17">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./19.html" title="ticket #19">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2007-12-04T02%3A09%3A00-08%3A00&amp;precision=second" title="See timeline at 12/04/07 02:09:00">13 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2008-04-14T07%3A41%3A34-07%3A00&amp;precision=second" title="See timeline at 04/14/08 07:41:34">13 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./18.html" class="trac-id">#18</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Additions and Revisions to CF Grid Mapping Attributes (v2.0)</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=pbentley">pbentley</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version=1.0">1.0</a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~coordinates">coordinates</a> <a href="/trac/query?status=!closed&amp;keywords=~datums">datums</a> <a href="/trac/query?status=!closed&amp;keywords=~ellipsoids">ellipsoids</a> <a href="/trac/query?status=!closed&amp;keywords=~projections">projections</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <h2 id="a1.Title">1. Title</h2>
+<p>
+Additions and revisions to CF grid mapping attributes to support the specification of coordinate reference system properties.
+</p>
+<h2 id="a2.Moderator">2. Moderator</h2>
+<p>
+Jonathan Gregory
+</p>
+<h2 id="a3.Requirement">3. Requirement</h2>
+<p>
+This submission is a follow-up proposal to the informative discussions that took place as part of <a class="ext-link" href="http://cf-pcmdi.llnl.gov./9"><span class="icon">​</span>CF Trac ticket #9</a>. Consequently the requirements remain  as stated in that ticket, and can be paraphrased as follows:
+</p>
+<blockquote>
+<p>
+There is a requirement for additional CF grid mapping attributes to be defined which can be used to provide a fuller description of the characteristics of the coordinate reference system (CRS), or systems, that form the basis of spatial coordinates within a netCDF file.
+</p>
+</blockquote>
+<p>
+Based on the discussions arising from Trac ticket <a class="closed ticket" href="./9.html" title="enhancement: Extensions to CF grid mapping attributes to support coordinate ... (closed: wontfix)">#9</a> it was concluded that further research needs to be undertaken in order to address the complexities of vertical datums and vertical coordinate systems. Accordingly the corresponding attributes have been dropped from this revised proposal. It is hoped that a domain expert within the CF community will be able to submit a separate proposal covering these topics.
+</p>
+<h2 id="a4.InitialStatementofTechnicalProposal">4. Initial Statement of Technical Proposal</h2>
+<p>
+The following sections detail the proposed changes to the CF-1.0 specification. They hopefully represent a synthesis of the discussions and conclusions arising from Trac ticket <a class="closed ticket" href="./9.html" title="enhancement: Extensions to CF grid mapping attributes to support coordinate ... (closed: wontfix)">#9</a>.
+</p>
+<h3 id="a4.1.AdditionsandRevisionstoAppendixFTableF.1">4.1. Additions and Revisions to Appendix F, Table F.1</h3>
+<p>
+This section describes the new and revised grid mapping attribute definitions that are required to be added to Table F.1 in Appendix F of the CF specification. Attributes are listed in alphabetical order. Attribute names appearing in <tt>normal typeface</tt> are newly defined in this proposal. Attribute names appearing in <em><tt>italic typeface</tt></em> refer to existing CF attributes for which a revised definition is proposed.
+</p>
+<p>
+<strong>Table F.1 Grid Mapping Attributes</strong>
+</p>
+<table class="wiki">
+<tr><td> <strong>Attribute</strong>  </td><td> <strong>Definition</strong> 
+</td></tr><tr><td> <tt>crs_id</tt> </td><td> Used to specify a unique identifier for the CRS. The identifier string should be a value taken from a controlled vocabulary maintained by a recognised authority. For the <tt>crs_id</tt> attribute the recommended vocabulary is the list of CRS URN definitions [OGC-URN] maintained and published by the Open Geospatial Consortium (OGC). These URNs refer to CRS entities realised in the <a class="ext-link" href="http://www.epsg.org/"><span class="icon">​</span>OGP/EPSG database of geodetic parameters</a>. A list of OGC URNs corresponding to current grid mapping names appears at Table F.2. Example: “urn:ogc:def:crs:EPSG:6.3:4326”, which identifies the familiar 2D geographic CRS named “WGS 84” in the EPSG v6.3 database. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>crs_name</tt> </td><td> Used to specify the well-known name of the CRS within which spatial coordinates are defined. The value of the <tt>crs_name</tt> attribute may also be taken from a controlled vocabulary such as the OGP/EPSG geodetic database referred to above. Otherwise a suitably informative, locally-defined name should be specified. Example: “OSGB 1936 / British National Grid”. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>crs_wkt</tt> </td><td> Used to specify the well-known text string encoding of the CRS using the OGC WKT syntax, as defined in OGC document 06-103r3 [OGC-SFA1]. It is envisaged that this attribute typically will be written and read automatically by software agents rather than by human operators. Comparable non-CF attributes are already being used for this purpose by a number of third-party software packages (both commercial and open source). Inclusion of the <tt>crs_wkt</tt> attribute here is intended therefore to standardise this usage within the CF community. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>earth_radius</tt> </td><td> Used to specify the radius, <em>in metres</em>, of the spherical figure used to approximate the shape of the Earth. This attribute should be specified for those projected CRS's in which the X-Y cartesian coordinates have been derived using a spherical Earth approximation. If the cartesian coordinates were derived using the ellipsoid associated with the geodetic datum then this attribute should not be defined. Example: "6371007” , which is the radius of the GRS 1980 Authalic Sphere. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>ellipsoid_name</tt> </td><td> Used to specify the well-known name of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. For coordinates based upon a spherical Earth approximation the value "Sphere" should be used. Example: “GRS 1980”. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>geodetic_datum_name</tt> </td><td> Used to specify the well-known name of the geodetic datum against which geographic coordinates are referenced. For coordinates based upon a spherical Earth approximation the value "Sphere" is permissible. Example: “World Geodetic System 1984”. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>inverse_flattening</tt> </td><td> Used to specify the <em>inverse</em> flattening (1/f) of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. The flattening (f) of the ellipsoid is related to the semi-major and semi-minor axes by the formula f = (a-b)/a. The current attribute is used to specify the denominator of this fraction when the numerator is reduced to unity. In the case of a spherical Earth this attribute should be omitted or set to zero. Example: 298.257222101 for the GRS 1980 ellipsoid. (Note: By convention the dimensions of an ellipsoid are specified using either the semi-major and semi-minor axis lengths, or the semi-major axis length and the inverse flattening. If all three attributes are specified then the supplied values must be consistent with the aforementioned formula.) 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>longitude_of_prime_meridian</tt> </td><td> Specifies the longitude, with respect to Greenwich, of the prime meridian associated with the geodetic datum. The prime meridian defines the origin from which longitude values are determined. Not to be confused with the projection origin longitude (cf. <tt>longitude_of_projection_origin</tt>, a.k.a. central meridian) which defines the longitude of the map projection origin. Domain: -180.0 &lt;= longitude_of_prime_meridian &lt; 180.0 decimal degrees. Default = 0.0 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>perspective_point_height</tt> </td><td> When applicable, records the the height, <em>in metres</em>, of the map projection perspective point above the ellipsoid (or sphere). Used by perspective-type map projections, for example the Vertical Perspective Projection, which may be used to simulate the view from a Meteosat satellite. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>projection_name</tt> </td><td> Used to specify the well-known name of the map projection operation employed to convert geographic coordinates to cartesian coordinates. It is recommended that this attribute is used to encode the familiar or vernacular name of the map projection operation in a human-readable manner so as to facilitate, for example, map labelling capabilities. Example: “UTM Zone 31N” (for which the corresponding CF grid mapping name is "transverse_mercator"). 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>semi_major_axis</tt> </td><td> Specifies the length, <em>in metres</em>, of the semi-major axis of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. Commonly denoted using the symbol “a”. In the case of a spherical Earth approximation this attribute defines the radius of the Earth. See also the <tt>inverse_flattening</tt> attribute. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>semi_minor_axis</tt> </td><td> Specifies the length, <em>in metres</em>, of the semi-minor axis of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. Commonly denoted using the symbol “b”. In the case of a spherical Earth approximation this attribute should be omitted (the preferred option) or else set equal to the value of the <tt>semi_major_axis</tt> attribute. See also the <tt>inverse_flattening</tt> attribute. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <em><tt>standard_parallel</tt></em> </td><td> Specifies the line, or lines, of latitude at which the developable map projection surface (plane, cone, or cylinder) touches the reference sphere or ellipsoid used to represent the Earth. Since there is zero scale distortion along a standard parallel it is also referred to as a ‘latitude of true scale’. In the situation where a conical developable surface intersects the reference ellipsoid there are two standard parallels, in which case this attribute can be used as a vector to record both latitude values, with the additional convention that the standard parallel nearest the pole (N or S) is provided first. Domain: -90.0 &lt;= standard_parallel &lt;= 90.0 decimal degrees. 
+</td></tr></table>
+<hr />
+<h3 id="a4.2.InsertionofAdditionalGridMappingExamplesintoAppendixF">4.2. Insertion of Additional Grid Mapping Examples into Appendix F</h3>
+<p>
+The following examples of grid mapping definitions are required to be added to Appendix F.
+</p>
+<p>
+<strong>Example F.9. 2D Latitude-Longitude Coordinate System (Spherical Earth)</strong>
+</p>
+<p>
+This grid mapping defines the canonical 2D geographical coordinate system based upon latitude and longitude coordinates on a spherical Earth. If required, the Earth radius can be specified via the <tt>semi_major_axis</tt> attribute.
+</p>
+<p>
+grid_mapping_name = "lat_long_on_sphere"
+</p>
+<pre class="wiki">dimensions:
+  lat = 18 ; // dummy values
+  lon = 36 ;
+variables:
+  double lat(lat) ;
+    // conventional definition
+  double lon(lon) ;
+    // conventional definition
+  float temp(lat, lon) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:grid_mapping = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "lat_long_on_sphere" ;
+    crs:crs_id = "urn:ogc:def:cs:EPSG:6.0:6422" ;   // EPSG ID 6422 == "Ellipsoidal 2D CS"
+    crs:crs_name = "Spherical 2D Coordinate System" ;
+    crs:ellipsoid_name = "Sphere" ;
+    crs:semi_major_axis = 6371000.0 ;
+    crs:inverse_flattening = 0 ;
+</pre><p>
+<strong>Example F.10. 3D Latitude-Longitude-Height Coordinate System (Spherical Earth)</strong>
+</p>
+<p>
+This grid mapping defines the canonical 3D geographical coordinate system based upon latitude and longitude and height coordinates on a spherical Earth. If required, the Earth radius can be specified via the <tt>semi_major_axis</tt> attribute.
+</p>
+<p>
+grid_mapping_name = "lat_long_ht_on_sphere"
+</p>
+<pre class="wiki">dimensions:
+  lat = 18 ; // dummy values
+  lon = 36 ;
+  ht = 50 ;
+variables:
+  double lat(lat) ;
+    // conventional definition
+  double lon(lon) ;
+    // conventional definition
+  double ht(ht) ;
+    // conventional definition
+  float temp(ht, lat, lon) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:grid_mapping = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "lat_long_ht_on_sphere" ;
+    crs:crs_id = "urn:ogc:def:cs:EPSG:6.0:6423" ;   // EPSG ID 6423 == "Ellipsoidal 3D CS"
+    crs:crs_name = "Spherical 3D Coordinate System" ;
+    crs:ellipsoid_name = "Sphere" ;
+    crs:semi_major_axis = 6371000.0 ;
+    crs:inverse_flattening = 0 ;
+</pre><p>
+<strong>Example F.11. Latitude-Longitude on the WGS 1984 Datum</strong>
+</p>
+<p>
+This grid mapping defines the commonly-used CRS involving geodetic latitude and longitude coordinates - and potentially also ellipsoidal height - based upon the WGS 1984 geodetic datum.
+</p>
+<p>
+grid_mapping_name = "lat_long_wgs1984" (2D case) or "lat_long_ht_wgs1984" (3D case)
+</p>
+<pre class="wiki">dimensions:
+  lat = 18 ; // dummy values
+  lon = 36 ;
+variables:
+  double lat(lat) ;
+    // conventional definition
+  double lon(lon) ;
+    // conventional definition
+  float temp(lat, lon) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:grid_mapping = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "lat_long_wgs1984" ;
+    crs:crs_id = "urn:ogc:def:crs:EPSG:6.0:4326" ;   // Use EPSG ID 4979 for 3D CRS. ID 4326 refers to 2D CRS.
+    crs:crs_name = "WGS 84" ;
+    crs:geodetic_datum_name = "World Geodetic System 1984" ;
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:ellipsoid_name = "WGS 84" ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+</pre><p>
+<strong>Example F.12. British National Grid (with CRS_WKT attribute)</strong>
+</p>
+<p>
+This example illustrates the use of grid mapping attributes to provide a full description of the 2D projected CRS that forms the basis of the British National Grid reference system. It also demonstrates how the same information could be encoded - possibly in an automated fashion by software applications - in OGC WKT format using the <tt>crs_wkt</tt> attribute.
+</p>
+<p>
+grid_mapping_name = "british_national_grid"
+</p>
+<pre class="wiki">dimensions:
+  lat = 648 ; // dummy values
+  lon = 648 ;
+  y = 18 ;
+  x = 36 ;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:long_name = "x coordinate of projection" ;
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:long_name = "y coordinate of projection" ;
+    y:units = "m" ;
+  double lat(y, x) ;
+    // conventional definition
+  double lon(y, x) ;
+    // conventional definition
+  float temp(y, x) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "british_national_grid" ;
+    crs:crs_id = "urn:ogc:def:crs:EPSG:6.0:27700" ;
+    crs:crs_name = "OSGB 1936 / British National Grid" ;
+    crs:geodetic_datum_name = "OSGB 1936" ;
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:ellipsoid_name = "Airy 1830" ;
+    crs:semi_major_axis = 6377563.396 ;
+    crs:semi_minor_axis = 6356256.910 ;
+    crs:inverse_flattening = 299.3249646 ;
+    crs:projection_name = "British National Grid" ;
+    crs:latitude_of_projection_origin = 49.0 ;
+    crs:longitude_of_projection_origin = -2.0 ;
+    crs:false_easting = 400000.0 ;
+    crs:false_northing = -100000.0 ;
+    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+    crs:crs_wkt = "[PROJCS ['OSGB 1936 / British National Grid',
+      GEOGCS ['OSGB 1936',
+        DATUM ['OSGB 1936', SPHEROID ['Airy 1830', 6377563.396, 299.3249646]],
+        PRIMEM ['Greenwich', 0], UNIT ['Degree', 0.0174532925199433]],
+      PROJECTION ['Transverse Mercator'],
+      PARAMETER ['False Easting', 400000], PARAMETER ['False Northing', -100000],
+      PARAMETER ['Central Meridian', -2.0], PARAMETER ['Scale Factor', 0.9996012717],
+      PARAMETER ['Latitude of Origin', 49.0],
+      UNIT ['Meter', 1.0]]" ;
+</pre><p>
+In this example the optional <tt>crs_wkt</tt> attribute is shown spread across multiple lines. In a netCDF file such an attribute value would, of course, appear as a single text string. Also, occurrences of the single-quote character would be replaced with double-quote characters.
+</p>
+<p>
+<strong>Example F.13. Cartesian (X-Y) Coordinates based on the Vertical Perspective Projection</strong>
+</p>
+<p>
+The following example demonstrates the use of grid mapping attributes to describe X-Y cartesian coordinates based on the vertical perspective projection. Such a CRS might be used, for example, to describe image data that simulates the view from a Meteosat satellite.
+</p>
+<p>
+grid_mapping_name = "vertical_perspective"
+</p>
+<pre class="wiki">variables:
+  double x(x) ;
+    // conventional definition
+  double y(y) ;
+    // conventional definition
+  double lat(y, x) ;
+    // conventional definition
+  double lon(y, x) ;
+    // conventional definition
+  float temp(lat, lon) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:grid_mapping = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "vertical_perspective" ;
+    crs:crs_name = "X-Y Coordinates based on Vertical Perspective Projection" ;   // Fabricated for this example.
+    crs:geodetic_datum_name = "World Geodetic System 1984" ;
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:ellipsoid_name = "WGS 84" ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+    crs:projection_name = "Vertical Perspective" ;
+    crs:latitude_of_projection_origin = 0.0 ;   // Above the equator...
+    crs:longitude_of_projection_origin = 75.0 ; // ... and over the Indian Ocean.
+    crs:perspective_point_height = 36000000 ;   // 36,000 km
+    crs:earth_radius = 6371007 ;   // Indicates that the projection used a spherical Earth approximation.
+</pre><p>
+The <tt>crs_id</tt> attribute is omitted from the above definition as, currently, a unique identifier for this map projection has yet to be assigned in the EPSG/OGP geodetic database.
+</p>
+<hr />
+<h3 id="a4.3.AdditionofNewSub-SectionF.1toAppendixF">4.3. Addition of New Sub-Section F.1 to Appendix F</h3>
+<p>
+The following sub-section is required to be added to Appendix F. This sub-section is also required to be repeated (or paraphrased) as a new section entitled <strong>F. Grid Mapping Attributes</strong> appended to the <a class="ext-link" href="http://cf-pcmdi.llnl.gov/conformance/requirements_recommendations/"><span class="icon">​</span>CF conformance document</a>.
+</p>
+<p>
+<strong>F.1. Recommended minimum set of grid mapping attributes</strong>
+</p>
+<p>
+In order to achieve a basic level of consistency of specification it is proposed that, wherever practicable, a minimum
+set of attribute values is employed to specify the CRS referenced by a netCDF variable. The recommended
+minimum set of grid mapping attributes for describing 2D geographic and 2D projected coordinate reference systems
+is given below.
+</p>
+<p>
+<em>F.1.1. Recommended minimum set of attributes required to describe a 2D geographic CRS</em>:
+</p>
+<pre class="wiki">grid_mapping_name
+crs_id*
+crs_name
+geodetic_datum_name
+ellipsoid_name
+semi_major_axis
+semi_minor_axis and/or inverse_flattening
+longitude_of_prime_meridian
+</pre><p>
+(* if known)
+</p>
+<p>
+In the case of a 3D geographic CRS the third dimension (or axis) is height above or below the ellipsoid, in which case a further parameter – units of ellipsoidal height – is normally required. However, this parameter typically will be defined via the <tt>units</tt> attribute for the relevant coordinate variable (e.g. Z). Hence no separate attribute is defined here.
+</p>
+<p>
+<em>F.1.2. Recommended minimum set of attributes required to describe a 2D projected CRS</em>:
+</p>
+<pre class="wiki">grid_mapping_name
+crs_id*
+crs_name
+geodetic_datum_name
+ellipsoid_name
+semi_major_axis
+semi_minor_axis and/or inverse_flattening
+longitude_of_prime_meridian
+projection_name
+latitude_of_projection_origin
+longitude_of_projection_origin
+earth_radius#
+</pre><p>
+(* if known) <br />
+(# if the map projection is based on a spherical figure of Earth)
+</p>
+<p>
+Additional projection-specific attributes should be defined as required, e.g. <tt>false_easting</tt>, <tt>false_northing</tt>, <tt>scale_factor_at_projection_origin</tt>, and so on.
+</p>
+<hr />
+<h3 id="a4.4.AdditionofNewSub-SectionF.2toAppendixF">4.4. Addition of New Sub-Section F.2 to Appendix F</h3>
+<p>
+The following sub-section is required to be added to Appendix F.
+</p>
+<p>
+<strong>F.2 OGC CRS Identifiers corresponding to CF grid mapping definitions</strong>
+</p>
+<p>
+Table F.2 lists the Open Geospatial Consortium (OGC) URNs for the coordinate reference systems, coordinate systems, and map projections (OGC 'coordinate operation methods') that correspond to the example grid mapping names illustrated in this version of the CF specification. Grid mapping names that are not currently associated with an equivalent OGC URN (e.g. "rotated_latitude_longitude") do not appear in Table F.2. It is noted that the majority of grid mapping names defined in CF-1.0 refer to OGC coordinate operation methods (i.e. map projections) rather than coordinate reference systems.
+</p>
+<p>
+The values defined in the <strong>OGC URN Identifier</strong> column may be used, as and when appropriate, to define the <tt>crs_id</tt> grid mapping attribute. The OGC URN syntax is described in reference [OGC-URN].
+</p>
+<p>
+<strong>Table F.2. OGC URNs corresponding to CF grid mapping names</strong>
+</p>
+<table class="wiki">
+<tr><td> <strong>CF Grid Mapping Name</strong> </td><td> <strong>OGC URN Identifier</strong> </td><td> <strong>OGC Object Type*</strong> 
+</td></tr><tr><td> albers_conical_equal_area </td><td> urn:ogc:def:method:EPSG:6.0:9822 </td><td> Coordinate Operation Method 
+</td></tr><tr><td> azimuthal_equidistant </td><td> urn:ogc:def:method:EPSG:6.0:9822 </td><td> Coordinate Operation Method 
+</td></tr><tr><td> azimuthal_equalarea </td><td> urn:ogc:def:method:EPSG:6.0:9820 </td><td> Coordinate Operation Method 
+</td></tr><tr><td> british_national_grid </td><td> urn:ogc:def:crs:EPSG:6.0:27700 </td><td> 2D Coordinate Reference System 
+</td></tr><tr><td> lambert_conformal_conic (1SP) </td><td> urn:ogc:def:method:EPSG:6.0:9801 </td><td> Coordinate Operation Method 
+</td></tr><tr><td> lambert_conformal_conic (2SP) </td><td> urn:ogc:def:method:EPSG:6.0:9802 </td><td> Coordinate Operation Method 
+</td></tr><tr><td> lat_long_on_sphere </td><td> urn:ogc:def:cs:EPSG:6.0:6422 </td><td> 2D Coordinate System 
+</td></tr><tr><td> lat_long_ht_on_sphere </td><td> urn:ogc:def:cs:EPSG:6.0:6423 </td><td>  3D Coordinate System 
+</td></tr><tr><td> lat_long_wgs1984 </td><td> urn:ogc:def:crs:EPSG:6.0:4326 </td><td> 2D Coordinate Reference System 
+</td></tr><tr><td> lat_long_ht_wgs1984 </td><td> urn:ogc:def:crs:EPSG:6.0:4979 </td><td> 3D Coordinate Reference System 
+</td></tr><tr><td> polar_stereographic </td><td> urn:ogc:def:method:EPSG:6.0:9810 </td><td> Coordinate Operation Method 
+</td></tr><tr><td> stereographic </td><td> urn:ogc:def:method:EPSG:6.0:9809 </td><td> Coordinate Operation Method 
+</td></tr><tr><td> transverse_mercator </td><td> urn:ogc:def:method:EPSG:6.0:9807 </td><td> Coordinate Operation Method 
+</td></tr></table>
+<p>
+(* OGC object types can be considered equivalent to like-named objects in the OGP/EPSG database.)
+</p>
+<hr />
+<h3 id="a4.5.AdditionofReferencestoBibliography">4.5. Addition of References to Bibliography</h3>
+<p>
+The following bibliographic references are required to be appended to the CF bibliography chapter.
+</p>
+<p>
+[OGC-SRC] Topic 2: Spatial Referencing by Coordinates. OGC Abstract Specification. OGC document 04-
+046r3. 16 August 2004. (URL: <a class="ext-link" href="http://www.opengeospatial.org/standards/as"><span class="icon">​</span>http://www.opengeospatial.org/standards/as</a>)
+</p>
+<p>
+[OGC-SFA1] OpenGIS Implementation Specification for Geographic information - Simple feature access - Part
+1: Common architecture. OGC document 06-103r3. 5 October 2006. (URL: <a class="ext-link" href="http://www.opengeospatial.org/standards/sfa"><span class="icon">​</span>http://www.opengeospatial.org/standards/sfa</a>)
+</p>
+<p>
+[OGC-URN] Definition Identifier URNs in OGC Namespace. OGC Best Practices Paper. OGC document 06-
+023r1. 8 August 2007. (URL: <a class="ext-link" href="http://www.opengeospatial.org/standards/bp"><span class="icon">​</span>http://www.opengeospatial.org/standards/bp</a>)
+</p>
+<hr />
+<h2 id="a5.Benefits">5. Benefits</h2>
+<p>
+As per <a class="ext-link" href="http://cf-pcmdi.llnl.gov./9"><span class="icon">​</span>original Trac ticket #9</a>.
+</p>
+<h2 id="a6.StatusQuo">6. Status Quo</h2>
+<p>
+As per <a class="ext-link" href="http://cf-pcmdi.llnl.gov./9"><span class="icon">​</span>original Trac ticket #9</a>.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(20)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1196949104000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-12-06T05%3A51%3A44-08%3A00&amp;precision=second" title="See timeline at 12/06/07 05:51:44">13 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Erratum:
+</p>
+<p>
+The definition of the variable <tt>temp</tt> in Example F.13 should mirror that of the same variable in Example F.12.
+</p>
+<p>
+--Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1198004084000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+        in reply to:
+    <a href="#comment:description">↑ description</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:3" class="follow-up">↓ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-12-18T10%3A54%3A44-08%3A00&amp;precision=second" title="See timeline at 12/18/07 10:54:44">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Phil
+</p>
+<p>
+Thank you for your hard work on your detailed revised proposal. I'm generally happy with this version, but I have some more comments (my own views - not as moderator!).
+</p>
+<ol><li>Your proposal changes the meaning of the <tt>grid_mapping_name</tt> attribute. Up to now, it has been the name of one of the permitted mappings of Appendix F. That is, it identifies the operation and the required parameters (not the values of those parameters) which relate coordinate space to geographical location. Knowing the operation and the parameters, generic software could do the transformation. In your proposal, there are values of <tt>grid_mapping_name</tt> such as <tt>british_national_grid</tt>. That's a different kind of thing; it implies a particular projection (transverse Mercator) and choice of parameters. If we make this change, the projection is no longer identified (as in your example F.12) and generic software would not be able to carry out the transformation. I don't think we should make this change. I think that we should retain the current function of <tt>grid_mapping_name</tt>, which would be <tt>transverse_mercator</tt> in this case. Knowing this, and the parameters for the projection, generic software can transform to and from the British National Grid.  In addition, the projection is identified as the British National Grid by the <tt>crs_id</tt> and <tt>crs_name</tt>, and that further information may be helpful to particular software, as was agreed in the previous ticket. Hence I think examples F.11 and F.12 can certainly be included as <em>examples</em> of <tt>latitude_longitude</tt> (see also below) and <tt>transverse_mercator</tt>, but not as new values of <tt>grid_mapping_name</tt>.  I would also amend your section F.2. I think the first column in the table should be changed: some of those are possible values of <tt>grid_mapping_name</tt>, but not all of them.
+</li></ol><ol start="2"><li>The coordinate reference systems are the essential contents for table F.2. They are the ones which combine a method with particular parameters. Do you (or others) think it is important to be able to give a <tt>crs_id</tt> for the pure projection (coordinate operation) methods? If it is useful, I wouldn't object, but I wonder why it is useful.
+</li></ol><ol start="3"><li>Table F.2 is needed because the OGP/EPSG database isn't easily accessible. Shouldn't this table contain the values of parameters which define coordinate reference systems? If it does, the CF checker can verify them. (The table would be needed in some machineable form e.g. XML.) Otherwise, there can be no check that the <tt>crs_id</tt> and the explicit parameters are consistent. If they could be inconsistent, what should an application believe?
+</li></ol><ol start="4"><li>We should add a <em>type</em> column to the list of attributes in appendix F (string or numeric, like Appendix A).
+</li></ol><ol start="5"><li>We had some discussion in the previous ticket about the <tt>crs_wkt</tt> attribute. Personally, I am still unhappy about it, for two reasons.  First, it is a departure for CF and inconsistent with one of principles to include an attribute that is not easily readable by humans. This attribute is provided for the benefit of software, but in earlier discussions it was argued that it was <em>less</em> convenient for software to parse a long attribute into components than to have the components stored in separate attributes. That is why we invented the <tt>grid_mapping</tt> variable with its separate attributes. Has this argument changed? Why can't these other packages read our separate attributes? Second, the <tt>crs_wkt</tt> attribute could be inconsistent with the <tt>crs_id</tt> and the explicit parameter attributes. The CF checker could check this, but you can't guarantee consistency if you introduce redundancy.
+</li></ol><ol start="6"><li>I don't understand the sentence "The current attribute ..." in the definition of <tt>inverse_flattening</tt>.
+</li></ol><ol start="7"><li>I would suggest the name <tt>latitude_longitude</tt> instead of <tt>lat_long_on_sphere</tt> because (a) we generally avoid abbreviations in our controlled vocabulary (b) to add <tt>on_sphere</tt> confuses the roles of projection and geodetic datum. A <tt>grid_mapping_name</tt> of <tt>latitude_longitude</tt> is useful as an identity operation for the coordinates; the coordinates are identical with the geographical location (unlike in transverse Mercator, rotated pole, etc.). The parameters of the ellipsoid are provided as additional information.
+</li></ol><ol start="8"><li>I don't think we should include latitude-longitude-height on sphere (Example F.10). Appendix F is about horizontal coordinate systems and we don't anywhere else combine these with vertical coordinates. Let's think about this if someone has such a requirement.
+</li></ol><ol start="9"><li>I don't agree with Section F.1. I think <tt>grid_mapping_name</tt> is mandatory and the rest are optional. I don't think one can recommend including the parameters describing the geodetic datum and the ellipsoid, because such information is not likely to be supplied in GCM data, where it's not needed, and hence GCM data would always produce unhelpful warnings in the CF-checker in future.
+</li></ol><ol start="10"><li>Before the CF standard document was moved to the PCMDI site, the various projections were given as unnumbered subsections of Appendix F. Now they are given as examples (I had noticed this before you made your proposal). I think that we should change them back, because they are not really examples.
+</li></ol><p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1198071964000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+        in reply to:
+    <a href="#comment:2">↑ 2</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:4" class="follow-up">↓ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-12-19T05%3A46%3A04-08%3A00&amp;precision=second" title="See timeline at 12/19/07 05:46:04">13 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./18#comment:2" title="Comment 2">jonathan</a>:
+</p>
+<p>
+Hi Jonathan,
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol><li>Your proposal changes the meaning of the <tt>grid_mapping_name</tt> attribute. [...] Hence I think examples F.11 and F.12 can certainly be included as <em>examples</em> of <tt>latitude_longitude</tt> (see also below) and <tt>transverse_mercator</tt>, but not as new values of <tt>grid_mapping_name</tt>.
+</li></ol></blockquote>
+<p>
+Yes, the British National Grid example was included as just that, an example. I have no problem with the grid_mapping_name attribute being set to 'transverse_mercator', as you suggest, and the corresponding entry removed from Table F.2. However...
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="2"><li>The coordinate reference systems are the essential contents for table F.2. They are the ones which combine a method with particular parameters. Do you (or others) think it is important to be able to give a <tt>crs_id</tt> for the pure projection (coordinate operation) methods?
+</li></ol></blockquote>
+<p>
+... I suspect that I may have misinterpreted the conclusions arising from the original proposal, which seemed to suggest that it would be useful to specify the OGC URN corresponding to each CF grid mapping name. On reflection, the fact that CF grid mappings are used to identify a mixture of different coordinate system concepts means that Table F.2 cannot sensibly be used to identify the OGC URNs for grid mappings that are not 2D or 3D CRS's. As you intimate, there is little value encoding a URN for, say, a map projection method in the 'crs_id' attribute (indeed such usage would be erroneous).
+</p>
+<p>
+Accordingly, Table F.2 should, I believe, either be limited to listing just the OGC URNs corresponding to CF grid mapping names that represent genuine 2D/3D CRS's, or else be dropped from the proposal altogether. I prefer the latter option. So...
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="3"><li>Table F.2 is needed because the OGP/EPSG database isn't easily accessible. Shouldn't this table contain the values of parameters which define coordinate reference systems? If it does, the CF checker can verify them. (The table would be needed in some machineable form e.g. XML.) Otherwise, there can be no check that the <tt>crs_id</tt> and the explicit parameters are consistent. If they could be inconsistent, what should an application believe?
+</li></ol></blockquote>
+<p>
+... I'm not convinced (yet) that it is desirable or indeed practicable to duplicate parts of the OGP/EPSG geodetic database as part of the CF conventions document or its supporting infrastructure. The EPSG database can now readily be queried (by humans, not machines yet) through their new-ish online web form (<a class="ext-link" href="http://www.epsg-registry.org/"><span class="icon">​</span>http://www.epsg-registry.org/</a>).
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="4"><li>We should add a <em>type</em> column to the list of attributes in appendix F (string or numeric, like Appendix A).
+</li></ol></blockquote>
+<p>
+Yes, that would be useful. Presumably this is something that the CF specification editor could do 'offline' with my input.
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="5"><li>We had some discussion in the previous ticket about the <tt>crs_wkt</tt> attribute. Personally, I am still unhappy about it, for two reasons. [...]
+</li></ol></blockquote>
+<p>
+My interpretation of the comments on the original proposal was that this attribute would be beneficial. We'll have to see how the votes fall :-)
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="6"><li>I don't understand the sentence "The current attribute ..." in the definition of <tt>inverse_flattening</tt>.
+</li></ol></blockquote>
+<p>
+A good example of obfuscation, I'd say! The offending sentence can be removed.
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="7"><li>I would suggest the name <tt>latitude_longitude</tt> instead of <tt>lat_long_on_sphere</tt>
+</li></ol></blockquote>
+<p>
+No objection.
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="8"><li>I don't think we should include latitude-longitude-height on sphere
+</li></ol></blockquote>
+<p>
+No objection.
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="9"><li>I don't agree with Section F.1. I think <tt>grid_mapping_name</tt> is mandatory and the rest are optional. I don't think one can recommend including the parameters describing the geodetic datum and the ellipsoid, because such information is not likely to be supplied in GCM data [...]
+</li></ol></blockquote>
+<p>
+Agreed re grid_mapping_name being mandatory. The recommendations come with the caveat "wherever practicable" in the introductory paragraph so I think the intent is clear.
+</p>
+<p>
+<br />
+</p>
+<blockquote class="citation">
+<ol start="10"><li>Before the CF standard document was moved to the PCMDI site, the various projections were given as unnumbered subsections of Appendix F. Now they are given as examples (I had noticed this before you made your proposal). I think that we should change them back, because they are not really examples.
+</li></ol></blockquote>
+<p>
+IMHO that is an editorial decision :)
+</p>
+<p>
+Regards,
+</p>
+<p>
+--Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1198194984000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+        in reply to:
+    <a href="#comment:3">↑ 3</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:6" class="follow-up">↓ 6</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-12-20T15%3A56%3A24-08%3A00&amp;precision=second" title="See timeline at 12/20/07 15:56:24">13 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Phil, Jonathan, all,
+</p>
+<p>
+Replying to <a class="ticket" href="./18#comment:3" title="Comment 3">pbentley</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./18#comment:2" title="Comment 2">jonathan</a>:
+</p>
+</blockquote>
+<p>
+I wrote a few comments before seeing your latest comments Phil. So, there may be some redundancy.
+</p>
+<p>
+I agree with your concern about duplicating the EPSG tables in the CF spec. Especially since, as you will see below, I think we should provide separate *_id attributes for many of the other non-CRS EPSG codes.
+</p>
+<p>
+Anyway, below are my comments written in response to Jonathan's comment.
+</p>
+<p>
+Ethan
+</p>
+<hr />
+<p>
+1) I think we need to add some text to the 5.6 "Grid Mappings and Projections" section of the CF spec to differentiate between describing the CRS for a set of coordinates and describing a transformation between two sets of coordinates. The current grid mapping spec provides a way to describe a transformation between a set of coordinate axes (x(x) and y(y) e.g.) and a set of auxiliary coordinates (lat(y,x) and lon(y,x) e.g.). This proposal improves on our ability to describe those transformations. It also allows us to describe the CRS for a single set of coordinates. I think we need to add some text that points out this difference and describes how the set of coordinates are linked to a CRS. The current grid mapping spec uses coordinate variables AND the coordinates attribute to link two sets of coordinates to the grid mapping variable. For a CRS to a single set of coordinates, I would think we should allow the connection to be coordinate variables OR the coordinates attribute. [In EPSG lingo, I think the current grid mapping variable describes a "Coordinate Operation" (CO) and the grid_mapping_name attribute specifies the "Coordinate Operation Method" used in the coordinate operation.]
+</p>
+<p>
+2) There are a number of *_name attributes that are defined as "well known names" and only one *_id attribute that uses EPSG codes. The EPSG codes seem much more well defined and stable than any "well known names" we might find or develop. Also, there are EPSG codes for all the building blocks needed to construct a CRS or coordinate operation (ellipse, datum, projection, cs, crs, units, etc). So, I would suggest we add a few more *_id attributes that will allow us to piece together CRS and CO using EPSG codes. I think this would mean for each new *_id attribute we need another table listing the EPSG codes (and/or OGC URNs). It would also mean that the *_name could just be human readable labels rather than identifiers.
+</p>
+<p>
+3) Then again, I'm a bit wary of what I just said above. I'm not sure I like the idea of *_id attributes or "well known names" in this situation. Maintaining a controlled vocabulary for sets of parameters (e.g., a fully defined CRS) seems quite different from our past controlled vocabulary efforts. Standard names, grid mapping names, and dimensionless vertical coordinate formulas are all identifiers linked with definitions; any parameters are given in attributes not given in the definition. I know there has been debate on this. I just worry this is starting on a slippery slope away from self-describing.
+</p>
+<p>
+4) And of course there are redundancy, inconsistency, and incompatibility issues if we allow both externally defined parameters (*_id) as well as internally specified parameters. Again something that has already been discussed.
+</p>
+<p>
+Anyway, I have some more details written down for possible additions and changes to this proposal dealing with some of the above points. But typing those up will have to wait till next week or next year.
+</p>
+<p>
+Happy holidays everyone.
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1198195837000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-12-20T16%3A10%3A37-08%3A00&amp;precision=second" title="See timeline at 12/20/07 16:10:37">13 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi again,
+</p>
+<p>
+One more quick comment. If we don't have tables of CF "certified" EPSG codes and/or OGC URNs, I think we need to be more explicit about what kinds of OGC URNs are allowed. The OGC URN spec allows for compound URNs and parameterized URNs which quickly get very unwieldy (they play the same role but are much harder to read than WKT). I think, if we don't include these tables, we should restrict any OGC URNs to "single object" URNs.
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1199985458000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+        in reply to:
+    <a href="#comment:4">↑ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-01-10T09%3A17%3A38-08%3A00&amp;precision=second" title="See timeline at 01/10/08 09:17:38">13 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./18#comment:4" title="Comment 4">edavis</a>:
+</p>
+<p>
+Hi Ethan
+</p>
+<blockquote class="citation">
+<p>
+2) There are a number of *_name attributes that are defined as "well known names" and only one *_id attribute that uses EPSG codes. The EPSG codes seem much more well defined and stable than any "well known names" we might find or develop. Also, there are EPSG codes for all the building blocks needed to construct a CRS or coordinate operation (ellipse, datum, projection, cs, crs, units, etc). So, I would suggest we add a few more *_id attributes that will allow us to piece together CRS and CO using EPSG codes. I think this would mean for each new *_id attribute we need another table listing the EPSG codes (and/or OGC URNs). It would also mean that the *_name could just be human readable labels rather than identifiers.
+</p>
+</blockquote>
+<p>
+In principle I agree, and my original proposal included many of the additional *_id attributes that you refer to. However, there seemed to be some resistance to incorporating these, partly, I think, because of the CF 'rule' about not introducing changes before there is a firm need for them. Hence they were dropped from the revised proposal.
+</p>
+<p>
+IMHO, it may be preferable to tackle such attributes via a subsequent proposal. My concern is that, in trying to resurrect them here, we will get into a circular debate about the pros and cons of using id attributes. And potentially miss the opportunity to adopt some of the less contentious features of the current proposal. It's been a long, long road already...!
+</p>
+<blockquote class="citation">
+<p>
+3) Then again, I'm a bit wary of what I just said above. I'm not sure I like the idea of *_id attributes or "well known names" in this situation. Maintaining a controlled vocabulary for sets of parameters (e.g., a fully defined CRS) seems quite different from our past controlled vocabulary efforts. Standard names, grid mapping names, and dimensionless vertical coordinate formulas are all identifiers linked with definitions; any parameters are given in attributes not given in the definition. I know there has been debate on this. I just worry this is starting on a slippery slope away from self-describing.
+</p>
+</blockquote>
+<p>
+Ultimately I think there will be some pieces of 'well-known' metadata that we just won't want to ship around in every netcdf file simply to adhere to the self-describing ideal. Many CRS properties are likely to fall into that category, I believe. For example, we don't consider it desirable (or practicable) to include the mathematical formula for the lat/lon to polar stereographic X/Y conversion in relevant netcdf files. It's accepted that this is a hint: software has to go look up the conversion algorithm somewhere else, e.g. a projection library.
+</p>
+<p>
+When standard names/concepts evolve to include other properties (authority, revision history, proposer, ...) then presumably that ancillary information will need to be looked up externally too.
+</p>
+<p>
+--Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1201458204000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:8" class="follow-up">↓ 8</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-01-27T10%3A23%3A24-08%3A00&amp;precision=second" title="See timeline at 01/27/08 10:23:24">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all
+</p>
+<p>
+Thank you, Phil and Ethan, for your contributions. It looks like there are not many serious outstanding issues at this point, so we are quite near consensus. According to the rules, the proposal would need support from another member of the CF conventions committee in order to be accepted. Also I think there are a couple of questions on which views from more people would be helpful:
+</p>
+<ol><li>The proposal allows an OGC/EPSG id to be given for a coordinate reference system. The id implies the ellipsoid and map projection, which would also be stored in separate attributes of the grid_mapping variable, according to the proposal. Applications which understand map projections can make use of these separate attributes; this is backward-compatible with the existing CF standard. The CRS id is thought useful (discussion in previous ticket) for those applications that are able to recognise it and make use of other properties of the CRS known to them as a result. But it is possible that the attributes explicitly defining the coordinate reference system and the CRS id attribute could be inconsistent. The EPSG database exists online, Phil explains, but is not machine-readable. Hence there is no way of automatically checking for possible inconsistencies. The only way the CF checker could do it would be if we copied relevant parts of the EPSG database into the CF standard in a machine-readable way. Should we do this? Is potential inconsistency a problem? If the attributes and the CRS id are inconsistent, which is correct? For example, if two variables are compared, should the application conclude they are on the same CRS if their CRS id's are the same, or if the attributes detailing the CRS are the same?
+</li></ol><ol start="2"><li>The proposal introduces a crs_wkt attribute of the data variable, which is a concatenation of the separate attributes of the grid_mapping variable describing the CRS. The format of this attribute is an OGC standard and is used in netCDF files by some existing software, so is included in the proposal to standardise that practice. This attribute requires parsing, which is a bit more awkward than the grid_mapping attributes, which were introduced precisely to avoid the need to parse a long string into bits and convert the bits into other data types. This attribute is obviously redundant, since it repeats information which is elsewhere in the file, and it is not easily human-readable. On both grounds it is a departure from normal CF practice. The CF-checker could detect inconsistency, but that doesn't guarantee there is no inconsistency. If there is inconsistency between the crs_wkt attribute and the grid_mapping variable, which is correct? Is the crs_wkt a good idea?
+</li></ol><p>
+Thanks for any input.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1202118437000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+        in reply to:
+    <a href="#comment:7">↑ 7</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-02-04T01%3A47%3A17-08%3A00&amp;precision=second" title="See timeline at 02/04/08 01:47:17">13 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./18#comment:7" title="Comment 7">jonathan</a>:
+</p>
+<p>
+Hi Jonathan
+</p>
+<p>
+Thanks for summarising the current status of this ticket.
+</p>
+<blockquote class="citation">
+<ol><li>The proposal allows an OGC/EPSG id to be given for a coordinate reference system. The id implies the ellipsoid and map projection, which would also be stored in separate attributes of the grid_mapping variable, according to the proposal. [snip] But it is possible that the attributes explicitly defining the coordinate reference system and the CRS id attribute could be inconsistent...
+</li></ol></blockquote>
+<blockquote class="citation">
+<p>
+Hence there is no way of automatically checking for possible inconsistencies. The only way the CF checker could do it would be if we copied relevant parts of the EPSG database into the CF standard in a machine-readable way. Should we do this?
+</p>
+</blockquote>
+<p>
+I believe not. At present I do not see a need to do this. Also, in view of the pace of change to the CF specification I'm not convinced that we have the resources to achieve this even if it was desirable. If netCDF-aware software applications (including the CF checker) need to 'understand' OGP/EPSG entities then it is a fairly straightforward task to build relational tables of those entities using the standard SQL scripts supplied by OGP/ESPG. (NB: I built the tables in a MySQL environment in about 1 hour.)
+</p>
+<blockquote class="citation">
+<p>
+Is potential inconsistency a problem? If the attributes and the CRS id are inconsistent, which is correct? For example, if two variables are compared, should the application conclude they are on the same CRS if their CRS id's are the same, or if the attributes detailing the CRS are the same?
+</p>
+</blockquote>
+<p>
+Potentially, yes. But as with other metadata, there is an onus on data producers to ensure that CRS definitions are correct and internally consistent. My view on this is that directly-specified properties (values defined explicitly within the netCDF file) should take precedence over indirectly-specified properties whose values are determined by dereferencing a pointer such as is provided, for example, by the crs_id attribute.
+</p>
+<blockquote class="citation">
+<ol start="2"><li>The proposal introduces a crs_wkt attribute of the data variable, which is a concatenation of the separate attributes of the grid_mapping variable describing the CRS. The format of this attribute is an OGC standard and is used in netCDF files by some existing software, so is included in the proposal to standardise that practice... Is the crs_wkt a good idea?
+</li></ol></blockquote>
+<p>
+As per my previous responses to this ticket, I believe that it would be beneficial to standardise the name and usage of this attribute now rather than have various software vendors or developers independently devise a number of alternative, potentially conflicting, attributes doing much the same thing.
+</p>
+<p>
+Regards,
+</p>
+<p>
+--Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1203096898000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-02-15T09%3A34%3A58-08%3A00&amp;precision=second" title="See timeline at 02/15/08 09:34:58">13 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all,
+</p>
+<p>
+I have mixed feelings about adding a crs_wkt attribute to contain a OGC WKT formatted string. Three concerns on this (the first two have already been discussed):
+</p>
+<p>
+1) Having two ways to encode the same information is bound to lead to interoperability issues.
+</p>
+<p>
+2) Redundancy also leads to the possibility of inconsistent information which compounds the interoperability issues.
+</p>
+<p>
+3) I don't think WKT really gets us much in terms of functionality and actually falls short in some ways. For instance, WKT does not deal with temporal coordinates or dimensionless vertical coordinates.
+</p>
+<p>
+So, I wonder if it wouldn't be worth splitting off the inclusion of WKT in CF as a separate issue. That would allow some other important additions to be made without being hung up by discussion on the WKT issue.
+</p>
+<p>
+Similarly, I wonder if we should split off the issue of crs_id and the *_name attributes as the discussion of allowed values and when to use them seems like it needs more discussion.
+</p>
+<p>
+My motivation for these suggestions is that I would like to quickly get the horizontal datum information (ellipsoid shape and prime meridian) into the grid mapping section of the CF specification. I'm working on producing CRS from netCDF files to use in our WCS server and this is the main piece of information that can't be included in a standard way. Also, I suspect the horizontal datum parts of Phil's proposal aren't very contentious.
+</p>
+<p>
+Phil, Jonathan, any objection to my writing up three new issues/proposals to possibly replace this proposal?
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1203668628000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:11" class="follow-up">↓ 11</a>
+    <a href="#comment:12" class="follow-up">↓ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-02-22T00%3A23%3A48-08%3A00&amp;precision=second" title="See timeline at 02/22/08 00:23:48">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+It would be good if we could conclude this discussion with agreement to adopt some form of this proposal. Let's see what we can agree on this ticket before we start other tickets.
+</p>
+<p>
+There has been no discussion following my summary of 27 Jan except about the crs_wkt and crs_id/crs_name issues. In the present ticket only Phil, Ethan and I have contributed, but there was other support expressed for the previous version of the proposal in ticket 9, including from John Caron and Rich Signell, who are  members of the conventions committee. In that ticket also, the only significant disagreements were related to the same two issues. Hence I conclude that we have accepted the proposal, according to the rules, apart from those two issues. Thanks to all who contributed.
+</p>
+<p>
+On the outstanding issues, further comments would be welcome.  Please see the last three entries in this ticket. I will leave this ticket open for further discussion about them. Maybe we can include them in the same update to the conventions document.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1204021272000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+        in reply to:
+    <a href="#comment:10">↑ 10</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-02-26T02%3A21%3A12-08%3A00&amp;precision=second" title="See timeline at 02/26/08 02:21:12">13 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./18#comment:10" title="Comment 10">jonathan</a>:
+</p>
+<p>
+Hi Jonathan,
+</p>
+<p>
+Many thanks for moderating this proposal. I would concur with your conclusions. Having come this far it would seem to make sense to at least adopt those elements of the proposal for which there is broad endorsement. Hopefully some of the other features can be pursued as part of follow-up proposals, as per Ethan's suggestion.
+</p>
+<p>
+--Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1204052873000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+        in reply to:
+    <a href="#comment:10">↑ 10</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:13" class="follow-up">↓ 13</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-02-26T11%3A07%3A53-08%3A00&amp;precision=second" title="See timeline at 02/26/08 11:07:53">13 years ago</a> by rsignell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./18#comment:10" title="Comment 10">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+There has been no discussion following my summary of 27 Jan except about the crs_wkt and crs_id/crs_name issues.  
+</p>
+</blockquote>
+<p>
+Going back and looking at the history of this crs_id and crs_wkt discussion, it seems that there were two schools of thought: Rob Lowry, Phil &amp; I were supporting these tags because software exists that could use these specifications immediately to do useful projection and datum transformations.  Others including Jonathan were generally against the idea, on grounds of duplication and concerns with how to resolve conflicts if these tags don't agree with the standard grid_mapping attributes.
+</p>
+<p>
+I must say after thinking about this some more, I'm now more in favor of not using the crs_id, and crs_wkt.  As long as we specify the datum and projection information unambiguously and completely, we should leave it at that, and then make it a priority to write the software that maps the CF convention into other namespaces, such as the EPSG IDs or the OGC WKT.  It seems that this mapping from one set of conventions to another should take part outside of the CF conventions.
+</p>
+<p>
+I spoke to Benno Blumenthal about this, who knows a lot more about this stuff, and he said he would go back and read the ticket 9 and 18 info, and then weigh in on the issue also (I found he has not been getting these messages when Trac tickets change).  
+</p>
+<p>
+-Rich
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1204055417000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+        in reply to:
+    <a href="#comment:12">↑ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-02-26T11%3A50%3A17-08%3A00&amp;precision=second" title="See timeline at 02/26/08 11:50:17">13 years ago</a> by rsignell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <blockquote class="citation">
+<p>
+Going back and looking at the history of this crs_id and crs_wkt discussion, it seems that there were two schools of thought: Rob Lowry, Phil &amp; I...
+</p>
+</blockquote>
+<p>
+I meant Roy Lowry, of course.   Grrr....
+</p>
+<p>
+-Rich
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1204323274000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-02-29T14%3A14%3A34-08%3A00&amp;precision=second" title="See timeline at 02/29/08 14:14:34">13 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+My suggestions are based on an evolution of how metadata is encoded in netcdf files:  rather than simply allowing multiple conventions in netcdf files by a comma-separated list in the Conventions attribute, specify prefixes so that attributes can be explicitly labelled as belonging to a different convention.  In particular, were I to want to use attributes from the convention used by WCS to describe projections, I would use a conventions tag in the file like,
+</p>
+<p>
+Conventions = "CF-1.0, wcs=<a class="ext-link" href="http://www.opengis.net/wcs/1.1/"><span class="icon">​</span>http://www.opengis.net/wcs/1.1/</a>"
+</p>
+<p>
+means the default convention is CF-1.0 (i.e the usual usage), but any attribute starting 'wcs:' belongs to the convention defined by the namespace <a class="ext-link" href="http://www.opengis.net/wcs/1.1/"><span class="icon">​</span>http://www.opengis.net/wcs/1.1/</a> (which is how wcs or any other XML convention standardizes its labels).   This whould change the WGS 84 example, slightly, to
+</p>
+<pre class="wiki">dimensions:
+  lat = 18 ; // dummy values
+  lon = 36 ;
+variables:
+  double lat(lat) ;
+    // conventional definition
+  double lon(lon) ;
+    // conventional definition
+  float temp(lat, lon) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:grid_mapping = "crs" ;
+    temp:wcs\:gridCRS = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "lat_long_wgs1984" ;
+    crs:wcs\:GridBaseCRS = "urn:ogc:def:crs:EPSG:6.0:4326" ;   // Use EPSG ID 4979 for 3D CRS. ID 4326 refers to 2D CRS.
+    crs:crs_name = "WGS 84" ;
+    crs:geodetic_datum_name = "World Geodetic System 1984" ;
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:ellipsoid_name = "WGS 84" ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+Conventions = "CF-1.0, wcs=http://www.opengis.net/wcs/1.1/"
+</pre><p>
+where gridCRS and GridBasCRS are the tags used in WCS to characterize projects.
+</p>
+<p>
+This keeps the redundancy out of CF, but allows alternate specifications to be put in a netcdf file.  It also makes use of standards that other people maintain.
+</p>
+<p>
+There are a number of reasons for doing it this way, listing of which would probably hide the essence of the proposal and should be put elsewhere.   The short version is redundant representations belong to different conventions, and there is then a framework for writing down the mappings between the different conventions, and for tagging datasets with them.  This would allow creation of a system that could deliver the metadata in alternate representations, so that  WCS applications could use WCS-style information, and CF applications could use CF information, regardless of the actual source of the data being analyzed.
+</p>
+<p>
+Note that recent and near-term changes to netcdf make this possible -- we could not have made this choice two years ago. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1204581788000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:16" class="follow-up">↓ 16</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-03-03T14%3A03%3A08-08%3A00&amp;precision=second" title="See timeline at 03/03/08 14:03:08">13 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+The usual apologies for taking so long with this.
+</p>
+<p>
+Ethan and I have been talking this over at some length. We think that splitting up the proposal would be in line with CF's process of making incremental progress on the things that we are in (almost) consensus on.
+</p>
+<p>
+We would propose the following incremental steps:
+</p>
+<p>
+1) Define the attributes that describe the horizontal datum (ellipse/sphere and prime meridian) along with reasonable defaults when not specified. That will allow mapping CF to GIS/OGC. This would be a great first step.
+</p>
+<p>
+2) Review the current grid mappings for completeness, propose new ones (Phil suggests vertical perspective, CDM needs that plus Mercator, Orthographic).
+</p>
+<p>
+3) Specifying a vertical datum is more complex, and may take more time to get right.
+</p>
+<p>
+Ethan has volunteered to split Phil's proposal, and at least get 1) written up. I think that should proceed unless Phil wants to do it.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1205433557000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+        in reply to:
+    <a href="#comment:15">↑ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-03-13T11%3A39%3A17-07%3A00&amp;precision=second" title="See timeline at 03/13/08 11:39:17">13 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all,
+</p>
+<p>
+Replying to <a class="ticket" href="./18#comment:15" title="Comment 15">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Ethan has volunteered to split Phil's proposal, and at least get 1) written up. I think that should proceed unless Phil wants to do it.
+</p>
+</blockquote>
+<p>
+I added a <a class="wiki" href="/trac/wiki/GridMappingAndCrs">GridMappingAndCrs</a> page to the wiki with links to two draft proposal wiki pages, both are mostly pulled from this proposal:
+</p>
+<ul><li><a class="wiki" href="/trac/wiki/GridMapHorizDatum">GridMapHorizDatum</a> - proposes adding new grid mapping attributes to describe the horizontal datum used by a grid mapping. One addition I made was to try to state something about default values for the ellipsoid. However, I didn't state it very strongly and I'm not really sure what values would be reasonable defaults.
+</li><li><a class="wiki" href="/trac/wiki/GridMapNames">GridMapNames</a> - proposes adding new grid mappings to the existing 8 grid mapping types. I only added two: Vertical Perspective and Mercator. If you have any you would like to add, let me know or add them on the wiki.
+</li></ul><p>
+I will add these two proposals as new tickets after some time for comments/additions. [Seems like it might be handy for editing to reference versions of the wiki page in the tickets. Or is the preference to include the actual proposal text in the ticket?]
+</p>
+<p>
+Also, on the <a class="wiki" href="/trac/wiki/GridMappingAndCrs">GridMappingAndCrs</a> page, I also list some possible future proposals that I think cover most of the content in Phil's proposal.
+</p>
+<p>
+Thanks,
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1206042170000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+        in reply to:
+    <a href="#comment:description">↑ description</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-03-20T12%3A42%3A50-07%3A00&amp;precision=second" title="See timeline at 03/20/08 12:42:50">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>closed</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Dear all
+</p>
+<p>
+Three weeks ago I concluded that we had accepted Phil's proposal, subject to various small changes (mostly ones which he and I agreed in this ticket), with the exception of the <tt>crs_id</tt> and <tt>crs_wkt</tt> attributes. The subsequent additions from Phil, Rich, John and Ethan support this conclusion. Benno has made a somewhat different proposal about how to include <tt>crs_id</tt>, which touches on the wider and recurring issue of how to incorporate other standards in CF without repeating them. That proposal would require a large new discussion, so I would suggest that Benno raise it in a new ticket.
+</p>
+<p>
+I append the changes we have thus agreed in this ticket. I have omitted <tt>geodetic_datum_name</tt> (geodetic datum = ellipsoid + geoid) and <tt>projection_name</tt>. They could be reproposed. I have included the vertical perspective projection, with the aid of text from Ethan in his <a class="wiki" href="/trac/wiki/GridMapNames">GridMapNames</a> wiki, since Phil argued for it in the earlier ticket, and it has been supported by Ethan and John. Ethan and John would also like to add some other projections, but they can be the subject of new tickets.
+</p>
+<p>
+Regarding the process for changes to the conventions, I think that the trac tickets should be used, including the detailed text. Wikis are not emailed out, so do not bring themselves to people's attention, and are not clearly related to tickets. However, that's a discussion for the email list, I think!
+</p>
+<p>
+I'm going to close this ticket now, requesting Velimir to make the following changes, in the standard document (marked as provisional) and the conformance document, and increment the version number, following the rules. Phil should be added to the list of Additional Authors.
+</p>
+<p>
+Thanks to Phil for working on the proposal and to everyone for their contributions to the discussion.
+</p>
+<p>
+Jonathan
+</p>
+<h3 id="AdditiontopreambleofAppendixFGridMappings">Addition to preamble of Appendix F, Grid Mappings</h3>
+<p>
+Append to the first paragraph: "The attributes which describe the ellipsoid may be included as applicable with any grid mapping."
+</p>
+<h3 id="AdditionstoAppendixFTableF.1GridMappingAttributes">Additions to Appendix F, Table F.1, Grid Mapping Attributes</h3>
+<table class="wiki">
+<tr><td> <strong>Attribute</strong>  </td><td> <strong>Definition</strong> 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>crs_name</tt> </td><td> Used to specify the name of the coordinate reference system (the combination of ellipsoid and projection) within which spatial coordinates are defined. The value of the <tt>crs_name</tt> attribute is not standardised by this convention, but it may be taken from a controlled vocabulary such as the OGP/EPSG database of geodetic parameters [OGP/EPSG]. Otherwise a suitably informative name should be specified. Example: "OSGB 1936 / British National Grid". 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>earth_radius</tt> </td><td> Used to specify the radius, <em>in metres</em>, of the spherical figure used to approximate the shape of the Earth. This attribute should be specified for those projected coordinate reference systems in which the X-Y cartesian coordinates have been derived using a spherical Earth approximation. If the cartesian coordinates were derived using an ellipsoid, this attribute should not be defined. Example: "6371007", which is the radius of the GRS 1980 Authalic Sphere. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>ellipsoid_name</tt> </td><td> Used to specify the name of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. The value of this attribute is not standardised by this convention, except that for coordinates based upon a spherical Earth approximation the value <tt>sphere</tt> should be used. Example: "GRS 1980". 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>inverse_flattening</tt> </td><td> Used to specify the <em>inverse</em> flattening (<em>1/f</em>) of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. The flattening (<em>f</em>) of the ellipsoid is related to the semi-major and semi-minor axes by the formula <em>f = (a-b)/a</em>. In the case of a spherical Earth this attribute should be omitted or set to zero. Example: 298.257222101 for the GRS 1980 ellipsoid. (Note: By convention the dimensions of an ellipsoid are specified using either the semi-major and semi-minor axis lengths, or the semi-major axis length and the inverse flattening. If all three attributes are specified then the supplied values must be consistent with the aforementioned formula.) 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>longitude_of_prime_meridian</tt> </td><td> Specifies the longitude, with respect to Greenwich, of the prime meridian associated with the geodetic datum. The prime meridian defines the origin from which longitude values are determined. Not to be confused with the projection origin longitude (cf. <tt>longitude_of_projection_origin</tt>, a.k.a. central meridian) which defines the longitude of the map projection origin. Domain: -180.0 &lt;= longitude_of_prime_meridian &lt; 180.0 decimal degrees. Default = 0.0 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>perspective_point_height</tt> </td><td> Records the the height, <em>in metres</em>, of the map projection perspective point above the ellipsoid (or sphere). Used by perspective-type map projections, for example the Vertical Perspective Projection, which may be used to simulate the view from a Meteosat satellite. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>semi_major_axis</tt> </td><td> Specifies the length, <em>in metres</em>, of the semi-major axis of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. Commonly denoted using the symbol <em>a</em>. In the case of a spherical Earth approximation this attribute defines the radius of the Earth. See also the <tt>inverse_flattening</tt> attribute. 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>semi_minor_axis</tt> </td><td> Specifies the length, <em>in metres</em>, of the semi-minor axis of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth. Commonly denoted using the symbol <em>b</em>. In the case of a spherical Earth approximation this attribute should be omitted (the preferred option) or else set equal to the value of the <tt>semi_major_axis</tt> attribute. See also the <tt>inverse_flattening</tt> attribute. 
+</td></tr></table>
+<p>
+A new column for <strong>Type</strong> is to be added to the table, indicating the data type of each attribute, as in Table A.1. The following text is needed to explain the new column:
+</p>
+<p>
+The "Type" values are <strong>S</strong> for string and <strong>N</strong> for numeric.
+</p>
+<p>
+All the attributes have type <strong>N</strong> except for <tt>crs_name</tt>, <tt>ellipsoid_name</tt>, <tt>geodetic_datum_name</tt> and <tt>projection_name</tt>, which have type <strong>S</strong>.
+</p>
+<h3 id="AmendmenttoAppendixFTableF.1GridMappingAttributes">Amendment to Appendix F, Table F.1, Grid Mapping Attributes</h3>
+<table class="wiki">
+<tr><td> <strong>Attribute</strong>  </td><td> <strong>Definition</strong> 
+</td></tr></table>
+<table class="wiki">
+<tr><td> <tt>standard_parallel</tt> </td><td> Specifies the line, or lines, of latitude at which the developable map projection surface (plane, cone, or cylinder) touches the reference sphere or ellipsoid used to represent the Earth. Since there is zero scale distortion along a standard parallel it is also referred to as a "latitude of true scale". In the situation where a conical developable surface intersects the reference ellipsoid there are two standard parallels, in which case this attribute can be used as a vector to record both latitude values, with the additional convention that the standard parallel nearest the pole (N or S) is provided first. Domain: -90.0 &lt;= standard_parallel &lt;= 90.0 decimal degrees. 
+</td></tr></table>
+<h3 id="RetitlingofthesubsectionsofAppendixF">Retitling of the subsections of Appendix F</h3>
+<p>
+The description of each <tt>grid_mapping_name</tt> described in Appendix F (<tt>albers_conical_equal_area</tt>, <tt>azimuthal_equidistant</tt> etc.) should constitute an unnumbered subsection of the appendix. At the moment they are given titles of "Example", but that is an error which was introduced when the CF standard document was translated into its present form. They are subsections, not examples.
+</p>
+<h3 id="Additionofgrid_mappingsubsectionstoAppendixF">Addition of <tt>grid_mapping</tt> subsections to Appendix F</h3>
+<p>
+<strong>Latitude-Longitude</strong>
+</p>
+<p>
+<tt>grid_mapping_name = latitude_longitude</tt>
+</p>
+<p>
+This grid mapping defines the canonical 2D geographical coordinate system based upon latitude and longitude coordinates on a spherical Earth. It is included so that the figure of the Earth can be described.
+</p>
+<p>
+<strong><em>Map parameters:</em></strong> None.
+</p>
+<p>
+<strong><em>Map coordinates:</em></strong>
+</p>
+<p>
+The rectangular coordinates are longitude and latitude identified by the usual conventions (Sections 4.1 and 4.2).
+</p>
+<p>
+<strong>Vertical perspective</strong>
+</p>
+<p>
+<tt>grid_mapping_name = vertical_perspective</tt>
+</p>
+<p>
+<strong><em>Map parameters:</em></strong>
+</p>
+<ul><li><tt>latitude_of_projection_origin</tt>
+</li><li><tt>longitude_of_projection_origin</tt>
+</li><li><tt>perspective_point_height</tt>
+</li><li><tt>false_easting</tt>
+</li><li><tt>false_northing</tt>
+</li></ul><p>
+<strong><em>Map coordinates:</em></strong>
+</p>
+<p>
+The x (abscissa) and y (ordinate) rectangular coordinates are identified by the <tt>standard_name</tt> attribute value <tt>projection_x_coordinate</tt> and <tt>projection_y_coordinate respectively</tt>.
+</p>
+<p>
+<strong><em>Notes:</em></strong>
+</p>
+<p>
+Notes on using the PROJ.4 software packages for computing the mapping may be found at <a class="ext-link" href="http://www.remotesensing.org/geotiff/proj_list/geos.html"><span class="icon">​</span>http://www.remotesensing.org/geotiff/proj_list/geos.html</a>. These notes assume the point of perspective is directly over the equator. A more general description of vertical perspective projection is given in [Snyder], pages 169-181.
+</p>
+<h3 id="NewexamplesinSection5.6GridMappingsandProjections">New examples in Section 5.6, Grid Mappings and Projections</h3>
+<p>
+<strong>Example. Latitude and longitude on a spherical Earth.</strong>
+</p>
+<pre class="wiki">dimensions:
+  lat = 18 ;
+  lon = 36 ;
+variables:
+  double lat(lat) ;
+  double lon(lon) ;
+  float temp(lat, lon) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:grid_mapping = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "latitude_longitude"
+    crs:crs_name = "Spherical 2D Coordinate System" ;
+    crs:ellipsoid_name = "sphere" ;
+    crs:semi_major_axis = 6371000.0 ;
+    crs:inverse_flattening = 0 ;
+</pre><p>
+<strong>Example. Latitude-Longitude on the WGS 1984 Datum.</strong>
+</p>
+<p>
+As in the previous example except for the <tt>grid_mapping</tt> variable:
+</p>
+<pre class="wiki">  int crs ;
+    crs:grid_mapping_name = "latitude_longitude";
+    crs:crs_name = "WGS 84" ;
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:ellipsoid_name = "WGS 84" ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+</pre><p>
+<strong>Example. British National Grid.</strong>
+</p>
+<pre class="wiki">dimensions:
+  lat = 648 ;
+  lon = 648 ;
+  y = 18 ;
+  x = 36 ;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:units = "m" ;
+  double lat(y, x) ;
+  double lon(y, x) ;
+  float temp(y, x) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "transverse_mercator";
+    crs:crs_name = "OSGB 1936 / British National Grid" ;
+    crs:ellipsoid_name = "Airy 1830" ;
+    crs:semi_major_axis = 6377563.396 ;
+    crs:semi_minor_axis = 6356256.910 ;
+    crs:inverse_flattening = 299.3249646 ;
+    crs:latitude_of_projection_origin = 49.0 ;
+    crs:longitude_of_projection_origin = -2.0 ;
+    crs:false_easting = 400000.0 ;
+    crs:false_northing = -100000.0 ;
+    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+</pre><h3 id="AdditionstoBibliography">Additions to Bibliography</h3>
+<p>
+[OGP/EPSG] <a class="ext-link" href="http://www.epsg.org/"><span class="icon">​</span>http://www.epsg.org/</a> and <a class="ext-link" href="http://www.epsg-registry.org/"><span class="icon">​</span>http://www.epsg-registry.org/</a>
+</p>
+<p>
+[Snyder] J Snyder. 1987. "Map Projections -- A Working Manual", USGS Professional Paper 1395.
+</p>
+<h3 id="Changetoconformancedocument">Change to conformance document</h3>
+<p>
+New requirements for 5.6
+</p>
+<ul><li>The data types of the attributes of the grid mapping variable must be as specified in Table 1 of Appendix F.
+</li></ul>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1206047195000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-03-20T14%3A06%3A35-07%3A00&amp;precision=second" title="See timeline at 03/20/08 14:06:35">13 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan,
+</p>
+<p>
+Just four comments:
+</p>
+<p>
+1) I think crs_name and ellipsoid_name should be removed or the definitions should say that they are only to be used as a human-readable label and specifically that certain values don't imply the values of any other attributes. Also, in the ellipsoid_name definition, the value "sphere" should not be explicitly suggested as there are a number of possible named spheres (with EPSG codes).
+</p>
+<p>
+2) Should we have default values for the ellipsoid attributes? Clients are going to have to assume something if the attributes are missing.
+</p>
+<p>
+3) To your new sentence in the Appendix F preamble, we should change "describe the ellipsoid" to "describe the ellipsoid and prime meridian".
+</p>
+<p>
+4) If we are going to add "latitude_longitude", we should extend the CF Grid Mapping concept to include the more general CRS concept. As it stands "Grid Mapping" is specifically defined for mapping between x(x)/y(y) and lat(x,y)/lon(x,y). It is not defined for specifying the CRS of lat(lat)/lon(lon). This should be a pretty minor change I think. So, here's my suggested changes:
+</p>
+<hr />
+<h3 id="ChangethetitleofSection5.6">Change the title of Section 5.6</h3>
+<p>
+5.6 Horizontal Coordinate Reference Systems, Grid Mappings, and Projections
+</p>
+<h3 id="AddthefollowingparagraphasthesecondparagraphinSection5.6">Add the following paragraph as the second paragraph in Section 5.6</h3>
+<p>
+When the coordinate variables for a horizontal grid are longitude and latitude, the horizontal coordinate reference system (CRS) may be described using the grid_mapping attribute. In particular, the latitude_longitude grid mapping should be used to specify the ellipsoid and prime meridian attributes.
+</p>
+<hr />
+<p>
+That is it for me. Looks good otherwise.
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1206086492000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-03-21T01%3A01%3A32-07%3A00&amp;precision=second" title="See timeline at 03/21/08 01:01:32">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        <em>fixed</em> deleted
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>closed</em> to <em>reopened</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Dear Ethan
+</p>
+<ol><li>refers to the text Phil proposed but has not been commented on before. In order to draw a conclusion on this ticket, I don't think we should debate it. Hence, I think we should <strong>remove <tt>crs_name</tt> and <tt>ellipsoid_name</tt> from the additions to be made to Appendix F</strong>. If required, they should be reproposed in a new ticket.
+</li></ol><ol start="2"><li>could be said about other optional attributes as well. It is not mandatory to define the ellipsoid. For instance in GCMs a realistic ellipsoid probably has not been considered at all and the radius of the Earth is not generally important for analysis or recorded in the model output. Hence, I think we can leave this silent but defaults could be proposed in a new ticket.
+</li></ol><ol start="3"><li>Thanks for picking that up. New text appended.
+</li></ol><ol start="4"><li>Thanks for picking that up too. New text appended - a simplified version of yours.
+</li></ol><p>
+In view of these changes, I am reopening the ticket for three weeks (following the rules) so further comments can be made. Velimir, please don't make the changes yet. The proposal is now as in my last summary, as modified here. I'd like to ask people only to append to this ticket if they object to any of it. For additions, please could you wait until we have concluded this ticket, then open new ones. Thanks.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+<h3 id="AdditiontopreambleofAppendixFGridMappings">Addition to preamble of Appendix F, Grid Mappings</h3>
+<p>
+Append to the first paragraph: "The attributes which describe the ellipsoid  and prime meridian may be included, when applicable, with any grid mapping." 
+</p>
+<h3 id="ChangethetitleofSection5.6">Change the title of Section 5.6</h3>
+<p>
+5.6 Horizontal Coordinate Reference Systems, Grid Mappings, and Projections
+</p>
+<h3 id="AddthefollowingparagraphasthesecondparagraphinSection5.6">Add the following paragraph as the second paragraph in Section 5.6</h3>
+<p>
+When the coordinate variables for a horizontal grid are longitude and latitude, a grid mapping variable with <tt>grid_mapping_name</tt> of <tt>latitude_longitude</tt> may be used to specify the ellipsoid and prime meridian.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1208184094000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-14T07%3A41%3A34-07%3A00&amp;precision=second" title="See timeline at 04/14/08 07:41:34">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>reopened</em> to <em>closed</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Dear Phil, Velimir and all
+</p>
+<p>
+There have been no further comments for three weeks on the present summary of Phil's ticket. Therefore the discussion is concluded, and I'm going to close this ticket again. Velimir, please could you make the changes required? There are changes in in the standard document (to be marked as provisional) and the conformance document; the version number should be incremented, and Phil should be added to the list of Additional Authors. The changes are as detailed in my long posting of 03/20/08 12:42:50, modified by my posting of 03/21/08 01:01:32. (Please ask me by email if these are not clear.)
+</p>
+<p>
+The addition of name/id attributes and of new grid mappings could now be proposed in new tickets. Thanks to all concerned for your work on this one.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./18?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./18?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./18?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

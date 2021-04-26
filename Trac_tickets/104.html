@@ -1,0 +1,3662 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #104 (Clarify the interpretation of scalar coordinate variables)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./103.html" title="ticket #103" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./104?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./104?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./104?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./105.html" title="ticket #105" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./103.html" title="ticket #103">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./105.html" title="ticket #105">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2013-06-13T10%3A00%3A21-07%3A00&amp;precision=second" title="See timeline at 06/13/13 10:00:21">8 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2017-03-28T13%3A02%3A43-07%3A00&amp;precision=second" title="See timeline at 03/28/17 13:02:43">4 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./104.html" class="trac-id">#104</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Clarify the interpretation of scalar coordinate variables</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=jonathan">jonathan</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner"><a href="/trac/query?status=!closed&amp;owner=davidhassell">davidhassell</a></td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+David Hassell and I propose the following changes to the CF standard document to clarify the interpretation of scalar coordinate variables. We do not think this is a material change to the convention, which already implies this interpretation, and we believe this interpretation is what was intended when scalar coordinate variables were introduced.
+</p>
+<p>
+<strong>Section 5.7, Scalar coordinate variables.</strong>
+</p>
+<p>
+The convention contains the following sentences:
+</p>
+<blockquote>
+<p>
+Under COARDS the method of providing a single valued coordinate was to add a dimension of size one to the variable, and supply the corresponding coordinate variable. The new scalar coordinate variable is a convenience feature which avoids adding size one dimensions to variables. Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable.
+</p>
+</blockquote>
+<p>
+These sentences are OK as they stand, we think, but it would be better to describe the current situation without emphasising its history, so we would propose to replace them with the following. In addition, we propose to add a bit extra, as shown, to the second sentence below:
+</p>
+<blockquote>
+<p>
+The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A scalar coordinate variable has the same information content and can be used in the same contexts as a size one coordinate variable, if numeric, or a size one auxiliary coordinate variable, if a string (Section 6.1).
+</p>
+</blockquote>
+<p>
+The next sentence would be unchanged; it mentions how this situation relates to that of the COARDS convention.
+</p>
+<p>
+At the end of the section, after the example, we propose to append the
+following sentences:
+</p>
+<blockquote>
+<p>
+If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (for instance, time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
+</p>
+</blockquote>
+<p>
+We think the above interpretation and implications are consistent with the convention already, which says in this section that, "Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable". However, it would be an improvement to spell it out.
+</p>
+<p>
+<strong>Section 6.1, Labels</strong>
+</p>
+<p>
+Replace the last sentence
+</p>
+<blockquote>
+<p>
+If a character variable has only one dimension (the maximum length of the string), it is regarded as a string-valued scalar coordinate variable, analogous to a numeric scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables).
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+If a character variable has only one dimension (the maximum length of the string), it is a string-valued scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables). As such, it has the same information content and can be used in the same contexts as a string-valued auxiliary coordinate variable of a size one dimension. This is a convenience feature which avoids adding the size one dimension to the data variable.
+</p>
+</blockquote>
+<p>
+The last part is a repetition of what Section 5.7 says. The reason for the change is that the existing wording is careless in implying that a string could be a coordinate variable; in fact, this is not possible, since string- value coordinates must be auxiliary coordinate variables.
+</p>
+<p>
+The interpretation of scalar coordinate variables in Section 9 may be different from the above, and this may require further clarification if the above is agreed.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(71)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1371146516000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-13T11%3A01%3A56-07%3A00&amp;precision=second" title="See timeline at 06/13/13 11:01:56">8 years ago</a> by mgschultz
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan and David,
+</p>
+<p>
+For the most part I like your changes and vote for them. Only one minor suggestion on the first alteration: I think it would be even clearer if we split the second sentence:
+</p>
+<blockquote>
+<p>
+A scalar coordinate variable has the same information content and can be used in the same contexts as a size one coordinate variable, if numeric. Scalar string coordinate variables (Section 6.1) can be used as size one auxiliary coordinate variables.
+</p>
+</blockquote>
+<p>
+Best regards,
+</p>
+<p>
+Martin 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1371211322000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-14T05%3A02%3A02-07%3A00&amp;precision=second" title="See timeline at 06/14/13 05:02:02">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+I think it's fine to split the sentence - thanks, good idea. I would suggest we insert some extra words to make it even clearer:
+</p>
+<blockquote>
+<p>
+A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1). 
+</p>
+</blockquote>
+<p>
+Is that all right?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1371212097000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-14T05%3A14%3A57-07%3A00&amp;precision=second" title="See timeline at 06/14/13 05:14:57">8 years ago</a> by mgschultz
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Perfect! Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1371464137000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:5" class="follow-up">↓ 5</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-17T03%3A15%3A37-07%3A00&amp;precision=second" title="See timeline at 06/17/13 03:15:37">8 years ago</a> by edward.campbell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello,
+</p>
+<p>
+I strongly disagree with your proposed change. You claim that this is a clarification and not a material change. I do not agree with this. Specifically, you wish to append a section stating that if a data variable has two or more scalars coordinate variables those scalar coordinate variables are independent. This is not currently the case - they may be independent, they may not be - the conventions make no assertion either way. If the dimensions are not specified one cannot currently infer independence. Put another way, without a dimension (a direction if you like) these are true scalars as opposed to unit vectors. Your proposed change will impose a single interpretation of existing data where a single interpretation does not currently exist. That in my view constitutes a material change.
+</p>
+<p>
+Ed
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1371500092000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+        in reply to:
+    <a href="#comment:4">↑ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-17T13%3A14%3A52-07%3A00&amp;precision=second" title="See timeline at 06/17/13 13:14:52">8 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./104#comment:4" title="Comment 4">edward.campbell</a>:
+</p>
+<p>
+Dear Ed,
+</p>
+<p>
+Thank you for posting on our proposal.
+</p>
+<p>
+This view is, of course, not unexpected. However, to move things on from the current area of discussion on this point (on this ticket and elsewhere), I suggest that it would be useful if you, or anyone, could post some examples of software libraries which by design interpret, read or write CF-netCDF datasets in the manner in which suggest. This would give us some evidence for or against your assertions about the reinterpretation of existing datasets, and how widespread this practice may be. I don't know of any, but I'm the first to admit that I'm familiar with only a small fraction of what is out there.
+</p>
+<blockquote class="citation">
+<p>
+If the dimensions are not specified one cannot currently infer independence. Put another way, 
+without a dimension (a direction if you like) these are true scalars as opposed to unit 
+vectors. Your proposed change will impose a single interpretation of existing data where a 
+single interpretation does not currently exist. That in my view constitutes a material change.
+</p>
+</blockquote>
+<p>
+I don't agree with your 'direction' analogy. Scalar coordinates are often endowed with a direction, via some combination of their <tt>positive</tt> property, their <tt>units</tt> property and their bounds' values. So I would say that they are indeed logically equivalent to unit vectors.
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1371557485000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-18T05%3A11%3A25-07%3A00&amp;precision=second" title="See timeline at 06/18/13 05:11:25">8 years ago</a> by edward.campbell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+David,
+</p>
+<p>
+Thanks for the response. I'm intrigued that you think units, bounds and/or a positive attribute can combine to turn a scalar quantity into a vector quantity. I do not believe this to be true, but putting that aside, I think your call for implementations that would be affected by this change is a good idea. However, given that the spec is not clear I suspect the interpretation we are debating may also be within user code rather than the libraries that load the data from file. Despite this I support your call for evidence so we can make an informed decision.
+</p>
+<p>
+Ed
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1371559057000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-18T05%3A37%3A37-07%3A00&amp;precision=second" title="See timeline at 06/18/13 05:37:37">8 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Small detail in the text, both old and new:
+</p>
+<p>
+'If a character variable has only one dimension (the maximum length of the string), it is a string-valued scalar coordinate variable' ...
+</p>
+<p>
+This implies that all 1-d character variables are coordinates; not true. Can this be edited while you're modifying this section of the text?
+</p>
+<p>
+Thanks - Nan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1371637365000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-19T03%3A22%3A45-07%3A00&amp;precision=second" title="See timeline at 06/19/13 03:22:45">8 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I disagree with this proposal.
+</p>
+<blockquote class="citation">
+<p>
+We do not think this is a material change to the convention, which already implies this interpretation, and we believe this interpretation is what was intended when scalar coordinate variables were introduced. 
+</p>
+</blockquote>
+<p>
+Such an implication is really not clear in the conventions as they stand.
+</p>
+<p>
+The reinterpretation of existing CF compliant data implied by the 'defect' status of this ticket is particularly undesirable.
+</p>
+<p>
+I view this as a regressive proposal, limiting the utility of CF for a number of scenarios without good justification.  This functionality is providing benefit to the community and we should not remove that. 
+</p>
+<blockquote class="citation">
+<p>
+The interpretation of scalar coordinate variables in Section 9 may be different from the above, and this may require further clarification if the above is agreed. 
+</p>
+</blockquote>
+<p>
+This statement highlights to me that the interpretation put forward here is not complete. 
+</p>
+<p>
+I have significant reservations about having a whole range of interpretations of scalar coordinate variables depending on the context they exist in with respect to a data variable.
+</p>
+<p>
+This is a particularly confusing approach for data creators and I fear it will lead to CF compliant data sets where the intended meaning is not correctly encoded.
+</p>
+<p>
+I think there is a better way to approach this, which will deliver a cleaner and clearer result.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1371655699000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+        in reply to:
+    <a href="#comment:description">↑ description</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-19T08%3A28%3A19-07%3A00&amp;precision=second" title="See timeline at 06/19/13 08:28:19">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Nan
+</p>
+<p>
+Thank you for your comment. In the context of the whole paragraph, it is probably clearer than it appears when quoted by itself, but I agree it could be clarified further. Thanks for the suggestion. We could replace "character variable" in this sentence with "string-valued auxiliary coordinate variable". Is that OK?
+</p>
+<p>
+Here are the text changes we are now proposing, following Martin's and Nan's comments.
+</p>
+<p>
+<strong>Section 5.7, Scalar coordinate variables.</strong>
+</p>
+<p>
+Replace
+</p>
+<blockquote>
+<p>
+Under COARDS the method of providing a single valued coordinate was to add a dimension of size one to the variable, and supply the corresponding coordinate variable. The new scalar coordinate variable is a convenience feature which avoids adding size one dimensions to variables. Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable.
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1). 
+</p>
+</blockquote>
+<p>
+At the end of the section, add:
+</p>
+<blockquote>
+<p>
+If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (for instance, time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
+</p>
+</blockquote>
+<p>
+<strong>Section 6.1, Labels</strong>
+</p>
+<p>
+Replace the last sentence
+</p>
+<blockquote>
+<p>
+If a character variable has only one dimension (the maximum length of the string), it is regarded as a string-valued scalar coordinate variable, analogous to a numeric scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables).
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+If a string-valued auxiliary coordinate variable has only one dimension (the maximum length of the string), it is a string-valued scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables). As such, it has the same information content and can be used in the same contexts as a string-valued auxiliary coordinate variable of a size one dimension which has not been added to the data variable. This is a convenience feature.
+</p>
+</blockquote>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1371655977000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-19T08%3A32%3A57-07%3A00&amp;precision=second" title="See timeline at 06/19/13 08:32:57">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Ed and Mark
+</p>
+<p>
+As you know, this is a long-running discussion with Mark. However, I maintain that what David and I propose here is what the convention is intended to mean. Firstly, this is because I am confident that it's what the authors of the convention had in mind when scalar coordinate variables were invented. Of course memories are not perfect, so I cannot be certain, but that's my honest recollection. Secondly, I think it is the most obvious interpretation of the words as they stand now. If we wanted to introduce a conceptually different kind of coordinate variable, it would be misleading to write, "Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable." I would say that the evident intention of that statement is that scalar coordinate variables <em>mean</em> the same as size one coordinate variables (not size one auxiliary coordinate variables). Thirdly, it is sufficient to have two abstract kinds of coordinate variable, and because it is simpler it should be preferred.
+</p>
+<p>
+David and I propose these changes because Mark suggests an alternative interpretation, which would not be what the convention was intended to mean, and which we would therefore like to exclude. Our aim is to clarify the intention of the CF document. That is why this is a defect ticket. The document is erroneous in apparently allowing an interpretation which was not intended.
+</p>
+<p>
+Your arguments are concerned with flexibility in the interpretation of CF-compliant data. I think that's a different matter from what the convention means. It's fine to reinterpret data as part of analysing or processing it. That's a routine thing to do. Therefore our statement of what the convention means does not prevent your interpretation of CF-compliant data. I wrote about this on <a class="ext-link" href="http://mailman.cgd.ucar.edu/pipermail/cf-metadata/2013/056615.html"><span class="icon">​</span>the email list</a>. It would be interesting to know your response to that (on the email list). I appreciate that you would be rightly concerned if there was a loss of flexibility, but I really don't think you need to be. You can offer the user of software a flexibility in interpreting scalar coordinate variables, if you want to (changing size one Unidata coordinate variables into size-one auxiliary coordinate variables or vice-versa). It is flexibility in the treatment of data which is of benefit to users of data.
+</p>
+<p>
+I appeal to you to consider this argument as a kind of compromise and to allow the clarification we propose to be made.
+</p>
+<p>
+Best wishes and thanks
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1371656967000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-19T08%3A49%3A27-07%3A00&amp;precision=second" title="See timeline at 06/19/13 08:49:27">8 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi guys,
+</p>
+<p>
+It's clear that convictions run deep on this issue.  It is a lot less clear what "this issue" is (so many demonstrative pronouns!).  Here is the disputed paragraph, right?
+</p>
+<blockquote>
+<p>
+o If a data variable has two or more scalar coordinate variables, they are regarded as though they were all <strong>independent</strong> coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (for instance, time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
+</p>
+</blockquote>
+<p>
+Concrete examples that illustrate the undesirable interpretations are needed. (At least for this discussion.) The text as it stands is awfully dense to serve us well in the standard.  If readers go away scratching their heads about the intended meaning, there will be divergent interpretations. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1371665996000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-19T11%3A19%3A56-07%3A00&amp;precision=second" title="See timeline at 06/19/13 11:19:56">8 years ago</a> by mcginnis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I would like to second Steve's request for some examples that illustrate the different interpretations.  
+</p>
+<p>
+I've been following this issue both here and on the mailing list, and I have to admit that despite my best attempts, I just don't understand what folks are disagreeing about, and I suspect that I am not alone...
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1371717448000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:14" class="follow-up">↓ 14</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-20T01%3A37%3A28-07%3A00&amp;precision=second" title="See timeline at 06/20/13 01:37:28">8 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I will try to illustrate a useful example.  Consider a CF compliant NetCDF data variable with a 2 dimensional data array and two coordinate variables:
+</p>
+<ul><li>latitude
+</li><li>longitude
+</li></ul><p>
+This data variable declares auxiliary coordinates, using the coordinates attribute.  All but one of these are scalar coordinate variables:
+</p>
+<ul><li>surface_pressure(latitude, longitude)
+</li><li>a
+</li><li>p0 
+</li><li>b
+</li><li>time
+</li><li>forecast_period
+</li><li>forecast_reference_time
+</li><li>source
+</li><li>experiment_id
+</li><li>model_id
+</li></ul><p>
+We have many such data sets.  Often these are converted from other formats using one of a number on converters developed inside my office and by collaborating organisations over the past few years.  Sometimes they are the results of analyses which have been persisted by researchers.
+</p>
+<p>
+These have always been viewed as reasonable data sets, given the comprehension of scalar coordinate variables.
+</p>
+<p>
+Under this proposal, this data set would be viewed as exactly equivalent to 
+</p>
+<p>
+a CF compliant NetCDF data variable with an 11 dimensional data array and 11 coordinate variables:
+</p>
+<ul><li>latitude
+</li><li>longitude
+</li><li>a
+</li><li>p0 
+</li><li>b
+</li><li>time
+</li><li>forecast_period
+</li><li>forecast_reference_time
+</li><li>source
+</li><li>experiment_id
+</li><li>model_id
+</li></ul><p>
+along with one auxiliary coordinate:
+</p>
+<ul><li>surface_pressure(latitude, longitude)
+</li></ul><p>
+The proposal makes explicit that there should be no semantic differentiation between the two data sets, the first is merely an encoding short hand for the second.
+</p>
+<p>
+This interpretation does not adequately reflect the data and metadata.  It defines a set of independent coordinates which were not intended to be independent by the data creator.  This will cause considerable confusion in the interpretation of these data sets, most of which are in storage, to be returned to at a later date as required.
+</p>
+<p>
+If the data creators had been shown an 11 dimensional data set when they created it, they would have very likely raised questions about the output, but the scalar coordinate variable has not been interpreted in this way. The first encoding appeared to people to be a logical and sensible representation of their data. 
+</p>
+<p>
+Scalar coordinate variables have been viewed by users as semantic containers: no clear statement existed in the conventions to disagree with this perspective.
+</p>
+<p>
+In most cases these data creators used software which had been deemed appropriate by the organisation and trusted its output would be valid.  For years it has been deemed to be valid.
+</p>
+<p>
+With cases such as this in mind, I do not think the community have the luxury of making decisions solely based on confidence in what the authors of the convention had in mind when scalar coordinate variables were invented. I think the interpretation of these features of the convention by users needs to be taken into account.
+</p>
+<p>
+I have previously posted examples from the discrete sampling geometries section of the conventions which require different interpretation.  I do not agree with the proposed approach of handling these as further special cases, requiring further clarification text not in this proposal.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1371724723000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+        in reply to:
+    <a href="#comment:13">↑ 13</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-20T03%3A38%3A43-07%3A00&amp;precision=second" title="See timeline at 06/20/13 03:38:43">8 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./104#comment:13" title="Comment 13">markh</a>:
+</p>
+<p>
+Dear Mark,
+</p>
+<p>
+Thank you for posting an example, especially one which also describes the position that Jonathan and I are stating. 
+</p>
+<blockquote class="citation">
+<p>
+This interpretation does not adequately reflect the data and metadata.  It defines a set of independent coordinates which were not intended to be independent by the data creator.
+</p>
+</blockquote>
+<p>
+Interesting that you should say this. If the creator had intended for some of these size one coordinates to be dependent, I rather think that they should have indicated this when they created the dataset, by giving them a shared dimension. How else can we know what the creator intended? A human can try to infer (correctly?), but a computer can't.
+</p>
+<p>
+For example, I might presume from their names that you mean <tt>a</tt>, <tt>p0</tt> and <tt>b</tt> to be related height coordinates (but as the data variable varible is surface pressure, I'm not 100% sure ...). If so, then these should have been written as something like the size 1, 1-d coordinates <tt>a(height)</tt>, <tt>p0(height)</tt>, <tt>b(height)</tt> and don't need to be listed in the <tt>coordinates</tt> attribute.
+</p>
+<blockquote class="citation">
+<p>
+If the data creators had been shown an 11 dimensional data set when they created it, they would have very likely raised questions about the output, but the scalar coordinate variable has not been interpreted in this way. The first encoding appeared to people to be a logical and sensible representation of their data.
+</p>
+</blockquote>
+<p>
+... and perhaps wished that they had clearly encoded the relationships between dependent variables when they created the file in the first place. You seem to ackowledge that the creator meant to indicate that some coordinates are related, but has neglected to encode this in the file.
+</p>
+<p>
+Given that we have a mechanism for linking dependent size 1 coordinates (via a shared dimension), if no link is specified then I prefer the only unambiguous interpretation: the exact opposite - i.e. they are independent.
+</p>
+<p>
+I would rather not change the convention just to attach credibility to some datasets which were unintentionally created without all of the relevent information.
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+ 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1371746864000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:21" class="follow-up">↓ 21</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-20T09%3A47%3A44-07%3A00&amp;precision=second" title="See timeline at 06/20/13 09:47:44">8 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+What CF calls a "scalar coordinate variable" is syntactically an "auxiliary coordinate" i.e. it lacks the axname(axname) syntax, and it is associated with a variable via the coordinates attribute.  About "auxiliary coordinate variables" CF says
+</p>
+<pre class="wiki">The use of coordinate variables is required whenever they are applicable. That is, auxiliary coordinate variables may not be used as the only way to identify latitude and longitude coordinates that could be identified using coordinate variables.
+</pre><p>
+So for length &gt;1 coordinates CF <strong>insists</strong> on using the axname(axname) syntax.  but for length=1 coordinates CF allows us to borrow the auxiliary coordinate syntax.  Through these 2 rules CF has orphaned the concept of a "scalar auxiliary coordinate variable".  This missing concept lies at the heart of the current discussion.
+</p>
+<p>
+This is a genuine flaw in the current CF specification.  It deserves to be fixed.  The text at the start of this trac ticket is wrong when it says that it is not proposing a <em>material change</em>.  But it is a needed change.
+</p>
+<p>
+The text, however, deserves to be expanded to much better illuminate the nature of the problem that it is fixing.  Frankly, it should get explicit in saying that it is defining a rule that addresses an ambiguity created by the definitions of <em>auxiliary coordinate variable</em> and <em>scalar coordinate variable</em>. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1371747822000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-20T10%3A03%3A42-07%3A00&amp;precision=second" title="See timeline at 06/20/13 10:03:42">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark
+</p>
+<p>
+Thanks for your example. I think it is notable that you say netCDF datasets with many scalar coordinate variables have often been converted from other formats. I would suggest this means the people who wrote the converters didn't fully understand the CF convention, and if so, this is a mistake. Indeed, a previous email exchange that we had revealed that I had made such a mistake in my conversion program pp_cfwrite, which I'll correct. (Namely, even if there is only one model level, it should have a size-one dimension for the level, in order to indicate that the model level number and the vertical coordinate are linked.)
+</p>
+<p>
+Why are a, p0 and b included as auxiliary coordinate variables? - David also asks about them. I guess they are formula terms for the atmosphere hybrid sigma pressure coordinate. Formula terms are not normally listed by the coordinates attribute; there is no prohibition on doing that, but I don't see it suggested in Section 4.3.2. Similarly perhaps surface_pressure is also a formula term (ps in the formula) and should not be in the coordinates attribute. Why isn't there a vertical coordinate variable (perhaps a scalar)? This variable ought to have a formula_terms attribute, pointing to these other quantities.
+</p>
+<p>
+As you and Richard have pointed out before, there is a link between forecast_period, forecast_reference_time and time. This link should be indicated in the file by use of coordinate and auxiliary coordinate variables, rather than coding them all as scalars.
+</p>
+<p>
+In the CF convention, source is an attribute, not a coordinate variable.
+</p>
+<p>
+If experiment_id and model_id could vary separately, it is fine to have them as scalar coordinate variables. On the other hand, if this data variable is really one from a set of experiment--model combinations, it would be more informative to encode them as auxiliary coordinate variables of a shared size one dimension, because they belong together.
+</p>
+<p>
+I think this variable is probably equivalent to one which has six independent dimensions (latitude, longitude, vertical, time, forecast time, and ensemble member). This is fine, I think, since a variable in which all six of these dimensions were multivalued is quite likely to be useful sometimes.
+</p>
+<p>
+I'm not suggesting that the file is erroneous. It no doubt passes the CF checker and is CF-compliant, but it is not ideal. It suggests that certain quantities are independent coordinates which actually are not. The problem is that many errors cannot be formally detected, because much of CF is optional, and because we allow everything which is not explicitly probibited, in order to allow other conventions to be used in combination with CF. So I don't think the data creator should be worried by our being more precise about what CF is intended to mean. It will still be a valid file, but not a good example of CF.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1371755180000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:18" class="follow-up">↓ 18</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-20T12%3A06%3A20-07%3A00&amp;precision=second" title="See timeline at 06/20/13 12:06:20">8 years ago</a> by biard
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I've been following this TRAC ticket and the discussion on the listserv, and I am wondering if I have correctly understood the point under dispute.  Is the statement below a fair representation of the difference between the two "camps"?
+</p>
+<p>
+The point under dispute is whether scalar coordinate variables should be assumed to have (implied) size-one dimensions that are independent of one another, or whether there should be no assumption at all made about dependence or independence of the implied dimensions.
+</p>
+<p>
+Does that sum it up, or is there something more?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1371803180000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+        in reply to:
+    <a href="#comment:17">↑ 17</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-21T01%3A26%3A20-07%3A00&amp;precision=second" title="See timeline at 06/21/13 01:26:20">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jim et al.
+</p>
+<p>
+Replying to <a class="ticket" href="./104#comment:17" title="Comment 17">biard</a>:
+</p>
+<blockquote class="citation">
+<p>
+The point under dispute is whether scalar coordinate variables should be assumed to have (implied) size-one dimensions that are independent of one another, or whether there should be no assumption at all made about dependence or independence of the implied dimensions.
+</p>
+<p>
+Does that sum it up, or is there something more?
+</p>
+</blockquote>
+<p>
+Yes, I think that's right. That's the contentious point.
+</p>
+<p>
+It has an implication for the CF logical data model (that is, an abstraction of the way we encode the metadata in a netCDF file). Mark and Ed think that scalar coordinate variables are a distinct concept in the logical data model from coordinate variables and auxiliary coordinate variables. David and I think that scalar coordinate variables are a convenient shorthand for coordinate variables and auxiliary coordinate variables, and not a distinct concept of the logical data model.
+</p>
+<p>
+Like Mark, Steve thinks that defining this either way is a material change rather than a clarification or a correction of the convention. Steve writes
+</p>
+<blockquote class="citation">
+<p>
+This is a genuine flaw in the current CF specification. It deserves to be fixed. The text at the start of this trac ticket is wrong when it says that it is not proposing a material change. But it is a needed change. 
+</p>
+</blockquote>
+<p>
+I think it isn't a change in the convention, myself, but since it is contentious I'm happy to change this ticket to a proposal for amendment rather than a defect ticket. That means it needs to be positively agreed, rather than agreed by default if not objected to. At the moment, it can't be agreed as a defect ticket anyway because there are outstanding objections. As Steve says,
+</p>
+<blockquote class="citation">
+<p>
+[This ticket] addresses an ambiguity created by the definitions of auxiliary coordinate variable and scalar coordinate variable.
+</p>
+</blockquote>
+<p>
+Our intention is to remove that ambiguity by clarifying that scalar coordinate variables represent size-one numeric coordinate variables and size-one string-valued auxiliary coordinate variables. We don't think that in practice this will limit the flexibility that software has in interpreting CF-netCDF files, and it doesn't make any existing file invalid. Really it's only an issue for the logical data model, we think.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1371803191000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-21T01%3A26%3A31-07%3A00&amp;precision=second" title="See timeline at 06/21/13 01:26:31">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-type">
+      <strong class="trac-field-type">Type</strong>
+        changed from <em>defect</em> to <em>enhancement</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-20-1371857858000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-21T16%3A37%3A38-07%3A00&amp;precision=second" title="See timeline at 06/21/13 16:37:38">8 years ago</a> by mcginnis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks for providing that example!  It's very helpful, and I think I actually understand the discussion now.
+</p>
+<p>
+Jonathan's interpretation of the example file makes sense to me.  Listing the source and the formula terms for the sigma height in the coordinates attribute seems strange to me.
+</p>
+<p>
+I wouldn't go so far as to actively campaign for assuming that scalar coordinate variable implies size-one dimension -- the issue of older files NOT assuming that makes me prefer to abstain -- but I will say that it's what I always thought it meant based on the CF spec.
+</p>
+<p>
+Cheers,
+</p>
+<p>
+Seth
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1372151307000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+        in reply to:
+    <a href="#comment:15">↑ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-06-25T02%3A08%3A27-07%3A00&amp;precision=second" title="See timeline at 06/25/13 02:08:27">8 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./104#comment:15" title="Comment 15">stevehankin</a>:
+</p>
+<p>
+I agree with Steve's analysis of this ticket.
+</p>
+<p>
+I support the change of ticket type, we can now talk about this issue as a forward looking adaption to CF.
+</p>
+<blockquote class="citation">
+<p>
+The text, however, deserves to be expanded to much better illuminate the nature of the problem that it is fixing.
+</p>
+</blockquote>
+<p>
+I think the nature of the problem and the objective for the solution are not well defined in the ticket proposal.
+</p>
+<p>
+It would be good to have the objective of the ticket clearly stated.  I think this objective needs to be agreed before any text to deliver this objective may be finalised.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1372674190000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-07-01T03%3A23%3A10-07%3A00&amp;precision=second" title="See timeline at 07/01/13 03:23:10">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Steve and Mark have requested a statement of the purpose of this ticket. This is how I would describe it:
+</p>
+<p>
+The current version of the CF standard does not state clearly that a scalar coordinate variable implies the notional existence of a size-one dimension which has not been included in the netCDF file as a dimension of the data variable. We believe this to have been the intention of the authors, and that is preferable because it is the most obvious and simplest interpretation of the CF standard, and we therefore propose these changes to make that intention clearer. It is possible that the writers of some existing CF-netCDF files might have had a different interpretation, but the changes we propose would not invalidate any existing file. The ambiguity relates only to the logical interpretation of the file. Resolving the ambiguity is therefore important to the CF data model, which is under discussion in other tickets.
+</p>
+<p>
+Note that the above statement is a motivation for the ticket. It's not intended as new text for the CF standard document. The proposed changes are as shown in <a class="ext-link" href="https://cf-pcmdi.llnl.gov./104#comment:9"><span class="icon">​</span>comment 9</a>.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-23-1372691419000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-07-01T08%3A10%3A19-07%3A00&amp;precision=second" title="See timeline at 07/01/13 08:10:19">8 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thank you for the statement of purpose, from your point of view; it is helpful.
+</p>
+<p>
+From my perspective the objective of this ticket is to remove any capability to encode a Scalar Coordinate in a NetCDF file. 
+</p>
+<p>
+The term 'scalar' is only ever to be interpreted as part of an encoding short cut with no semantic implications.  
+</p>
+<p>
+As is clear from my earlier comments I don't support this approach.  With this in mind I have created a new ticket <a class="closed ticket" href="./105.html" title="enhancement: Scalar Coordinates (closed: wontfix)">#105</a> to enable an alternative approach to be discussed on its merits.
+</p>
+<p>
+I have noted on that ticket that it is not consistent with this ticket and the proposed changes should be seen as mutually exclusive.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-24-1372856982000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:24" class="cnum">
+    <a href="#comment:24">comment:24</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-07-03T06%3A09%3A42-07%3A00&amp;precision=second" title="See timeline at 07/03/13 06:09:42">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all
+</p>
+<p>
+In an email, Steve has suggested further helpful text to describe the problem we are trying to resolve. Here is my version of his suggestion.
+</p>
+<p>
+Scalar coordinate variables provide a convenient way to encode coordinate variables of size one. They do so by borrowing the syntax that is otherwise used for auxiliary coordinate variables. There is, however, a key difference between the interpretation of scalar coordinate variables and auxiliary coordinate variables. Scalar coordinates have the same status in a CF file as (conventional, Unidata, COARDS) coordinates in which the dimension name and the variable name match. These coordinates define the independent variables (spatiotemporal and others) for the data variable. Auxiliary coordinate variables provide extra information as a function of these independent variables, as alternative numeric values (which don't have to be unique or monotonic along a given dimension), or string-valued labels. To indicate that a variable is intended to be an auxiliary coordinate variable, it is necessary to give it a dimension, in order to show which coordinate variable(s) it belongs to. Numeric scalar coordinate variables are not to be interpreted as auxiliary coordinate variables.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-25-1373011995000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:25" class="cnum">
+    <a href="#comment:25">comment:25</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-07-05T01%3A13%3A15-07%3A00&amp;precision=second" title="See timeline at 07/05/13 01:13:15">8 years ago</a> by mgschultz
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+I like this text and believe it gives a rather clear view. There is only one point which seems to be implicit and could perhaps be made more explicitly: You refer to the Unidata and COARDS convention to give coordinate variables the same name as the corresponding dimension. Is it therefore safe to assume that a scalar variable with the same name as a dimension is a coordinate variable? Note that this limits the flexibility for switching coordinate variables and auxiliary coordinate variables around as you suggested in the other post on height and model_level.
+</p>
+<p>
+Best regards,
+</p>
+<p>
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-26-1373037514000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:26" class="cnum">
+    <a href="#comment:26">comment:26</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-07-05T08%3A18%3A34-07%3A00&amp;precision=second" title="See timeline at 07/05/13 08:18:34">8 years ago</a> by biard
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Martin,
+</p>
+<p>
+I believe that the situation you describe is specifically prohibited (or should be).  Having a scalar variable with the same name as a dimension would be very bad berries.
+</p>
+<p>
+Grace and peace,
+</p>
+<p>
+Jim
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-27-1373203154000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:27" class="cnum">
+    <a href="#comment:27">comment:27</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-07-07T06%3A19%3A14-07%3A00&amp;precision=second" title="See timeline at 07/07/13 06:19:14">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+I'm glad you like the motivation statement. Thanks are due to Steve.
+</p>
+<p>
+Sect 5.7 strongly recommends against giving a scalar coordinate variable the same name as a dimension, as Jim advocates too. That's because it could be confusing: the scalar coordinate variable is a shorthand; it takes the places of a size-one coordinate variable, with the dimension omitted.
+</p>
+<p>
+If you wanted to exchange the roles of a coordinate variable and a 1D auxiliary coordinate variable which share a size-one dimension in a netCDF file, you would have to rename the dimension. Also, auxiliary coordinate variables have to be named by the <tt>coordinates</tt> attribute; coordinate variables are not normally listed there, but it is not prohibited. When I was writing about exchanging their roles, I was thinking more of doing this in software which processes, and hence could reinterpret, the CF-netCDF file, rather than changing the file itself.
+</p>
+<p>
+Is this OK?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-28-1375460804000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:28" class="cnum">
+    <a href="#comment:28">comment:28</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:64" class="follow-up">↓ 64</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-02T09%3A26%3A44-07%3A00&amp;precision=second" title="See timeline at 08/02/13 09:26:44">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all
+</p>
+<p>
+For the sake of clarity, I will restate what we now propose in this ticket. This is the motivation:
+</p>
+<blockquote>
+<p>
+Scalar coordinate variables provide a convenient way to encode coordinate variables of size one. They do so by borrowing the syntax that is otherwise used for auxiliary coordinate variables. There is, however, a key difference between the interpretation of scalar coordinate variables and auxiliary coordinate variables. Scalar coordinates have the same status in a CF file as (conventional, Unidata, COARDS) coordinates in which the dimension name and the variable name match. These coordinates define the independent variables (spatiotemporal and others) for the data variable. Auxiliary coordinate variables provide extra information as a function of these independent variables, as alternative numeric values (which don't have to be unique or monotonic along a given dimension), or string-valued labels. To indicate that a variable is intended to be an auxiliary coordinate variable, it is necessary to give it a dimension, in order to show which coordinate variable(s) it belongs to. Numeric scalar coordinate variables are not to be interpreted as auxiliary coordinate variables.
+</p>
+</blockquote>
+<p>
+This is the change to the convention:
+</p>
+<p>
+<strong>Section 5.7, Scalar coordinate variables.</strong>
+</p>
+<p>
+Replace
+</p>
+<blockquote>
+<p>
+Under COARDS the method of providing a single valued coordinate was to add a dimension of size one to the variable, and supply the corresponding coordinate variable. The new scalar coordinate variable is a convenience feature which avoids adding size one dimensions to variables. Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable.
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1). 
+</p>
+</blockquote>
+<p>
+At the end of the section, add:
+</p>
+<blockquote>
+<p>
+If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (for instance, time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
+</p>
+</blockquote>
+<p>
+<strong>Section 6.1, Labels</strong>
+</p>
+<p>
+Replace the last sentence
+</p>
+<blockquote>
+<p>
+If a character variable has only one dimension (the maximum length of the string), it is regarded as a string-valued scalar coordinate variable, analogous to a numeric scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables).
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+If a string-valued auxiliary coordinate variable has only one dimension (the maximum length of the string), it is a string-valued scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables). As such, it has the same information content and can be used in the same contexts as a string-valued auxiliary coordinate variable of a size one dimension which has not been added to the data variable. This is a convenience feature.
+</p>
+</blockquote>
+<p>
+Since no new objections or comments have been made for three weeks, and enough support has been expressed previously, I think this ticket could be accepted according to the rules. However, I guess that Mark, for instance, is not content with it. It would be helpful to hear views from others on the proposal as it now stands.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-29-1376074148000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:29" class="cnum">
+    <a href="#comment:29">comment:29</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-09T11%3A49%3A08-07%3A00&amp;precision=second" title="See timeline at 08/09/13 11:49:08">8 years ago</a> by russ
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Having just reviewed this ticket and ticket <a class="closed ticket" href="./105.html" title="enhancement: Scalar Coordinates (closed: wontfix)">#105</a> as well as all the associated comments, I'm convinced by the arguments in favor of <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>.  I believe the new clarifications capture the original intent of scalar coordinate variables as a convenient and natural shortcut and convenience, avoiding the proliferation of size 1 dimensions.  Dependencies among scalar values are best captured by use of explicit dimensions expressing such relationships. In their absence, scalar coordinate variables may be assumed to be independent.
+</p>
+<p>
+--Russ
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-30-1376334167000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:30" class="cnum">
+    <a href="#comment:30">comment:30</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-12T12%3A02%3A47-07%3A00&amp;precision=second" title="See timeline at 08/12/13 12:02:47">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Im pondering the relationship of coordinate (regular or auxiliary) variables to the concepts of dependence and independence. This may be very worthwhile to figure this out, though i dont think the conventions as they stand are clear.
+</p>
+<ol><li>Is there a clear definition of dependence and independence that can be used in this context?
+</li></ol><ol start="2"><li>I cant think of any counterexamples to the notion that a coordinate variable represents an independent variable. But there are some auxilary coordinate variables that im not sure are dependent variables, namely:
+</li></ol><blockquote>
+<p>
+2.1 2D coordinate lat(x,y) and lon(x,y) are auxiliary coordinates, but it seems that they could be considered independent. Especially when the x(x) and y(y) coordinates are missing.
+</p>
+</blockquote>
+<blockquote>
+<p>
+2.2 Are discrete sampling coordinates lat(sample) and lon(sample) dependent or independent?
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-31-1376395931000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:31" class="cnum">
+    <a href="#comment:31">comment:31</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:32" class="follow-up">↓ 32</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-13T05%3A12%3A11-07%3A00&amp;precision=second" title="See timeline at 08/13/13 05:12:11">8 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I am particularly wary of the following sentence in this proposal:
+</p>
+<blockquote class="citation">
+<p>
+The interpretation of scalar coordinate variables in Section 9 may be different from the above, and this may require further clarification if the above is agreed. 
+</p>
+</blockquote>
+<p>
+The implications for discrete sampling geometries need to be considered for any change to the conventions for version 1.7.
+</p>
+<p>
+In my view this approach makes the description of discrete sampling geometries more complex, but whatever my view, I think the implications should be clearly documented as part of this ticket.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-32-1376411512000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:32" class="cnum">
+    <a href="#comment:32">comment:32</a>
+  </span>
+        in reply to:
+    <a href="#comment:31">↑ 31</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-13T09%3A31%3A52-07%3A00&amp;precision=second" title="See timeline at 08/13/13 09:31:52">8 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./104#comment:31" title="Comment 31">markh</a>:
+</p>
+<p>
+Dear Mark,
+</p>
+<blockquote class="citation">
+<p>
+In my view this approach makes the description of discrete sampling geometries more complex, but whatever my view, I think the implications should be clearly documented as part of this ticket.
+</p>
+</blockquote>
+<p>
+I don't think, at the moment, that the interpretation of scalar coordinate variables in Section 9 will be different under what Jonathan and I are proposing.
+</p>
+<p>
+The examples <a class="ext-link" href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html#Example%20H.2.3.1"><span class="icon">​</span>H.4</a>, H.5 and H.9, for example, are fine for me under our proposal. Is it a problem, in these examples, that <tt>time</tt>, <tt>lat</tt>, <tt>lon</tt> (and <tt>alt</tt>) are independent? I would expect it, I think. One reason for this is, for example, that given enough of these files for different locations, I'd want to try and stitch them together to make a data variable with indpendent <tt>lat</tt> and <tt>lon</tt> dimensions which are both of size greater than 1.
+</p>
+<p>
+I suspect, however, that you have spent more time than me considering this issue, so it would be helpful if you could expand on any implications you think there may be.
+</p>
+<p>
+Many thanks and all the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-33-1376439094000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:33" class="cnum">
+    <a href="#comment:33">comment:33</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-13T17%3A11%3A34-07%3A00&amp;precision=second" title="See timeline at 08/13/13 17:11:34">8 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all,
+</p>
+<p>
+I vote against ticket 105 and I favor 104, but I think the wording is still not ideal for the addition to the end of section 5.7 which is proposed to read:
+</p>
+<blockquote>
+<p>
+"If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (for instance, time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables."
+</p>
+</blockquote>
+<p>
+For the second sentence do we mean:  "If two or more single-valued coordinates are not independent, but have related values (for instance, station number and station name or vertical coordinate and model level number or station number and station name, Section 6.2), then one should be stored as a coordinate of size one dimension and the rest should be stored as associated auxiliary coordinate variables."
+</p>
+<blockquote>
+<p>
+I was confused by "should be stored as coordinate or auxiliary coordinate variables".  Which is it? 
+</p>
+</blockquote>
+<p>
+Note besides modifying the end of the sentence, I replaced one of the "for instances"; it seems to me that time and forecast period would often be considered to be independent coordinates, no?  I'm not familiar with forecasting terminology, but I would think "period" would indicate the time since initialization whereas "time" would indicate the time at the end of the period.  These would be independent only if you assume all forecasts were initiated at the same time. 
+</p>
+<p>
+Please clarify this before accepting the ticket.
+</p>
+<p>
+thanks,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-34-1376489907000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:34" class="cnum">
+    <a href="#comment:34">comment:34</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-14T07%3A18%3A27-07%3A00&amp;precision=second" title="See timeline at 08/14/13 07:18:27">8 years ago</a> by biard
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Karl,
+</p>
+<p>
+Regarding coordinates vs auxiliary coordinates - there is nothing that forces you to make one of these coordinate-type variables under consideration a "primary" coordinate, is there?  I think it is completely valid for a group of coordinate-type variables to share a common dimension name that is not the name of any of the variables.  In such a case, all of them would be auxiliary coordinates for one or more data variables.
+</p>
+<p>
+Grace and peace,
+</p>
+<p>
+Jim
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-35-1376492742000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:35" class="cnum">
+    <a href="#comment:35">comment:35</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-14T08%3A05%3A42-07%3A00&amp;precision=second" title="See timeline at 08/14/13 08:05:42">8 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Jim,
+</p>
+<p>
+Thanks for clarifying.  My attempt to reword is wrong, I guess, since severally auxiliary coordinates can be associated with one another simply by defining them to be functions of the common dimension.  It doesn't matter if one of them is an actual coordinate or not.  
+</p>
+<p>
+Also my statement that "These would be independent only if you assume all forecasts were initiated at the same time"  should have read "These would be independent except in the case when all forecasts were initiated at the same time."  But I'm probably wrong about that too.
+</p>
+<p>
+My support for accepting ticket 104 still stands, but I'm worried that it is difficult to understand all of this by reading the documentation.  The whole idea is rather simple, but I'm not sure we've explained it concisely and clearly.
+</p>
+<p>
+cheers,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-36-1376494290000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:36" class="cnum">
+    <a href="#comment:36">comment:36</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-14T08%3A31%3A30-07%3A00&amp;precision=second" title="See timeline at 08/14/13 08:31:30">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John, Karl, Jim
+</p>
+<p>
+I think Jim is correct in saying that you can have a number of 1D auxiliary coordinate variables of the same dimension, without there being a (Unidata, COARDS) coordinate variable of that dimension. This might well happen, for example, with a model ensemble axis. The ordering of such an axis is arbitrary, and there isn't necessarily a monotonic coordinate variable for it. The elements are distinguished by a combination of information such as ensemble member number and model identity. Therefore I don't think we can prescribe whether coordinate or auxiliary coordinate variables should be used.
+</p>
+<p>
+I agree with John to the extent that coordinate variables and auxiliary coordinate variables are similar and sometimes exchangeable semantically, but I wouldn't say they are the same. The differences that we state in the draft data model (<a class="ext-link" href="https://cf-pcmdi.llnl.gov./95#comment:52"><span class="icon">​</span>latest version of this text</a>)  are that coordinate variables must be one-dimensional, numeric and monotonic (implying all their values must be distinct). Auxiliary coordinate variables can be multidimensional, string-valued and don't have to be monotonic.
+</p>
+<p>
+Note that in the data model we use the term <em>dimension coordinate construct</em> to correspond to a (Unidata, COARDS) coordinate variable, and <em>auxiliary coordinate construct</em> for a (CF) auxiliary coordinate variable.
+</p>
+<p>
+To address Karl's other concern, I would propose
+</p>
+<blockquote>
+<p>
+If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (this might be the case, for instance, for time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
+</p>
+</blockquote>
+<p>
+That's only slightly different from before. I've inserted "this might be the case", because time and forecast period <em>might</em> be related, but they might not, as Karl suggests - it depends on the application. It's valuable to indicate whether there is a relationship or not (this has been discussed earlier in this ticket). Is this text OK?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-37-1376494833000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:37" class="cnum">
+    <a href="#comment:37">comment:37</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:40" class="follow-up">↓ 40</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-14T08%3A40%3A33-07%3A00&amp;precision=second" title="See timeline at 08/14/13 08:40:33">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark and John
+</p>
+<p>
+Discrete sampling geometries will require an addition to the CF data model, but we decided in the first place to agree the data model for CF 1.5, in which we do not have DSGs. I think the question John asks, about whether <tt>lat(sample)</tt> and <tt>lon(sample)</tt> are independent in a DSG, will have to be thought about in the context of the data model for CF 1.6 and later.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-38-1376495695000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:38" class="cnum">
+    <a href="#comment:38">comment:38</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-14T08%3A54%3A55-07%3A00&amp;precision=second" title="See timeline at 08/14/13 08:54:55">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all
+</p>
+<p>
+Arising from a comment of Nan's, I'd like to propose a further clarification to the text of 5.7, namely to change the first para from
+</p>
+<blockquote>
+<p>
+When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable. Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the <tt>coordinates</tt> attribute.
+</p>
+</blockquote>
+<p>
+to
+</p>
+<blockquote>
+<p>
+When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable (i.e. a data variable which has no netCDF dimensions). Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the <tt>coordinates</tt> attribute.
+</p>
+</blockquote>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-39-1376499519000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:39" class="cnum">
+    <a href="#comment:39">comment:39</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-14T09%3A58%3A39-07%3A00&amp;precision=second" title="See timeline at 08/14/13 09:58:39">8 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all, 
+</p>
+<p>
+Concerning Jonathan's post above (8/14/13  08:54:56), I think the additional text is very helpful and should be included.
+</p>
+<p>
+regards,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-40-1376515186000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:40" class="cnum">
+    <a href="#comment:40">comment:40</a>
+  </span>
+        in reply to:
+    <a href="#comment:37">↑ 37</a>
+        ;
+          <span>follow-ups:</span>
+    <a href="#comment:41" class="follow-up">↓ 41</a>
+    <a href="#comment:47" class="follow-up">↓ 47</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-14T14%3A19%3A46-07%3A00&amp;precision=second" title="See timeline at 08/14/13 14:19:46">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+The DSG v1.6 uses dimensions in a new way, which i agree can wait to think through. But point data representations are valid in 1.5, so it might be better to think the implications of this on point data. For example from proposal:
+</p>
+<blockquote>
+<p>
+"If two or more single-valued coordinates are not independent, but have related values..., they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables."
+</p>
+</blockquote>
+<p>
+But you dont want to add a new dimension onto point data just to represent that two coordinates are not independent. An example:
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time";
+  float lat(sample);
+  float lon(sample);
+  float time(sample);
+</pre><p>
+suppose that you are sampling at the same point. Its intuitive to indicate this using scalar coordinates:
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time";
+  float lat;
+  float lon;
+  float time(sample);
+</pre><p>
+so here you are really doing a shorthand for lat(sample), lon(sample) indicating that these are constants. which is really useful to know.
+</p>
+<p>
+you might also want to put height levels of the sample:
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time heightAboveGround heightAboveMsl";
+  float lat;
+  float lon;
+  float heightAboveGround ;
+  float heightAboveMsl;
+  float time(sample);
+</pre><p>
+you dont really want to do this:
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+  height = 1;
+variables:
+  float data(sample, height);
+    data:coordinates = "lat lon time heightAboveGround heightAboveMsl";
+  float lat;
+  float lon;
+  float heightAboveGround(height) ;
+  float heightAboveMsl(height);
+  float time(sample);
+</pre><p>
+well maybe you do. i dont like it because it makes it looks like a profile. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-41-1376558535000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:41" class="cnum">
+    <a href="#comment:41">comment:41</a>
+  </span>
+        in reply to:
+    <a href="#comment:40">↑ 40</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:43" class="follow-up">↓ 43</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-15T02%3A22%3A15-07%3A00&amp;precision=second" title="See timeline at 08/15/13 02:22:15">8 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./104#comment:40" title="Comment 40">caron</a>:
+</p>
+<p>
+Hello John,
+</p>
+<p>
+Thanks for this. It's definitely clarified things for me. I still bravely maintain that DSG is not affected <em>logically</em> by <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>. I sympathize with your last example ("I don't like it because it makes it looks like a profile"), but surely the resemblance is passing, since the <tt>featureType</tt> attribute will be <tt>"point"</tt>, rather than <tt>"profile"</tt>, and extra dimensions are not prohibited. Is that right?
+</p>
+<blockquote class="citation">
+<p>
+suppose that you are sampling at the same point. Its intuitive to indicate this using scalar coordinates:
+</p>
+</blockquote>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time";
+  float lat;
+  float lon;
+  float time(sample);
+</pre><blockquote class="citation">
+<p>
+so here you are really doing a shorthand for lat(sample), lon(sample) indicating that these are constants. which is really useful to know.
+</p>
+</blockquote>
+<p>
+I like this example, but I don't understand how the scalar <tt>lat</tt> is shorthand for <tt>lat(sample)</tt> when <tt>sample</tt> = 39238923. Am I missing something?
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-42-1376574331000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:42" class="cnum">
+    <a href="#comment:42">comment:42</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:44" class="follow-up">↓ 44</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-15T06%3A45%3A31-07%3A00&amp;precision=second" title="See timeline at 08/15/13 06:45:31">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+CF 1.6 talks about scalar coordinate variables in section 9.2:
+</p>
+<blockquote>
+<p>
+If there is only a single feature to be stored in a data variable, there is no need for an instance dimension and it is permitted to omit it. The data will then be one-dimensional, which is a special (degenerate) case of the multidimensional array representation.  The instance variables will be scalar coordinate variables; the data variable and other auxiliary coordinate variables will have only an element dimension and not have an instance dimension, e.g. data(o) and t(o) for a single timeSeries.
+</p>
+</blockquote>
+<p>
+Your first example, with <tt>data(sample)</tt>, <tt>lat(sample)</tt>, <tt>lon(sample)</tt> and <tt>time(sample)</tt>, could be a collection of point data, with <tt>sample</tt>, which is (much!) greater than one, being the instance dimension (i.e. the number of points). No scalar coordinate variables are involved in that case.
+</p>
+<p>
+Alternatively, it could be a single trajectory feature, in which <tt>sample</tt> is the element dimension (the number of points along the trajectory). Again, there are no scalar coordinates.
+</p>
+<p>
+Your second example, with <tt>data(sample)</tt>, <tt>lat</tt>, <tt>lon</tt> and <tt>time(sample)</tt>, could be a single timeseries feature, in which <tt>sample</tt> is the element dimension (the number of times in the timeseries). This has two scalar coordinate variables. Following this ticket, they would be regarded as logically equivalent to <tt>lat(lat)</tt> and <tt>lon(lon)</tt>, as though the data were dimensioned <tt>data(sample,lat,lon)</tt> with <tt>lat=1</tt> and <tt>lon=1</tt>. This is a valid and logically equivalent way of representing a single timeseries.
+</p>
+<p>
+If it's actually not a timeseries, but still a collection of points which happen to be coincident (?), you have to dimension <tt>lat</tt> and <tt>lon</tt> with <tt>sample</tt>, in order to agree with Table 9.1.
+</p>
+<p>
+Thus, this ticket doesn't appear to cause a problem for DSGs, but I expect we will have to do some more thinking about the logical data model. With that caveat, is the ticket OK as it stands?
+</p>
+<p>
+Best wishes and thanks
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-43-1376585598000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:43" class="cnum">
+    <a href="#comment:43">comment:43</a>
+  </span>
+        in reply to:
+    <a href="#comment:41">↑ 41</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-15T09%3A53%3A18-07%3A00&amp;precision=second" title="See timeline at 08/15/13 09:53:18">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi David:
+</p>
+<p>
+Replying to <a class="ticket" href="./104#comment:41" title="Comment 41">davidhassell</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./104#comment:40" title="Comment 40">caron</a>:
+</p>
+<p>
+Hello John,
+</p>
+<p>
+Thanks for this. It's definitely clarified things for me. I still bravely maintain that DSG is not affected <em>logically</em> by <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>. I sympathize with your last example ("I don't like it because it makes it looks like a profile"), but surely the resemblance is passing, since the <tt>featureType</tt> attribute will be <tt>"point"</tt>, rather than <tt>"profile"</tt>, and extra dimensions are not prohibited. Is that right?
+</p>
+</blockquote>
+<p>
+no, its not really fatal, just an idiom that i like. but it does make me wonder if height is really an "independent" variable. if so, it would be nice to know more precisely what that means.
+</p>
+<p>
+Also, note that I am not reffering to the implications of DSG representation, just the way that one would do point data pre-DSG.
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+suppose that you are sampling at the same point. Its intuitive to indicate this using scalar coordinates:
+</p>
+</blockquote>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time";
+  float lat;
+  float lon;
+  float time(sample);
+</pre><blockquote class="citation">
+<p>
+so here you are really doing a shorthand for lat(sample), lon(sample) indicating that these are constants. which is really useful to know.
+</p>
+</blockquote>
+<p>
+I like this example, but I don't understand how the scalar <tt>lat</tt> is shorthand for <tt>lat(sample)</tt> when <tt>sample</tt> = 39238923. Am I missing something?
+</p>
+</blockquote>
+<p>
+I just mean to say that by making it a scalar, you indicate that all the values of lat(39238923) would be identical if you made it into a dimensioned variable. So by looking at the "structural metadata" of the file, you know something thats very useful.
+</p>
+<p>
+Regards,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-44-1376679427000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:44" class="cnum">
+    <a href="#comment:44">comment:44</a>
+  </span>
+        in reply to:
+    <a href="#comment:42">↑ 42</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-16T11%3A57%3A07-07%3A00&amp;precision=second" title="See timeline at 08/16/13 11:57:07">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all:
+</p>
+<p>
+From my POV, CF Conventions have not previously made any clear semantic distinction between coordinate variables and auxiliary coordinate variables. Now tickets 104 and 105 seem to have that as an important distinction. Yet the main difference between the two, monotonicity, has no effect on a scalar coordinate.
+</p>
+<p>
+FYI, in the CDM data model, there is no real difference between coordinate variables and auxiliary coordinate variables, bot between scalar and non-scalar coordinates. However, maybe there should be if we can figure it out.
+</p>
+<p>
+Im guessing that the real issue is with the data model, for which I apologize for not having followed. Perhaps thats what I need to do next in order to have anything useful to say.
+</p>
+<p>
+In terms of the actual wording:
+</p>
+<blockquote>
+<p>
+"The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1)."
+</p>
+</blockquote>
+<blockquote>
+<p>
+"If a string-valued auxiliary coordinate variable has only one dimension (the maximum length of the string), it is a string-valued scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables). As such, it has the same information content and can be used in the same contexts as a string-valued auxiliary coordinate variable of a size one dimension which has not been added to the data variable. This is a convenience feature."
+</p>
+</blockquote>
+<p>
+both seem quite good.
+</p>
+<p>
+This sentence:
+</p>
+<blockquote>
+<p>
+"If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (for instance, time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables."
+</p>
+</blockquote>
+<p>
+implies a distinction between "independent coordinate variables" and "not independent coordinate variables", and indictates how to use the dimensions of a variable to convey which is which.
+</p>
+<p>
+My gut instinct is that dimension usage is actually already overloaded, and in the absence of a data model which would spell out the implications, we are probably making things unnecessarily complex and confusing with this addition. 
+</p>
+<p>
+What I would need to accept either proposal is a working definition of "dependent" and "independent", esp reletive to "coordinate variable" and "auxiliary coordinate variable". Is it true that a "coordinate variable" must be independent ? Is an "auxiliary coordinate variable" always dependent, or can it be either? or?
+</p>
+<p>
+Regards,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-45-1376896601000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:45" class="cnum">
+    <a href="#comment:45">comment:45</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:46" class="follow-up">↓ 46</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-19T00%3A16%3A41-07%3A00&amp;precision=second" title="See timeline at 08/19/13 00:16:41">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Yes, we agree, this whole ticket is really about clarifying the data model. The clarifications being discussed are concerned with how CF-netCDF metadata are interpreted, and do not affect the legality of CF-netCDF files, although they do imply that some ways are better than others for encoding a given dataset. The part you quote last is the crucial issue in this debate.
+</p>
+<p>
+I think you have made a good point, and thanks for that. In the <a class="ext-link" href="https://cf-pcmdi.llnl.gov./95#comment:52"><span class="icon">​</span>draft data model as it stands</a>, we distinguish dimension (Unidata, COARDS) coordinates and auxiliary coordinates purely on formal grounds (uniqueness, monotonicity, dimensionality, data type). That's because we based the data model on the CF-netCDF convention, of course. But I think you have correctly identified the conceptual distinction, and we should put that in the data model document as well, namely that the dimension coordinate variables are independent, and the auxiliary coordinate variables are dependent. It's because the dimension coordinates are independent that they must be unique and one-dimensional. Those formal properties don't help with a scalar coordinate, as you say, but the idea that it's an independent variable is still valid.
+</p>
+<p>
+In some situations, a CF-netCDF file might have auxiliary coordinate variables of dimensions which do not have dimension coordinate variables. One situation is an axis for an unordered collection, such as an ensemble axis. In that case, I suppose the index along the ensemble dimension is the independent variable, in a sense, but that is not useful information since the ordering is arbitrary, and there's no need for explicit independent coordinates. In the case you mentioned earlier, of 2D lat and lon auxiliary coordinate variables if the 1D projection coordinates are not given, I would say that the auxiliary coordinates are still dependent on the projection coordinates. Even though the latter are absent, there are formulae which define the relationship.
+</p>
+<p>
+Will this ticket be OK, do you think, if we add some text to insert a couple of sentences in the CF-netCDF standard, when the two kinds of coordinate variable are introduced, to point out their distinction in role of independence/dependence? If so, I'll draft some extra text for this ticket. Do you think we really need to <em>define</em> what independence and dependence mean in the CF-netCDF standard, or can we assume that people will understand them in their usual mathematical sense?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-46-1377042596000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:46" class="cnum">
+    <a href="#comment:46">comment:46</a>
+  </span>
+        in reply to:
+    <a href="#comment:45">↑ 45</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-20T16%3A49%3A56-07%3A00&amp;precision=second" title="See timeline at 08/20/13 16:49:56">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan and all:
+</p>
+<p>
+Well, if we had to make a decision here, I would say that "coordinate variables" = "independent" and "auxiliary coordinates" = "dependent" would be the correct one. Obviously very simple and powerful idea.
+</p>
+<p>
+For all the examples I can think of, this interpretation seems reasonable to me. It would be good if others look at their data files and see if there is an important exception to this rule.
+</p>
+<p>
+For gridded data, I agree that aux coordinates lat(x,y) and lon(x,y) are best thought of as dependent on coordinate variables x(x) and y(y), even when x(x) and y(y) are missing.
+</p>
+<p>
+For point data, I agree that aux coordinates lat(time), lon(time) are best thought of as dependent on the coordinate variable time(time).
+</p>
+<p>
+However, under this interpretation, it seems that a scalar auxiliary coordinate should be thought of as dependent, not independent. For example if "lat(time)" is actually constant, so one uses a scalar auxiliary coordinate "lat" in its place, it seems that it is still a dependent variable, and should not be thought of as adding another degree of freedom to the data, ie with some implicit dimension lat(1).
+</p>
+<p>
+Conversely, if you want to indicate that the domain has another independent coordinate, you should dimension your data with it, even if that dimension happens to only be of length 1, and you should add a coordinate variable of length 1. A good example I run across a lot in GRIB data are vertical coordinates. If one could have multiple vertical levels, say on pressure levels, I will add a vertical dimension even if theres only one such level in the file. But for things like "Temperature at the tropopause" I wont add a vertical dimension. Obviously one could do it differently, but I think thats reasonable.
+</p>
+<p>
+This interpretation has the advantage that one can add as many auxiliary coordinates as you need, without increasing the dimensionality of the domain. I think that's the essence of what it means to have n independent coordinates.
+</p>
+<p>
+What do you think?
+</p>
+<p>
+John
+</p>
+<p>
+Regards, John
+</p>
+<p>
+Replying to <a class="ticket" href="./104#comment:45" title="Comment 45">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+Yes, we agree, this whole ticket is really about clarifying the data model. The clarifications being discussed are concerned with how CF-netCDF metadata are interpreted, and do not affect the legality of CF-netCDF files, although they do imply that some ways are better than others for encoding a given dataset. The part you quote last is the crucial issue in this debate.
+</p>
+<p>
+I think you have made a good point, and thanks for that. In the <a class="ext-link" href="https://cf-pcmdi.llnl.gov./95#comment:52"><span class="icon">​</span>draft data model as it stands</a>, we distinguish dimension (Unidata, COARDS) coordinates and auxiliary coordinates purely on formal grounds (uniqueness, monotonicity, dimensionality, data type). That's because we based the data model on the CF-netCDF convention, of course. But I think you have correctly identified the conceptual distinction, and we should put that in the data model document as well, namely that the dimension coordinate variables are independent, and the auxiliary coordinate variables are dependent. It's because the dimension coordinates are independent that they must be unique and one-dimensional. Those formal properties don't help with a scalar coordinate, as you say, but the idea that it's an independent variable is still valid.
+</p>
+<p>
+In some situations, a CF-netCDF file might have auxiliary coordinate variables of dimensions which do not have dimension coordinate variables. One situation is an axis for an unordered collection, such as an ensemble axis. In that case, I suppose the index along the ensemble dimension is the independent variable, in a sense, but that is not useful information since the ordering is arbitrary, and there's no need for explicit independent coordinates. In the case you mentioned earlier, of 2D lat and lon auxiliary coordinate variables if the 1D projection coordinates are not given, I would say that the auxiliary coordinates are still dependent on the projection coordinates. Even though the latter are absent, there are formulae which define the relationship.
+</p>
+<p>
+Will this ticket be OK, do you think, if we add some text to insert a couple of sentences in the CF-netCDF standard, when the two kinds of coordinate variable are introduced, to point out their distinction in role of independence/dependence? If so, I'll draft some extra text for this ticket. Do you think we really need to <em>define</em> what independence and dependence mean in the CF-netCDF standard, or can we assume that people will understand them in their usual mathematical sense?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-47-1377099609000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:47" class="cnum">
+    <a href="#comment:47">comment:47</a>
+  </span>
+        in reply to:
+    <a href="#comment:40">↑ 40</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-21T08%3A40%3A09-07%3A00&amp;precision=second" title="See timeline at 08/21/13 08:40:09">8 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+In <a class="ticket" href="./104#comment:40" title="Comment 40">caron</a>, John provides us with a useful set of examples and remind us that there are many uses of non-gridded data which predate CF 1.6 and the DSG implementations.  I expect many of these use cases to continue, not making use of the DSG featureType attribute, which I do not think is mandated.  
+</p>
+<p>
+I would like to pick out one of John's examples, a definition of a collection of samples at a single location:
+ 
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time";
+  float lat;
+  float lon;
+  float heightAboveGround ;
+  float heightAboveMsl;
+  float time(sample);
+</pre><p>
+In my naive and simple days of scalars I happily interpreted this as an observation collection at a point, a single location in space.
+ 
+My understanding of <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a> is that, in the future, this is to be treated as exactly equivalent to: 
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+  lat = 1;
+  lon = 1;
+  heightAboveGround = 1;
+  heightAboveMsl = 1;
+
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time";
+  float lat(lat);
+  float lon(lon);
+  float heightAboveGround(heightAboveGround) ;
+  float heightAboveMsl(heightAboveMsl);
+  float time(sample);
+</pre><p>
+This seems an odd way of representing the data to me which doesn't fit comfortably with the neat flexibility I have seen in use in many datasets.  I would avoid using scalar coordinate variables under any circumstances on this basis.
+</p>
+<p>
+I am uncomfortable with this re-interpretation of John's example, I have numerous examples with similar characteristics.  
+</p>
+<ul><li>How, under the terms of <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>, may I represent such data, such that it explicitly defines 1 degree of freedom and a collection of metadata elements, some of which are invariant with respect to the data variable?
+</li></ul>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-48-1377107702000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:48" class="cnum">
+    <a href="#comment:48">comment:48</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:52" class="follow-up">↓ 52</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-21T10%3A55%3A02-07%3A00&amp;precision=second" title="See timeline at 08/21/13 10:55:02">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+If you have a coordinate variable <tt>lat(time)</tt>, I think it must be a trajectory - is that right? In Table 9.1, we define a trajectory as "a series of data points along a path through space with monotonically increasing times", so it is natural to record time as the independent coordinate, and latitude depends on it. In that situation, according to this ticket, you would <em>not</em> replace <tt>lat(time)</tt> with a scalar <tt>lat</tt>, even if the latitude were unchanging all the way along the trajectory, because doing so would incorrectly imply that latitude is independent. You have to keep <tt>lat(time)</tt> and fill it with repeated values. Actually, I think that is better anyway in this case, precisely because latitude really is a function of time. I think it would be strange to use a different way of storing a trajectory if the latitude values were [51, 51, 51, 51] on the one hand, or [51, 51.001, 51, 51] on the other.
+</p>
+<p>
+For timeseries data, the latitude and time coordinates are independent. If it's a single timeseries, it will have only one latitude, and in that situation, according to this ticket, it would be fine to replace the size-one coordinate variable <tt>lat(lat)</tt> with the scalar <tt>lat</tt>, and omit the dimension <tt>lat=1</tt>.
+</p>
+<p>
+If you have data on multiple vertical levels with a physical coordinate, it might have dimensions <tt>data(pressure,lat,lon)</tt>. When you extract a single level, you reduce the dimension to <tt>pressure=1</tt>. The size-one  <tt>pressure(pressure)</tt> is an independent coordinate. In this situation, CF permits you to replace it with a scalar <tt>pressure</tt> and omit the size-one dimension. You don't have to do this; it's a convenience feature, as the standard document says. According to this ticket, replacing <tt>pressure(pressure)</tt> with <tt>pressure</tt> does not alter the interpretation. It is still a size-one independent coordinate. This ticket says that the scalar coordinate implies the existence of a size-one dimension.
+</p>
+<p>
+I agree that you do not add a vertical dimension for temperature at the tropopause, because tropopause doesn't have a numerical coordinate to define it. CF provides standard_names for quantities that exist on special physically defined leves, for this reason. CF does not provide standard names for levels which can be specified with coordinate values. There isn't a standard name for temperature at 2.0 m height, because that can be specified with a size-one <tt>height</tt> coordinate. It could be either <tt>height(height)</tt> with dimension <tt>height=1</tt>, or a scalar <tt>height</tt>. According to this ticket, they both logically describe an independent size-one dimension.
+</p>
+<p>
+CF has this convenience feature because it allows you to have many size-one independent coordinates without having to create netCDF dimensions for them. This ticket says that the domain logically has these size-one dimensions anyway.
+</p>
+<p>
+Is that all right?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-49-1377108472000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:49" class="cnum">
+    <a href="#comment:49">comment:49</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:50" class="follow-up">↓ 50</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-21T11%3A07%3A52-07%3A00&amp;precision=second" title="See timeline at 08/21/13 11:07:52">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark
+</p>
+<p>
+Concerning the example
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+variables:
+  float data(sample);
+    data:coordinates = "lat lon time";
+  float lat;
+  float lon;
+  float heightAboveGround ;
+  float heightAboveMsl;
+  float time(sample);
+</pre><p>
+I would say this is not an ideal way of storing this data. I agree that, according to this ticket, it implies five independent dimensions. It is not illegal, but it is likely that it doesn't really describe the data's logical structure properly (of course, I am guessing at what the true situation is), in two ways:
+</p>
+<ul><li>The <tt>sample</tt> dimension is really an independent coordinate of time. So a 1D (dimension) coordinate variable should be used for this, not an auxiliary.
+</li></ul><ul><li>Height above ground and height above MSL are necessarily related. The above does not show their relationship.
+</li></ul><p>
+Therefore, I think this data should probably be stored like this instead:
+</p>
+<pre class="wiki">dimensions:
+  sample = 39238923;
+  heightAboveGround=1;
+variables:
+  float data(time,heightAboveGround);
+    data:coordinates = "lat lon heightAboveMsl";
+  float lat;
+  float lon;
+  float heightAboveGround(heightAboveGround) ;
+  float heightAboveMsl(heightAboveGround);
+  float time(time);
+</pre><p>
+or the roles of <tt>heightAboveGround</tt> and <tt>heightAboveMsl</tt> could be exchanged.
+</p>
+<p>
+The data actually has four independent coordinates, and one dependent coordinate. If we adopt this ticket, the interpretation is umambiguous. The original version has a different interpretation. It might cause a nuisance to the analyst that the dependencies had not been indicated in the file, but it shouldn't be hard to fix it up when the data is being processed.
+</p>
+<p>
+As in previous discussions, I would argue that adopting this ticket doesn't make anything illegal which is currently legal, but in some cases it may lead to data-writers being clearer about their intentions, and that's a good thing, I would say.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-50-1377185567000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:50" class="cnum">
+    <a href="#comment:50">comment:50</a>
+  </span>
+        in reply to:
+    <a href="#comment:49">↑ 49</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-22T08%3A32%3A47-07%3A00&amp;precision=second" title="See timeline at 08/22/13 08:32:47">8 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./104#comment:49" title="Comment 49">jonathan</a>:
+</p>
+<p>
+In the example lat, lon and both heights are invariant with respect to the data.  This is not the same as stating that they are independent.
+</p>
+<p>
+The data set has 1 degree of freedom, the sample, all other coordinate quantities are invariant with respect to the data or vary with the sample dimension.  I'm afraid I don't see a good way of encoding this information with coordinates under this proposal. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-51-1377190192000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:51" class="cnum">
+    <a href="#comment:51">comment:51</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-22T09%3A49%3A52-07%3A00&amp;precision=second" title="See timeline at 08/22/13 09:49:52">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark
+</p>
+<p>
+That's a matter of interpretation. There is a choice to be made with this dataset. One possibility is to regard it the timeseries for a single point from a 4D dataset (time,vertical,lat,lon), in which case it is natural to regard the spatial coordinates as independent and with size one. That's how I represented it above.
+</p>
+<p>
+Alternatively, you could regard it as a single timeseries from a set of timeseries at scattered points. In that case, the spatial coordinates are not independent; there is one independent coordinate for location and another for time. For several timeseries, you would have for instance (this is like Example H.2 in the CF document)
+</p>
+<pre class="wiki">dimensions:
+  time = 39238923;
+  location=10;
+variables:
+  float data(time,location);
+    data:coordinates = "lat lon heightAboveGround heightAboveMsl";
+  float lat(location);
+  float lon(location);
+  float heightAboveGround(location) ;
+  float heightAboveMsl(location);
+  float time(time);
+</pre><p>
+If you regard the single-location timeseries as a special case of the above, with <tt>location=1</tt>, then according to this ticket you cannot drop the "location" dimension of the size-one coordinates. You have to keep it in order to show that they are related and do not vary independently of one another.
+</p>
+<p>
+These are different points of view. Given the means of production of the data (e.g. was it selected from a GCM, or is it a single observational location), one of them is probably more natural than the other. The data-writer can choose, but it's easy for the analyst to convert one to the other if necessary, since the data are all the same, it's only a matter of size-one dimensions being included or not. The effect of this ticket is to give an unambiguous interpretation to the dataset, thus:
+</p>
+<ul><li>numeric scalar coordinate is equivalent to size-one (Unidata, COARDS, dimension) coordinate, and is an independent variable.
+</li><li>numeric size-one (CF) auxiliary coordinate is a dependent variable.
+</li></ul><p>
+I think this is nice and simple. I am getting a sense of deja vu, though.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-52-1377560054000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:52" class="cnum">
+    <a href="#comment:52">comment:52</a>
+  </span>
+        in reply to:
+    <a href="#comment:48">↑ 48</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-26T16%3A34%3A14-07%3A00&amp;precision=second" title="See timeline at 08/26/13 16:34:14">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan:
+</p>
+<p>
+I think the core of the disagreement might be alternative ways to understand what the domain is of the variable. We agree that the dimensionality of the domain is the number of independent coordinates. So lets just clarify how we each interpret the number of independent coordinates in a few example cases.
+</p>
+<p>
+First, let me use radar data to illustrate the difference between domain and range dimensionality. Im guessing you may not disagree here, but i think it may help others to follow along. Consider a sweep from a scanning radar mounted on an airplane. This might look like:
+</p>
+<pre class="wiki">  float elev(y, x);
+  float azimuth(y, x);
+  float radius(y, x);
+  float data(y, x);
+    coordinates: "azimuth elev radius";
+</pre><p>
+I think of the data as 2 dimensional, embedded in 3 dimensional space. So the number of independent coordinates is 2, and the total number of coordinates is 3. 
+</p>
+<p>
+Ok, so whats the dimensionality of a trajectory? In the CDM data model, its considered one dimensional, because it can be represented as:
+  
+</p>
+<pre class="wiki">  float lat(sample);
+  float lon(sample);
+  float alt(sample);
+  float time(sample);
+  float data(sample);
+    coordinates: "lat lon alt time";
+</pre><p>
+The idea is that it looks like a 1D line embedded in 4D space/time. 
+</p>
+<p>
+Since time is almost always monotonic, its nice to use:
+</p>
+<pre class="wiki">  
+  float lat(time);
+  float lon(time);
+  float alt(time);
+  float time(time);
+  float data(time);
+    coordinates: "lat lon alt time";
+</pre><p>
+  
+What about time series data?
+</p>
+<p>
+Well, it could also look like:
+</p>
+<pre class="wiki">  float lat(time);
+  float lon(time);
+  float alt(time);
+  float time(time);
+  float data(time);
+    coordinates: "lat lon alt time";
+</pre><p>
+although
+</p>
+<pre class="wiki">  float lat;
+  float lon;
+  float alt;
+  float time(time);
+  float data(time);
+    coordinates: "lat lon alt time";
+</pre><p>
+               
+is really nice in making it clear from the structural metadata alone that all the data is at one point. 
+</p>
+<p>
+Note that under propsal <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>, if you want to preserve the idea that time series have only one degree of freedom, it would be difficult since scalar coordinates imply that they are independent. Your only choice would be to the one above that looks just like a trajectory.
+</p>
+<p>
+When there "really is" another degree of freedom, then adding another explicit dimension seems natural, as we agree with height coordinates for gridded data.
+          
+</p>
+<p>
+Replying to <a class="ticket" href="./104#comment:48" title="Comment 48">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+If you have a coordinate variable <tt>lat(time)</tt>, I think it must be a trajectory - is that right? In Table 9.1, we define a trajectory as "a series of data points along a path through space with monotonically increasing times", so it is natural to record time as the independent coordinate, and latitude depends on it. In that situation, according to this ticket, you would <em>not</em> replace <tt>lat(time)</tt> with a scalar <tt>lat</tt>, even if the latitude were unchanging all the way along the trajectory, because doing so would incorrectly imply that latitude is independent. You have to keep <tt>lat(time)</tt> and fill it with repeated values. Actually, I think that is better anyway in this case, precisely because latitude really is a function of time. I think it would be strange to use a different way of storing a trajectory if the latitude values were [51, 51, 51, 51] on the one hand, or [51, 51.001, 51, 51] on the other.
+</p>
+<p>
+For timeseries data, the latitude and time coordinates are independent. If it's a single timeseries, it will have only one latitude, and in that situation, according to this ticket, it would be fine to replace the size-one coordinate variable <tt>lat(lat)</tt> with the scalar <tt>lat</tt>, and omit the dimension <tt>lat=1</tt>.
+</p>
+<p>
+If you have data on multiple vertical levels with a physical coordinate, it might have dimensions <tt>data(pressure,lat,lon)</tt>. When you extract a single level, you reduce the dimension to <tt>pressure=1</tt>. The size-one  <tt>pressure(pressure)</tt> is an independent coordinate. In this situation, CF permits you to replace it with a scalar <tt>pressure</tt> and omit the size-one dimension. You don't have to do this; it's a convenience feature, as the standard document says. According to this ticket, replacing <tt>pressure(pressure)</tt> with <tt>pressure</tt> does not alter the interpretation. It is still a size-one independent coordinate. This ticket says that the scalar coordinate implies the existence of a size-one dimension.
+</p>
+<p>
+I agree that you do not add a vertical dimension for temperature at the tropopause, because tropopause doesn't have a numerical coordinate to define it. CF provides standard_names for quantities that exist on special physically defined leves, for this reason. CF does not provide standard names for levels which can be specified with coordinate values. There isn't a standard name for temperature at 2.0 m height, because that can be specified with a size-one <tt>height</tt> coordinate. It could be either <tt>height(height)</tt> with dimension <tt>height=1</tt>, or a scalar <tt>height</tt>. According to this ticket, they both logically describe an independent size-one dimension.
+</p>
+<p>
+CF has this convenience feature because it allows you to have many size-one independent coordinates without having to create netCDF dimensions for them. This ticket says that the domain logically has these size-one dimensions anyway.
+</p>
+<p>
+Is that all right?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-53-1377611490000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:53" class="cnum">
+    <a href="#comment:53">comment:53</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:54" class="follow-up">↓ 54</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-27T06%3A51%3A30-07%3A00&amp;precision=second" title="See timeline at 08/27/13 06:51:30">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+We agree about the 2D radar data (two independent dimensions) and the trajectory (one independent dimension). Table 9.1 defines a timeseries as "a series of data points at the same spatial location with monotonically increasing times". A collection of timeseries in a discrete sampling geometry has data(i,o) and mandatory coordinates x(i) y(i) t(i,o), where i is the instance dimension and o the element dimension i.e.
+</p>
+<pre class="wiki">float lat(stations);
+float lon(stations);
+float time(time);
+float temp(stations,time);
+  temp:coordinates="lat lon";
+</pre><p>
+in the orthogonal representation, like example H.2. In this representation, <tt>time</tt> is a 1D coordinate variable, because it's the same for all the stations, so it does not have the instance dimension. If there is only one station, you can keep the size-one instance dimension <tt>stations=1</tt>, or you can omit it (last para of sect 9.2):
+</p>
+<pre class="wiki">float lat;
+float lon;
+float time(time);
+float temp(time);
+  temp:coordinates="lat lon";
+</pre><p>
+like example H.4. According to this ticket, the interpretations are different. If you keep the size-one dimension, you are making explicit that lat and lon are related: they are two coordinates which share a single dimension of the domain. If you drop the size-one dimension, lat and lon are independent dimensions. That means the single timeseries is equivalent to
+</p>
+<pre class="wiki">float lat(lat);
+float lon(lon);
+float time(time);
+float temp(time,lat,lon);
+</pre><p>
+with <tt>lat=1</tt> and <tt>lon=1</tt>. That is, it's regarded as having been extracted from a 2D array of timeseries. Physically, this is a perfectly fine interpretation; that might indeed be how the single timeseries was obtained.
+</p>
+<p>
+Therefore I think that the two interpretations are physically distinct, and this ticket recognises them as distinct. However, it is clearly not difficult to convert between them, as the data is completely unaffected; they only differ through the presence and absence of size-one dimensions.
+</p>
+<p>
+However, this kind of data:
+</p>
+<pre class="wiki">float lat(time);
+float lon(time);
+float time(time);
+float temp(time);
+  temp:coordinates="lat lon";
+</pre><p>
+is not a timeseries feature, according to Table 9.1. It's a trajectory. In a timeseries, the x and y coordinates do not vary with the element dimension (<tt>time</tt> in this case).
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-54-1377623580000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:54" class="cnum">
+    <a href="#comment:54">comment:54</a>
+  </span>
+        in reply to:
+    <a href="#comment:53">↑ 53</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:55" class="follow-up">↓ 55</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-27T10%3A13%3A00-07%3A00&amp;precision=second" title="See timeline at 08/27/13 10:13:00">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan:
+</p>
+<p>
+Suppose that the data provider would prefer to represent her time-series data as having a single independent coordinate, ie is 1 dimensional? How would she do that under ticket <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>?
+</p>
+<p>
+Regards,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-55-1377684197000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:55" class="cnum">
+    <a href="#comment:55">comment:55</a>
+  </span>
+        in reply to:
+    <a href="#comment:54">↑ 54</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:56" class="follow-up">↓ 56</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-28T03%3A03%3A17-07%3A00&amp;precision=second" title="See timeline at 08/28/13 03:03:17">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<blockquote class="citation">
+<p>
+Suppose that the data provider would prefer to represent her time-series data as having a single independent coordinate, ie is 1 dimensional? How would she do that under ticket <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>?
+</p>
+</blockquote>
+<p>
+If the single timeseries is recorded like this:
+</p>
+<pre class="wiki">dimensions:
+  station=1;
+  time=NNN;
+variables:
+  float lat(station);
+  float lon(station);
+  float time(time);
+  float temp(station,time);
+    temp:coordinates="lat lon";
+</pre><p>
+it would be interpreted as having two independent dimensions, one of space and one of time. The space dimension has size one and lat and lon both depend on it. Is that what you mean by 1D? It can't be truly 1D unless you omit the spatial information altogether. A timeseries discrete sampling geometry must have at least horizontal coordinates.
+</p>
+<p>
+If the single timeseries is recorded like this:
+</p>
+<pre class="wiki">dimensions:
+  time=NNN;
+variables:
+  float lat;
+  float lon;
+  float time(time);
+  float temp(time);
+    temp:coordinates="lat lon";
+</pre><p>
+or like this:
+</p>
+<pre class="wiki">dimensions:
+  lon=1;
+  lat=1;
+  time=NNN;
+variables:
+  float lon(lon);
+  float lat(lat);
+  float time(time);
+  float temp(time,lat,lon);
+</pre><p>
+it would be interpreted as having three independent dimensions, of longitude, latitude and time, with the longitude and latitude both having size one. The main point of this ticket is that these last two representations are logically equivalent.
+</p>
+<p>
+So there are two logically distinct ways of representing a single timeseries. Which one you choose depends on whether you regard it as a single feature from a discrete sampling geometry (scattered points), or as the time-dependent data from a single point on a grid.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-56-1377705214000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:56" class="cnum">
+    <a href="#comment:56">comment:56</a>
+  </span>
+        in reply to:
+    <a href="#comment:55">↑ 55</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-28T08%3A53%3A34-07%3A00&amp;precision=second" title="See timeline at 08/28/13 08:53:34">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan:
+</p>
+<p>
+I think that this is the root of the disagreement/misunderstanding. Just as radar data is 2 dimensional (has 2 independent coordinates) but is "embedded" in 3D space (has 3 coordinates needed to represent its position on the earth), so too can time-series data be understood as a 1 dimensional subspace ("manifold") embedded in 4D space. But I dont think that proposal <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a> allows that possibility.
+</p>
+<p>
+Regards,
+John
+</p>
+<p>
+Replying to <a class="ticket" href="./104#comment:55" title="Comment 55">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<blockquote class="citation">
+<p>
+Suppose that the data provider would prefer to represent her time-series data as having a single independent coordinate, ie is 1 dimensional? How would she do that under ticket <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>?
+</p>
+</blockquote>
+<p>
+If the single timeseries is recorded like this:
+</p>
+<pre class="wiki">dimensions:
+  station=1;
+  time=NNN;
+variables:
+  float lat(station);
+  float lon(station);
+  float time(time);
+  float temp(station,time);
+    temp:coordinates="lat lon";
+</pre><p>
+it would be interpreted as having two independent dimensions, one of space and one of time. The space dimension has size one and lat and lon both depend on it. Is that what you mean by 1D? It can't be truly 1D unless you omit the spatial information altogether. A timeseries discrete sampling geometry must have at least horizontal coordinates.
+</p>
+<p>
+If the single timeseries is recorded like this:
+</p>
+<pre class="wiki">dimensions:
+  time=NNN;
+variables:
+  float lat;
+  float lon;
+  float time(time);
+  float temp(time);
+    temp:coordinates="lat lon";
+</pre><p>
+or like this:
+</p>
+<pre class="wiki">dimensions:
+  lon=1;
+  lat=1;
+  time=NNN;
+variables:
+  float lon(lon);
+  float lat(lat);
+  float time(time);
+  float temp(time,lat,lon);
+</pre><p>
+it would be interpreted as having three independent dimensions, of longitude, latitude and time, with the longitude and latitude both having size one. The main point of this ticket is that these last two representations are logically equivalent.
+</p>
+<p>
+So there are two logically distinct ways of representing a single timeseries. Which one you choose depends on whether you regard it as a single feature from a discrete sampling geometry (scattered points), or as the time-dependent data from a single point on a grid.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-57-1377709903000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:57" class="cnum">
+    <a href="#comment:57">comment:57</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-28T10%3A11%3A43-07%3A00&amp;precision=second" title="See timeline at 08/28/13 10:11:43">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+I don't understand, I'm afraid. I think it is natural to regard a single timeseries as a kind of core bored, or skewered, through 4D space-time, at a particular fixed single point (with size-one x and y coordinates, required in a timeseries DSG, and perhaps a size-one z coordinate), ranging over all times. Both the logical representations above have that idea, I would say; they differ according to whether you regard this single timeseries as one from a number of scattered points in a DSG, or one from a point selected in 2D or 3D continuous space. This ticket does not change what is allowed or disallowed wrt the present convention.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-58-1377814688000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:58" class="cnum">
+    <a href="#comment:58">comment:58</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:59" class="follow-up">↓ 59</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-29T15%3A18%3A08-07%3A00&amp;precision=second" title="See timeline at 08/29/13 15:18:08">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan:
+</p>
+<p>
+This representation:
+</p>
+<pre class="wiki">variables:
+  float lat;
+  float lon;
+  float time(time);
+  float temp(time);
+    temp:coordinates="lat lon";
+</pre><p>
+would be interpreted as having three independent dimensions. But thats incorrect, or at least should be optional. It should be possible to interpret this as having only one independent coordinate, ie "1D". But theres no way to represent that in proposal <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a>.
+</p>
+<p>
+The more general issue is that the number of dimensions and the number of coordinates have different meanings. Interpreting a scalar coordinate as a dimension 1 coordinate (meaning independent) complicates things without any gain that i can see. Better is to let it be understood as a dependent variable, and if you want to indicate that its an independent coordinate, then you have to make it a coordinate variable, ie give it a dimension of length 1, and add that dimension to the data.
+</p>
+<p>
+OTOH, theres nothing special about a scalar coordinate, and should not be handled in a special way in the data model. Its just an auxiliary coordinate, period. By the current definition of coordinate and auxiliary coordinate, its clearly an auxiliary coordinate.
+</p>
+<p>
+What this discussion has helped clarify for me is that coordinate variables are independent, and auxiliary coordinates are dependent variables. I think thats a really valuable advance in the data model.
+</p>
+<p>
+Things are complicated a bit by the DSG representations that introduce, eg a station dimension, that allows one to factor out the station info from the observation. Since all we have in the classic model are multidimensional arrays, one has to use dimensions for lots of things, not just to indicate the domain dimensionality. I guess we should look hard at the DSG representation to see what it says about the assertion that "coordinate variables are independent, and auxiliary coordinates are dependent variables".
+</p>
+<p>
+regards,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-59-1377876521000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:59" class="cnum">
+    <a href="#comment:59">comment:59</a>
+  </span>
+        in reply to:
+    <a href="#comment:58">↑ 58</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:60" class="follow-up">↓ 60</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-30T08%3A28%3A41-07%3A00&amp;precision=second" title="See timeline at 08/30/13 08:28:41">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<blockquote class="citation">
+<p>
+What this discussion has helped clarify for me is that coordinate variables are independent, and auxiliary coordinates are dependent variables. I think thats a really valuable advance in the data model.
+</p>
+</blockquote>
+<p>
+I agree. We will put that in the data model.
+</p>
+<blockquote class="citation">
+<p>
+OTOH, theres nothing special about a scalar coordinate, and should not be handled in a special way in the data model. Its just an auxiliary coordinate, period. By the current definition of coordinate and auxiliary coordinate, its clearly an auxiliary coordinate.
+</p>
+</blockquote>
+<p>
+It is formally an auxiliary coordinate variable, but not logically so. That's a point that Steve made and is included in the motivation for this ticket - now a long way back in <a class="ext-link" href="https://cf-pcmdi.llnl.gov./104#comment:28"><span class="icon">​</span>comment 28</a>:
+</p>
+<blockquote>
+<p>
+Scalar coordinate variables provide a convenient way to encode coordinate variables of size one. They do so by borrowing the syntax that is otherwise used for auxiliary coordinate variables. There is, however, a key difference between the interpretation of scalar coordinate variables and auxiliary coordinate variables. Scalar coordinates have the same status in a CF file as (conventional, Unidata, COARDS) coordinates in which the dimension name and the variable name match. These coordinates define the independent variables (spatiotemporal and others) for the data variable. Auxiliary coordinate variables provide extra information as a function of these independent variables, as alternative numeric values (which don't have to be unique or monotonic along a given dimension), or string-valued labels. To indicate that a variable is intended to be an auxiliary coordinate variable, it is necessary to give it a dimension, in order to show which coordinate variable(s) it belongs to. Numeric scalar coordinate variables are not to be interpreted as auxiliary coordinate variables.
+</p>
+</blockquote>
+<p>
+Yes, the single timeseries representation with scalar <tt>lat</tt> and <tt>lon</tt> coordinates would, according to this ticket, be regarded as having independent dimensions of lat and lon. That is a possible interpretation, and I would say it's the preferred one in the case that the timeseries was extracted from a gridded dataset.
+</p>
+<p>
+I would argue that it <em>is</em> possible, according to this ticket, to store the data with the interpretation you prefer, that it's one timeseries from a DSG. That is what it means if we use auxiliary coordinates i.e.
+</p>
+<pre class="wiki">dimensions:
+  station=1;
+  time=NNN;
+variables:
+  float lat(station);
+  float lon(station);
+  float time(time);
+  float temp(station,time);
+    temp:coordinates="lat lon";
+</pre><p>
+In this case, the <tt>station</tt> dimension is a discrete axis. CF section 4.5 says a discrete axis "indicates either an ordered list or an unordered collection, and does not correspond to any continuous coordinate variable." So it is a netCDF dimension, but it doesn't correspond to any independent physical dimension. It's just an index; only <tt>time</tt> is an independent physical dimension. Isn't that what you want?
+</p>
+<p>
+Consider the case with <tt>station=2</tt> but otherwise the same. Now you have two 1D timeseries, each with a single independent physical dimension of time. The other netCDF dimension is just an index to bundle them up. You could put exactly the same data in a one of the chapter 9 ragged representations. Then the data array would have only one netCDF dimension, but the station dimension would still exist, and you would still have <tt>lat(station)</tt> and <tt>lon(station)</tt> just as above. Again, the <tt>station</tt> dimension is simply an index. Would you agree that this does not add any physical dimensions to the individual timeseries?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-60-1377890846000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:60" class="cnum">
+    <a href="#comment:60">comment:60</a>
+  </span>
+        in reply to:
+    <a href="#comment:59">↑ 59</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-30T12%3A27%3A26-07%3A00&amp;precision=second" title="See timeline at 08/30/13 12:27:26">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all:
+</p>
+<blockquote class="citation">
+<p>
+I would argue that it <em>is</em> possible, according to this ticket, to store the data with the interpretation you prefer, that it's one timeseries from a DSG. That is what it means if we use auxiliary coordinates i.e.
+</p>
+<pre class="wiki">dimensions:
+  station=1;
+  time=NNN;
+variables:
+  float lat(station);
+  float lon(station);
+  float time(time);
+  float temp(station,time);
+    temp:coordinates="lat lon";
+</pre><p>
+In this case, the <tt>station</tt> dimension is a discrete axis. CF section 4.5 says a discrete axis "indicates either an ordered list or an unordered collection, and does not correspond to any continuous coordinate variable." So it is a netCDF dimension, but it doesn't correspond to any independent physical dimension. It's just an index; only <tt>time</tt> is an independent physical dimension. Isn't that what you want?
+</p>
+<p>
+Consider the case with <tt>station=2</tt> but otherwise the same. Now you have two 1D timeseries, each with a single independent physical dimension of time. The other netCDF dimension is just an index to bundle them up. You could put exactly the same data in a one of the chapter 9 ragged representations. Then the data array would have only one netCDF dimension, but the station dimension would still exist, and you would still have <tt>lat(station)</tt> and <tt>lon(station)</tt> just as above. Again, the <tt>station</tt> dimension is simply an index. Would you agree that this does not add any physical dimensions to the individual timeseries?
+</p>
+</blockquote>
+<p>
+I agree with your interpretation and that this is a possible way to represent 1D data.
+</p>
+<blockquote class="citation">
+<p>
+It is formally an auxiliary coordinate variable, but not logically so. That's a point that Steve made and is included in the motivation for this ticket - now a long way back in <a class="ext-link" href="https://cf-pcmdi.llnl.gov./104#comment:28"><span class="icon">​</span>comment 28</a>:
+</p>
+<blockquote>
+<p>
+Scalar coordinate variables provide a convenient way to encode coordinate variables of size one. They do so by borrowing the syntax that is otherwise used for auxiliary coordinate variables. There is, however, a key difference between the interpretation of scalar coordinate variables and auxiliary coordinate variables. Scalar coordinates have the same status in a CF file as (conventional, Unidata, COARDS) coordinates in which the dimension name and the variable name match. These coordinates define the independent variables (spatiotemporal and others) for the data variable. Auxiliary coordinate variables provide extra information as a function of these independent variables, as alternative numeric values (which don't have to be unique or monotonic along a given dimension), or string-valued labels. To indicate that a variable is intended to be an auxiliary coordinate variable, it is necessary to give it a dimension, in order to show which coordinate variable(s) it belongs to. Numeric scalar coordinate variables are not to be interpreted as auxiliary coordinate variables.
+</p>
+</blockquote>
+</blockquote>
+<p>
+I dont see the motivation in this comment, it appears to be a statement of the proposal. Also this statement of the purpose of auxiliary coordinates misses the critical point of that they can represent the embedding of the data domain into a higher dimensional space (think of 2D radar in 3D cartesion space).
+</p>
+<p>
+Here's why I think scalar coordinates need to be understood as auxiliary coordinates. Suppose you want to add a length=1 coordinate, and you now get to decide if its dependent or independent. If independent, you must add a new dimension to the data, and if you want it to be a dependent variable, you must not add a new dimension to the data. In the independent case, you can use a standard coordinate variable lat (lat=1). But in the dependent case, you cant use anything other than the scalar form. So we need to leave that form as indicating an auxiliary coordinate. 
+</p>
+<p>
+The example that ive been using to illustrate this is:
+</p>
+<pre class="wiki">1D data:
+
+dimensions:
+  time=23236727;
+
+float data(time);
+  data:coordinates = "lat lon time"
+float time(time);
+float lat;
+float lon
+
+3D data:
+
+dimensions:
+  lat=1;
+  lon=1;
+  time=23236727;
+
+float data(time, lat, lon);
+  data:coordinates = "lat lon time"
+float time(time);
+float lat(lat);
+float lon(lon)
+</pre><p>
+The dimensionality of the data, indicates the dimensionality of the domain. The number of coordinates represents the dimensionality of the range. If you lose track of that then none of this really matters.
+</p>
+<p>
+Regards
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-61-1377900830000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:61" class="cnum">
+    <a href="#comment:61">comment:61</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-30T15%3A13%3A50-07%3A00&amp;precision=second" title="See timeline at 08/30/13 15:13:50">8 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I think this is our question:  <em>When a scalar coordinate is associated with a data variable through a coordinates attribute, is the proper interpretation that the scalar coordinate is an independent axis of length 1?  Or simply a dependent variable?</em>
+</p>
+<p>
+The current text is internally contradictory (*).  But I like the free wheeling approach that is found in this definition:
+</p>
+<blockquote>
+<p>
+<strong>scalar coordinate variable</strong><br />
+A scalar variable that contains coordinate data. Functionally equivalent to either a size one coordinate variable or a size one auxiliary coordinate variable. 
+</p>
+</blockquote>
+<p>
+I suspect that we should continue to live with this ambiguity. To emphasize this perspective consider example H.5 (<em>Single time series, including deviations from a nominal fixed spatial location</em> <a class="ext-link" href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html#idp8320208"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html#idp8320208</a> ) in which scalar variables 'lat' and 'lon' may be regarded as independent or dependent depending on the context in which the file is being used.
+</p>
+<p>
+This ambiguity is (I think) a challenge for the data model rather than for CF, itself.   Can it be addressed by redefining some concepts inside of the data model, without altering CF?  (So easy to lose track of the question.  Sorry if I have.)
+</p>
+<p>
+====
+</p>
+<p>
+(*) The text also says: "Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable."
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-62-1377910225000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:62" class="cnum">
+    <a href="#comment:62">comment:62</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-08-30T17%3A50%3A25-07%3A00&amp;precision=second" title="See timeline at 08/30/13 17:50:25">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan, Steve and all:
+</p>
+<p>
+Whatever the outcome of this discussion, i feel like it has really helped me understand the meaning of dependent/independent coordinate variables. 
+</p>
+<p>
+Most data providers are not thinking about this when they design their files, im sure, so it remains to be seen if existing CF files are consistent in the use of coordinate/auxiliary coordinate as indicating dependence/independence.
+</p>
+<p>
+Would love to hear other's perspectives, and ill be out of touch next week.
+</p>
+<p>
+Kind regards,
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-63-1378111414000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:63" class="cnum">
+    <a href="#comment:63">comment:63</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-09-02T01%3A43%3A34-07%3A00&amp;precision=second" title="See timeline at 09/02/13 01:43:34">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Steve and John
+</p>
+<p>
+Thanks for your additions.
+</p>
+<p>
+Yes, as Steve says, this discussion is entirely about interpretation and the data model. The current text can be seen as contradictory. This ticket proposes to remove the ambiguity by following the text, "Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable." That follows what Steve said earlier, and I quoted: "Scalar coordinate variables provide a convenient way to encode coordinate variables of size one. They do so by borrowing the syntax that is otherwise used for auxiliary coordinate variables." I think that the definition appears to be ambiguous because there are two kinds of scalar coordinate variable mentioned in the CF document. There are numeric scalar coordinate variables, which were introduced to mean the same thing as size-one numeric coordinate variables, and there are string-valued scalar coordinate variables, and they have to be logically regarded auxiliary coordinate variables because string-valued coordinate variables are not possible in netCDF. This ticket proposes to clarify that as well.
+</p>
+<p>
+We do not think that ambiguity is desirable or necessary and was not intended. We could retain the ambiguity by creating a third class of coordinate (not dimension coordinate, not auxiliary coordinate) in the data model, as Mark argues in ticket 105. David and I think that's an unnecessary complexity which has not been envisaged in the design of CF up to now, and that it's better for data-writers to indicate what their data mean.
+</p>
+<p>
+I'd like to understand John's point but it looks like I'll have to wait for a week. :-) The problem I'm having with it is shown by the example implied in my last posting:
+</p>
+<pre class="wiki">dimensions:
+  station=2;
+  time=NNN;
+variables:
+  float lat(station);
+  float lon(station);
+  float time(time);
+  float temp(station,time);
+    temp:coordinates="lat lon";
+</pre><p>
+This is a discrete sampling geometry with two timeseries. The data variable has two dimensions. John writes, "The dimensionality of the data indicates the dimensionality of the domain. The number of coordinates represents the dimensionality of the range." So what is the dimensionality of the data here? I think, by expressing it as a DSG, we are saying the data is physically one-dimensional (time). The other netCDF dimension is just an index, a discrete axis. If you like, you can regard lat and lon as a function of this index. It's like an ensemble axis, which is also not a physical coordinate. If this is not true, I do not understand how chapter 9 can possibly meet John's requirement that timeseries should be regarded as physically one-dimensional. In my opinion, if <tt>station=1</tt> in the above example, we have the same interpretation of it. The data is still physically one-dimensional, though formally two-dimensional.
+</p>
+<p>
+In order to decide about this ticket, the CF committee has been asked to vote on it. So far, Nan, Roy, Russ, Martin, Rich, Karl and I have given support. It would be good to hear from Balaji, Philip, Bryan and Alison, as well as more from John and Steve, when possible.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-64-1378111932000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:64" class="cnum">
+    <a href="#comment:64">comment:64</a>
+  </span>
+        in reply to:
+    <a href="#comment:28">↑ 28</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-09-02T01%3A52%3A12-07%3A00&amp;precision=second" title="See timeline at 09/02/13 01:52:12">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Since there have been a couple of changes since the proposal was last stated, here it is again in its current form:
+</p>
+<p>
+<strong>Overview, or motivation</strong>
+</p>
+<blockquote>
+<p>
+Scalar coordinate variables provide a convenient way to encode coordinate variables of size one. They do so by borrowing the syntax that is otherwise used for auxiliary coordinate variables. There is, however, a key difference between the interpretation of scalar coordinate variables and auxiliary coordinate variables. Scalar coordinates have the same status in a CF file as (conventional, Unidata, COARDS) coordinates in which the dimension name and the variable name match. These coordinates define the independent variables (spatiotemporal and others) for the data variable. Auxiliary coordinate variables provide extra information as a function of these independent variables, as alternative numeric values (which don't have to be unique or monotonic along a given dimension), or string-valued labels. To indicate that a variable is intended to be an auxiliary coordinate variable, it is necessary to give it a dimension, in order to show which coordinate variable(s) it belongs to. Numeric scalar coordinate variables are not to be interpreted as auxiliary coordinate variables.
+</p>
+</blockquote>
+<p>
+This is the change to the convention:
+</p>
+<p>
+<strong>Section 5.7, Scalar coordinate variables.</strong>
+</p>
+<p>
+Replace
+</p>
+<blockquote>
+<p>
+When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable. Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the coordinates attribute.
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+When a variable has an associated coordinate which is single-valued, that coordinate may be represented as a scalar variable (i.e. a data variable which has no netCDF dimensions). Since there is no associated dimension these scalar coordinate variables should be attached to a data variable via the coordinates attribute.
+</p>
+</blockquote>
+<p>
+Replace
+</p>
+<blockquote>
+<p>
+Under COARDS the method of providing a single valued coordinate was to add a dimension of size one to the variable, and supply the corresponding coordinate variable. The new scalar coordinate variable is a convenience feature which avoids adding size one dimensions to variables. Scalar coordinate variables have the same information content and can be used in the same contexts as a size one coordinate variable.
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables. A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable. Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (Section 6.1). 
+</p>
+</blockquote>
+<p>
+At the end of the section, add:
+</p>
+<blockquote>
+<p>
+If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one. If two or more single-valued coordinates are not independent, but have related values (this might be the case, for instance, for time and forecast period, or vertical coordinate and model level number, Section 6.2), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables. 
+</p>
+</blockquote>
+<p>
+<strong>Section 6.1, Labels</strong>
+</p>
+<p>
+Replace the last sentence
+</p>
+<blockquote>
+<p>
+If a character variable has only one dimension (the maximum length of the string), it is regarded as a string-valued scalar coordinate variable, analogous to a numeric scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables).
+</p>
+</blockquote>
+<p>
+with
+</p>
+<blockquote>
+<p>
+If a string-valued auxiliary coordinate variable has only one dimension (the maximum length of the string), it is a string-valued scalar coordinate variable (see Section 5.7, Scalar Coordinate Variables). As such, it has the same information content and can be used in the same contexts as a string-valued auxiliary coordinate variable of a size one dimension which has not been added to the data variable. This is a convenience feature.
+</p>
+</blockquote>
+<p>
+In addition, when/if we return to the data model discussion, we should note that (dimension) coordinate constructs are for independent coordinates, and auxiliary coordinate constructs for dependent coordinates, as John's comments have suggested.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-65-1379677608000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:65" class="cnum">
+    <a href="#comment:65">comment:65</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-09-20T04%3A46%3A48-07%3A00&amp;precision=second" title="See timeline at 09/20/13 04:46:48">8 years ago</a> by apamment
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+After careful reading of both tickets <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a> and <a class="closed ticket" href="./105.html" title="enhancement: Scalar Coordinates (closed: wontfix)">#105</a> and the relevant sections of CF 1.6, I have come to the conclusion that I support the approach taken in ticket 104. Therefore I vote to accept <a class="closed ticket" href="./104.html" title="enhancement: Clarify the interpretation of scalar coordinate variables (closed: fixed)">#104</a> and reject <a class="closed ticket" href="./105.html" title="enhancement: Scalar Coordinates (closed: wontfix)">#105</a>.
+</p>
+<p>
+I agree that the original intention in section 5.7 seems to have been that scalar coordinate variables represent independent axes. Scalar coordinates are stated to be an alternative to adding a size one dimension, which implies that each one does indeed represent an independent dimension of the data variable. I can't help feeling that if CF had stuck to the COARDS way of doing things, i.e., always requiring the addition of size 1 dimensions to data variables, then this ambiguity about whether scalar coordinates are independent or auxiliary would not have arisen. Perhaps this is something to bear in mind if we are tempted to add any more "convenience features" in the future.
+</p>
+<p>
+I can see how the kind of practices highlighted by Mark may have arisen, but I think it is highly undesirable for data files to be written in which the relationship between the coordinates and auxiliary coordinates is ambiguous. I fully agree with Jonathan and David's position that users of data are free to interchange coordinates and auxiliary coordinates as appropriate for their application of the data. Furthermore, I think the ability to do this in a meaningful way (i.e. correctly interpreting the data) is enhanced by making the relationships between the possible alternative coordinates clear at the time of writing. Not to document these relationships is to supply incomplete and possibly misleading metadata which diminishes the opportunities to reuse the data and interpret it appropriately. I certainly do not think we should change the convention to encourage ambiguous use of either coordinate or auxiliary coordinate variables, hence my rejection of the proposal in ticket 105.
+</p>
+<p>
+I confess to having become rather bogged down when reading the discussion of dimensionality versus degrees of freedom, but John's examples  helped me to understand (eventually!) the issue. My feeling is to go with Jonathan's way of doing things, i.e., that scalar coordinates are independent and data with only one real degree of freedom, like John's time series, should be described by adding auxiliary coordinates of size one. I think John's idea of making scalar coordinates dependent is in some ways simpler, but it is a more radical change than the one Jonathan is proposing. I had a look at the CF 1.6 conformance document to see what it says about scalar coordinates. They are referred to in section 7.3 (and also, of course, in the corresponding section of the conventions). The text on cell methods clearly treats scalar coordinates as separate dimensions along which statistical processing may have taken place. For this reason, I think that changing scalar coordinates to being dependent rather than independent is in fact a break with the way things have been done in the past and it risks making CF1.7 incompatible with earlier versions.
+</p>
+<p>
+Regardless of whether we ultimately choose to declare scalar coordinates as dependent or independent, I would advocate the inclusion in the conventions document of as many examples as are necessary to fully illustrate the intended use of both scalar coordinates and auxiliary coordinates. In this way, we can hope to avoid future ambiguities and misunderstandings. Maybe we could even include clearly signposted "Do" and "Don't" examples, showing first how scalar coordinate variables are meant to be used and also how they are <em>not</em> meant to be used.
+</p>
+<p>
+Best wishes,
+Alison
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-66-1383321128000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:66" class="cnum">
+    <a href="#comment:66">comment:66</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-11-01T08%3A52%3A08-07%3A00&amp;precision=second" title="See timeline at 11/01/13 08:52:08">7 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all
+</p>
+<p>
+Thank you for your thoughtful comments, Alison.
+</p>
+<p>
+Following the above useful discussions with John and Steve, and further email discussions, I'd like to add one more change to this proposal:
+</p>
+<p>
+In Section 1.2, change the definition
+</p>
+<blockquote>
+<p>
+scalar coordinate variable: A scalar variable that contains coordinate data. Functionally equivalent to either a size one coordinate variable or a size one auxiliary coordinate variable.
+</p>
+</blockquote>
+<p>
+to
+</p>
+<blockquote>
+<p>
+scalar coordinate variable. A scalar variable (i.e. one with no dimensions) that contains coordinate data. Depending on context, it may be functionally equivalent either to a size-one coordinate variable (Section 5.7) or to a size-one auxiliary coordinate variable (Sections 6.1 and 9.2).
+</p>
+</blockquote>
+<p>
+This is in order to define what "scalar" means, and to provide pointers to the relevant parts of the document where the role of scalar coordinate variables is clarified.
+</p>
+<p>
+It's become clear from these discussions that it would be better to indicate the role of scalar coordinate variables explicitly. I will make a proposal in another ticket to define new <tt>cf_role</tt> values for that purpose. However, if agreed, that wouldn't be implemented until CF 1.7 or 1.8. At the moment we are discussing the interpretation and the data model of CF 1.5. None of the changes proposed in this ticket intend to change anything about CF-netCDF; they are concerned only with clarifying what CF 1.5 means. I don't want to make a proposal to modify CF metadata in this ticket, because I fear that it would delay the conclusion of the data model discussion, which has already been in progress for a couple of years (beginning in ticket 68)!
+</p>
+<p>
+If this ticket is agreed, we can go back to continuing the data model discussion in ticket 98. Following other comments by John, we will there propose inserting some text about the correspondence between dimension/auxiliary and independent/dependent coordinates in the data model.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-67-1383559767000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:67" class="cnum">
+    <a href="#comment:67">comment:67</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-11-04T02%3A09%3A27-08%3A00&amp;precision=second" title="See timeline at 11/04/13 02:09:27">7 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I appreciate the clarifications and thoughts from all parties involved in this discussion, and the patience shown with me.
+</p>
+<p>
+The community has concluded on its view, I do not have further objections to the principle of the approach stated in this ticket.  I would like to see the discussions on this ticket conclude with suitable clarification text in time for for the 1.7 conventions document.
+</p>
+<p>
+I will consider the text as <a class="ticket" href="./104#comment:64" title="Comment 64">posted above</a> and add any comments I have on wording as part of concluding this ticket.
+</p>
+<p>
+mark
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-68-1383955891000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:68" class="cnum">
+    <a href="#comment:68">comment:68</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-11-08T16%3A11%3A31-08%3A00&amp;precision=second" title="See timeline at 11/08/13 16:11:31">7 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+ok with me
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-69-1386144637000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:69" class="cnum">
+    <a href="#comment:69">comment:69</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-12-04T00%3A10%3A37-08%3A00&amp;precision=second" title="See timeline at 12/04/13 00:10:37">7 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+A month has passed with no new comments being made. There are no outstanding objections and the ticket has enough support to be accepted according to the rules, so I presume that it is concluded and this change should be included in CF version 1.7, in the form shown in <a class="ext-link" href="https://cf-pcmdi.llnl.gov./104#comment:64"><span class="icon">​</span>comment 64</a> and <a class="ext-link" href="https://cf-pcmdi.llnl.gov./104#comment:66"><span class="icon">​</span>comment 66</a>. Thanks to all the participants in the discussion.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-70-1483541367001755">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:70" class="cnum">
+    <a href="#comment:70">comment:70</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-01-04T06%3A49%3A27-08%3A00&amp;precision=second" title="See timeline at 01/04/17 06:49:27">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-conventions@…</em> to <em>davidhassell</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>accepted</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-71-1490731363116237">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:71" class="cnum">
+    <a href="#comment:71">comment:71</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-28T13%3A02%3A43-07%3A00&amp;precision=second" title="See timeline at 03/28/17 13:02:43">4 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>accepted</em> to <em>closed</em>
+    </li>
+  </ul>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./104?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./104?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./104?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

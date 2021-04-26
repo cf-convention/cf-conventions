@@ -1,0 +1,782 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #92 (Add oblique mercator projection)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./91.html" title="ticket #91" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./92?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./92?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./92?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./93.html" title="ticket #93" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./91.html" title="ticket #91">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./93.html" title="ticket #93">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2012-08-01T16%3A19%3A15-07%3A00&amp;precision=second" title="See timeline at 08/01/12 16:19:15">9 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2017-02-15T11%3A27%3A22-08%3A00&amp;precision=second" title="See timeline at 02/15/17 11:27:22">4 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./92.html" class="trac-id">#92</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Add oblique mercator projection</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=mcginnis">mcginnis</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner"><a href="/trac/query?status=!closed&amp;owner=davidhassell">davidhassell</a></td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+The Oblique Mercator projection is used by at least one regional climate model, RegCM3, which is part of the NARCCAP climate modeling program.  Currently we record its map projection information using the transverse_mercator projection, which I have learned is very similar but not quite the same.  I propose to add this map projection so we can get it right.
+</p>
+<p>
+Proposed text:
+</p>
+<hr />
+<p>
+Oblique Mercator
+</p>
+<blockquote>
+<p>
+grid_mapping_name = oblique_mercator
+</p>
+</blockquote>
+<p>
+Map parameters:
+</p>
+<ul><li>azimuth
+</li><li>latitude_of_projection_origin
+</li><li>longitude_of_projection_origin
+</li><li>scale_factor_at_projection_origin
+</li><li>false_easting
+</li><li>false_northing 
+</li></ul><p>
+Map coordinates:
+</p>
+<blockquote>
+<p>
+The x (abscissa) and y (ordinate) rectangular coordinates are identified by the standard_name attribute value projection_x_coordinate and projection_y_coordinate respectively. 
+</p>
+</blockquote>
+<p>
+Notes: 
+</p>
+<blockquote>
+<p>
+Notes on using the PROJ.4 software package for computing the mapping may be found at <a class="ext-link" href="http://www.remotesensing.org/geotiff/proj_list/hotine_oblique_mercator.html"><span class="icon">​</span>http://www.remotesensing.org/geotiff/proj_list/hotine_oblique_mercator.html</a> . The Rotated Mercator projection is an Oblique Mercator projection with azimuth = +90.
+</p>
+</blockquote>
+<hr />
+<p>
+If adding a new attribute for azimuth is problematic, this proposal could be modified to add the rotated_mercator projection instead, which is a special case of Oblique Mercator with azimuth = 90.
+</p>
+<p>
+Note that apparently there is a subtle technical difference between an Oblique Mercator projection and a Hotine Oblique Mercator projection that depends on when the rectification from skew grid to map grid is applied. Since most mapping packages don't support a rectified grid angle parameter at all (effectively giving it a default value of 90 degrees, such that it has no effect), to avoid unnecessary proliferation of attributes I propose to omit this parameter and elide this distinction until such time as it proves necessary.
+</p>
+<p>
+My knowledge of this topic is quite limited; I have made this proposal based on what understanding I have gleaned from the geotiff website and communications with colleagues working with our RegCM3 output in GIS. Commentary from experts would be very welcome.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(14)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1343891998000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-08-02T00%3A19%3A58-07%3A00&amp;precision=second" title="See timeline at 08/02/12 00:19:58">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Seth
+</p>
+<p>
+Thanks for this proposal. I too am not an expert but it looks sensible to me, there is clearly a use-case for it, and I support it. It is fine to add an extra parameter of <tt>azimuth</tt>. That needs to be defined in Table F.1. Please could you propose a new draft entry for that table as well?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1343935211000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:3" class="follow-up">↓ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-08-02T12%3A20%3A11-07%3A00&amp;precision=second" title="See timeline at 08/02/12 12:20:11">9 years ago</a> by mcginnis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Jonathan--
+</p>
+<p>
+Happy to.
+</p>
+<p>
+--Seth
+</p>
+<p>
+Azimuth entry for Table F.1:
+</p>
+<p>
+Attribute: azimuth
+Type: N
+Description: Specifies a horizontal angle measured in degrees clockwise from North. Used by certain projections (e.g., Oblique Mercator) to define the orientation of the map projection relative to a reference direction.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1348149877000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+        in reply to:
+    <a href="#comment:2">↑ 2</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-09-20T07%3A04%3A37-07%3A00&amp;precision=second" title="See timeline at 09/20/12 07:04:37">9 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./92#comment:2" title="Comment 2">mcginnis</a>:
+</p>
+<p>
+Hi Seth,
+</p>
+<blockquote class="citation">
+<p>
+Azimuth entry for Table F.1:
+</p>
+<p>
+Attribute: azimuth
+Type: N
+Description: Specifies a horizontal angle measured in degrees clockwise from North. Used by certain projections (e.g., Oblique Mercator) to define the orientation of the map projection relative to a reference direction.
+</p>
+</blockquote>
+<p>
+Since there are potentially many different ways in which azimuth values are used in the CRS world, I'm wondering if a more specific attribute name might be worth considering here.
+</p>
+<p>
+Searching the online <a class="ext-link" href="http://www.epsg-registry.org/"><span class="icon">​</span>EPSG registry</a> of geodetic parameters it looks like the analogous coordinate parameter is called "azimuth of initial line", which might suggest an attribute name of <tt>azimuth_of_initial_line</tt>, for example. But I could well be wrong (it wouldn't be the first time ;-).
+</p>
+<p>
+For information, the corresponding parameter description in the EPSG registry is:
+</p>
+<blockquote>
+<p>
+"The azimuthal direction (north zero, east of north being positive) of the great circle which is the centre line of an oblique projection. The azimuth is given at the projection centre."
+</p>
+</blockquote>
+<p>
+Regards,
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1351889715000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:7" class="follow-up">↓ 7</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-11-02T13%3A55%3A15-07%3A00&amp;precision=second" title="See timeline at 11/02/12 13:55:15">8 years ago</a> by mcginnis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I hadn't thought about other CRS uses for azimuth, so that makes sense.  Thanks for the suggestion, Phil.
+</p>
+<p>
+Searching around the web, I think that for this projection it's most commonly referred to as the "center line", so I will revise the entry for table F.1 as follows:
+</p>
+<p>
+`Attribute: azimuth_of_center_line
+</p>
+<p>
+Type: N
+</p>
+<p>
+Description: Specifies the horizontal angle, measured in degrees clockwise from North, of the great circle used as the center line of the Oblique Mercator projection.`
+</p>
+<p>
+--Seth
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1351889958000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-11-02T13%3A59%3A18-07%3A00&amp;precision=second" title="See timeline at 11/02/12 13:59:18">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Seth:
+</p>
+<p>
+Do you have a sample file we could use for testing? thanks.
+</p>
+<p>
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1351890752000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-11-02T14%3A12%3A32-07%3A00&amp;precision=second" title="See timeline at 11/02/12 14:12:32">8 years ago</a> by mcginnis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi John,
+</p>
+<p>
+I've placed a sample file here:
+</p>
+<p>
+<a class="ext-link" href="http://www.narccap.ucar.edu/temp/oblique/orog_RCM3.nc"><span class="icon">​</span>http://www.narccap.ucar.edu/temp/oblique/orog_RCM3.nc</a>
+</p>
+<p>
+--Seth
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1352109796000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+        in reply to:
+    <a href="#comment:4">↑ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-11-05T02%3A03%3A16-08%3A00&amp;precision=second" title="See timeline at 11/05/12 02:03:16">8 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./92#comment:4" title="Comment 4">mcginnis</a>:
+</p>
+<blockquote class="citation">
+<p>
+`Attribute: azimuth_of_center_line
+</p>
+</blockquote>
+<p>
+With an alias of <tt>azimuth_of_centre_line</tt>, presumably, for us old-world users (only kidding :-)
+</p>
+<p>
+Although, thinking about it, as an alternative you might want to mirror some of the existing grid mapping attributes (which use 'central') and go with <tt>azimuth_of_central_line</tt>.
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1361917386000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:10" class="follow-up">↓ 10</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-02-26T14%3A23%3A06-08%3A00&amp;precision=second" title="See timeline at 02/26/13 14:23:06">8 years ago</a> by mcginnis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Phil,
+</p>
+<p>
+Google says usage of "central line" vs "center line" is about 50/50, so if it'll make it more consistent with other grid mappings, let's go with azimuth_of_central_line.
+</p>
+<p>
+Thanks for the suggestion!
+</p>
+<p>
+Cheers,
+</p>
+<p>
+--Seth
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1362066209000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-02-28T07%3A43%3A29-08%3A00&amp;precision=second" title="See timeline at 02/28/13 07:43:29">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Seth
+</p>
+<p>
+Thanks for investigating that. Does anyone have any more comments on this proposal as it now stands?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1362068268000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+        in reply to:
+    <a href="#comment:8">↑ 8</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-02-28T08%3A17%3A48-08%3A00&amp;precision=second" title="See timeline at 02/28/13 08:17:48">8 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Seth,
+</p>
+<p>
+Replying to <a class="ticket" href="./92#comment:8" title="Comment 8">mcginnis</a>:
+</p>
+<blockquote class="citation">
+<p>
+Google says usage of "central line" vs "center line" is about 50/50, so if it'll make it more consistent with other grid mappings, let's go with azimuth_of_central_line.
+</p>
+<p>
+Thanks for the suggestion!
+</p>
+</blockquote>
+<p>
++1.  Good to go for v1.7, I reckon.
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1362375437000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-03T21%3A37%3A17-08%3A00&amp;precision=second" title="See timeline at 03/03/13 21:37:17">8 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Looks ok to me.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1362422600000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-04T10%3A43%3A20-08%3A00&amp;precision=second" title="See timeline at 03/04/13 10:43:20">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Enough support has been expressed for this proposal to be accepted according to the rules. If there are no objections before 20 March, it will be accepted. Thanks to all for their contributions.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1483541596359580">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-01-04T06%3A53%3A16-08%3A00&amp;precision=second" title="See timeline at 01/04/17 06:53:16">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-conventions@…</em> to <em>davidhassell</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>accepted</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-14-1487186842438101">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-02-15T11%3A27%3A22-08%3A00&amp;precision=second" title="See timeline at 02/15/17 11:27:22">4 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>accepted</em> to <em>closed</em>
+    </li>
+  </ul>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./92?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./92?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./92?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,654 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #6 (Unstructured Grids Vocabulary Request)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./5.html" title="ticket #5" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./6?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./6?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./6?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./7.html" title="ticket #7" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./5.html" title="ticket #5">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./7.html" title="ticket #7">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2006-10-31T10%3A35%3A49-08%3A00&amp;precision=second" title="See timeline at 10/31/06 10:35:49">14 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2008-10-29T09%3A20%3A33-07%3A00&amp;precision=second" title="See timeline at 10/29/08 09:20:33">12 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./6.html" class="trac-id">#6</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=task">task</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=wontfix">wontfix</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Unstructured Grids Vocabulary Request</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=tomgross">tomgross</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-wg-supporting-technologies@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="milestone" href="/trac/milestone/Unstructured%20Grid%20Data%20Model" title="No date set">Unstructured Grid Data Model</a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-wg-supporting-technologies">cf-wg-supporting-technologies</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~unstructured">unstructured</a> <a href="/trac/query?status=!closed&amp;keywords=~grids">grids</a> <a href="/trac/query?status=!closed&amp;keywords=~ontology">ontology</a> <a href="/trac/query?status=!closed&amp;keywords=~vocabulary">vocabulary</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+Welcome to the Unstructured Grid Mailing lists.  This task will be a
+sort of test for our ability to use the new CF task tracking and mailing
+list methods.  Remember: Don't "reply" to the emails directly, use the
+web page instead. See <a class="wiki" href="/trac/wiki/GettingStarted">GettingStarted</a> and <a class="wiki" href="/trac/wiki/UnstructuredTaskLists">UnstructuredTaskLists</a>
+</p>
+<p>
+This first task/discussion thread concerns the creation of a
+vocabulary for Unstructured Grids.  We began the task at the workshop
+and agreed upon a few useful starting points, such as the use of
+"Unstructured Grids" rather than "Unstructured Meshes", and the use of
+"Cell" instead of "Element" to refer to that fine grain structure which
+is usually a triangle or quadralateral made up of nodes, edges and faces.
+</p>
+<p>
+Contribute to this thread your ideas for other necessary vocabulary
+and perhaps other structures and "things" we need to describe in the
+construction of the Unstructured Grid Data Model
+</p>
+<blockquote>
+<p>
+Tom Gross
+</p>
+</blockquote>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(6)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1162320407000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2006-10-31T10%3A46%3A47-08%3A00&amp;precision=second" title="See timeline at 10/31/06 10:46:47">14 years ago</a> by tomgross
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-wg-supporting-technologies@…</em> to <em>tomgross</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-2-1162426943000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2006-11-01T16%3A22%3A23-08%3A00&amp;precision=second" title="See timeline at 11/01/06 16:22:23">14 years ago</a> by halliday1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>tomgross</em> to <em>cf-wg-supporting-technologies@…</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-3-1162494133000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:4" class="follow-up">↓ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2006-11-02T11%3A02%3A13-08%3A00&amp;precision=second" title="See timeline at 11/02/06 11:02:13">14 years ago</a> by dstuebe
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-milestone">
+      <strong class="trac-field-milestone">Milestone</strong>
+        changed from <em>Unstructured Grid Vocabulary</em> to <em>Unstructured Grid Data Model</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Hi Folks
+</p>
+<p>
+To kick things off on the Unstructured Grids WIKI page I have added some ideas
+that I scribbled down on the flight home to the wiki page that Tom has set up.
+</p>
+<p>
+*I need to change everything to Grid rather than Mesh, oops! Does anyone know how to fix the pages which are miss named mesh? how do I move those pages to xxxgrid instead of xxxmesh?
+</p>
+<p>
+In the <a class="wiki" href="/trac/wiki/CdlDiscussion">CdlDiscussion</a> section, I added a bunch of topics and some of my thoughts
+about workable solutions.
+</p>
+<p>
+The topics are:
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/Terminology"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/Terminology</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/GlobalAttributes"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/GlobalAttributes</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/MeshMetaData"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/MeshMetaData</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/CellTypes"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/CellTypes</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/ExtrudedMesh"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/ExtrudedMesh</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/StorageVsApplication"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/StorageVsApplication</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/Dimensions"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/Dimensions</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/Variables"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/Variables</a>
+</p>
+<p>
+<em>sorry about the http's, I am still getting the hang of the wiki thing...</em>
+</p>
+<p>
+The focus here is a practical approach to fitting our needs into the existing
+NetCDF CDL framework. I structured the meta data from the perspective of a
+programmer trying to write an API to read any compliant data set. The
+organization I tried to create is top down from the global attributes, to the
+grids, to the variables. It needs a lot of work so please add your own
+perspective, I hope it will be a good starting place though!
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1163804288000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+        in reply to:
+    <a href="#comment:3">↑ 3</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:5" class="follow-up">↓ 5</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2006-11-17T14%3A58%3A08-08%3A00&amp;precision=second" title="See timeline at 11/17/06 14:58:08">14 years ago</a> by tomgross
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Continuing the discussion of Unstructured Grid Vocabulary:
+</p>
+<blockquote>
+<p>
+Most of this is detailed in the wiki page: <a class="wiki" href="/trac/wiki/UgCellArrays">UgCellArrays</a>
+</p>
+</blockquote>
+<p>
+The unstructured grids are two things: A collection of variables which are associated with a few simple geometric objects and more complex geometric constructions made out of those objects.  There will be spacially located 1-d points which reside somewhere in space.  Then there are triangles which are simply three of those points.  
+A simple vocabulary hierarchy:
+<dl class="wiki"><dt>node</dt><dd>The 1d geometry point.  A location.
+</dd><dt>edge</dt><dd>Simple line segments, defined by two locations
+</dd><dt>face</dt><dd>An area defined on a cell
+</dd><dt>cell</dt><dd>An object with corners, edges and faces.  May or may not be three dimensional.
+</dd><dt>grid</dt><dd>A collection of cells
+</dd><dt>mosaic</dt><dd>A collection of grids with connectivity information
+</dd><dt>track</dt><dd>A collection of edges.  Used to describe coastlines, boundaries or interior elongated objects like roadways or levees.
+</p>
+</dd></dl>
+<p>
+The grid is the descriptor of the unstructured collection of triangles.  Each cell of three points would be described by the indices of those three points [node1, node2, node3}  Generalized a little bit to also call out the face and edges:
+</p>
+<blockquote>
+<p>
+int grid(ncells, cell_length) ;
+</p>
+<blockquote>
+<p>
+grid:cell_type = "tri_face_edged"
+grid:dims=[ nodes, nodes, nodes, faces, edges, edges, edges ];
+grid:standard_name= "Cell_Connectivity_Indices"
+</p>
+</blockquote>
+</blockquote>
+<p>
+A question for the CF conventions:  Does this violate the "coordinate" dimension and variable concept?  Or does the coordinate dimension of "nodes" make the connection to the variables Longitude(nodes), Latitude(nodes) etc.??
+</p>
+<p>
+ 
+</p>
+<p>
+Replying to <a class="ticket" href="./6#comment:3" title="Comment 3">dstuebe</a>:
+</p>
+<blockquote class="citation">
+<p>
+Hi Folks
+</p>
+<p>
+To kick things off on the Unstructured Grids WIKI page I have added some ideas
+that I scribbled down on the flight home to the wiki page that Tom has set up.
+</p>
+<p>
+*I need to change everything to Grid rather than Mesh, oops! Does anyone know how to fix the pages which are miss named mesh? how do I move those pages to xxxgrid instead of xxxmesh?
+</p>
+<p>
+In the <a class="wiki" href="/trac/wiki/CdlDiscussion">CdlDiscussion</a> section, I added a bunch of topics and some of my thoughts
+about workable solutions.
+</p>
+<p>
+The topics are:
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/Terminology"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/Terminology</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/GlobalAttributes"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/GlobalAttributes</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/MeshMetaData"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/MeshMetaData</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/CellTypes"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/CellTypes</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/ExtrudedMesh"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/ExtrudedMesh</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/StorageVsApplication"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/StorageVsApplication</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/Dimensions"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/Dimensions</a>
+</p>
+<p>
+<a class="ext-link" href="http://cf-pcmdi.llnl.gov/trac/wiki/Variables"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/trac/wiki/Variables</a>
+</p>
+<p>
+<em>sorry about the http's, I am still getting the hang of the wiki thing...</em>
+</p>
+<p>
+The focus here is a practical approach to fitting our needs into the existing
+NetCDF CDL framework. I structured the meta data from the perspective of a
+programmer trying to write an API to read any compliant data set. The
+organization I tried to create is top down from the global attributes, to the
+grids, to the variables. It needs a lot of work so please add your own
+perspective, I hope it will be a good starting place though!
+</p>
+<p>
+David
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1164546824000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+        in reply to:
+    <a href="#comment:4">↑ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2006-11-26T05%3A13%3A44-08%3A00&amp;precision=second" title="See timeline at 11/26/06 05:13:44">14 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./6#comment:4" title="Comment 4">tomgross</a>:
+</p>
+<blockquote class="citation">
+<blockquote>
+<p>
+int grid(ncells, cell_length) ;
+</p>
+<blockquote>
+<p>
+grid:cell_type = "tri_face_edged"
+grid:dims=[ nodes, nodes, nodes, faces, edges, edges, edges ];
+grid:standard_name= "Cell_Connectivity_Indices"
+</p>
+</blockquote>
+</blockquote>
+<p>
+A question for the CF conventions:  Does this violate the "coordinate" dimension and variable concept?  Or does the coordinate dimension of "nodes" make the connection to the variables Longitude(nodes), Latitude(nodes) etc.??
+</p>
+</blockquote>
+<p>
+Dear Tom
+</p>
+<p>
+To be CF complaint, all the variables ought to have coordinates and bounds. A data variable dimensioned (nodes) needs auxiliary coordinate variables (pointed to by its coordinates attribute) of latitude and longitude e.g. lat(nodes), and these should have bounds variables (named by their bounds attributes) such as lat_bounds(nodes,vertices). I presume that one of your objectives is to devise a scheme whereby the nodes of one grid e.g. the temperature grid can be indicated to be the faces of another e.g. velocity, whereas currently in CF there is no association of grids.
+</p>
+<p>
+It is interesting to look at this example of the use of trac. My initial impression is that it may make it harder to engage people and help them follow the discussion, especially if the wiki is used. To follow a thread, it may work best to reply, like this. Then it can be read sequentially by other people. If it is dotted all over, it is hard to digest. Moreover, if only a small part of the actual information is in the trac ticket, observers of the discussion don't know what's going on unless they read the wiki too, and this may lead to less participation, as you can't pick it up without special effort. I think a wiki is useful if you are working on a document and editing it together, like a tracked-changes word document. But in that case, I wonder whether this system could automatically email out the current version of the wiki page whenever the ticket is updated. Could it do that, Kyle?
+</p>
+<p>
+I wonder if we could use trac just like an email list, but with the advantage that people will be more aware than they are with email of the organisation of discussions into threads. It is unfortunately less convenient to type this kind of thing into trac than it is to write an email.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1225297233000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-29T09%3A20%3A33-07%3A00&amp;precision=second" title="See timeline at 10/29/08 09:20:33">12 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>wontfix</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>closed</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Dear all,
+</p>
+<p>
+Given that there is a small working group exploring options for representing unstructured grids, I am closing this ticket with the expectation that a new ticket will be opened when the working group comes up with one or more concrete proposals.
+</p>
+<p>
+Best regards,
+Karl
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./6?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./6?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./6?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #152 (Time mean over area fractions which vary with time)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./151.html" title="ticket #151" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./152?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./152?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./152?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./153.html" title="ticket #153" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./151.html" title="ticket #151">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./153.html" title="ticket #153">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2016-07-07T06%3A59%3A10-07%3A00&amp;precision=second" title="See timeline at 07/07/16 06:59:10">5 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2017-01-12T10%3A22%3A39-08%3A00&amp;precision=second" title="See timeline at 01/12/17 10:22:39">4 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./152.html" class="trac-id">#152</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Time mean over area fractions which vary with time</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=martin.juckes">martin.juckes</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+      <a href="./152?action=diff&amp;version=21" class="lastmod trac-diff" title="2017-01-12 18:20:00.565362+00:00">
+        (last modified by taylor13)
+      </a>
+    </h3>
+    <div class="searchable">
+      <p>
+Following a discussion on the mailing list, I'd like to propose adding a new example to the CF Convention document to illustrate the use of cell_methods to specify different mean quantities when using a mask which is time varying (e.g. sea_ice). The qualifier <tt>where</tt> has been introduced into the <tt>cell_methods</tt> to specify masked spatial operations, e.g. <tt>area: mean where sea_ice</tt> to represent a spatial mean over sea ice. The current convention does not explicitly comment on whether the <tt>where</tt> construct can be used with other dimensions. For the CMIP6 data request there is a requirement to specify the temporal mean of quantities averaged over sea ice, and the spatial extent of the sea ice is generally varying in time. 
+</p>
+<p>
+The proposal is to make it clear that use of <tt>where</tt> for non-spatial dimensions is allowed by adding examples in section 7. It is also necessary to provide these examples to clarify the subtle differences implied by different formulations of the <tt>cell_methods</tt> statement. 
+</p>
+<h2 id="a1.Replacetextofsection7.3.3first3paragraphs">1. Replace text of section 7.3.3 (first 3 paragraphs)</h2>
+<p>
+By default, the statistical method indicated by cell_methods is assumed to have been evaluated over the entire horizontal area of the cell. Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area). The portion concerned is constant in time in some cases, but it could be time-varying. Grid cell “portions” that can be considered are only those permitted to be associated with the   <tt>standard_name</tt> of <tt>area_type</tt>. There are two options for indicating when a quantity represents a portion of a cell.
+</p>
+<p>
+The first method can be used for the common case that the cell_method applies to a single area-type. In this case, the cell_methods attribute may include a string of the form <tt>name: method where type</tt>. Here name could, for example, be area and type may be any of the strings permitted for a variable with a standard_name of area_type. As an example, if the method is <tt>area: mean where sea_ice</tt>, then the data would represent a mean over only the sea ice portion of the grid cell. When this first option is adopted, none of the variables in the netCDF file should be given a name identical to the string that names the <tt>area_type</tt>.  This restriction is imposed so that it will be clear that the metadata should not be interpreted following the second option (described in the next paragraph), which takes precedence.
+</p>
+<p>
+The second method for indicating that a statistic applies to only a portion of a cell is more general because it can reference multiple area-types.  This may be needed when a variable has a dimension that ranges across various area types.  In this case, the cell_methods entry is of the form <tt>name: method where typevar</tt>. Here <tt>typevar</tt> is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see Section 6.1, "Labels") with a <tt>standard_name</tt> of <tt>area_type</tt>. The variable <tt>typevar</tt> contains the name(s) of the selected portion(s) of the grid cell to which the method is applied. This method provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface grid cell (e.g., vegetation, bare_ground, snow, etc.).
+</p>
+<h2 id="a2.Captionofexample7.6">2. Caption of example 7.6</h2>
+<p>
+If the method is <tt>mean</tt>, various ways of calculating the mean can be distinguished in the <tt>cell_methods</tt> attribute with a string of the form <tt>mean where type1 [over type2]</tt>. Here, type1 can be any of the possibilities allowed for typevar or type (as specified in the two paragraphs preceding above Example). The same options apply to type2, except it is not allowed to be the name of an auxiliary coordinate variable with a dimension greater than one (ignoring the dimension accommodating the maximum string length). 
+</p>
+<p>
+A cell_methods attribute with a string of the form <tt>area: mean where type1 over type2</tt> indicates the mean is calculated by integrating over the type1 portion of the cell and dividing by the area of the type2 portion.  When <tt>over type2</tt> is omitted, it is assumed to be the same as type1.
+</p>
+<h2 id="a3.Addtionaltextformaskswhichvaryoveradditionaldimensionse.g.time..formproposedbyKarl">3. Addtional text for masks which vary over additional dimensions (e.g. time) .. form proposed by Karl</h2>
+<p>
+When the “where” construct is used, and when “area” is not the only “dimension” to which it applies, the interpretation more generally is that a “weighted” mean is reported. Specifically, the quantity of interest is integrated over the additional dimension(s) with weights proportional to the fraction of “type1” area_type that exists, and then this is divided by the integral over the same dimension(s) of the fraction of “type2” area_type that exists.   [Note that certain variables might be undefined if the fraction of the area_type considered is 0; for example the temperature of sea ice is not defined if there is no sea ice.  In this case, a time-mean value can still be computed for cells containing some sea ice during at least a portion of the averaging interval because no matter what the value assumed for temperature when sea ice is missing, those values are given zero weight in computing the time-mean.] 
+</p>
+<p>
+Note that "`all_area_types” is one of the valid strings permitted for a variable with the standard_name area_type,  so a cell_methods string of the form “area: mean over type1 where all_area_types” indicates the mean is calculated by integrating over the type1 portion of the grid cell and dividing by the entire area of the grid cell.
+</p>
+<p>
+The following three examples illustrate cases when one might want to use “where” or “where … over” in defining the cell_methods: 
+</p>
+<ol><li>Suppose that in a grid cell the fractional sea ice varies over time, but there is interest in the time-mean surface temperature of the sea ice. The time-samples, each representing a spatially-averaged sea ice temperature can be summed and then divided by the number of samples to obtain an unweighted mean where sea ice exists. This would be indicated with: 
+</li></ol><p>
+cell_methods = “area: mean where sea_ice time: mean” 
+</p>
+<ol start="2"><li>Suppose there is interest in recording the mean fractional area covered by sea ice and the mean sea ice thickness in such a way that their product would equal the time-mean volume of sea ice in each grid cell. In this case the sea ice area would be reported as an unweighted time-mean, while the mean sea ice thickness would be calculated with time samples weighted by the fractional area of sea ice. Thus, for sea ice thickness: 
+</li></ol><p>
+cell_methods = “area: time: mean where sea_ice” 
+</p>
+<ol start="3"><li>Suppose the time-mean contributions to total heat flux from different portions of a grid cell (e.g., ice-free and ice-covered) are of interest, and there are reasons to report these in such a way that the total heat flux is the sum of the individual contributions. Then the cell_methods attribute would be defined: 
+</li></ol><p>
+cell_methods=”area: mean where sea_ice over all_area_types time: mean” 
+</p>
+<p>
+In some cases a variable referencing a specific area_type will actually be defined even in the absence of that area_type (i.e., over the entire grid cell).  Consider the surface_snow_thickness, which could sensibly be considered to be 0 in the absence of snow.  In this case one might in some instances want to report “area: time: mean where snow” (giving a measure of the typical snow depth when snow exists) and in other instances “area: time: mean where snow over all_area_types” (which in this case would be identical to “area: time: mean”) or “area: time: mean where snow over land”.
+</p>
+<h2 id="a4.Clarificationatstartofsection7.3.3notneededifaboveisaccepted">4. Clarification at start of section 7.3.3 (not needed if above is accepted)</h2>
+<p>
+<em>Add a clarification after this sentence in the first paragraph of 7.3.3 "Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area)", to introduce the idea of time-varying area fractions:</em>
+</p>
+<p>
+The portion concerned is constant in time in many cases, but it could be time-varying.
+</p>
+<h2 id="a5.Newexamplefortime-varyingareafractions">5. New example for time-varying area fractions</h2>
+<p>
+<em>The following new example and explanatry text should be added in section 7.3.3:</em>
+</p>
+<p>
+Example 7.8: Time mean over area fractions which vary with time
+</p>
+<pre class="wiki">float simple_mean(lat,lon):
+   simple_mean:cell_methods: area: mean where sea_ice time: mean
+
+float weighted_mean(lat,lon):
+   weighted_mean:cell_methods: area: time: mean where sea_ice
+
+float partial_mean(lat,lon):
+   partial_mean:cell_methods: area: mean where sea_ice over sea time: mean
+</pre><p>
+When the area fraction is varying with time, there are several different ways in which a time mean can be formulated. Three of these are illustrated in this example. Suppose, for instance, we are averaging over three time steps and the data at one grid point is -10, -6, -2 with area fractions .75, .50, .25. The values of the simple_mean, weighted_mean and partial mean are, respectively, (-10 -6 -2)/3 = -6, (-10*.75 - 6*.5 -2*.25)/(.75+.5+.25) = -7.33 , and (-10*.75 - 6*.5 -2*.25)/3 = -3.667. The partial mean provides the contribution to the mean over the entire grid cell from a specified area type. The simple mean is weighting each time period equally, while the weighted mean provides equal weighting to each unit area of <tt>sea_ice</tt>.
+</p>
+<p>
+In example 7.8, <tt>time</tt> could be replaced by any other coordinate over which an average is taken, such as an ensemble index.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+    <div id="attachments">
+        <h3 class="foldable">Attachments <span class="trac-count">(3)</span></h3>
+        <div class="attachments">
+          <dl class="attachments">
+              <dt>
+    <a href="/trac/attachment/ticket/152/cell_methods_new2.docx" title="View attachment">cell_methods_new2.docx</a><a href="/trac/raw-attachment/ticket/152/cell_methods_new2.docx" class="trac-rawlink" title="Download">​</a>
+       (<span title="99993 bytes">97.6 KB</span>) -
+      added by <em>taylor13</em> <a class="timeline" href="/trac/timeline?from=2016-11-19T12%3A40%3A46-08%3A00&amp;precision=second" title="See timeline at 11/19/16 12:40:46">4 years ago</a>.
+  </dt>
+              <dd>
+                proposed text
+              </dd>
+              <dt>
+    <a href="/trac/attachment/ticket/152/cell_methods_new2.pdf" title="View attachment">cell_methods_new2.pdf</a><a href="/trac/raw-attachment/ticket/152/cell_methods_new2.pdf" class="trac-rawlink" title="Download">​</a>
+       (<span title="201527 bytes">196.8 KB</span>) -
+      added by <em>taylor13</em> <a class="timeline" href="/trac/timeline?from=2016-11-19T12%3A41%3A38-08%3A00&amp;precision=second" title="See timeline at 11/19/16 12:41:38">4 years ago</a>.
+  </dt>
+              <dd>
+                proposed text pdf
+              </dd>
+              <dt>
+    <a href="/trac/attachment/ticket/152/cell_methods_new2_clean.docx" title="View attachment">cell_methods_new2_clean.docx</a><a href="/trac/raw-attachment/ticket/152/cell_methods_new2_clean.docx" class="trac-rawlink" title="Download">​</a>
+       (<span title="153647 bytes">150.0 KB</span>) -
+      added by <em>taylor13</em> <a class="timeline" href="/trac/timeline?from=2016-11-19T12%3A42%3A35-08%3A00&amp;precision=second" title="See timeline at 11/19/16 12:42:35">4 years ago</a>.
+  </dt>
+              <dd>
+                proposed text (clean)
+              </dd>
+          </dl>
+          <p>
+            Download all attachments as: <a rel="nofollow" href="/trac/zip-attachment/ticket/152/">.zip</a>
+          </p>
+          
+        </div>
+    </div>
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(25)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1468335920267042">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-12T08%3A05%3A20-07%3A00&amp;precision=second" title="See timeline at 07/12/16 08:05:20">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+Thank you for making this proposal, which I support. Is the text following the example to be included in the standard document as explanation? I suppose it should be.
+</p>
+<p>
+I think that this proposal should also include some modification to the first paragraph of 7.3.3, which at the moment refers explicitly to "horizontal area". For instance, this could be changed to "extent in the dimension(s) concerned" or something, and in the parenthesis you could add "or over the time-interval when sea-ice is present". Possibly the next paragraph might need some minor tweaking for generality as well.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1468396648586076">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-13T00%3A57%3A28-07%3A00&amp;precision=second" title="See timeline at 07/13/16 00:57:28">5 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./152?action=diff&amp;version=2">diff</a>)
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Hello Jonathan,
+</p>
+<p>
+The answer to the first question is yes, and I've modified the layout to make it a bit clearer.
+</p>
+<p>
+On the 2nd point, I'm not sure. What I'm proposing is clarifying the usage with time-varying area fractions, or, in principle, area fractions which vary with any other coordinate dimension (e.g. an ensemble index). At the moment the construct is still dependent on the standard name <tt>area_fraction</tt>, so it can only apply to horizonal areas. 
+</p>
+<p>
+I've added a sentence to the proposed insert to clarify that <tt>time</tt> can be replaced by another dimension.
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1468836117387619">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-18T03%3A01%3A57-07%3A00&amp;precision=second" title="See timeline at 07/18/16 03:01:57">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+Thanks for the first point.
+</p>
+<p>
+CF 7.3.3 begins "By default, the statistical method indicated by cell_methods is assumed to have been evaluated over the entire horizontal area of the cell. Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area)." My concern is that this implies that the "where" syntax is concerned only with fractions of area, which is indeed what it was intended to imply. If we are now generalising it to fractions of a cell in any possible dimension, I think that we need to make this clear at the outset.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1468920032798619">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-19T02%3A20%3A32-07%3A00&amp;precision=second" title="See timeline at 07/19/16 02:20:32">5 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+Perhaps there has been a mis-understanding: what I am proposing is clarifying the <tt>cell_methods</tt> usage for time-varying area fractions. The dimensions over which the method (mean in the example) is applied will then be <tt>area</tt> and <tt>time</tt>. The area fraction is still, however, the fraction of the cell area identifying with the specified type at any time. I was not proposing to generalise to other kinds of cell fractions,
+</p>
+<p>
+regards,
+Martin
+ 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1469022800207519">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-20T06%3A53%3A20-07%3A00&amp;precision=second" title="See timeline at 07/20/16 06:53:20">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+You could then insert some text to acknowledge that the areas could be time-varying, which is not obvious currently. Alternatively you could take a broader view, which is how it seemed to me. Consider that you only had a dimension of time and were measuring sea-ice at a point. Would it not be natural still to allow a <tt>cell_method</tt> of "time: mean where sea_ice"?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1469030167269148">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-20T08%3A56%3A07-07%3A00&amp;precision=second" title="See timeline at 07/20/16 08:56:07">5 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+I'm not sure I understand the first point: the fact that the proposed example 7.8 is about time varying area fractions is in the example title. 
+</p>
+<p>
+On the 2nd point: yes, I can see that this is possible, but I don't think it would fit in 7.3.3, which is about portions of cells. If you want to generalise the idea of cell, I think that would raise quite a number of issues. As I don't have a use case for this, I'd like to leave it out of this ticket. Another approach might be to add a new sub-section, e.g. "7.3.5 Cell methods on a masked axis" (as you would essentially be using sea_ice as a mask). This looks like a sensible generalisation to me, but it is not directly relevant to my use case, so, again, I would like to leave it out of this ticket.
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1469032022030259">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-20T09%3A27%3A02-07%3A00&amp;precision=second" title="See timeline at 07/20/16 09:27:02">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+I suggest inserting the a new third sentence of the first paragraph of 7.3.3: "The portion concerned is constant in time in many cases, but it could be time-varying." This will make the generality clear.
+</p>
+<p>
+I think the generalisation to applying "where" in time when there is no space would be obvious, but we can leave it until it's explicitly requested, as you say.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1469085811853776">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-21T00%3A23%3A31-07%3A00&amp;precision=second" title="See timeline at 07/21/16 00:23:31">5 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./152?action=diff&amp;version=8">diff</a>)
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+First point: Thanks, I see the point now. I've added your suggested sentence to the proposal.
+</p>
+<p>
+Second point: OK
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1476898234876541">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-10-19T10%3A30%3A34-07%3A00&amp;precision=second" title="See timeline at 10/19/16 10:30:34">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin and Jonathan,
+</p>
+<p>
+I think it is confusing (wrong?) to consider the construct “where &lt;type1&gt; over &lt;type2&gt;” as applying only to a horizontal dimension (even if “area_type” seems to imply this).  In fact a time series taken at a single point location will have some sort of “area_type” defined at that point (and it won’t be fractional).  If the area_type varies over space or over time, then we can define “cell_methods = &lt;standard_name1: [&lt;standard_name2]&gt;: mean where &lt;type1&gt; over &lt;type2&gt;” to mean:  “integrate quantity over the dimension(s) identified by their standard_names but conditional on the co-located existence of area-type1 and then divide by the integral of the unit scalar (i.e., 1) over that same dimension(s) conditional on the co-located existence of area-type2.”  I think that just because we restrict the names allowed for type1 and type2 to be those names found in the area_type controlled vocabulary doesn’t mean that in the cell_methods attribute they *must* represent an area fraction.   I think more generally they can be viewed as a binary indicator of the existence of the surface type at a particular point and a particular instant of time.  (After temporal or spatial averaging, of course they would in fact generally represent a fraction.)
+</p>
+<p>
+So, I think starting section 7.3.3 by referring to the “horizontal area of a cell” should be avoided.  I suggest rewriting the beginning of section 7.3.3 as follows:
+</p>
+<hr />
+<p>
+“By default, the statistical method indicated by cell_methods is assumed to have been evaluated over the entire domain of a cell (where a cell is not necessarily restricted to spatial dimensions).  Sometimes, however, it is useful to limit consideration to only a subdomain of a cell (e.g. a mean over the sea-ice area, or a time mean considering only times when snow exists).  The subdomains are restricted to be identified by one of the strings permitted for a variable with the standard_name area_type.  There are two options for indicating when a quantity represents a subdomain of a cell.
+</p>
+<p>
+“The first option is used for the common case that the quantity of interest has been recorded for a single subdomain. In this case, the cell_methods attribute may include a string of the form "name: method where type".  As an example, if cell_methods is “area: mean where sea_ice”, then the data would represent a mean over only the sea ice portion of the grid cell. On the other hand for a point location, if the cell_methods is “time: mean where sea_ice”, then the data would represent the time-mean at that point based on samples obtained when sea ice existed there.
+</p>
+<p>
+“When this first option (describe in the preceding paragraph) is adopted, none of the variables appearing in the netCDF file should be given a name identical to any string recording the area_type.  This restriction is imposed so that it will be clear that the data writer has not elected to adopt the second option (described in the next paragraph).
+</p>
+<p>
+"The second approach for indicating that a statistic applies to only a portion of a cell is more general because a single variable can contain statistics for multiple area-types. In this case, the cell_methods entry is of the form "name: method where typevar". Here typevar is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see Section 6.1, "Labels") with a standard_name of area_type. The variable typevar contains the name(s) of the selected portion(s) of the grid cell to which the method is applied. This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types). It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., vegetation, bare_ground, snow, etc.)."
+</p>
+<hr />
+<p>
+The discussion of the “where … over” option after example 7.6 should also I think be rewritten:
+</p>
+<hr />
+<p>
+“If the method is mean, various ways of calculating the mean can be distinguished in the cell_methods attribute with a string of the form “mean where` type1 [over type2]".  Here, type1 can be any of the possibilities allowed for typevar or type (as specified in the paragraphs preceding the above example). The same options apply to type2, except it is not allowed to be the name of an auxiliary coordinate variable with a dimension greater than one (ignoring the dimension accommodating the maximum string length).   
+</p>
+<p>
+"A cell_methods attribute with a string of the form "<tt>area: mean where</tt> type1 over type2" indicates the mean is calculated by integrating over the type1 portion of the cell and dividing by the area of the type2 portion.  When “over type2” is omitted, it is assumed to be the same as type1.
+</p>
+<p>
+"When “area” is not the only “dimension” for which the “where… over” construct is used in a cell_methods, the interpretation more generally is that a “weighted” mean is being reported.  Specifically, the quantity of interest is integrated over the specified dimension(s) with weights proportional to the fraction of “type1” area_type that exists, and then this is divided by the integral of the fraction of “type2” area_type that exists.  
+</p>
+<p>
+"Note that “all_area_types” is one of the valid strings permitted for a variable with the standard_name area_type, so a cell_methods string of the form "area: <tt>mean where all_area_types over</tt> type2" indicates the mean is calculated by integrating over all types of area and dividing by the area of the type2 portion. 
+</p>
+<p>
+"The following three examples illustrate cases when one might want to use “where” or “where … over” in defining the cell_methods:
+</p>
+<ol><li>       Suppose that in a grid cell the fractional sea ice varies over time, but there is interest in the time-mean surface temperature of the sea ice.  The time-samples, each representing a spatially-averaged sea ice temperature can be summed and then divided by the number of samples to obtain an unweighted mean where sea ice exists.  This would be indicated with:
+</li></ol><blockquote>
+<p>
+cell_methods = “area: mean where sea_ice time: mean”  
+</p>
+</blockquote>
+<ol start="2"><li>       Suppose there is interest in recording the mean fractional area covered by sea ice and the mean sea ice thickness in such a way that their product would equal the time-mean volume of sea ice in each grid cell.  In this case the sea ice area would be reported as an unweighted time-mean, while the mean sea ice thickness would be calculated with time samples weighted by the fractional area of sea ice. Thus, for sea ice thickness:
+</li></ol><blockquote>
+<p>
+cell_methods = “area: time: mean where sea_ice”
+</p>
+</blockquote>
+<p>
+        
+</p>
+<ol start="3"><li>       Suppose the time-mean contributions to total heat flux from different portions of a grid cell (e.g., ice-free and ice-covered) are of interest, and there are reasons to report these in such a way that the total heat flux is the sum of the individual contributions.  Then the cell_methods attribute would be defined:
+</li></ol><blockquote>
+<p>
+cell_methods=”area: mean where sea_ice over sea time: mean”
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<hr />
+<p>
+best regards,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1476902231736033">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-10-19T11%3A37%3A11-07%3A00&amp;precision=second" title="See timeline at 10/19/16 11:37:11">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all,
+</p>
+<p>
+One further note:
+</p>
+<p>
+There is a use-case that would be nice to fit into all of this, but I suspect it would be difficult:
+</p>
+<p>
+Consider "sea ice velocity".  If you wanted to report the time-mean velocity such that ice transport could be a correctly calculated as the product of time-mean velocity and time-mean sea ice mass, then each velocity time-sample would have to be weighted by the mass of sea ice (not its area) and then we would divide by the sum of the weights.   The "where ... over" construct would not cover this case, so the mass-weighting scheme would have to appear as a "comment" in cell_methods. 
+</p>
+<p>
+Karl 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1476910879918782">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-10-19T14%3A01%3A19-07%3A00&amp;precision=second" title="See timeline at 10/19/16 14:01:19">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all,
+</p>
+<p>
+And one additional note:
+</p>
+<p>
+The 3rd example assumes that the grid cell is occupied by open ocean plus sea ice (but no land or ice shelves).  This should be made clear, or the cell_methods should be changed to:
+</p>
+<p>
+cell_methods="area: mean where sea_ice over all_surface_types time: mean
+</p>
+<p>
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1476982240078998">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-10-20T09%3A50%3A40-07%3A00&amp;precision=second" title="See timeline at 10/20/16 09:50:40">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl
+</p>
+<p>
+Thanks for thinking about this. You've proposed to rewrite parts of text which seem clear enough already to me and don't need to be rewritten for the sake of this proposal. That might be an improvement, but it makes me uneasy because I'm not sure what's changed, and it would take more work to check it! Please could you propose text with the minimum necessary modification, alongside the existing text for comparison? That would be very helpful.
+</p>
+<p>
+I agree that the case <tt>time: mean where sea_ice</tt> is an obvious extension, but it hasn't yet been requested (see comments 7 and 8 above) and thus following our normal rule we would not add it. The same applies to your comment 10.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1477045868272784">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-10-21T03%3A31%3A08-07%3A00&amp;precision=second" title="See timeline at 10/21/16 03:31:08">5 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl, Jonathan,
+</p>
+<p>
+Karl's last comment is correct: there is an inconsistency between the 3rd example and the text. I think the best resolution is to make the example consistent with the text be replacing "over sea" with "over all_area_types". The example as it stands is a possible construction, but I think the mean over the whole grid cell, as stated in the text, is the more useful example to present.
+</p>
+<p>
+For the 2nd comment: the statement that we cannot encode a the weighted mean of a velocity, with the current convention, in such a way that the time mean mass transport is correctly represented. The approach followed by SIMIP to deal with this in CMIP6 is to request mass transport variables (for which standard names exist, e.g. sea_ice_x_transport). 
+</p>
+<p>
+I agree that we should omit "horizontal area of the" from the sentence at the start of 7.3.3: "... is assumed to have been evaluated over the entire horizontal area of the cell." We may have, for instance, an array which represents sea ice properties at a certain point in an emsemble of simulations and as a fuction of time. In this case we would still be using an area_type, but using it to identify portions of an ensemble rather than portions of a horizontal area. The shorter text " .... is assumed to have been evaluated over the entire cell" conveys all the necessary information. I agree with Jonathan, however, that we do not need to move away from the restriction to the existing area_type usage at present. A more general <tt> ... where condition_xxx</tt> is conceivable, but I'm not sure we would want to fit it into the existing area_type framework. 
+</p>
+<p>
+Reviewing the ticket again I have, however, seen an additional problem with the first example: <tt>area: mean where sea_ice time: mean</tt> .. the problem is the <tt>area: mean where sea_ice</tt> is undefined where there is no sea ice, so how do we take the time mean? There are 3 options: (1) fill with zero where there is no sea ice, (2) report the time mean as undefined or (3) take the time average over those cells where there is sea ice. The last should be encoded <tt>area: mean where sea_ice time: mean where sea_ice</tt>. As far as the convention is concerned, we should try to avoid usage which is ambiguous. I think that (2) is the best interpretation of the first example as far as the convention goes, but this probably means it is not a very useful formulation from a scientific perspective and we should perhaps advise against its use. If people want a time mean over the whole time period they should use a formulation which gives a completely unambiguous definition at each time. Thus, I would change the wording to say that the first example is ambiguous for time varying area_type and should, in general be avoided in this case.
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-19T12%3A40%3A46-08%3A00&amp;precision=second" title="See timeline at 11/19/16 12:40:46">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/152/cell_methods_new2.docx"><em>cell_methods_new2.docx</em></a><a href="/trac/raw-attachment/ticket/152/cell_methods_new2.docx" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+proposed text
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-19T12%3A41%3A38-08%3A00&amp;precision=second" title="See timeline at 11/19/16 12:41:38">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/152/cell_methods_new2.pdf"><em>cell_methods_new2.pdf</em></a><a href="/trac/raw-attachment/ticket/152/cell_methods_new2.pdf" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+proposed text pdf
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-19T12%3A42%3A35-08%3A00&amp;precision=second" title="See timeline at 11/19/16 12:42:35">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/152/cell_methods_new2_clean.docx"><em>cell_methods_new2_clean.docx</em></a><a href="/trac/raw-attachment/ticket/152/cell_methods_new2_clean.docx" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+proposed text (clean)
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1479588221885574">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-19T12%3A43%3A41-08%3A00&amp;precision=second" title="See timeline at 11/19/16 12:43:41">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I have attached a word document with "track changes" turned on showing the proposed changes in text to the conventions.  I also have rendered it in pdf form (also attached).  The 3rd attached document is a clean version of the proposed text without mark-up.   Comments welcome.
+</p>
+<p>
+Karl Taylor
+</p>
+<p>
+From an offline discussion, I copy the following comment from Martin Juckes:
+</p>
+<p>
+Dear Karl,
+</p>
+<p>
+thanks, it is good that you have tackled the section on cell_methods for area_type arrays.
+</p>
+<p>
+There is one place where I think there is an inconsistency between your text and the text in the ticket at present: you suggest that 'the interpretation more generally is that a “weighted” mean is reported.', and that this would also apply to "area: mean where sea_ice time: mean". I had interpreted this differently, that "time: mean" should mean an unweighted mean over time, and the way to report a weighted mean was to use "area: time: mean where sea_ice". The example in the current text reflects this, giving different results for the weighted and un-weighted time mean. This followed earlier discussion with Jonathan and Jim Baird, in which I learnt that the complete cell_methods string should be treated as a sequence of operations, carried out in the order presented from left to right. I feel that it is clearer, syntactically, to keep this distinction, but would be interested to hear the views of others,
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1479748747915912">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-21T09%3A19%3A07-08%3A00&amp;precision=second" title="See timeline at 11/21/16 09:19:07">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin and Karl
+</p>
+<p>
+I suppose that the sentence "The interpretation more generally ..." in Karl's text applies to the particular cell_method concerned, not to the entire cell_methods attribute. if that is so, it doesn't contradict Martin's statement, which I agree with, about different methods for different dimensions. It would be good to clarify this by specifying this remark replies to an entry in the attribute. Also, I find the phrase "when area is not the only dimension to which is applies" rather confusing. I <em>guess</em> this phrase is there because if the cell method is about <tt>area</tt> it surely must be area-weighted, so it's redundant rather than wrong - is that the idea, Karl? If it is, I think we could omit it. I suggest running together this paragraph and the preceding one in Karl's new text, as follows:
+</p>
+<p>
+An entry in the <tt>cell_methods</tt> attribute with the form "<tt>area: mean where</tt> <em>type1</em> <tt>over</tt> <em>type2</em>" indicates the mean is calculated by integrating over the <em>type1</em> portion of the cell and dividing by the  area of the <em>type2</em> portion. When "<tt>over</tt> <em>type2</em>" is omitted, it is assumed to be the same as <em>type1</em>. When the "where" construct is used, the interpretation is that a "weighted" mean is reported. Specifically, the quantity of interest is integrated over all dimensions associated with the method with weights proportional to the fraction of <em>type1</em> area_type that exists, and then this is divided by the integral over the same dimension(s) of the fraction of <em>type2</em> area_type that exists.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1479757593311931">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-21T11%3A46%3A33-08%3A00&amp;precision=second" title="See timeline at 11/21/16 11:46:33">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./152?action=diff&amp;version=16">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-17-1479757760243705">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-21T11%3A49%3A20-08%3A00&amp;precision=second" title="See timeline at 11/21/16 11:49:20">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./152?action=diff&amp;version=17">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-18-1479758062171798">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-21T11%3A54%3A22-08%3A00&amp;precision=second" title="See timeline at 11/21/16 11:54:22">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./152?action=diff&amp;version=18">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-19-1479758916910948">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-21T12%3A08%3A36-08%3A00&amp;precision=second" title="See timeline at 11/21/16 12:08:36">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello Karl, Jonathan,
+</p>
+<p>
+I've copied Karl's proposed text into the ticket .. I thought it might make the discussion easier. I've also split it into 3 parts .. (1) modification of existing text, (2) modification of example 7.6 caption, (3) new text. The last is a variation on my original submission .. expanded.
+</p>
+<p>
+I'm happy with with the first two of these parts. For the 3rd part, I see an ambiguity between the text saying "the interpretation more generally is that a “weighted” mean is reported" and the first example (area: mean where sea_ice time: mean) which I would not interpret as a weighted mean. This latter interpretation is supported by Jonathan's last comment, but it is not, I think, consistent with the bracketted part of Karl's text about dealing with time series when sea_ice is completely absent for part of the time period. In such cases, I would interpret <tt>area: mean where sea_ice</tt> as yielding a time series with some missing values, when sea_ice is completely absent, and <tt>time: mean</tt> would then also give a missing value. The construct <tt>area: mean where sea_ice time: mean where sea_ice</tt> would be needed to average over the portions of the time series for which sea ice is present,
+</p>
+<p>
+Martin
+</p>
+
+    </div>
+  <div class="trac-lastedit ">
+    Last edited <a class="timeline" href="/trac/timeline?from=2016-11-22T09%3A30%3A46-08%3A00&amp;precision=second" title="See timeline at 11/22/16 09:30:46">4 years ago</a>
+        by martin.juckes
+      (<a href="./152?cversion=0&amp;cnum_hist=19#comment:19">previous</a>)
+      (<a href="./152?action=comment-diff&amp;cnum=19&amp;version=1">diff</a>)
+  </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1484233622610375">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-01-12T07%3A07%3A02-08%3A00&amp;precision=second" title="See timeline at 01/12/17 07:07:02">4 years ago</a> by apamment
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Martin, Jonathan and Karl,
+</p>
+<p>
+On the mailing list I expressed support for Martin's suggestion to extend the use of 'where' in
+cell_methods to accommodate time means and I support the changes proposed in this ticket. I agree that we
+should confine ourselves to addressing Martin's current use cases and leave further extensions until they
+are needed.
+</p>
+<p>
+The inclusion of the additional examples and detailed explanation is very useful - without them
+it would be difficult to understand the proposed changes. I can see that a lot of work has already gone
+into making the text as clear as possible. I am struck by the fact that this section of the conventions is getting steadily longer and more complicated so to help people navigate
+through the text it would be useful to signpost even more clearly which parts describe the use
+cases for constant grid cell portions and time varying portions, respectively.
+</p>
+<p>
+I suggest re-ordering and extending the first proposed paragraph so that it serves as an introduction and
+overview for the whole of section 7.3.3:<br />
+</p>
+<p>
+'By default, the statistical method indicated by cell_methods is assumed to have been evaluated over the
+entire horizontal area of the cell. Sometimes, however, it is useful to limit consideration to only a
+portion of a cell (e.g. a mean over the sea-ice area). Grid cell “portions” that can be considered are
+only those permitted to be associated with the standard_name of area_type. There are two options for
+indicating when a quantity represents a portion of a cell and these are explained in the following two
+paragraphs. The portion of the grid cell to which the statistical method is applied may remain constant
+in time, for example, the portion occupied by land or sea; examples 7.6 and 7.7 illustrate this use
+case. The remainder of the section following example 7.7 describes instances when the grid cell portion
+varies in time, for example, when the area occupied by sea-ice changes during the sampling period.'
+</p>
+<p>
+The first sentence of the second paragraph would then need to be reworded slightly:
+'The first method for indicating that a statistic applies to only a portion of a cell can be used for
+the common case that the cell_method applies to a single area-type.'
+</p>
+<p>
+The penultimate sentence in the paragraph following the proposed example 7.8 currently reads:
+'The partial mean provides the contribution to the mean over the entire grid from a specified
+area type.' Shouldn't this say 'entire grid cell' rather than 'entire grid'?
+</p>
+<p>
+Best wishes,
+Alison
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1484245200565362">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-01-12T10%3A20%3A00-08%3A00&amp;precision=second" title="See timeline at 01/12/17 10:20:00">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./152?action=diff&amp;version=21">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-22-1484245359840557">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-01-12T10%3A22%3A39-08%3A00&amp;precision=second" title="See timeline at 01/12/17 10:22:39">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Responding to Alison's last paragraph, I have changed "entire grid" to read "entire grid cell".  I also changed one instance of "gridbox" to read "grid cell".  That change was made to the sentence just before section 2.
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./152?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./152?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./152?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

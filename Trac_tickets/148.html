@@ -1,0 +1,611 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #148 (New cell_methods: mabs/mibs/mebs)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./147.html" title="ticket #147" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./148?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./148?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./148?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./149.html" title="ticket #149" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./147.html" title="ticket #147">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./149.html" title="ticket #149">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2016-02-17T12%3A47%3A01-08%3A00&amp;precision=second" title="See timeline at 02/17/16 12:47:01">5 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2017-02-14T13%3A45%3A40-08%3A00&amp;precision=second" title="See timeline at 02/14/17 13:45:40">4 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./148.html" class="trac-id">#148</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">New cell_methods: mabs/mibs/mebs</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=zender">zender</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner"><a href="/trac/query?status=!closed&amp;owner=davidhassell">davidhassell</a></td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~cell_methods">cell_methods</a>
+        </td>
+        <th id="h_cc">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+              d.c.hassell@…, zender@…
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+      <a href="./148?action=diff&amp;version=6" class="lastmod trac-diff" title="2016-02-20 20:43:00.384222+00:00">
+        (last modified by zender)
+      </a>
+    </h3>
+    <div class="searchable">
+      <h2 id="a1.Title">1. Title</h2>
+<p>
+Add absolute value statistics to cell methods
+</p>
+<h2 id="a2.Moderator">2. Moderator</h2>
+<p>
+David Hassell
+</p>
+<h2 id="a3.Requirement">3. Requirement</h2>
+<p>
+The statistics mabs/mibs/mebs stand for "Maximum absolute value",
+"Minimum absolute value",  and "Mean absolute value", respectively.
+They are similar to max/min/mean statistics, and they can be useful
+in characterizing data when one wants positive-definite metrics.
+mebs (unlike mean) does not allow positive and negative values to
+compensate eachother. Unlike rms, mebs not does weight outliers
+quadratically. NCO implements mabs/mibs/mebs as
+fundamental statistics (like max/min/mean), and annotates the
+cell_methods attribute of variables reduced by these statistics with
+the strings "maximum_absolute_value", "minimum_absolute_value",
+"mean_absolute_value". 
+</p>
+<h2 id="a4.InitialStatementofTechnicalProposal">4. Initial Statement of Technical Proposal</h2>
+<p>
+This recommendation could be implemented in CF by
+inserting the following lines into Table E.1. Cell Methods
+</p>
+<p>
+<a class="ext-link" href="http://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/build/cf-conventions.html#appendix-cell-methods"><span class="icon">​</span>http://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/build/cf-conventions.html#appendix-cell-methods</a>
+</p>
+<pre class="wiki">cell_methods:		Units:	Description:
+maximum_absolute_value	u	Maximum absolute value
+minimum_absolute_value	u	Minimum absolute value
+mean_absolute_value	u	Mean absolute value
+</pre><h2 id="a5.Benefits">5. Benefits</h2>
+<p>
+This would improve the CF-compliance of fields processed by absolute-value statistics.  
+</p>
+<h2 id="a6.StatusQuo">6. Status Quo</h2>
+<p>
+There is no standard CF terminology to describe absolute-value statistics so fields analyzed with these methods may have missing, erroneous, or non-standard cell_methods for this stage of processing. Unless the statistics were computed with NCO which has implemented the proposed cell_methods  since February, 2015. 
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(12)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1455742655103234">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-17T12%3A57%3A35-08%3A00&amp;precision=second" title="See timeline at 02/17/16 12:57:35">5 years ago</a> by zender
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks David and Jonathan for your comments thus far. Jonathan asked for a use case for tabs().  I don't have a real-world use case for that. mebs() is widely used to compute absolute mean errors for intensive variables. I expect that someone somewhere sometime will want to obtain equivalent information for an extensive variable. With extensive variables often the appropriate arithmetic is summation, and tabs() would fill that need. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1455745004294742">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-17T13%3A36%3A44-08%3A00&amp;precision=second" title="See timeline at 02/17/16 13:36:44">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks, Charlie, for suggesting the addition of these cell_methods.  I am in favor of adding all of them except sum_absolute_value, as I can't think of anyone needing this (except as a step toward computing mean_absolute_value).
+</p>
+<p>
+I would note that most extensive properties of interest to climate scientists (that I can think of) seem to be positive definite quantities (e.g., precipitation amount, energy content, sea ice area), so perhaps it would be useful to provide an example where that isn't the case if that is to be the rationale for including sum_absolute_value. 
+</p>
+<p>
+best regards,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1455747304875692">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-17T14%3A15%3A04-08%3A00&amp;precision=second" title="See timeline at 02/17/16 14:15:04">5 years ago</a> by zender
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks, Karl, for your thoughts. As I said, I do not have a real-world example for tabs(). I added it for completeness because I think someone will eventually want it. If you and others prefer to excise it, I will acquiesce. Let's give it a day or two in case David or someone else wants to fight to save it.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1455803923142280">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-18T05%3A58%3A43-08%3A00&amp;precision=second" title="See timeline at 02/18/16 05:58:43">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Charlie
+</p>
+<p>
+Thanks for making this proposal. Like Karl, I support it all except for <tt>sum_absolute_value</tt> if that doesn't have a present use-case - that is our usual requirement for additions, except for very obvious corollaries. It could be added later of course if required.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1455908014731353">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-19T10%3A53%3A34-08%3A00&amp;precision=second" title="See timeline at 02/19/16 10:53:34">5 years ago</a> by balaji
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I agree with the current proposal as well (with the omission of <tt>sum_absolute_value</tt>).
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1456000980384222">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-20T12%3A43%3A00-08%3A00&amp;precision=second" title="See timeline at 02/20/16 12:43:00">5 years ago</a> by zender
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./148?action=diff&amp;version=6">diff</a>)
+    </li><li class="trac-field-summary">
+      <strong class="trac-field-summary">Summary</strong>
+        changed from <em>New cell_methods: mabs/mibs/mebs/tabs</em> to <em>New cell_methods: mabs/mibs/mebs</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-7-1456001357310165">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-20T12%3A49%3A17-08%3A00&amp;precision=second" title="See timeline at 02/20/16 12:49:17">5 years ago</a> by zender
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+No one has stepped forward to defend tabs()=sum_absolute_value statistics so I deleted all reference to tabs() from the proposal.  As far as I know the proposal is now acceptable to everyone who has commented. I'm not sure altering the proposal was the right step but it seemed to make more sense than stating all this only in the comments section. II've never been involved with a CF trac ticket before so I don't know what the next step is. Expect that someone will let me know via taking the next step and I'll be informed electronically. Best, Charlie
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1456149924495710">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-22T06%3A05%3A24-08%3A00&amp;precision=second" title="See timeline at 02/22/16 06:05:24">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks, Charlie. The rules are at <a class="ext-link" href="http://cfconventions.org/rules.html"><span class="icon">​</span>http://cfconventions.org/rules.html</a>. If no-one raises any new concerns within three weeks, the moderator (David) will conclude the discussion. As things stand now, enough support has been expressed for the ticket to be accepted according to the rules. Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1456155967841479">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-02-22T07%3A46%3A07-08%3A00&amp;precision=second" title="See timeline at 02/22/16 07:46:07">5 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I, too, am happy with the revised proposal. Thanks. 
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1458046186518045">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-03-15T05%3A49%3A46-07%3A00&amp;precision=second" title="See timeline at 03/15/16 05:49:46">5 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Three weeks have passed without comment and all are in favour with the revised proposal, so it will be marked as accepted for the next version of CF. Thanks to everyone who took the time to discuss this ticket.
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1483540392498361">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-01-04T06%3A33%3A12-08%3A00&amp;precision=second" title="See timeline at 01/04/17 06:33:12">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-conventions@…</em> to <em>davidhassell</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>accepted</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-12-1487108740077499">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-02-14T13%3A45%3A40-08%3A00&amp;precision=second" title="See timeline at 02/14/17 13:45:40">4 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>accepted</em> to <em>closed</em>
+    </li>
+  </ul>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./148?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./148?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./148?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

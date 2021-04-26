@@ -1,0 +1,496 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #116 (remove AMIP and PCMDI codes)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./115.html" title="ticket #115" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./116?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./116?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./116?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./117.html" title="ticket #117" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./115.html" title="ticket #115">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./117.html" title="ticket #117">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2014-07-11T15%3A33%3A26-07%3A00&amp;precision=second" title="See timeline at 07/11/14 15:33:26">7 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2016-08-12T05%3A19%3A55-07%3A00&amp;precision=second" title="See timeline at 08/12/16 05:19:55">5 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./116.html" class="trac-id">#116</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=task">task</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">remove AMIP and PCMDI codes</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=graybeal">graybeal</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-standard-names@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-standard-names">cf-standard-names</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~GRIB">GRIB</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+In 2008 (At 8:37 AM +0100 4/10/08), Jonathan Gregory wrote:
+</p>
+<blockquote class="citation">
+<p>
+As I mentioned, for these reasons I think we should remove the AMIP and PCMDI equivalences from the [standard names] table. In any case, they are not being maintained and are out of date, and probably wrong for some GRIB codes.
+</p>
+</blockquote>
+<p>
+These haven't been removed, and clutter up the table considerably, so this trac ticket proposes their removal.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(7)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1405353600480129">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-07-14T09%3A00%3A00-07%3A00&amp;precision=second" title="See timeline at 07/14/14 09:00:00">7 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks for opening this ticket, John. I haven't changed my view in the last six years! Hence I support the change.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1406315765941032">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-07-25T12%3A16%3A05-07%3A00&amp;precision=second" title="See timeline at 07/25/14 12:16:05">7 years ago</a> by graybeal
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Karl Taylor says:
+</p>
+<blockquote class="citation">
+<p>
+An alternative would be to replace them with the names used for CMIP5 (see  <a class="ext-link" href="http://cmip-pcmdi.llnl.gov/cmip5/docs/standard_output.xls"><span class="icon">​</span>http://cmip-pcmdi.llnl.gov/cmip5/docs/standard_output.xls</a> ). We'd have to find a volunteer to do that. 
+</p>
+</blockquote>
+<p>
+Would an external mapping, in this day and technology age, more appropriate? Or does it benefit CF to have the Standard Names tightly coupled to the CMIP5 community?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1407936782293584">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-08-13T06%3A33%3A02-07%3A00&amp;precision=second" title="See timeline at 08/13/14 06:33:02">7 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I'm not quite sure what it means here to have an external mapping (the table that Karl points us to already maps CMIP5 names to standard names), nor if there's sufficient interest in putting the CMIP5 names in the standard name table (although I quite like the idea). Slightly more helpfully, I'm fairly sure that helping to do <em>something</em> is within my job description and I'd be glad to put in any  effort that I am able to, if required.
+</p>
+<p>
+All the best,
+</p>
+<p>
+David 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1409588962374652">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-09-01T09%3A29%3A22-07%3A00&amp;precision=second" title="See timeline at 09/01/14 09:29:22">7 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+That's a helpful offer, David!
+</p>
+<p>
+I think that in this day and age, in Karl's phrase, any table of equivalences should be maintained separately from the standard name table. It does not particularly benefit CF to be related to a particular subset of other standards, I feel. However, it might be useful to have the equivalence between PCMDI CMIP5 names and standard_names available <em>somewhere</em> (the CMOR tables contain this information), and the relationship between GRIB codes and standard names might also be useful to some users of CF, provided they can be kept up to date, and if there is sufficient demand for them.
+</p>
+<p>
+I still support the proposal as it stands.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1470925520087462">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-08-11T07%3A25%3A20-07%3A00&amp;precision=second" title="See timeline at 08/11/16 07:25:20">5 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I support this proposal. The GRIB codes refer to GRIB 1, which is being replaced by GRIB2, a new standard with different codes. While there is a clearly a need within the community for such mappings, keeping them in the standard name table is a distraction from the core work of the standard. Keeping the mappings up to date is, as Jonathan notes, very important -- and having them embedded in the CF Standard Name table makes this harder. For the AMIP/CMIP names it is clear that the mappings are determined in the CMOR tables, and should be updated every time a new set of tables is produced -- so it makes more sense to direct users to these tables for the mappings. 
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1470944403402760">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-08-11T12%3A40%3A03-07%3A00&amp;precision=second" title="See timeline at 08/11/16 12:40:03">5 years ago</a> by durack1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+The mappings would be fairly trivial to undertake, considering that the CMIP6 (at least the placeholder working versions) are now easily web-accessible through Martins XML format and displayed at <a class="ext-link" href="http://clipc-services.ceda.ac.uk/dreq/index/var.html"><span class="icon">​</span>http://clipc-services.ceda.ac.uk/dreq/index/var.html</a> along with the CMIP6_CVs at <a class="ext-link" href="https://github.com/WCRP-CMIP/CMIP6_CVs/blob/master/CMIP6_variable.json"><span class="icon">​</span>https://github.com/WCRP-CMIP/CMIP6_CVs/blob/master/CMIP6_variable.json</a> (although I'm sure we're a couple of commits behind the latest). It would also be a great step to ensure that CMIPx and CF are consistent.
+</p>
+<p>
+If David Hassell is still willing to undertake this step that would be great!
+</p>
+<p>
+A point that I note, is that for many of the new (and even some of the old) CMIPx variables, a CF standard_name either currently doesn't exist and it's not obvious to me that the data requesters are making the effort to (or in many cases are even aware of the standard_name list) get these new variables "blessed" by CF.
+</p>
+<p>
+Just my two bobs..
+</p>
+<p>
+P
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1471004395013263">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-08-12T05%3A19%3A55-07%3A00&amp;precision=second" title="See timeline at 08/12/16 05:19:55">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Paul
+</p>
+<p>
+I believe that Alison is working on the large number of new standard names needed by CMIP6.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./116?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./116?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./116?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

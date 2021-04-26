@@ -1,0 +1,534 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #65 (new cell_methods of "range")
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./64.html" title="ticket #64" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./65?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./65?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./65?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./66.html" title="ticket #66" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="2a1d58405209d9593267aa5d";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./64.html" title="ticket #64">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./66.html" title="ticket #66">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2011-02-10T01%3A37%3A10-08%3A00&amp;precision=second" title="See timeline at 02/10/11 01:37:10">10 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2013-10-08T05%3A27%3A50-07%3A00&amp;precision=second" title="See timeline at 10/08/13 05:27:50">8 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2016-03-08T09%3A53%3A07-08%3A00&amp;precision=second" title="See timeline at 03/08/16 09:53:07">5 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./65.html" class="trac-id">#65</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">new cell_methods of "range"</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=jonathan">jonathan</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <h2 id="a1.Newcell_methodsofrange">1. New <tt>cell_methods</tt> of <tt>range</tt></h2>
+<h2 id="a2.Moderator">2. Moderator</h2>
+<p>
+Alison Pamment
+</p>
+<h2 id="a3.Requirement">3. Requirement</h2>
+<p>
+Provide a way to indicate that the data value for an element of data variable is the range of values (the absolute difference between the maximum and the minimum) that occur within the cell.
+</p>
+<h2 id="a4.InitialStatementofTechnicalProposal">4. Initial Statement of Technical Proposal</h2>
+<p>
+Add a entry in the table of Appendix E, as follows
+</p>
+<table class="wiki">
+<tr><td><tt>cell_methods</tt></td><td>Units</td><td>Description
+</td></tr><tr><td><tt>range</tt></td><td><em>u</em></td><td>Absolute difference between maximum and minimum
+</td></tr></table>
+<p>
+The choice of the word <tt>range</tt> is consistent with the existing <tt>cell_methods</tt> of <tt>mid_range</tt>.
+</p>
+<h2 id="a5.Benefits">5. Benefits</h2>
+<p>
+The particular use case which motivated the proposal was provided by José María Rodríguez González, who wished to describe the diurnal range of surface air temperature. With the new convention, this could be described by <tt>cell_methods="time: range"</tt> with a time coordinate variable whose bounds specified daily intervals. This new use of <tt>cell_methods</tt> corresponds to the use of <tt>maximum</tt> and <tt>minimum</tt> to describe the daily maximum and daily minimum temperature.
+</p>
+<h2 id="a6.StatusQuo">6. Status Quo</h2>
+<p>
+Using the <tt>long_name</tt> is the most likely alternative.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(7)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1297359421000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-02-10T09%3A37%3A01-08%3A00&amp;precision=second" title="See timeline at 02/10/11 09:37:01">10 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I wonder whether we have adequately thought through the interplay between the cell methods and the standard_names.  The discussion that follows is a general concern that applies to other values of cell_methods, as well as what is proposed here.  (Perhaps it deserves to be in a separate ticket.)
+</p>
+<p>
+The proposal contained in this trac ticket suggests that, for example diurnal variation in sea surface temperature might best be represented as
+</p>
+<pre class="wiki">float sstrng(dimensions)
+   sstrng: standard_name = "sea_surface_skin_temperature";
+   sstrng: cell_methods = "time: range";
+</pre><p>
+The cell_methods attribute has altered the fundamental concept of this parameter, rendering the standard_name incorrect as a stand-alone description.  Most likely, for example, data discovery systems will present this variable under the concept "sea_surface_skin_temperature" and lead users to data discovery blind alleys.  Even if the authors of data discovery systems wanted to improve the search fidelity, CF is not providing them with the tools they need -- a concept name for the parameter that this file actually contains.  If they wanted to synthesize a name they would need to consult the standard_name, the cell_methods AND (in order to capture the diurnal concept) look at the time axis coordinates, as well.
+</p>
+<p>
+Tools like the emerging ncISO from NGDC (which will shortly be embedded into both TDS and HYRAX servers) may provide the way out of this fix.  These tools can have in-build CF-aware smarts to enable them to synthesize more fully descriptive search terms when generating metadata records. <strong>The CF standard could define the algorithm for doing so.</strong>  In this example, perhaps the algorithm would generate
+"time-interval-ranged_sea_surface_skin_temperature".  Or if it had been a range over the spatial dimensions, perhaps, "lat-long-interval-ranged_sea_surface_skin_temperature"
+</p>
+<p>
+More discussion seems warranted.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1297363337000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:3" class="follow-up">↓ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-02-10T10%3A42%3A17-08%3A00&amp;precision=second" title="See timeline at 02/10/11 10:42:17">10 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Steve
+</p>
+<p>
+This is certainly an important issue. The <tt>standard_name</tt> alone is not a stand-alone description, but often has to be combined with <tt>cell_methods</tt> and coordinates. However, this isn't a new issue, is it. It was being discussed under the heading of common concepts in ticket 24. Please could we continue the discussion there, instead of in this ticket?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1297419302000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+        in reply to:
+    <a href="#comment:2">↑ 2</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:4" class="follow-up">↓ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-02-11T02%3A15%3A02-08%3A00&amp;precision=second" title="See timeline at 02/11/11 02:15:02">10 years ago</a> by jrodriguezg
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./65#comment:2" title="Comment 2">jonathan</a>:
+Hi all,
+</p>
+<p>
+I was a beginner in CF coding when I asked for the best way to represent this short of data (and still I am), but I think that this solution is the most consequent with the current standard. It's true that the cell_methods modify in some way the concept of the parameter that is denoted by the standard_name (as I suppose that they are intended to do), but I do not think that the modification is of a more 'fundamental' character, in this particular case, as other cell_methods currently in use as the 'standard_deviation' or 'variance'.
+</p>
+<p>
+Cheers,
+</p>
+<p>
+Jose M. Rodriguez
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1297423844000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+        in reply to:
+    <a href="#comment:3">↑ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-02-11T03%3A30%3A44-08%3A00&amp;precision=second" title="See timeline at 02/11/11 03:30:44">10 years ago</a> by jrodriguezg
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Just to give another argument in favour to the proposed solution.
+I might be interested in representing some data containing the daily temperature range, averaged monthly for each month of the year, and then these monthly values are averaged over a given number of years (that was indeed my problem). I think that it could be well represented with Steve's proposal of putting the range attribute in the standard_name.
+But let's suppose that another one in is interested in averaging the temperature daily, then over the month, and then you take the range of the monthly mean temperatures over the year (summer minus winter), and then again average over a number of years. You would end also with a temperature range, but I do not find it so straightforward to follow the track of all the operations that you have performed on the data, unless you specify the range attribute both in the standard_name and the cell_methods.
+In both cases, I think that you would need the range option in cell_methods to specify the point at which the range operation was performed. If you also want to include spatial ranges, your data would get even more complicated to describe.
+</p>
+<p>
+Best wishes,
+</p>
+<p>
+Chema
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1304532871000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-05-04T11%3A14%3A31-07%3A00&amp;precision=second" title="See timeline at 05/04/11 11:14:31">10 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I argue above that Steve's point is a broader one about an additional need in the CF standard than this particular proposal to make an obvious extension to current standard. Steve hasn't reasserted his objection, so I believe that according to the rules this ticket can be accepted now, if the moderator (Alison) so decides.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1381235270000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-10-08T05%3A27%3A50-07%3A00&amp;precision=second" title="See timeline at 10/08/13 05:27:50">8 years ago</a> by apamment
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>closed</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Dear All,
+</p>
+<p>
+I think agreement was reached on this ticket during the original discussion in 2011 and the formal conditions for acceptance were met. I am declaring the ticket formally closed so that the proposed change can be included in the CF 1.7 conventions document.
+</p>
+<p>
+Alison
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1457459587995868">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-03-08T09%3A53%3A07-08%3A00&amp;precision=second" title="See timeline at 03/08/16 09:53:07">5 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+completed by 
+<a class="ext-link" href="https://github.com/cf-convention/cf-conventions/pull/62"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/pull/62</a>
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./65?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./65?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./65?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,2488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #27 (Use namespace tags to include other conventions in netcdf files without repeating them in CF)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./26.html" title="ticket #26" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./27?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./27?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./27?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./28.html" title="ticket #28" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./26.html" title="ticket #26">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./28.html" title="ticket #28">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2008-03-28T14%3A26%3A41-07%3A00&amp;precision=second" title="See timeline at 03/28/08 14:26:41">13 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2009-10-18T09%3A41%3A36-07%3A00&amp;precision=second" title="See timeline at 10/18/09 09:41:36">12 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./27.html" class="trac-id">#27</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=accepted">accepted</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Use namespace tags to include other conventions in netcdf files without repeating them in CF</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=benno">benno</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner"><a href="/trac/query?status=!closed&amp;owner=edavis">edavis</a></td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+Strictly speaking, this is not an enhancement to CF -- it is a way of encoding additional information in a netcdf files without extending CF.  It certainly would affect discussions for extending CF, and hopefully will elicit some discussion in the CF community.  In any case, creating a ticket was suggested.
+</p>
+<p>
+My suggestions are based on an evolution of how metadata is encoded in netcdf files:  rather than simply allowing multiple conventions in netcdf files by a comma-separated list in the Conventions attribute, specify prefixes so that attributes can be explicitly labelled as belonging to a different convention.  In particular, were I to want to use attributes from the convention used by WCS to describe projections, I would use a conventions tag in the file like,
+ 
+</p>
+<blockquote>
+<p>
+Conventions = "CF-1.0, wcs=<a class="ext-link" href="http://www.opengis.net/wcs/1.1/"><span class="icon">​</span>http://www.opengis.net/wcs/1.1/</a>"
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+means the default convention is CF-1.0 (i.e the usual usage), but any attribute starting 'wcs:' belongs to the convention defined by the namespace <a class="ext-link" href="http://www.opengis.net/wcs/1.1/"><span class="icon">​</span>http://www.opengis.net/wcs/1.1/</a> (which is how wcs or any other XML convention standardizes its labels).   This would change the WGS 84 example in ticket 18 slightly, for example, to
+</p>
+</blockquote>
+<p>
+ 
+ 
+</p>
+<pre class="wiki">dimensions:
+  lat = 18 ; // dummy values
+  lon = 36 ;
+variables:
+  double lat(lat) ;     // conventional definition
+  double lon(lon) ;     // conventional definition
+  float temp(lat, lon) ;
+    temp:long_name = "temperature" ;
+    temp:units = "K" ;
+    temp:grid_mapping = "crs" ;
+    temp:wcs\:gridCRS = "crs" ;
+  int crs ;
+    crs:grid_mapping_name = "lat_long_wgs1984" ;
+    crs:wcs\:GridBaseCRS = "urn:ogc:def:crs:EPSG:6.0:4326" ;   // Use EPSG ID 4979 for 3D CRS. ID 4326 refers to 2D CRS.
+    crs:crs_name = "WGS 84" ;
+    crs:geodetic_datum_name = "World Geodetic System 1984" ;
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:ellipsoid_name = "WGS 84" ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+Conventions = "CF-1.0, wcs=http://www.opengis.net/wcs/1.1/"
+</pre><p>
+ 
+ 
+</p>
+<blockquote>
+<p>
+where gridCRS and GridBasCRS are the tags used in WCS to characterize projects.  In particular, it declares 'crs' to be both a CF convention grid_mapping, and a WCS convention gridCRS, and it adds an WCS attribute to gridCRS called GridBaseCRS, which is part of the WCS convention.
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+This keeps the redundancy out of CF, but allows alternate specifications to be put in a netcdf file.  It also makes use of standards that other people maintain, i.e. OGC maintains the wcs namespace and list of concepts.
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+There are a number of reasons for doing it this way, listing of which would probably hide the essence of the proposal and should be put elsewhere.   The short version is redundant representations belong to different conventions, and this is a framework for writing down the mappings between the different conventions, and for tagging datasets with them.  This would allow creation of a system that could deliver the metadata in alternate representations, so that  WCS applications could use WCS-style information, and CF applications could use CF information, regardless of the actual source of the data being analyzed.
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+Note that recent and near-term changes to netcdf make this possible -- we could not have made this choice two years ago. But netcdf version 3.6 libraries support ':' characters in attributes, and version 3.7 will support it in ncgen/ncdump, i.e. the '\:' escapes shown above will work in CDL.  
+</p>
+</blockquote>
+<p>
+Benno Blumenthal
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(36)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1206836992000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-03-29T17%3A29%3A52-07%3A00&amp;precision=second" title="See timeline at 03/29/08 17:29:52">13 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I like the idea of namespaces, thanks for bring this out. Defining them in the Conventions attribute is ok, although a separate global attribute for them might also be a good idea, to keep older programs  from barfing which don't look through comma separated tokens.
+</p>
+<p>
+I don't like using the ":" char which needs to be escaped in CDL. Why not use another char that does not need escaping? For example, I think "@" is allowed in all versions of netcdf and hardly ever used:
+</p>
+<pre class="wiki">crs:wcs@GridBaseCRS = "urn:ogc:def:crs:EPSG:6.0:4326"
+</pre><blockquote>
+<p>
+instead of
+</p>
+</blockquote>
+<pre class="wiki">crs:wcs\:GridBaseCRS = "urn:ogc:def:crs:EPSG:6.0:4326"
+</pre>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1206950154000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-03-31T00%3A55%3A54-07%3A00&amp;precision=second" title="See timeline at 03/31/08 00:55:54">13 years ago</a> by bnl
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I like this. A lot. 
+</p>
+<p>
+The escaping issue isn't obvious (to me). By pushing the escaping away from CDL are we pushing it somewhere else, and introducing a non-standard parsing scheme? (I appreciate Benno's comments against this in <a class="new ticket" href="./24.html" title="enhancement: Common Concept: vocabulary with mapping to CF attributes (new)">ticket:24</a> and will respond accordingly.)
+I guess it depends on where (in the software stack) one decodes wcs@GridBaseCRS ... but if it's not in the CF part of the stack then doing this could cause problems.
+</p>
+<p>
+I would argue that we leave anything alone that follows the colon (which then belongs in another namespace), beyond netcdf/CDL escaping, which could (and should)be automatically dealt with in the CF stack ...
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1207154853000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-02T09%3A47%3A33-07%3A00&amp;precision=second" title="See timeline at 04/02/08 09:47:33">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Benno
+</p>
+<p>
+Thanks for this idea. As my regular readers might expect I am more cautious about it than Bryan and John :-). I do think it is good to avoid redundancy, and to make use of other conventions where we can. However, I suspect that the situations where we could do that have quite exacting requirements. The convention we were depending on would have to be framed so that it could be used directly to supply a list of possible values for a netCDF attribute, and its intentions would have to be orthogonal to everything else in the CF convention so there weren't problems with overlaps and conflicts. Also, if it is supplying metadata that we regard as important and useful (and if it wasn't we wouldn't consider it anyway), I suppose we ought to have the same expectations of it in terms of intelligibility, clear definitions and self-descriptiveness that we do for CF metadata in general.  Is that too demanding?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1207666769000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-08T07%3A59%3A29-07%3A00&amp;precision=second" title="See timeline at 04/08/08 07:59:29">13 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello All,
+</p>
+<p>
+My apologies for not responding earlier: for whatever reason, updates to this ticket are not coming through my subscription to the mailing list, so I was unaware.  I suspect my mail server, but then again, I always suspect my mail server.
+</p>
+<p>
+I share John's concern about the escaping, but I think keeping the colon (because that is what is used elsewhere) helps with clarity more than it hurts.  And it is only a problem in older CDL -- the netcdf library already handles it, OPeNDAP has no problem with it.  And I thought comma-separated (line-separated in Opendap) conventions in the Conventions tag were used elsewhere, but John would know best.
+</p>
+<p>
+In response to Jonathan's comments, I would like to point out that namespaces address the metadata problem of delivering information to multiple audiences in an alternative way to the Microsoft approach of attempted domination.  The example I cited above was WCS, redundant to part of CF.  But alternatively, look at what Ted Habermann is doing to put Dublin Core and FGDC metadata into netcdf attributes <a class="ext-link" href="http://galeon-wcs.jot.com/WikiHome/GALEON%20Phase2%20Main%20Page/Unidata%20OGC%20Interoperability%20Day%20Presentations/Metadata_Standards_and_netCDF_ppt___119021166608511_916828076687903?jot.downloadName=Metadata+Standards+and+netCDF.ppt"><span class="icon">​</span>http://galeon-wcs.jot.com/WikiHome/GALEON%20Phase2%20Main%20Page/Unidata%20OGC%20Interoperability%20Day%20Presentations/Metadata_Standards_and_netCDF_ppt___119021166608511_916828076687903?jot.downloadName=Metadata+Standards+and+netCDF.ppt</a>.
+He has a convention that adds attributes like FGDC_Link, fgdc_publisher, dc_publisher, and an additional Metadata_Conventions tag "FGDC, <a class="missing wiki">DublinCore?</a>".  But, of course, no software understands this but his, despite FGDC and Dublin Core being widely used metadata standards. And having both a Conventions tag and a Metadata_Conventions tag is confusing, since it is all metadata. This namespace convention would put a standard machine-readable framework around such a construction, so that software could understand the conventions that the metadata belongs to, and even making the attributes a bit more human readable as well (since they would be perfectly consistent in the way they are connected to conventions).
+</p>
+<p>
+Note that it is already possible to put attributes belonging to multiple conventions in a single netcdf file -- this proposal simply makes it possible to say which attribute belongs to which convention.
+</p>
+<p>
+Benno
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1207681697000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-08T12%3A08%3A17-07%3A00&amp;precision=second" title="See timeline at 04/08/08 12:08:17">13 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I would like to amend my last statement -- it did not come out the way I intended.
+</p>
+<p>
+First of all, having a dominant standard is a great thing, the "Holy Grail" of metadata exchange, and whatever time spent that leads to such a thing is time well spent.  I think it is really hard to achieve, and maintain, but the effort is essential.  And data that is fully described by a widely-adopted standard will be the  most universally and easily accessible.
+</p>
+<p>
+But not all data are fully-described by standard metadata, possibly no data are (emphasis on the word "fully").
+</p>
+<p>
+Netcdf already allows multiple conventions in a particular file (Russ supplied the reference which is at <a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf/conventions.html"><span class="icon">​</span>http://www.unidata.ucar.edu/software/netcdf/conventions.html</a>). And netcdf already allows specifying a convention with a uri in the conventions tag (possibly predating namespaces in XML).  I am just trying to make it clear which attribute goes with which convention in such a way that it is consistent with what the greater IT community is doing, in particular XML and RDF, formats that are used for a lot of metadata exchange.
+</p>
+<p>
+Benno
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1207739383000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:7" class="follow-up">↓ 7</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-09T04%3A09%3A43-07%3A00&amp;precision=second" title="See timeline at 04/09/08 04:09:43">13 years ago</a> by bnl
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I guess I'm making the same point in other threads. But let me be direct.
+</p>
+<ul><li>Not everything we find important or useful can be encoded in the CF convention.
+</li><li>CF cannot and will not be the governing body for all the metadata folk want to put into their NetCDF files. 
+</li><li>CF had better make it possible for CF to "play nicely" with metadata governed by other communities.
+</li></ul><p>
+However, in supporting that, we do run the risk of data producers contradicting themselves in their attributes between conventions. C'est la vie. Is that not better than data providers not putting as much documentation as they can with their data?
+</p>
+<p>
+So, the only question in my mind is how we do support something like this proposal, not whether we should do it? So I find myself disagreeing with Jonathan again. (I hasten to add that just because I'm disagreeing with Jonathan a lot right now, I have no less respect for his opinions, or the work that he's done that has got us here. Precisely the contrary, because I respect him so much I want to make sure that our points of disagreement are resolved).
+</p>
+<p>
+(And given I support doing something like this, and can't improve it technically, I obviously support this one!)
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1207755110000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+        in reply to:
+    <a href="#comment:6">↑ 6</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-09T08%3A31%3A50-07%3A00&amp;precision=second" title="See timeline at 04/09/08 08:31:50">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Bryan, Benno et al
+</p>
+<blockquote class="citation">
+<ul><li>Not everything we find important or useful can be encoded in the CF convention.
+</li><li>CF cannot and will not be the governing body for all the metadata folk want to put into their NetCDF files. 
+</li><li>CF had better make it possible for CF to "play nicely" with metadata governed by other communities.
+</li></ul></blockquote>
+<p>
+I agree with these statements and I am not opposed to the principle of making use of other conventions, which is the point of this ticket. I was expressing caution about it, especially this:
+</p>
+<blockquote class="citation">
+<p>
+we do run the risk of data producers contradicting themselves in their attributes between conventions.
+</p>
+</blockquote>
+<p>
+I wouldn't find that a satisfactory situation. I think that if that arises we would have to specify, as part of CF, how the conflict or overlap should be resolved. That's why I suggested that another convention should only be adopted if it was "orthogonal" to CF i.e. dealing with something that CF didn't. If that is too exacting, we ought instead to say how they should work together.
+</p>
+<p>
+Hence, I think we should consider individual cases as specific proposals, and say explicitly in CF which other conventions can be used with CF, and how they can be used, as a result of considering them individually (in trac tickets, just like any extension to CF). It's a bit less safe because subsequently the "other" convention might develop in a way which threw up problems when used with CF, so we would have to keep an eye out for that. Would you agree with such an approach?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1207771108000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-09T12%3A58%3A28-07%3A00&amp;precision=second" title="See timeline at 04/09/08 12:58:28">13 years ago</a> by bnl
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I don't think conflicted duplication is satisfactory, but it's better to be in the position of trying to resolve conflicting information than having nothing to work with ...
+</p>
+<p>
+... and if we tried to make all other conventions orthogonal to CF we would be on a hiding to nothing, and if we tried to identify only those parts of other conventions that we like and only allow those, then we would also be on a hiding to nothing (in both cases, in workload terms).
+</p>
+<p>
+I guess the point we really should be careful about, and maybe which is exercising you, is where within a piece of the CF convention itself, we mandate using an external attribute. That's a rather different case and each needs to be explored in it's own right. Yes, that's where this proposal originated, but this proposal itself isn't addressing that use case. I think this proposal is rather more what it says in line one: 
+</p>
+<blockquote class="citation">
+<p>
+Strictly speaking, this is not an enhancement to CF -- it is a way of encoding additional information in a netcdf files without extending CF. 
+</p>
+</blockquote>
+<p>
+and I think most of arguments about orthonality and duplication are mostly relevant to cases where
+</p>
+<blockquote class="citation">
+<p>
+It certainly would affect discussions for extending CF, ...
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1207891270000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-10T22%3A21%3A10-07%3A00&amp;precision=second" title="See timeline at 04/10/08 22:21:10">13 years ago</a> by graybeal
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+This is naive, but why isn't it a simple matter to say 'in case of conflicts, any netCDF/CF specification is the winner; between external conventions, the last statement is considered the winner' and be done with it?
+</p>
+<p>
+I think this is a useful proposal. I'm not sure how realistic it is to keep CF pure and clean with respect to conflicts that could be introduced by unsavory programmers. But I admire you for trying!
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1207954542000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-11T15%3A55%3A42-07%3A00&amp;precision=second" title="See timeline at 04/11/08 15:55:42">13 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+A technical point about using the ":" in the attribute name. The only real problem with this is that older software <em>might</em> have problems with it, since technically the ":" is not part of the set of allowable chars (yet). It does have to be escaped in the CDL, but CDL is just a representation; theres no problem in the file format itself. So if the ":" in analogue to XML namespaces is more important than possible trouble with old code, im ok with it.
+</p>
+<p>
+With regard to possible conflicts, in my opinion theres nothing to be done about it. The point/effect of this proposal is to allow arbitrary other semantics. I would just say, from the CF POV, something like "all CF semantics have to be correct and consistent, and shall not be modified by non-CF attributes".
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1207954796000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-11T15%3A59%3A56-07%3A00&amp;precision=second" title="See timeline at 04/11/08 15:59:56">13 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Oh one more point: its conceivable that CF itself might in the future want to use this mechanism, in which case we would claim a namespace (and probably a prefix) and then I would agree with all of Jonathon's concerns and requirements for consistency, clarity, lack of conflicts, etc. for anything in that namespace.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1208032228000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:13" class="follow-up">↓ 13</a>
+    <a href="#comment:14" class="follow-up">↓ 14</a>
+    <a href="#comment:15" class="follow-up">↓ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-12T13%3A30%3A28-07%3A00&amp;precision=second" title="See timeline at 04/12/08 13:30:28">13 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Ok, if you insist, maybe a few more thoughts.
+</p>
+<ol><li>I find this a bit cleaner:
+</li></ol><pre class="wiki"> Conventions = "CF-1.0";
+ namespaces ="wcs=http://www.opengis.net/wcs/1.1/"
+</pre><p>
+than:
+</p>
+<pre class="wiki"> Conventions = "CF-1.0, wcs=http://www.opengis.net/wcs/1.1/"
+</pre><ol start="2"><li>I find myself thinking about using a cf namespace for cf attributes, which I think adds a lot of readability:
+</li></ol><pre class="wiki">   float temp(lat, lon) ;
+     long_name = "temperature" ;
+     units = "K" ;
+     cf:grid_mapping = "crs";
+     wcs:gridCRS = "crs" ;
+</pre><p>
+(note i am using modified CDL, by not including the variable prefix and not escaping the namespace ":" ). 
+</p>
+<p>
+If this proposal is accepted, i would propose that a cf namespace be established for all existing cf attributes, optional use of course, so that 
+</p>
+<blockquote>
+<p>
+cf:grid_mapping = "crs"
+</p>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>
+and 
+</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>
+:grid_mapping = "crs"
+</p>
+</blockquote>
+<p>
+are equivalent.
+</p>
+<ol start="3"><li>Benno, I assume that these proposed namespaces are the same as XML namespaces? Eg, tools match on the namespace URI, and the prefix is arbitrary? Or is it intended to be something else, like URN namespaces (which I know little about) ?
+</li></ol>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1208185327000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+        in reply to:
+    <a href="#comment:12">↑ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-04-14T08%3A02%3A07-07%3A00&amp;precision=second" title="See timeline at 04/14/08 08:02:07">13 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:12" title="Comment 12">caron</a>:
+</p>
+<p>
+John is again precisely on topic, and brings up some excellent points.  My short response is that these are precisely the same as XML namespaces (which are the same as RDF namespaces), and yes, there needs to be a CF namespace as well.   Since I think Conventions and namespaces are representing exactly the same thing <em>in this context</em> (a set of attributes/terms that are used to describe things in a defined context), I originally proposed continuing to use Conventions (you might want to use namespaces for something else, see below). 
+</p>
+<p>
+But let me explain.
+</p>
+<p>
+There were a bunch of details I left out of the original proposal, because I thought the details would obscure the essence of the thing, and lose most of the audience, and kill the proposal.  But John is quite right, the goal is to be exactly analogous to XML namespaces, mainly so that there can be a clean general semantic translation from netcdf to RDF/XML and back.
+</p>
+<p>
+My starting point is two sections of the netcdf documentation talking about the Conventions tag.  First is <a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf/conventions.html"><span class="icon">​</span>http://www.unidata.ucar.edu/software/netcdf/conventions.html</a>, which states,
+</p>
+<blockquote>
+<p>
+If present in a netCDF file, `Conventions' is a global attribute that is a character array for the name of the conventions followed by the file. Originally, these conventions were named by a string that was interpreted as a directory name relative to the directory /pub/netcdf/Conventions/ on the host ftp.unidata.ucar.edu.
+</p>
+</blockquote>
+<blockquote>
+<p>
+This web page is now the preferred and authoritative location for registering a URI reference to a set of conventions maintained elsewhere. The FTP site will be preserved for compatibility with existing references, but authors of new conventions should submit a request to support-netcdf@… for listing on this page.
+</p>
+</blockquote>
+<blockquote>
+<p>
+It may be convenient for defining institutions and groups to use a hierarchical structure for general conventions and more specialized conventions. For example, if a group named XXX agrees upon a set of conventions for required attributes, attribute names, and netCDF representations for certain discipline-specific data structures, they may describing the agreed-upon conventions in a document associated with the name "XXX", and files that followed these conventions would contain the global attribute
+</p>
+<pre class="wiki">    :Conventions = "XXX" ;
+</pre><p>
+Later, if another group agrees upon some additional conventions for a specific subset of XXX data, for example time series data, the description of the additional conventions might be associated with the name "XXX/Time_series", and files that adhered to these additional conventions would use the global attribute
+</p>
+<pre class="wiki">    :Conventions = "XXX/Time_series" ;
+</pre><p>
+It is possible for a netCDF file to adhere to more than one set of conventions, even when there is no inheritance relationship among the conventions. In this case, the value of the `Conventions' attribute may be a single text string containing a list of the convention names, separated by blank space or commas, such as
+</p>
+<pre class="wiki">    :Conventions = "XXX, YYY" ;
+</pre></blockquote>
+<p>
+So netcdf as it currently stands uses a comma-separated list in the Conventions tag for multiple conventions.
+</p>
+<p>
+The user guide has some additional important detail (<a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf/guidef/guidef-13.html"><span class="icon">​</span>http://www.unidata.ucar.edu/software/netcdf/guidef/guidef-13.html</a>).
+</p>
+<blockquote>
+<p>
+If present, 'Conventions' is a global attribute that is a character array for the name of the conventions followed by the dataset, in the form of a string that is interpreted as a directory name relative to a directory that is a repository of documents describing sets of discipline-specific conventions. This permits a hierarchical structure for conventions and provides a place where descriptions and examples of the conventions may be maintained by the defining institutions and groups. The conventions directory name is currently interpreted relative to the directory pub/netcdf/Conventions/ on the host machine ftp.unidata.ucar.edu. Alternatively, a full URL specification may be used to name a WWW site where documents that describe the conventions are maintained.
+</p>
+</blockquote>
+<p>
+For me, this is really important.  First of all, it already allows a URL to specify the convention, so specifying an XML namespace here is already supported.  Secondly, it specifies how to construct an URI for a convention that is not specified as a URL, namely the convention CF-1.0 has the URI <em><a class="ext-link" href="ftp://ftp.unidata.ucar.edu/pub/netcdf/Conventions/CF-1.0/"><span class="icon">​</span>ftp://ftp.unidata.ucar.edu/pub/netcdf/Conventions/CF-1.0/</a></em>.  More particularly, if one had an attribute called attributename it would have a uri <em><a class="ext-link" href="ftp://ftp.unidata.ucar.edu/pub/netcdf/Conventions/CF-1.0/attributename"><span class="icon">​</span>ftp://ftp.unidata.ucar.edu/pub/netcdf/Conventions/CF-1.0/attributename</a></em>.  This would let us make statements about this attribute in XML or RDF.
+</p>
+<p>
+Unfortunately, I don't think that is exactly the URI we want to use to represent CF, and we (the netcdf community) have strayed from that ftp directory to a web page which does not make it clear (to me) how to construct a URI to represent a netcdf convention.   But we could fix this, right?  Some kind of netcdf convention registry that is explicit/machine readable.
+</p>
+<p>
+As for this proposal, it changes the current netcdf Conventions attribute value by allowing prefixes so that the attributes can be explicitly attached to their conventions.  The convention without a prefix tag would contain all the unprefixed attributes.  
+</p>
+<p>
+So John is quite right, the prefixes are determined by the Conventions tag.  One of the beauties of this scheme (and why XML adopted it), is that software that does not know about namespaces just sees a list of conventions, and a whole bunch of attributes, which is pretty much the situation that the software was in originally, particularly if CF is used as the default (unprefixed) convention.
+</p>
+<p>
+There is a subtlety in this:  these namespaces only apply to attribute names, not to attribute values.  This is precisely the same as a RDF/XML file:  the namespace prefixes are only used on the attributes, not on the URIs that identify objects (though you can define XML entities for that).  The one exception to that statement is that the base uri is used to abbreviate URIs for objects local to the file.  Which is not to say that you cannot define a namespace that would apply to attribute values, but that is not what the Conventions tag is about, and it is not what this proposal is about.
+</p>
+<p>
+I can't overemphasize how important I think this is.  But I am afraid if I start talking about all the wonderful things RDF would let us write down, and how much it would help CF/netcdf, I will get a large off-topic conversation attached to this proposal, which would not help.  This proposal is a first step towards clean metadata exchange between netcdf and XML/RDF.  Establishing URI's is the second.
+</p>
+<p>
+Thanks again, John,
+</p>
+<p>
+Benno
+</p>
+<p>
+P.S. Is your 'modified CDL' currently implemented?  It certainly is clear.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1210172320000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+        in reply to:
+    <a href="#comment:12">↑ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-05-07T07%3A58%3A40-07%3A00&amp;precision=second" title="See timeline at 05/07/08 07:58:40">13 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:12" title="Comment 12">caron</a>:
+<br />
+</p>
+<blockquote class="citation">
+<ol><li>I find this a bit cleaner:
+</li></ol></blockquote>
+<pre class="wiki"> Conventions = "CF-1.0";
+ namespaces ="wcs=http://www.opengis.net/wcs/1.1/"
+</pre><blockquote class="citation">
+<p>
+than:
+</p>
+</blockquote>
+<pre class="wiki"> Conventions = "CF-1.0, wcs=http://www.opengis.net/wcs/1.1/"
+</pre><p>
+<br />
+The possibility of using XML-type namespaces in netCDF was also on my mind when I was formulating tickets 9 and 18. Like you, John, I'm not too keen on the idea of overloading the Conventions attribute to encode namespace declarations. Instead, I'd envisaged using a separate netCDF variable specifically for this purpose, e.g.
+</p>
+<pre class="wiki">char namespace_declarations ;
+   :cf = "http://www.cfconventions.org/" ;
+   :wcs = "http://www.opengis.net/wcs/1.1/" ;
+   :dc = "http://www.dublincore.org/" ;
+   ...
+</pre><p>
+Which is not too dissimilar from the way we store CRS metadata in a separate grid mapping variable. However, I also like your suggestion of encoding namespace declarations in a single global attribute, though I think this may be hard for human-readers to decode if there are more than a couple of namespaces. Obviously this is not an issue if it is only ever parsed by software.
+</p>
+<p>
+Even though I have some reservations about the way in which we're proposing to crowbar XML-style techniques into netCDF's simple name-value metadata mechanism, I realise that this is what we have to work with for the time being. Hence this proposal would get my vote in principle.
+</p>
+<p>
+Regards,
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1212106963000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+        in reply to:
+    <a href="#comment:12">↑ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-05-29T17%3A22%3A43-07%3A00&amp;precision=second" title="See timeline at 05/29/08 17:22:43">13 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:12" title="Comment 12">caron</a>:
+</p>
+<blockquote class="citation">
+<ol><li>I find this a bit cleaner:
+</li></ol></blockquote>
+<pre class="wiki"> Conventions = "CF-1.0";
+ namespaces ="wcs=http://www.opengis.net/wcs/1.1/"
+</pre><blockquote class="citation">
+<p>
+than:
+</p>
+</blockquote>
+<pre class="wiki"> Conventions = "CF-1.0, wcs=http://www.opengis.net/wcs/1.1/"
+</pre><blockquote class="citation">
+</blockquote>
+<p>
+I've been pondering "cleaner" for some time, as well as Phil's idea <a class="ticket" href="./27#comment:14" title="Comment 14">phil </a>, which reverses the usual role of attributes and variables.  I would put both these ideas in the class of "don't mess with Conventions", and I have been thinking about implementation reasons why one should leave Conventions along.  Before I give those reasons, I'd like to add another possibility for "don't mess with Conventions" schemes: simply borrow xml namespaces literally, i.e. an xmlns attribute sets the default namespace for the container it is in, and xmlns:xyz  attribute sets the namespace for prefix xyz:.  So to continue this example, we would say
+</p>
+<pre class="wiki">   xmlns:wcs = "http://www.opengis.net/wcs/1.1/";
+</pre><p>
+Now suppose for the moment that we have all decided on a URI for CF-1.0.  It could be a constructed URI, i.e. there is a simple rule for constructing it that we all agree to, i.e.   <a class="ext-link" href="ftp://ftp.unidata.ucar.edu/pub/netcdf/Conventions/CF-1.0/"><span class="icon">​</span>ftp://ftp.unidata.ucar.edu/pub/netcdf/Conventions/CF-1.0/</a>.  On the other hand, it could be a registry URI, meaning that we have agreed on a registry for Convention URIs, e.g. urn:cfns:cf-1.0: or whatever.
+</p>
+<p>
+This proposal was that 
+</p>
+<pre class="wiki"> Conventions = "CF-1.0" ;
+</pre><p>
+would set the default namespace, i.e. the CF1.0 URI.  Equivalently, we could say
+</p>
+<pre class="wiki">  xmlns = "urn:cfns:cf-1.0:" ; 
+</pre><p>
+<strong>However</strong>
+</p>
+<ol><li>that is not what Conventions means at present (Conventions="CF-1.0" current meaning is that some of the attributes might belong to the CF-1.0 convention) 
+</li></ol><ol start="2"><li>If we do use a registry for setting Convention-equivalent URIs, then any code that does the tranlation to prefixed attributes has to consult the registry.
+</li></ol><p>
+So as far as the default namespace is concerned, we have for a CF-1.0 statement
+</p>
+<ol><li>current Conventions, which has some of the attributes belonging to CF-1.0
+</li></ol><ol start="2"><li> proposed Conventions, which has all the unprefixed attributes belonging to CF-1.0, and,
+</li></ol><ol start="3"><li>xmlns, which explicitly states the URI for CF-1.0 that we have all agreed to.
+</li></ol><p>
+From an implementation point of view, unless we agree on a construction method for Conventions to URIs, xmlns is very different from the proposed Conventions in that no external lookup is required to convent to explicit URIs.   
+</p>
+<p>
+As proposed, i.e. using Conventions to set the default URI, prevents us from writing clever programs that use the CF standard to figure which attributes in the file actually belong to CF-1.0 when the Conventions tag says the attributes are CF-1.0 (because the new standard says put them all in CF-1.0 because it is the default namespace).  It is not clear whether this is a major issue or not, but it might be.
+</p>
+<p>
+John's namespaces tag could also handle the default namespace, but he might consider the proposal sullied at this point (or at least less than clean) ...
+</p>
+<p>
+Another reason one might want to not use Conventions is that one might want to tag variable names (Conventions being explicitly about attributes).
+</p>
+<p>
+One more can-of-worms is if one would like to set name spaces for the values of attributes, i.e. to conveniently point to a concept.  This requires knowing which attribute values are URI's and not plain strings -- possible to do in opendap because it has a URL type, but not if one started with a netcdf file, i.e. one needs to be careful to translate to URL from string when appropriate, but not possible in netcdf unless you 
+</p>
+<ol><li>want to say if it looks like a URI it is a URI, or
+</li><li>are willing to look at the description (i.e. ontology) of  the standard and thus deduce that it is an URI.  Which would be external information, thus relatively messy.
+</li></ol><p>
+Benno
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1248800672000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-07-28T10%3A04%3A32-07%3A00&amp;precision=second" title="See timeline at 07/28/09 10:04:32">12 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-conventions@…</em> to <em>edavis</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>assigned</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Hi all,
+</p>
+<p>
+I've volunteered to moderate this ticket and it seems a summary is in order. Hopefully, we can come to some agreement on the open issues. Below is my summary.
+</p>
+<p>
+Thanks,
+</p>
+<p>
+Ethan
+</p>
+<h1 id="Proposal">Proposal</h1>
+<p>
+Extend CF to allow tagging of attribute names with namespace tags (similar to XML Namespace). This will allow data providers to use multiple attribute conventions without having to worry about attribute name clashes. It will also allow CF to use other attribute conventions without duplicating them directly in CF.
+</p>
+<p>
+There seems to be general agreement that attribute namepaces would work in a manner similar to XML Namespaces. Something like:
+</p>
+<ol><li>A namespace is identified by a URI.
+</li><li>A namespace prefix/tag is associated with a namespace.
+</li><li>Prefixing an attribute name with a namespace prefix/tag and a colon (':') places that attribute name in the associated namespace. [Some initial concern over need to escape ":" in CDL but seems OK now.]
+</li><li>Not prefixing an attribute name with a namespace prefix/tag places that attribute name in the empty/default namespace.
+</li></ol><h1 id="Issues">Issues</h1>
+<p>
+There are a number of issues for which there is not general agreement and more discussion is needed:
+</p>
+<ul><li>Should the proposal maintain backward compatibility?
+</li><li>How will the namespaces used in a netCDF file be declared/encoded? How will the empty/default namespace be used?
+</li><li>How will namespace URIs be constructed?
+</li><li>How will potential semantic conflict/overlap be handled?
+</li><li>How would non-attribute based conventions be mapped into an attribute list?
+</li></ul><p>
+And there are a few issues that we might want to push into new tickets:
+</p>
+<ul><li>Namespaces for variable names.
+</li><li>Namespaces for attribute values (e.g., common concept?).
+</li></ul><h2 id="BackwardCompatibility">Backward Compatibility</h2>
+<p>
+One of the main goals of this proposal is to allow the use of external conventions without having attribute name clash issues. This goal can be solved without affecting backward compatibility by requiring that CF attributes always be placed in the empty/default namespace (i.e., without a prefix/tag).
+</p>
+<p>
+On the other hand, (as Benno points out) this would "prevent us from writing clever programs that use [CF] to figure [out] which attributes ... actually belong to CF".
+</p>
+<p>
+If the proposal does not include restrictions for backward compatibility, data sets can still be written that use namespaces but maintain backward compatibility by placing all CF attributes in the empty/default namespace. This could be spelled out as best practice until namespaces are more broadly supported.
+</p>
+<p>
+Two questions to consider if the proposal does not include restrictions for backward compatibility:
+</p>
+<ul><li>How will namespaces affect attributes defined by NUG ("units" and "long_name" e.g.), COARDS, etc?
+</li><li>Should some level of backward compatibility be required if CF attributes are in an explicitly declared namespace?
+</li></ul><p>
+The backward compatibility issue seems somewhat key to the discussion as a decision on this matter will affect a number of other decisions.
+</p>
+<h2 id="Declaringencodingnamespaces">Declaring/encoding namespaces</h2>
+<p>
+Four different options where discussed for declaring namespaces in a netCDF file (and a fifth specific to a reserved CF namespace prefix). Some of these options implicitly left CF in the empty/default namespace, one explicitly placed CF in the empty/default namespace, and another explicitly placed CF in the CF namespace. However, the issue of backward compatibility was not always part of the discussion.
+</p>
+<p>
+1) Benno's initial proposal extended the meaning of the "Conventions" global attribute to include namespace declarations:
+</p>
+<pre class="wiki">Conventions = "CF-1.0, wcs=http://www.opengis.net/wcs/1.1";
+</pre><p>
+There was further discussion over the current meaning of the "Conventions" attribute and that the NUG associates it with URLs. However, the current meaning is that some attributes MAY be from the listed convention(s). Using values in the "Conventions" attribute for namespace declarations would be an extension of its current meaning and might cause backward compatibility issues.
+</p>
+<p>
+2) John Caron proposed a new "namespaces" global attribute:
+</p>
+<pre class="wiki">Conventions = "CF-1.0";
+namespaces = "wcs=http://www.opengis.net/wcs/1.1";
+</pre><p>
+3) Phil proposed a namespace container variable:
+</p>
+<pre class="wiki">char namespace_declarations;
+    :cf = "http://www.cfconventions.org/";
+    :wcs = "http://www.opengis.net/wcs/1.1";
+    :dc = "http://www.dublincore.org/";
+    ...
+</pre><p>
+Which has readability advantages when declaring multiple namespaces.
+</p>
+<p>
+4) Benno then suggested using the form of namespace declaration from XML Namespace:
+</p>
+<pre class="wiki">xmlns = "urn:cfns:cf-1.4:" ; // Defines the default namespace.
+xmlns:wcs = "http://www.opengis.net/wcs/1.1";
+</pre><p>
+Which completely removes the "Conventions" attribute from the namespace issue.
+</p>
+<p>
+5) Another suggestion related to namespaces and backward compatibility involved explicitly reserving the "cf:&#34; prefix and the empty/default namespace to be equivalent, e.g., &#34;cf:grid_mapping" and "grid_mapping" are equivalent. Though it wasn't clear whether all attributes in the empty/default namespace would be required to be CF.
+</p>
+<h2 id="Possiblesemanticconflictoverlap">Possible semantic conflict/overlap</h2>
+<p>
+There was quite a bit of discussion about how to deal with any conflict or overlap in the semantics of different conventions. Several options where mentioned for handling possible semantic conflict/overlap with external conventions:
+</p>
+<p>
+1) CF keeps a controlled list of  allowed external conventions making sure there are no conflicts/overlaps between CF and all conventions on the controlled list.
+</p>
+<p>
+[NOTE: There was broad agreement that this would require too much work for CF and would reduce the flexibility for data providers targeted by this proposal. Specifying how conflict/overlap should be handled by CF clients and data providers seemed a satisfactory and required alternative.]
+</p>
+<p>
+2) CF semantics must be consistent and overrule external semantics. Add a statement to the specification something like:
+</p>
+<blockquote>
+<p>
+"all CF semantics must be correct and consistent, and shall not be modified by non-CF attributes"
+</p>
+</blockquote>
+<p>
+[Can compliance be tested? Strong restriction on client, not as much on data provider.]
+</p>
+<p>
+3) CF semantics must be consistent. Add a statement to the specification something like:
+</p>
+<blockquote>
+<p>
+"all CF semantics must be correct and consistent"
+</p>
+</blockquote>
+<h2 id="WheredonamespaceURIscomefrom">Where do namespace URIs come from?</h2>
+<p>
+There were a number of suggestions on where the namespace URIs would come from. These included:
+</p>
+<ul><li>Using the "Conventions" global attribute and the NUG URL discussion to define namespace URIs.
+</li><li>Having CF keep a list of allowed namespaces and their URIs. [NOTE: See the note in item 1 on semantic conflict/overlap.]
+</li><li>Allowing external convention writers to control the namespace URI for their conventions.
+</li></ul><p>
+In the end, I think there was general agreement 1) not to extend the meaning of the "Conventions" attribute and 2) that it would be too much work for CF to maintain a list of allowed namespaces (and their URIs). This leaves the option of having external convention writers control their namespace URI. [Which is in-line with how XML Namespaces work.] 
+</p>
+<h2 id="Mappingnon-attributebasedconventionsintoattributelists">Mapping non-attribute based conventions into attribute lists</h2>
+<p>
+Somewhat related to the semantic conflict overlap issue ...
+</p>
+<p>
+How do external, non-attribute based conventions get mapped into an attribute list. E.g., OGC WCS concepts are defined in UML (and XML Schema) which don't easily translate into a simple list of attributes.
+</p>
+<p>
+Do we need to suggest that only well-defined attribute conventions be used in CF-netCDF files?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1255197654000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:18" class="follow-up">↓ 18</a>
+    <a href="#comment:19" class="follow-up">↓ 19</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-10T11%3A00%3A54-07%3A00&amp;precision=second" title="See timeline at 10/10/09 11:00:54">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Id like to get this proposal finished if possible, and use it in my point obs proposal. FWIW, here is my vote on resolving the outstanding issues:
+</p>
+<ol><li>Backwards Compatibility
+</li></ol><p>
+Use of CF: prefix is optional but recommended for all attributes in the CF Appendix A and F. For data providers concerned about breaking existing software, it is recommended to add both CF: and non-prefixed attributes for existing attributes, and only CF: for new attributes added after this proposal is accepted. Client software is strongly urged to recognize CF: prefixes.  CF web pages should have a place for describing client software and its conformance to this and other CF conventions.
+</p>
+<ol start="2"><li>Declaring/encoding namespaces
+</li></ol><p>
+While Phil's proposal is probably the most readable:
+</p>
+<pre class="wiki">char namespace_declarations;
+    :C";
+    :wcs = "http://www.opengis.net/wcs/1.1";
+    :dc = "http://www.dublincore.org/";
+    ...
+</pre><p>
+but im not sure how we find this variable, is "namespace_declarations" now reserved?
+</p>
+<p>
+Im not all that attached, but i slightly prefer:
+</p>
+<pre class="wiki">attributes:
+  CF:namespaces = "CF=http://www.cfconventions.org/", "wcs=http://www.opengis.net/wcs/1.1", "dc=http://www.dublincore.org/";
+
+</pre><p>
+using a global attribute whose value is an array of strings. 
+</p>
+<p>
+In any case, each namespace declaration string must be of the form 'prefix=namespace'. it is recommended that the namespace resolve to a human-readable web page for that vocabulary. 
+</p>
+<ol start="3"><li>Possible semantic conflict
+</li></ol><p>
+"all CF semantics must be correct and consistent, and shall not be modified by non-CF attributes" 
+</p>
+<ol start="4"><li>Where do namespace URIs come from?
+</li></ol><p>
+The CF namespace definition MUST be exactly the string:
+</p>
+<p>
+"CF=<a class="ext-link" href="http://www.cfconventions.org/"><span class="icon">​</span>http://www.cfconventions.org/</a>";
+</p>
+<p>
+(or if you prefer Phil's proposal:)
+</p>
+<p>
+:CF= "<a class="ext-link" href="http://www.cfconventions.org/"><span class="icon">​</span>http://www.cfconventions.org/</a>";
+</p>
+<p>
+all other namespaces and their semantics are not controlled by CF, except that the prefix CF (case-insensitive) is not allowed to be used by any other namespace.
+</p>
+<p>
+Given that the CF prefix is reserved and its namespace is fixed, the namespaces declaration is optional for the use of the CF: prefix.
+</p>
+<ol start="5"><li>Mapping non-attribute based conventions into attribute lists
+</li></ol><p>
+out of scope for this proposal.
+</p>
+<p>
+So how about on Oct 26, comments/votes are completed and ethan and/or benno writes up a revised proposal based on this input, and we accept or reject that revised proposal as written ? All in favor, please stay quiet ;<sup>)
+</sup></p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1255211068000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+        in reply to:
+    <a href="#comment:17">↑ 17</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:20" class="follow-up">↓ 20</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-10T14%3A44%3A28-07%3A00&amp;precision=second" title="See timeline at 10/10/09 14:44:28">12 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Thanks for moving this on. I have some comments on your proposal.
+</p>
+<blockquote class="citation">
+<p>
+Use of CF: prefix is optional but recommended for all attributes in the CF Appendix A and F. For data providers concerned about breaking existing software, it is recommended to add both CF: and non-prefixed attributes for existing attributes, and only CF: for new attributes added after this proposal is accepted.
+</p>
+</blockquote>
+<p>
+I think that the prefix should be recommended only if the dataset uses more than one convention. If it is a pure CF dataset, as many will continue to be (e.g. CMIP5 datasets created by CMOR, I expect), adding a CF prefix is an unnecessary complication. If the dataset is created as a pure CF dataset and subsequent you want to use another one too, then you'll be modifying the dataset anyway and can rename the attributes to include the prefix at the same time.
+</p>
+<p>
+We should be clear in the CF standard about whether we are recommending duplicates (prefixed and non-prefixed), rather than leaving it to the data-writer's conscience. Recommendations are not mandatory anyway.
+</p>
+<p>
+The prefix is not necessary for the NUG attributes in App A, I would say. Wouldn't all netCDF conventions recognise those anyway? They are not the property of CF. It is also not necessary for App F attributes, because these ones can only be attributes of a <tt>grid_mapping</tt> variable, which is specifically a CF convention.
+</p>
+<blockquote class="citation">
+<ol start="2"><li>Declaring/encoding namespaces
+</li></ol></blockquote>
+<pre class="wiki">  CF:namespaces = "CF=http://www.cfconventions.org/", "wcs=http://www.opengis.net/wcs/1.1", "dc=http://www.dublincore.org/";
+</pre><p>
+ 
+</p>
+<blockquote class="citation">
+<p>
+using a global attribute whose value is an array of strings.
+</p>
+</blockquote>
+<p>
+Should that say <tt>:CF:namespaces</tt> instead of <tt>CF:namespaces</tt> if it's a global attribute? I agree, a global attribute is a good solution. I think that an attribute in the CF spirit would be a blank-separated list of words, rather than an array of strings. (Can attributes really be vectors of strings anyway? I thought that attributes could have only one dimension.) I would suggest the syntax "<em>namespace</em> <em>URL</em> [ <em>namespace</em> <em>URL</em> ... ]" e.g.
+</p>
+<pre class="wiki">  :CF:namespaces="CF http://www.cfconventions.org/ wcs http://www.opengis.net/wcs/1.1 dc http://www.dublincore.org/"
+</pre><p>
+I suggest that would be more robust, because it won't be upset by including extra spaces and it'll be simpler to parse, not depending on = being included.
+</p>
+<p>
+What about the Conventions attribute? Will the dataset continue to identify itself just as CF-1.4, for instance? The CF:namespaces attribute implies that multiple conventions are used.
+</p>
+<blockquote class="citation">
+<ol start="3"><li>Possible semantic conflict
+</li></ol><p>
+"all CF semantics must be correct and consistent, and shall not be modified by non-CF attributes" 
+</p>
+</blockquote>
+<p>
+OK. Does that mean that, if the file contains both CF metadata and metadata according to another convention, and they have conflicting meanings, the application should take the CF metadata as correct? 
+</p>
+<blockquote class="citation">
+<p>
+the prefix CF (case-insensitive)
+</p>
+</blockquote>
+<p>
+Do you mean that the attributes could be prefixed by either "CF:&#34; or &#34;cf:"? That makes more work for the software reading the data, since it would have to check both. What if both are provided and they disagree? I would suggest that it would be better to decide on the case.
+</p>
+<blockquote class="citation">
+<p>
+So how about on Oct 26, comments/votes are completed and ethan and/or benno writes up a revised proposal based on this input, and we accept or reject that revised proposal as written ?
+</p>
+</blockquote>
+<p>
+The procedure is that we express views after the proposal has been written. The proposal should specify in detail the alterations to be made to the text of the CF standard and the conformance document (since there's no-one else available to do this work other than proposers). Then, as usual, the moderator (Ethan) decides after three weeks after the last comment made whether the proposal is accepted. See <a class="ext-link" href="http://cf-pcmdi.llnl.gov/governance/governance-rules"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/governance/governance-rules</a>
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1255366267000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+        in reply to:
+    <a href="#comment:17">↑ 17</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:21" class="follow-up">↓ 21</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-12T09%3A51%3A07-07%3A00&amp;precision=second" title="See timeline at 10/12/09 09:51:07">12 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:17" title="Comment 17">caron</a>:
+</p>
+<p>
+Hi John, 
+</p>
+<blockquote class="citation">
+<ol start="2"><li>Declaring/encoding namespaces
+</li></ol><p>
+While Phil's proposal is probably the most readable:
+</p>
+<pre class="wiki">char namespace_declarations;
+    :CF = "http://www.cfconventions.org/";
+    :wcs = "http://www.opengis.net/wcs/1.1";
+    :dc = "http://www.dublincore.org/";
+    ...
+</pre><p>
+but im not sure how we find this variable, is "namespace_declarations" now reserved?
+</p>
+</blockquote>
+<p>
+I merely used that name as an example. Presumably "namespaces" or "cf_namespaces" could serve equally well as the variable name here. The 'reserved-ness' would be the same as for other CF names, I presume - purely a matter of agreed convention.
+</p>
+<p>
+As you say, the main motivation for suggesting this particular idiom was visual parsing. I guess the choice of encoding style (variable vs attribute) may be influenced by what we perceive to be the typical programmatic access patterns.
+</p>
+<p>
+By way of a contrived example, if a programmer wanted to detect if a particular namespace has been assigned and, if so, what is its value, then with the variable idiom this could be achieved simply (I think - correct me if I'm wrong) using the existing netcdf functions <tt>nc_inq_att()</tt> and <tt>nc_get_att_text()</tt>. Using the namespace idiom, however, one would need to use the latter function to get the attribute text, then use a locally-written function to parse the text and extract the required namespace URI, if it's there.
+</p>
+<p>
+Sure, writing such a parsing function is clearly not one of The Grand Programming Challenges, especially not if you use Python ;-)  But I guess it does mean that this noddy function will end up being written a thousand ways in a thousand different places. Heck, maybe that's not such a big deal.
+</p>
+<p>
+That said, however, ...
+</p>
+<blockquote class="citation">
+<p>
+I'm not all that attached, but I slightly prefer:
+</p>
+<pre class="wiki">attributes:
+  :CF:namespaces = "CF=http://www.cfconventions.org/", "wcs=http://www.opengis.net/wcs/1.1", "dc=http://www.dublincore.org/";
+
+</pre><p>
+using a global attribute whose value is an array of strings. 
+</p>
+</blockquote>
+<p>
+... I'd agree that this does sit better with the 'CF nature'. It also means that in <tt>ncdump -h</tt> output any namespace declarations would appear near the top of the output, which mirrors the way XML namespaces (typically) appear at the top of an XML document, which in turn is the representational model that many of us have in mind in this context, I suspect.
+</p>
+<p>
+So, with my CF hat on I'd vote for the global attribute idiom, but with my programmer and end-user hat on I'd vote for the variable idiom! Give me both, please :-) :-)
+</p>
+<p>
+Regards,
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1255368113000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+        in reply to:
+    <a href="#comment:18">↑ 18</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-12T10%3A21%3A53-07%3A00&amp;precision=second" title="See timeline at 10/12/09 10:21:53">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:18" title="Comment 18">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John
+</p>
+<p>
+Thanks for moving this on. I have some comments on your proposal.
+</p>
+<blockquote class="citation">
+<p>
+Use of CF: prefix is optional but recommended for all attributes in the CF Appendix A and F. For data providers concerned about breaking existing software, it is recommended to add both CF: and non-prefixed attributes for existing attributes, and only CF: for new attributes added after this proposal is accepted.
+</p>
+</blockquote>
+<p>
+I think that the prefix should be recommended only if the dataset uses more than one convention. If it is a pure CF dataset, as many will continue to be (e.g. CMIP5 datasets created by CMOR, I expect), adding a CF prefix is an unnecessary complication. If the dataset is created as a pure CF dataset and subsequent you want to use another one too, then you'll be modifying the dataset anyway and can rename the attributes to include the prefix at the same time.
+</p>
+</blockquote>
+<p>
+I think thats a valid use case. I was thinking of the problem of distinguishing CF and non-CF attributes. Its hard for non-experts to know what they're looking at when they look at a file's metadata. Having a CF prefix unambiguously says "go look up what this attribute means in CF conventions". So I would prefer to recommend that usage, since many providers will follow those recommendations.
+</p>
+<blockquote class="citation">
+<p>
+We should be clear in the CF standard about whether we are recommending duplicates (prefixed and non-prefixed), rather than leaving it to the data-writer's conscience. Recommendations are not mandatory anyway.
+</p>
+</blockquote>
+<p>
+Yes, I was suggesting duplicates. i dont see any other way to provide backwards compatability.
+</p>
+<blockquote class="citation">
+<p>
+The prefix is not necessary for the NUG attributes in App A, I would say. Wouldn't all netCDF conventions recognise those anyway? They are not the property of CF. It is also not necessary for App F attributes, because these ones can only be attributes of a <tt>grid_mapping</tt> variable, which is specifically a CF convention.
+</p>
+</blockquote>
+<p>
+Thats a good point, I guess we need to clarify what attributes are owned by CF. OTOH, I dont see a lot of harm for CF to take ownership of CF: prefixed attributes, even if they duplicate NUG ones.
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<ol start="2"><li>Declaring/encoding namespaces
+</li></ol></blockquote>
+<pre class="wiki">  CF:namespaces = "CF=http://www.cfconventions.org/", "wcs=http://www.opengis.net/wcs/1.1", "dc=http://www.dublincore.org/";
+</pre><p>
+ 
+</p>
+<blockquote class="citation">
+<p>
+using a global attribute whose value is an array of strings.
+</p>
+</blockquote>
+<p>
+Should that say <tt>:CF:namespaces</tt> instead of <tt>CF:namespaces</tt> if it's a global attribute? 
+</p>
+</blockquote>
+<p>
+yes
+</p>
+<blockquote class="citation">
+<p>
+I agree, a global attribute is a good solution. I think that an attribute in the CF spirit would be a blank-separated list of words, rather than an array of strings. (Can attributes really be vectors of strings anyway? I thought that attributes could have only one dimension.) 
+</p>
+</blockquote>
+<p>
+I guess arrays of strings are a new feature in netcdf-4, so we better stick with the blank separated single strings.
+</p>
+<blockquote class="citation">
+<p>
+I would suggest the syntax "<em>namespace</em> <em>URL</em> [ <em>namespace</em> <em>URL</em> ... ]" e.g.
+</p>
+<pre class="wiki">  :CF:namespaces="CF http://www.cfconventions.org/ wcs http://www.opengis.net/wcs/1.1 dc http://www.dublincore.org/"
+</pre><p>
+I suggest that would be more robust, because it won't be upset by including extra spaces and it'll be simpler to parse, not depending on = being included.
+</p>
+</blockquote>
+<p>
+ok with me, thats the way XML does it, though its not that readable. perhaps we could also allow newlines to seperate "prefix namespace" pairs for readability? BTW, in XML I think its "prefix namespace" not "namespace URL".
+</p>
+<blockquote class="citation">
+<p>
+What about the Conventions attribute? Will the dataset continue to identify itself just as CF-1.4, for instance? The CF:namespaces attribute implies that multiple conventions are used.
+</p>
+</blockquote>
+<p>
+thats a good point, it does seem we have some overlap there. In a way the CF:namespaces attribute is a generalization of the Conventions attribute.
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<ol start="3"><li>Possible semantic conflict
+</li></ol><p>
+"all CF semantics must be correct and consistent, and shall not be modified by non-CF attributes" 
+</p>
+</blockquote>
+<p>
+OK. Does that mean that, if the file contains both CF metadata and metadata according to another convention, and they have conflicting meanings, the application should take the CF metadata as correct? 
+</p>
+</blockquote>
+<p>
+yes
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+the prefix CF (case-insensitive)
+</p>
+</blockquote>
+<p>
+Do you mean that the attributes could be prefixed by either "CF:&#34; or &#34;cf:"? That makes more work for the software reading the data, since it would have to check both. What if both are provided and they disagree? I would suggest that it would be better to decide on the case.
+</p>
+</blockquote>
+<p>
+yes, lets just decide on one. My intention is to prevent other namespaces from using the same prefix with different case.
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+So how about on Oct 26, comments/votes are completed and ethan and/or benno writes up a revised proposal based on this input, and we accept or reject that revised proposal as written ?
+</p>
+</blockquote>
+<p>
+The procedure is that we express views after the proposal has been written. The proposal should specify in detail the alterations to be made to the text of the CF standard and the conformance document (since there's no-one else available to do this work other than proposers). Then, as usual, the moderator (Ethan) decides after three weeks after the last comment made whether the proposal is accepted. See <a class="ext-link" href="http://cf-pcmdi.llnl.gov/governance/governance-rules"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/governance/governance-rules</a>
+</p>
+</blockquote>
+<p>
+agree, i just mean to encourage anyone's comments in the next two weeks as a deadline for a new version of the proposal
+</p>
+<blockquote class="citation">
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+</blockquote>
+<p>
+thanks for your insightful comments, as usual.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1255368327000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+        in reply to:
+    <a href="#comment:19">↑ 19</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-12T10%3A25%3A27-07%3A00&amp;precision=second" title="See timeline at 10/12/09 10:25:27">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:19" title="Comment 19">pbentley</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./27#comment:17" title="Comment 17">caron</a>:
+</p>
+<p>
+Hi John, 
+</p>
+<blockquote class="citation">
+<ol start="2"><li>Declaring/encoding namespaces
+</li></ol><p>
+While Phil's proposal is probably the most readable:
+</p>
+<pre class="wiki">char namespace_declarations;
+    :CF = "http://www.cfconventions.org/";
+    :wcs = "http://www.opengis.net/wcs/1.1";
+    :dc = "http://www.dublincore.org/";
+    ...
+</pre><p>
+but im not sure how we find this variable, is "namespace_declarations" now reserved?
+</p>
+</blockquote>
+<p>
+I merely used that name as an example. Presumably "namespaces" or "cf_namespaces" could serve equally well as the variable name here. The 'reserved-ness' would be the same as for other CF names, I presume - purely a matter of agreed convention.
+</p>
+<p>
+As you say, the main motivation for suggesting this particular idiom was visual parsing. I guess the choice of encoding style (variable vs attribute) may be influenced by what we perceive to be the typical programmatic access patterns.
+</p>
+<p>
+By way of a contrived example, if a programmer wanted to detect if a particular namespace has been assigned and, if so, what is its value, then with the variable idiom this could be achieved simply (I think - correct me if I'm wrong) using the existing netcdf functions <tt>nc_inq_att()</tt> and <tt>nc_get_att_text()</tt>. Using the namespace idiom, however, one would need to use the latter function to get the attribute text, then use a locally-written function to parse the text and extract the required namespace URI, if it's there.
+</p>
+<p>
+Sure, writing such a parsing function is clearly not one of The Grand Programming Challenges, especially not if you use Python ;-)  But I guess it does mean that this noddy function will end up being written a thousand ways in a thousand different places. Heck, maybe that's not such a big deal.
+</p>
+<p>
+That said, however, ...
+</p>
+<blockquote class="citation">
+<p>
+I'm not all that attached, but I slightly prefer:
+</p>
+<pre class="wiki">attributes:
+  :CF:namespaces = "CF=http://www.cfconventions.org/", "wcs=http://www.opengis.net/wcs/1.1", "dc=http://www.dublincore.org/";
+
+</pre><p>
+using a global attribute whose value is an array of strings. 
+</p>
+</blockquote>
+<p>
+... I'd agree that this does sit better with the 'CF nature'. It also means that in <tt>ncdump -h</tt> output any namespace declarations would appear near the top of the output, which mirrors the way XML namespaces (typically) appear at the top of an XML document, which in turn is the representational model that many of us have in mind in this context, I suspect.
+</p>
+<p>
+So, with my CF hat on I'd vote for the global attribute idiom, but with my programmer and end-user hat on I'd vote for the variable idiom! Give me both, please :-) :-)
+</p>
+<p>
+Regards,
+Phil
+</p>
+</blockquote>
+<p>
+We could also add parsing namespaces to cflib, so the user doesnt care how we end up encoding it.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1255448580000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:23" class="follow-up">↓ 23</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T08%3A43%3A00-07%3A00&amp;precision=second" title="See timeline at 10/13/09 08:43:00">12 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello All,
+</p>
+<p>
+At this point I would like to point out the larger context that this proposal fits into, in the hope that it will clarify the criteria for choosing the best solution.
+</p>
+<p>
+This proposal was always intended to facilitate the free exchange of information between netcdf and RDF/OWL, and with the experience I have gained in the subsequent year, exchange of information with conventions expressed in XML Schema as well.
+</p>
+<p>
+XML Schema are important because a lot of data exchange conventions are expressed in XML Schema.  RDF/OWL is important because it is a framework where multiple conventions can co-exist, in contrast to the focus of XML Schema where only one convention is meaningful at a time.  And data exchange will occur in an ontological framework -- it is the only feasible solution on the horizon to the exploding chaos of data frameworks that are being built.
+</p>
+<p>
+Nathan Potter and I and others have been working on an OPeNDAP project where we insert OGC metadata into NcML, and move it to the ddx (i.e. it can be exchanged between DAP servers), and move it from the ddx into rdf (i.e. it is in RDF/OWL).  We also read in XML Schema so that we 1) convert multiple schema in OWL so that they coexist in a single framework, and 2) we can extract XML documents consistent with their schema based on the information in the RDF/OWL framework.  It is not quite finished yet, and Nathan is travelling for quite some time, but it is pretty close.
+</p>
+<p>
+Note that the part that we have not done is move the information from NcML to netcdf, an important step, and where this proposal fits in.  But we do have a sense of what things should look like in NcML or the ddx  or RDF/OWL to be usable, and I think that is an important part of formulating this proposal.
+</p>
+<p>
+So what do I think I have learned on my CF-trac<a class="accepted ticket" href="./27.html" title="enhancement: Use namespace tags to include other conventions in netcdf files ... (accepted)">#27</a> vacation?  
+</p>
+<blockquote>
+<p>
+1) if one wants to insert external information into a document controlled by an XML Schema, one is probably going to wrap it in a special container that says "this is where stuff not in the schema goes".  That block is naturally instrumented with the namespaces for the external information.
+</p>
+</blockquote>
+<blockquote>
+<p>
+2) XML is not as clean as one would hope.   In particular, in XML there is no standard for converting a (namespace,qname) pair into a Universal Resource Identifier (URI); XML is written exclusively in terms of the pair.   In XML Schema, the convention is to insert a '#' between the namespace and qname to create the URI.  In RDF/XML, the convention is to simply concatenate the two with no intervening character.  So to keep the Universal in URI, one has to convert namespace strings in moving information around, and be explicit about how one creates URIs from namespace,qname pairs in the current context.
+</p>
+</blockquote>
+<p>
+As things currently stand, we are using a special attribute otherXML which holds XML governed by some (unspecified) XML Schema.
+</p>
+<p>
+In NcML, this could appear as
+</p>
+<p>
+&lt;variable name="u"&gt;
+</p>
+<blockquote>
+<p>
+&lt;attribute name="nameNotUsed" type="OtherXML"&gt;
+</p>
+<blockquote>
+<p>
+&lt;ows:Abstract xmlns:ows=&#34;http://www.opengis.net/ows/1.1&#34;&gt;Northward component of a 2D sea surface velocity vector.&lt;/ows:Abstract&gt;
+&lt;Definition xmlns="<a class="ext-link" href="http://www.opengis.net/wcs/1.1"><span class="icon">​</span>http://www.opengis.net/wcs/1.1</a>" 
+</p>
+<blockquote>
+<p>
+xmlns:ows=&#34;http://www.opengis.net/ows/1.1"
+</p>
+<blockquote class="citation">
+</blockquote>
+</blockquote>
+<p>
+&lt;ows:AnyValue/&gt;
+</p>
+</blockquote>
+<p>
+&lt;/Definition&gt;
+&lt;owcs:InterpolationMethods xmlns:owcs=&#34;http://www.opengis.net/wcs/1.1/ows&#34; &gt;
+</p>
+<blockquote>
+<p>
+&lt;owcs:DefaultMethod&gt;nearest&lt;/owcs:DefaultMethod&gt;
+</p>
+</blockquote>
+<p>
+&lt;/owcs:InterpolationMethods&gt;
+</p>
+</blockquote>
+<blockquote>
+<p>
+&lt;/attribute&gt;
+&lt;attribute name="standard_name" type="String" &gt;surface_eastward_sea_water_velocity&lt;/attribute&gt;
+</p>
+</blockquote>
+<p>
+In the ddx, this appears as
+</p>
+<blockquote>
+<p>
+&lt;Grid name="u"&gt;
+</p>
+<blockquote>
+<p>
+&lt;Attribute name="nameNotUsed" type="OtherXML"&gt;
+</p>
+<blockquote>
+<p>
+&lt;ows:Abstract xmlns:ows=&#34;http://www.opengis.net/ows/1.1&#34;&gt;Northward component of a 2D sea surface velocity vector.&lt;/ows:Abstract&gt;
+&lt;Definition xmlns="<a class="ext-link" href="http://www.opengis.net/wcs/1.1"><span class="icon">​</span>http://www.opengis.net/wcs/1.1</a>" 
+</p>
+<blockquote>
+<p>
+xmlns:ows=&#34;http://www.opengis.net/ows/1.1"
+</p>
+<blockquote class="citation">
+</blockquote>
+</blockquote>
+<p>
+&lt;ows:AnyValue/&gt;
+</p>
+</blockquote>
+<p>
+&lt;/Definition&gt;
+&lt;owcs:InterpolationMethods xmlns:owcs=&#34;http://www.opengis.net/wcs/1.1/ows&#34; &gt;
+</p>
+<blockquote>
+<p>
+&lt;owcs:DefaultMethod&gt;nearest&lt;/owcs:DefaultMethod&gt;
+</p>
+</blockquote>
+<p>
+&lt;/owcs:InterpolationMethods&gt;
+</p>
+</blockquote>
+<p>
+&lt;/Attribute&gt;
+&lt;Attribute name="standard_name" type="String"&gt;
+</p>
+<blockquote>
+<p>
+&lt;value&gt;surface_eastward_sea_water_velocity&lt;/value&gt;
+</p>
+</blockquote>
+<p>
+&lt;/Attribute&gt;
+</p>
+</blockquote>
+<p>
+And this is translated to RDF/XML as
+</p>
+<blockquote>
+<p>
+&lt;dap:Grid rdf:ID=&#34;u&#34;&gt;
+</p>
+<blockquote>
+<p>
+&lt;ows:Abstract xmlns:ows=&#34;http://www.opengis.net/ows/1.1#"
+</p>
+<blockquote>
+<p>
+xmlns:grddl=&#34;http://www.w3.org/2003/g/data-view#"
+xmlns="<a class="ext-link" href="http://xml.opendap.org/ns/DAP/3.3"><span class="icon">​</span>http://xml.opendap.org/ns/DAP/3.3</a>#"&gt;Eastward component of a 2D sea surface      velocity vector.&lt;/ows:Abstract&gt;
+</p>
+</blockquote>
+<p>
+&lt;Definition xmlns="<a class="ext-link" href="http://www.opengis.net/wcs/1.1"><span class="icon">​</span>http://www.opengis.net/wcs/1.1</a>" xmlns:ows=&#34;http://www.opengis.net/ows/1.1#"
+</p>
+<blockquote>
+<p>
+xmlns:grddl=&#34;http://www.w3.org/2003/g/data-view#" rdf:parseType=&#34;Resource" &gt;
+</p>
+</blockquote>
+<p>
+&lt;ows:AnyValue rdf:resource=&#34;http://www.w3.org/1999/02/22-rdf-syntax-ns#nil&#34; /&gt;
+</p>
+</blockquote>
+<p>
+&lt;/Definition&gt;
+&lt;owcs:InterpolationMethods xmlns:owcs=&#34;http://www.opengis.net/wcs/1.1/ows#"
+</p>
+<blockquote>
+<blockquote>
+<p>
+xmlns:grddl=&#34;http://www.w3.org/2003/g/data-view#"
+xmlns="<a class="ext-link" href="http://xml.opendap.org/ns/DAP/3.3"><span class="icon">​</span>http://xml.opendap.org/ns/DAP/3.3</a>#"  rdf:parseType=&#34;Resource"&gt;
+</p>
+</blockquote>
+</blockquote>
+<p>
+&lt;owcs:DefaultMethod&gt;nearest&lt;/owcs:DefaultMethod&gt;
+</p>
+</blockquote>
+<blockquote>
+<p>
+&lt;/owcs:InterpolationMethods&gt;
+&lt;att:standard_name xmlns:att=&#34;http://localhost:8080/opendap/coverage/200803061600_HFRadar_USEGC_6km_rtv_SIO.nc.ddx/att#"
+</p>
+<blockquote>
+<p>
+rdf:datatype=&#34;http://www.w3.org/2001/XMLSchema#string"&gt;surface_eastward_sea_water_velocity&lt;/att:standard_name&gt;
+</p>
+</blockquote>
+</blockquote>
+<p>
+This solution is not perfect -- we introduced a new datatype OtherXML, we are not using the attribute name, we do not reference the Schema used in the inserted XML so there is no explicit way of finding the framework that explains how to use the inserted metadata.  We have assumed that the inserted XML is described by an XML Schema, we cannot, for example, use it to insert RDF/XML directly.  John C. may for example, already have an element in NcML that would be better suited to the purpose of inserting external XML, and we could map that to the ddx instead.
+</p>
+<p>
+Again, the point is not to force the particular solution, but that we neede to address the problem of moving information cleanly between the different systems.  Whatever CF/netcdf chooses to represent multiple conventions, it needs to map cleanly into other systems in general, and NcML/DDX OWL/RDF in particular.   I hope we can add this to the conversation, and devise a solution that will be implemented cleanly to interconnect these essential frameworks.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-23-1255451041000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+        in reply to:
+    <a href="#comment:22">↑ 22</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:24" class="follow-up">↓ 24</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T09%3A24%3A01-07%3A00&amp;precision=second" title="See timeline at 10/13/09 09:24:01">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Naively translating your XML into CDL, I would guess:
+</p>
+<pre class="wiki">attributes:
+ :CF\:namespaces = "ows http://www.opengis.net/ows/1.1 owcs http://www.opengis.net/wcs/1.1/ows";
+
+variables:
+  float u(x,y);
+    u:ows\:Abstract = "Northward component of a 2D sea surface velocity vector";
+    u:owcs\:InterpolationMethods= "nearest";
+
+</pre><p>
+what are the issues with this form?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-24-1255452237000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:24" class="cnum">
+    <a href="#comment:24">comment:24</a>
+  </span>
+        in reply to:
+    <a href="#comment:23">↑ 23</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:25" class="follow-up">↓ 25</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T09%3A43%3A57-07%3A00&amp;precision=second" title="See timeline at 10/13/09 09:43:57">12 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:23" title="Comment 23">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Naively translating your XML into CDL, I would guess:
+</p>
+<pre class="wiki">attributes:
+ :CF\:namespaces = "ows http://www.opengis.net/ows/1.1 owcs http://www.opengis.net/wcs/1.1/ows";
+
+variables:
+  float u(x,y);
+    u:ows\:Abstract = "Northward component of a 2D sea surface velocity vector";
+    u:owcs\:InterpolationMethods= "nearest";
+
+</pre><p>
+what are the issues with this form?
+</p>
+</blockquote>
+<p>
+My point was that it is not a solution until it is translated cleanly into NCML/DAP.ddx/ RDF/OWL.  Code as it currently exists would not express this as namespaces/qnames in XML versions of the netcdf information -- it would be buried as attribute elements in NcML/DDX.
+</p>
+<blockquote>
+<p>
+Are you committed to cleanly representing this in NcML so that the information can be recognized as XML elements by standard XML tools?  Does it cleanly represent in the DDX?  Can I translate it cleanly into RDF/OWL?  Is this the solution that implements cleanly in C/Java/XSLT?
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-25-1255453817000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:25" class="cnum">
+    <a href="#comment:25">comment:25</a>
+  </span>
+        in reply to:
+    <a href="#comment:24">↑ 24</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:26" class="follow-up">↓ 26</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T10%3A10%3A17-07%3A00&amp;precision=second" title="See timeline at 10/13/09 10:10:17">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:24" title="Comment 24">benno</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./27#comment:23" title="Comment 23">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Naively translating your XML into CDL, I would guess:
+</p>
+<pre class="wiki">attributes:
+ :CF\:namespaces = "ows http://www.opengis.net/ows/1.1 owcs http://www.opengis.net/wcs/1.1/ows";
+
+variables:
+  float u(x,y);
+    u:ows\:Abstract = "Northward component of a 2D sea surface velocity vector";
+    u:owcs\:InterpolationMethods= "nearest";
+
+</pre><p>
+what are the issues with this form?
+</p>
+</blockquote>
+<p>
+My point was that it is not a solution until it is translated cleanly into NCML/DAP.ddx/ RDF/OWL.  Code as it currently exists would not express this as namespaces/qnames in XML versions of the netcdf information -- it would be buried as attribute elements in NcML/DDX.
+</p>
+<blockquote>
+<p>
+Are you committed to cleanly representing this in NcML so that the information can be recognized as XML elements by standard XML tools?  Does it cleanly represent in the DDX?  Can I translate it cleanly into RDF/OWL?  Is this the solution that implements cleanly in C/Java/XSLT?
+</p>
+</blockquote>
+</blockquote>
+<p>
+For CF, all we have is the netcdf-3 classic data model, and I am using CDL to show the way these proposed conventions would look. For now, I think just getting this right is worth doing.
+</p>
+<p>
+I would guess that special tools can recognize the attributes with the ows/owcs namespace and translate back to your XML. But you would have a better hit on that than me.
+</p>
+<p>
+Alternatively, theres nothing in this convention to stop you from embedding the XML as a string in the attribute value. Not that pretty, but probably reasonable. Obviously again you need special tools that would understand the XML, which I think would be the same as understanding the namespace.
+</p>
+<p>
+So I would say that you would need to come up with another convention for mapping between CDL and your XML, presumably building on top of this convention. The hope is that this convention would enable that in a clean way, ie, allow multiple conventions to happen in the same file.
+</p>
+<p>
+What do you think?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-26-1255460312000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:26" class="cnum">
+    <a href="#comment:26">comment:26</a>
+  </span>
+        in reply to:
+    <a href="#comment:25">↑ 25</a>
+        ;
+          <span>follow-ups:</span>
+    <a href="#comment:27" class="follow-up">↓ 27</a>
+    <a href="#comment:33" class="follow-up">↓ 33</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T11%3A58%3A32-07%3A00&amp;precision=second" title="See timeline at 10/13/09 11:58:32">12 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:25" title="Comment 25">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+What do you think?
+</p>
+</blockquote>
+<p>
+A bit of a split decision.  Yes, it is up to me to make sure that the ddx to rdf translation (which is an XSLT transform written by Nathan), can handle the translation, and that the metadata arrives there as clean RDF elements. And XSLT is limited in how it can move things around from namespace to attribute to content, so I am concerned (it certainly was not obvious enough to code in the first two implementations).
+</p>
+<p>
+But I suspect that there is a strong use case for users wanting to inject blocks of XML-coded metadata into NcML to be taken up into the system.  The type="otherXML" example manages to do that, sort of, though there are the loose ends I mentioned earlier (loose ends that the CDL injections have as well, by the way -- we have no way of referencing the Schema a.k.a convention).
+</p>
+<p>
+Focusing exclusively on CDL means the NcML representation will be awful given the current mapping -- I want to avoid that.  If there is a clean NcML representation, users will have an XML option for injecting information, and we can be pretty sure that the information can be moved to the other XML-based formats in standard ways.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-27-1255462531000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:27" class="cnum">
+    <a href="#comment:27">comment:27</a>
+  </span>
+        in reply to:
+    <a href="#comment:26">↑ 26</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:28" class="follow-up">↓ 28</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T12%3A35%3A31-07%3A00&amp;precision=second" title="See timeline at 10/13/09 12:35:31">12 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:26" title="Comment 26">benno</a>:
+</p>
+<blockquote class="citation">
+<p>
+A bit of a split decision.  Yes, it is up to me to make sure that the ddx to rdf translation (which is an XSLT transform written by Nathan), can handle the translation, and that the metadata arrives there as clean RDF elements. And XSLT is limited in how it can move things around from namespace to attribute to content, so I am concerned (it certainly was not obvious enough to code in the first two implementations).
+</p>
+<p>
+But I suspect that there is a strong use case for users wanting to inject blocks of XML-coded metadata into NcML to be taken up into the system.  The type="otherXML" example manages to do that, sort of, though there are the loose ends I mentioned earlier (loose ends that the CDL injections have as well, by the way -- we have no way of referencing the Schema a.k.a convention).
+</p>
+<p>
+Focusing exclusively on CDL means the NcML representation will be awful given the current mapping -- I want to avoid that.  If there is a clean NcML representation, users will have an XML option for injecting information, and we can be pretty sure that the information can be moved to the other XML-based formats in standard ways.
+</p>
+</blockquote>
+<p>
+In <a class="ticket" href="./27#comment:16" title="Comment 16">my summary above</a>, I saw this ticket as dealing with attribute encodings only and left the mapping from non-attribute conventions up to the external convention writers. Since the ability to include external attribute conventions is such an important use case, I would suggest we split the "Capturing XML and RDF/OWL Semantics and Structure in CF" use case into another ticket.
+</p>
+<p>
+This would allow the external attribute convention use case to move forward quickly. However, I don't want to slow down the "XML and RDF/OWL" discussion either and splitting it into a new ticket may take some of the energy out of that discussion.
+</p>
+<p>
+Thoughts?
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-28-1255463253000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:28" class="cnum">
+    <a href="#comment:28">comment:28</a>
+  </span>
+        in reply to:
+    <a href="#comment:27">↑ 27</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:29" class="follow-up">↓ 29</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T12%3A47%3A33-07%3A00&amp;precision=second" title="See timeline at 10/13/09 12:47:33">12 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:27" title="Comment 27">edavis</a>:
+</p>
+<blockquote class="citation">
+<p>
+In <a class="ticket" href="./27#comment:16" title="Comment 16">my summary above</a>, I saw this ticket as dealing with attribute encodings only and left the mapping from non-attribute conventions up to the external convention writers. 
+</p>
+</blockquote>
+<p>
+This ticket has always been about representing non-attribute conventions in netcdf -- the initial example was WCS.  OGC and ISO are not going to define netcdf attribute representations of their conventions.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-29-1255465305000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:29" class="cnum">
+    <a href="#comment:29">comment:29</a>
+  </span>
+        in reply to:
+    <a href="#comment:28">↑ 28</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:32" class="follow-up">↓ 32</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T13%3A21%3A45-07%3A00&amp;precision=second" title="See timeline at 10/13/09 13:21:45">12 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:28" title="Comment 28">benno</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./27#comment:27" title="Comment 27">edavis</a>:
+</p>
+<blockquote class="citation">
+<p>
+In <a class="ticket" href="./27#comment:16" title="Comment 16">my summary above</a>, I saw this ticket as dealing with attribute encodings only and left the mapping from non-attribute conventions up to the external convention writers. 
+</p>
+</blockquote>
+<p>
+This ticket has always been about representing non-attribute conventions in netcdf -- the initial example was WCS.  OGC and ISO are not going to define netcdf attribute representations of their conventions.
+</p>
+</blockquote>
+<p>
+Sorry, I should have said "an external convention writer" rather than "the ...". You are right, I don't see OGC or ISO (or many other standards groups) developing mappings to CF. But someone needs to write the mappings.
+</p>
+<p>
+Does it then seem like a bad idea to split this ticket into two: 1) a CF attribute namespace ticket; and 2) an "XML and RDF/OWL" ticket?
+</p>
+<p>
+Could 1 be written to support 2? Or is there too much uncertainty about the connections between the two to safely split them at this time?
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-30-1255465582000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:30" class="cnum">
+    <a href="#comment:30">comment:30</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:31" class="follow-up">↓ 31</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-13T13%3A26%3A22-07%3A00&amp;precision=second" title="See timeline at 10/13/09 13:26:22">12 years ago</a> by edavis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Just to muddy the water a bit more ...
+</p>
+<p>
+I believe this ticket was originally branched from the common concept ticket. I'm a bit fuzzy on the connection. It seems that the common concept ticket might use the results of this ticket but there isn't as much dependency in the other direction. Does that sound correct?
+</p>
+<p>
+Are there issues from the common concept ticket that should come into play when considering this ticket?
+</p>
+<p>
+Thanks,
+</p>
+<p>
+Ethan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-31-1255508297000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:31" class="cnum">
+    <a href="#comment:31">comment:31</a>
+  </span>
+        in reply to:
+    <a href="#comment:30">↑ 30</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-14T01%3A18%3A17-07%3A00&amp;precision=second" title="See timeline at 10/14/09 01:18:17">12 years ago</a> by bnl
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:30" title="Comment 30">edavis</a>:
+</p>
+<blockquote class="citation">
+<p>
+I believe this ticket was originally branched from the common concept ticket. I'm a bit fuzzy on the connection. It seems that the common concept ticket might use the results of this ticket but there isn't as much dependency in the other direction. Does that sound correct?
+</p>
+</blockquote>
+<p>
+I think that's correct. 
+</p>
+<blockquote class="citation">
+<p>
+Are there issues from the common concept ticket that should come into play when considering this ticket?
+</p>
+</blockquote>
+<p>
+The key link is that common concept needs a way of encoding urns and/or scoped names. there is no reverse dependency that I'm aware of.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-32-1255508598000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:32" class="cnum">
+    <a href="#comment:32">comment:32</a>
+  </span>
+        in reply to:
+    <a href="#comment:29">↑ 29</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:36" class="follow-up">↓ 36</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-14T01%3A23%3A18-07%3A00&amp;precision=second" title="See timeline at 10/14/09 01:23:18">12 years ago</a> by bnl
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:29" title="Comment 29">edavis</a>:
+</p>
+<blockquote class="citation">
+<p>
+Does it then seem like a bad idea to split this ticket into two: 1) a CF attribute namespace ticket; and 2) an "XML and RDF/OWL" ticket?
+</p>
+<p>
+Could 1 be written to support 2? Or is there too much uncertainty about the connections between the two to safely split them at this time?
+</p>
+</blockquote>
+<p>
+I think they can be split. 
+</p>
+<p>
+It seems that in the first case we want to mark a "netcdf-acious" attribute with a namespace ... in the other we want to <em>embed</em> some semantics which go beyond a key value pair in a particular namespace. In the latter case we then want to think through the issues of exposing the information in ncml etc ... independently of what seems like a much simpler use case in the former.
+</p>
+<p>
+Bryan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-33-1255529230000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:33" class="cnum">
+    <a href="#comment:33">comment:33</a>
+  </span>
+        in reply to:
+    <a href="#comment:26">↑ 26</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:34" class="follow-up">↓ 34</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-14T07%3A07%3A10-07%3A00&amp;precision=second" title="See timeline at 10/14/09 07:07:10">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:26" title="Comment 26">benno</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./27#comment:25" title="Comment 25">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+What do you think?
+</p>
+</blockquote>
+<p>
+A bit of a split decision.  Yes, it is up to me to make sure that the ddx to rdf translation (which is an XSLT transform written by Nathan), can handle the translation, and that the metadata arrives there as clean RDF elements. And XSLT is limited in how it can move things around from namespace to attribute to content, so I am concerned (it certainly was not obvious enough to code in the first two implementations).
+</p>
+<p>
+But I suspect that there is a strong use case for users wanting to inject blocks of XML-coded metadata into NcML to be taken up into the system.  The type="otherXML" example manages to do that, sort of, though there are the loose ends I mentioned earlier (loose ends that the CDL injections have as well, by the way -- we have no way of referencing the Schema a.k.a convention).
+</p>
+<p>
+Focusing exclusively on CDL means the NcML representation will be awful given the current mapping -- I want to avoid that.  If there is a clean NcML representation, users will have an XML option for injecting information, and we can be pretty sure that the information can be moved to the other XML-based formats in standard ways.
+</p>
+</blockquote>
+<p>
+Im hearing that we have an opportunity to create a standard way to add more complex semantics like RDF to the data model. This sounds worth pursuing and I agree with Bryan we should split this into a new ticket.
+</p>
+<p>
+BTW, I personally avoid XSLT (except when I dont), in favor of working directly with an object representation of the information content. This means I dont have artificial restrictions on what I can do, due to difficulties with XSLT.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-34-1255617628000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:34" class="cnum">
+    <a href="#comment:34">comment:34</a>
+  </span>
+        in reply to:
+    <a href="#comment:33">↑ 33</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:35" class="follow-up">↓ 35</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-15T07%3A40%3A28-07%3A00&amp;precision=second" title="See timeline at 10/15/09 07:40:28">12 years ago</a> by benno
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:33" title="Comment 33">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+BTW, I personally avoid XSLT (except when I dont), in favor of working directly with an object representation of the information content. This means I dont have artificial restrictions on what I can do, due to difficulties with XSLT.
+</p>
+</blockquote>
+<p>
+From a programmer point-of-view, I can understand that.  For a writing-a-standard point-of-view, it would be best to get the information representation correct so that one does not have to bury the translational semantics in some custom code in a general-purpose language.  And now we have an opportunity to get the representation correct.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-35-1255619689000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:35" class="cnum">
+    <a href="#comment:35">comment:35</a>
+  </span>
+        in reply to:
+    <a href="#comment:34">↑ 34</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-15T08%3A14%3A49-07%3A00&amp;precision=second" title="See timeline at 10/15/09 08:14:49">12 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:34" title="Comment 34">benno</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./27#comment:33" title="Comment 33">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+BTW, I personally avoid XSLT (except when I dont), in favor of working directly with an object representation of the information content. This means I dont have artificial restrictions on what I can do, due to difficulties with XSLT.
+</p>
+</blockquote>
+<p>
+From a programmer point-of-view, I can understand that.  For a writing-a-standard point-of-view, it would be best to get the information representation correct so that one does not have to bury the translational semantics in some custom code in a general-purpose language.  And now we have an opportunity to get the representation correct.
+</p>
+</blockquote>
+<p>
+I agree on getting the representation correct, but there are a lot of design forces on this. My own opinion is that "usable with XSLT" is in the "nice but not mandatory" list.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-36-1255884096000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:36" class="cnum">
+    <a href="#comment:36">comment:36</a>
+  </span>
+        in reply to:
+    <a href="#comment:32">↑ 32</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2009-10-18T09%3A41%3A36-07%3A00&amp;precision=second" title="See timeline at 10/18/09 09:41:36">12 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./27#comment:32" title="Comment 32">bnl</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./27#comment:29" title="Comment 29">edavis</a>:
+</p>
+<blockquote class="citation">
+<p>
+Does it then seem like a bad idea to split this ticket into two: 1) a CF attribute namespace ticket; and 2) an "XML and RDF/OWL" ticket?
+</p>
+</blockquote>
+</blockquote>
+<p>
+I too agree they can be split. Also, this ticket is distinct from common concepts, in my understanding.
+</p>
+<p>
+I'd like to raise another small point about the netCDF syntax. This was discussed before, but I'd like to question whether it's wise to use ":" as a separator in attribute names. John explained that this is a legal netCDF character but has to be escaped in CDL, and I can imagine this tripping some people up. Moreover, ":" has a particular significance in CDL anyway, in identifying attributes, and it's possible than an attribute name which itself contains ":" could look confusing to a reader, even though strictly there is no ambiguity.
+</p>
+<p>
+Perhaps it would be safer to use a less exotic character e.g. the more conventional underscore, and hence a prefix like "CF_"?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./27?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./27?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./27?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

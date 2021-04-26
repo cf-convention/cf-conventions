@@ -1,0 +1,572 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #11 (A standard for CF variable names ("short names") should be added.)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./9.html" title="ticket #9" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./11?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./11?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./11?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./12.html" title="ticket #12" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./9.html" title="ticket #9">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./12.html" title="ticket #12">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2007-08-20T12%3A47%3A49-07%3A00&amp;precision=second" title="See timeline at 08/20/07 12:47:49">14 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2008-10-28T14%3A07%3A06-07%3A00&amp;precision=second" title="See timeline at 10/28/08 14:07:06">12 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./11.html" class="trac-id">#11</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=duplicate">duplicate</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">A standard for CF variable names ("short names") should be added.</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=balaji">balaji</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+      <a href="./11?action=diff&amp;version=1" class="lastmod trac-diff" title="2007-08-20 20:03:03+00:00">
+        (last modified by halliday1)
+      </a>
+    </h3>
+    <div class="searchable">
+      <h2 id="a1.Title">1. Title</h2>
+<blockquote>
+<p>
+A standard for CF variable names ("short names") should be added.
+</p>
+</blockquote>
+<h2 id="a2.Moderator">2. Moderator</h2>
+<ol class="upperalpha" start="22"><li>Balaji
+</li></ol><h2 id="a3.Requirement">3. Requirement</h2>
+<blockquote>
+<p>
+In any of the data formats associated with CF (e.g netCDF) the variable <strong>name</strong> is its most convenient handle. Most command-line and script-based data tools use this handle. The NCO utilities for manipulating netCDF data, visualization and analysis tools such as ferret or grads or Matlab, all use the variable name as a handle.
+</p>
+</blockquote>
+<p>
+This name is not currently included in the standard, though some <em>de facto</em> standards exist. In the absence of a standard, users cannot write scripts or methods that are general enough to apply across datasets from many sources.
+</p>
+<p>
+For instance, a typical user request from GFDL is to make our internal variables names match what PCMDI (via the CMOR program) required for IPCC AR4: this would enable users who have developed new scientific analyses on their own data to apply them instantly to any model in the IPCC archive.
+</p>
+<p>
+The CF <tt>standard_name</tt> attribute does not satisfy this need. Shortcomings include:
+</p>
+<ul><li>the <tt>standard_name</tt> is too long to type.
+</li><li>the <tt>standard_name</tt> attribute along does not uniquely identify a single variable in a file (example: "high", "middle" and "low" cloud amount all have the standard name <tt>cloud_area_fraction_in_atmosphere_layer</tt>, and are disambiguated using other attributes (height limits of associated layer).
+</li></ul><h2 id="a4.InitialStatementofTechnicalProposal">4. Initial Statement of Technical Proposal</h2>
+<p>
+We propose a list of "CF short names".
+</p>
+<ul><li>Names should be short (6 character max) and human-typable.
+</li><li>Names should uniquely identify a physical variable.
+</li><li>Proposals to the standard_name list should also list a recommended short name. 
+</li><li>It is desirable that names be vaguely mnemonic: e.g "slp" for sea level pressure. But this should not be a reason to have long debates over the short name.
+</li><li>The "PCMDI short name" used by IPCC AR4 is a good starting point for climate variables. Perhaps someone can suggest an equally useful starting point for weather (e.g based on ERA-40 or NCEP reanalysis datasets).
+</li></ul><h2 id="a5.Benefits">5. Benefits</h2>
+<p>
+Benefits and use cases are coverd in some slides prepared for GO-ESSP are attached here, and also available <a class="ext-link" href="http://www.gfdl.noaa.gov/~vb/talks/goessp_2007-standard_names.pdf"><span class="icon">​</span>from Balaji's home page</a>.
+</p>
+<h2 id="a6.StatusQuo">6. Status Quo</h2>
+<blockquote>
+<p>
+Without changing the standard, we might get by with <em>de facto</em> standards such as the AR4 short names; but the benefit is limited as many of us participate in multiple international modleing campaigns. There is no guarantee that all such campaigns remain consistent in their use of short names.
+</p>
+</blockquote>
+
+    </div>
+  </div>
+</div>
+          
+    <div id="attachments">
+        <h3 class="foldable">Attachments <span class="trac-count">(1)</span></h3>
+        <div class="attachments">
+          <dl class="attachments">
+              <dt>
+    <a href="/trac/attachment/ticket/11/standard_names.pdf" title="View attachment">standard_names.pdf</a><a href="/trac/raw-attachment/ticket/11/standard_names.pdf" class="trac-rawlink" title="Download">​</a>
+       (<span title="119859 bytes">117.0 KB</span>) -
+      added by <em>balaji</em> <a class="timeline" href="/trac/timeline?from=2007-08-20T12%3A48%3A15-07%3A00&amp;precision=second" title="See timeline at 08/20/07 12:48:15">14 years ago</a>.
+  </dt>
+          </dl>
+          <p>
+            Download all attachments as: <a rel="nofollow" href="/trac/zip-attachment/ticket/11/">.zip</a>
+          </p>
+          
+        </div>
+    </div>
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(7)</span></h3>
+          <div id="changelog">
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-08-20T12%3A48%3A15-07%3A00&amp;precision=second" title="See timeline at 08/20/07 12:48:15">14 years ago</a> by balaji
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/11/standard_names.pdf"><em>standard_names.pdf</em></a><a href="/trac/raw-attachment/ticket/11/standard_names.pdf" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-1-1187640183000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-08-20T13%3A03%3A03-07%3A00&amp;precision=second" title="See timeline at 08/20/07 13:03:03">14 years ago</a> by halliday1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./11?action=diff&amp;version=1">diff</a>)
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Edited moderator's name to display properly.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1188333298000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+        in reply to:
+    <a href="#comment:description">↑ description</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:3" class="follow-up">↓ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-08-28T13%3A34%3A58-07%3A00&amp;precision=second" title="See timeline at 08/28/07 13:34:58">14 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="closed ticket" href="./11.html" title="enhancement: A standard for CF variable names (&#34;short names&#34;) should be added. (closed: duplicate)">balaji</a>:
+</p>
+<blockquote class="citation">
+<p>
+<a class="closed ticket" href="./11.html" title="enhancement: A standard for CF variable names (&#34;short names&#34;) should be added. (closed: duplicate)">#11</a>: A standard for CF variable names ("short names") should be added.
+</p>
+</blockquote>
+<p>
+My concern with this proposal is that there are CF users who already have selected
+different short names; the OceanSITES implementation of CF, for example, uses the
+short names from another standard (the name of which escapes me, sorry).
+</p>
+<p>
+If this change is implemented, a way would need to be found to make it backward
+compatible, so that datasets without CF standard short names could be accommodated. 
+One possibility would be to use "cf_name" instead of "name" and allow one or both
+of these fields to be used.
+</p>
+<blockquote class="citation">
+<p>
+In the absence of a standard, users cannot write scripts or methods that are general enough to apply across datasets from many sources.
+</p>
+</blockquote>
+<p>
+Is there a reason why scripts can't generate standard names from short ones, as
+long as the short names come from SOME standard and a conversion is available?
+This seems like a reasonable place to do the transformation between varying short
+names and unvarying standard names. Our thought in setting up the OceanSITES
+implementation this way was that the human interface, whatever it might be, would
+take a user-provided standard short name and our software would provide the CF
+standard_name.  Since we haven't yet built this interface, I can't say how well it will work.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1188372943000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+        in reply to:
+    <a href="#comment:2">↑ 2</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-08-29T00%3A35%3A43-07%3A00&amp;precision=second" title="See timeline at 08/29/07 00:35:43">14 years ago</a> by tomgross
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I cannot see how adding an additional list of names to be tested against local names can be useful.  The first time we write a netcdf reader we usually do rely upon local names to avoid the tedious switch case construct.  The second time you write a Netcdf reader you sequentially open variables, read their standard name and then assign the contents to your local name.  The whole idea of the standard_name is that you do that testing and then assign your ambiguous (six characters) name to the variable which is described by the standard_name.  In other words (to paraphrase) "there is no reason why scripts can't generate short names from standard ones, since the standard names do come from CF standards."
+</p>
+<p>
+To me short names are only as meaningful as the names of variables used by subroutines, they are purposefully changeable and have no scope meaning outside their narrow application.  
+</p>
+<blockquote>
+<p>
+Tom Gross
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1189096760000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-09-06T09%3A39%3A20-07%3A00&amp;precision=second" title="See timeline at 09/06/07 09:39:20">14 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I don't like the idea of adding a convention whose purpose is to duplicate the information in other attributes, as redundancy is always an opportunity for inconsistency. Furthermore, existing files do not follow this convention, and since it is optional its presence could not be relied on by software. I'm not clear whether the proposal is for a new attribute or to standardise the variable names, but the same comments apply. If the proposal is for standard variable names, that has the additional drawback that variable names are an aspect of a file format. In principle CF-netCDF data might be translated into files that don't have variable names.
+</p>
+<p>
+I feel that defining an additional controlled vocabulary for use by programs examining the data (such as proposed by Frank Toussaint et al. on the email list) is a more flexible approach, as it could apply to all existing files, and could be modified without affecting the validity of files. It is especially attractive to give names to "bundles" of metadata, such as the combination of standard_name="surface_air_temperature" and a size-1 coordinate of "height" having a value in the range 1.5-2.0 m. This is a specification of surface air temperature, what PCMDI call "tas", which would be a handy name for this bundle.
+</p>
+<p>
+I generally think it's better to put intelligence into programs which read files, since files often last for a long time, while programs can be changed. It doesn't sound too hard to me to write a program to examine a file in such terms. It would also be quite easy in many languages to write something that would match abbreviations, or regular expressions, against the standard_names in the file, for the convenience of the analyst.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1189690967000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2007-09-13T06%3A42%3A47-07%3A00&amp;precision=second" title="See timeline at 09/13/07 06:42:47">14 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thought I'd bet get trac-registered and answer a couple of comments to this thread....
+</p>
+<p>
+I totally agree with Jonathan that Frank's proposed external controlled vocabulary is the best mechanism for allowing CF parameters to be referenced by abbreviated names. As this is the basis for an ontology - i.e. a network of terms and their relationships - it can also be used to address Nan's concerns by mapping in terms from other standards and provides the potential for her suggestion of dynamic generation of standardised abbreviations from Standard Names. 
+</p>
+<p>
+I don't think I agree with Tom.  There is a definite need for short names to fulfil functions like labelling diagrams, particularly as some Standard Names are getting more like Standard Essays.  If these short names aren't standardised in some way we will end up with standardised interoperable data being degraded into heterogenous data products with many different labels describing the same thing.
+</p>
+<p>
+Roy.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1225228026000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-10-28T14%3A07%3A06-07%3A00&amp;precision=second" title="See timeline at 10/28/08 14:07:06">12 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>duplicate</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>closed</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+As noted by Balaji and others (offline), this ticket has been superceded by the discussion in ticket 24 (common concept), so I am closing it.
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./11?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./11?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./11?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

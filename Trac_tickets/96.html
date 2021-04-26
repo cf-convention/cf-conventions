@@ -1,0 +1,686 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #96 (Julian/Gregorian calendar name and constraints)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./95.html" title="ticket #95" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./96?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./96?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./96?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./97.html" title="ticket #97" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./95.html" title="ticket #95">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./97.html" title="ticket #97">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2013-01-17T16%3A10%3A41-08%3A00&amp;precision=second" title="See timeline at 01/17/13 16:10:41">8 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2013-02-24T06%3A29%3A31-08%3A00&amp;precision=second" title="See timeline at 02/24/13 06:29:31">8 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./96.html" class="trac-id">#96</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Julian/Gregorian calendar name and constraints</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=Dave.Allured">Dave.Allured</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~calendar">calendar</a> <a href="/trac/query?status=!closed&amp;keywords=~time">time</a> <a href="/trac/query?status=!closed&amp;keywords=~julian">julian</a> <a href="/trac/query?status=!closed&amp;keywords=~gregorian">gregorian</a> <a href="/trac/query?status=!closed&amp;keywords=~udunits">udunits</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <h1 id="a1.Title">1. Title</h1>
+<p>
+<a class="missing wiki">Julian/Gregorian?</a> calendar name and constraints
+</p>
+<h1 id="a2.Moderator">2. Moderator</h1>
+<p>
+*
+</p>
+<h1 id="a3.Requirement">3. Requirement</h1>
+<p>
+An accurate name for the mixed <a class="missing wiki">Julian/Gregorian?</a> calendar system is needed as an alternative to the current naming scheme, which hides the complexity and pitfalls of this calendar.  Time range constraints enable error checking.
+</p>
+<h1 id="a4.InitialStatementofTechnicalProposal">4. Initial Statement of Technical Proposal</h1>
+<p>
+A new calendar name <strong>"<a class="missing wiki">Julian/Gregorian?</a>"</strong> is added to the existing CF synonyms for the mixed <a class="missing wiki">Julian/Gregorian?</a> calendar as defined by UDUNITS.
+</p>
+<p>
+However, this is proposed as an independent calendar definition, because it is also desirable to add time range constraints which are not part of the original definitions.  Negative years, year zero, and illegal transition dates are all excluded.  I am excluding Julian negative years because there is no unambiguous definition in the broader context of general history.
+</p>
+<p>
+This new definition is fully compatible with existing translation routines in UDUNITS and other calendar software, provided that any name checking procedures are updated.  Constraint checking is optional.
+</p>
+<p>
+This proposal does not change existing usage or create incompatibility with existing data files.
+</p>
+<h1 id="a5.Benefits">5. Benefits</h1>
+<ul><li>Provide an accurate and distinct alternate name for this calendar system, for those who wish to be more specific than the default or "standard".
+</li></ul><ul><li>Facilitate migration away from inadequate calendar names, for both existing and new data sets.
+</li></ul><ul><li>Increase user awareness of complicated calendar usage and computational issues.
+</li></ul><ul><li>Thereby reduce undetected computational errors resulting from misunderstanding or misapplication of the mixed <a class="missing wiki">Julian/Gregorian?</a> calendar.
+</li></ul><ul><li>Preserve the mixed <a class="missing wiki">Julian/Gregorian?</a> calendar definition within CF, for legitimate purposes.
+</li></ul><ul><li>Constraint specifications support optional range checking to catch accidental misapplication and computational errors in time coordinates.
+</li></ul><h1 id="a6.StatusQuo">6. Status Quo</h1>
+<p>
+If no alternative name is provided, the ongoing hidden usage of a complicated calendar will continue to engender misunderstanding, undetected errors, and controversy.
+</p>
+<h1 id="a7.TextofProposedChanges">7. Text of Proposed Changes</h1>
+<ul><li>In <a class="ext-link" href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/ch04s04.html#calendar"><span class="icon">​</span>section 4.4.1, Calendar,</a> insert a new definition as the second item in the list of calendars:
+</li></ul><blockquote>
+<blockquote>
+<p>
+<strong><a class="missing wiki">Julian/Gregorian?</a></strong>
+</p>
+<blockquote>
+<p>
+Mixed <a class="missing wiki">Julian/Gregorian?</a> calendar, with constraints.  All usage of negative years, year zero, and transitional dates 1582 October 5 through 1582 October 14 inclusive, is prohibited.
+</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<ul><li>For consistency, change the term "<a class="missing wiki">Gregorian/Julian?</a>" to "<a class="missing wiki">Julian/Gregorian?</a>" in three places in section 4.4.1.  Do not change the formal excerpt from the UDUNITS man page.
+</li></ul><ul><li>Add a new paragraph in 4.4.1, just above the third from last paragraph which now begins "The mixed <a class="missing wiki">Julian/Gregorian?</a> calendar used by Udunits is explained ...":
+</li></ul><blockquote>
+<blockquote>
+<p>
+The calendar name "<a class="missing wiki">Julian/Gregorian?</a>" should be used only (a) in genuine historical data sets having a proper need to span the <a class="missing wiki">Julian/Gregorian?</a> discontinuity; and (b) to facilitate backward compatibility in existing data sets.
+</p>
+</blockquote>
+</blockquote>
+<h1 id="a8.References">8. References</h1>
+<p>
+There have been several discussions and proposals over the years about problems with the mixed <a class="missing wiki">Julian/Gregorian?</a> calendar.  Shown here is the most recent thread.  Please consult the CF archives and related mailing lists for more.
+</p>
+<ul><li><a class="ext-link" href="http://mailman.cgd.ucar.edu/pipermail/cf-metadata/2012/055978.html"><span class="icon">​</span>CF mailing list discussion, December 2012</a>
+</li></ul><ul><li><a class="ext-link" href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/ch04s04.html#calendar"><span class="icon">​</span>Current language of section 4.4.1, Calendar</a> (CF-1.6)
+</li></ul><ul><li><a class="ext-link" href="http://www.unidata.ucar.edu/cgi-bin/man-cgi?udunits+-s3"><span class="icon">​</span>UDUNITS-1 calendar documentation</a> (see "handling time")
+</li></ul><ul><li><a class="ext-link" href="http://www.unidata.ucar.edu/software/udunits/udunits-2/udunits2lib.html#Time"><span class="icon">​</span>UDUNITS-2 calendar documentation</a>
+</li></ul><ul><li><a class="ext-link" href="http://en.wikipedia.org/wiki/Gregorian_calendar"><span class="icon">​</span>Gregorian calendar,</a> Wikipedia article with history of the transition between Julian and Gregorian calendars
+</li></ul>
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(7)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1358533534000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:2" class="follow-up">↓ 2</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-01-18T10%3A25%3A34-08%3A00&amp;precision=second" title="See timeline at 01/18/13 10:25:34">8 years ago</a> by mcginnis
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I recommend changing the proposed name to "mixed <a class="missing wiki">Julian/Gregorian?</a>" instead of "<a class="missing wiki">Julian/Gregorian?</a>".
+</p>
+<p>
+Without some indicator like the word 'mixed' in there, I think that users unfamiliar with the complications of the historical calendaring system will be prone to reading the slash as meaning 'or', rather than 'and', which will mislead them into thinking it means something like "Julian or Gregorian, whatever, they're equivalent in this context."
+</p>
+<p>
+(If avoiding spaces in the name is desirable, we could abbreviate it to "mixed". That would also avoid non-alphanumeric / in the string...)
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1358549973000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+        in reply to:
+    <a href="#comment:1">↑ 1</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-01-18T14%3A59%3A33-08%3A00&amp;precision=second" title="See timeline at 01/18/13 14:59:33">8 years ago</a> by Dave.Allured
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./96#comment:1" title="Comment 1">mcginnis</a>:
+</p>
+<blockquote class="citation">
+<p>
+I recommend changing the proposed name to "mixed <a class="missing wiki">Julian/Gregorian?</a>" instead of "<a class="missing wiki">Julian/Gregorian?</a>".
+</p>
+</blockquote>
+<p>
+Agreed.  I was hoping that the slightly shorter version would be sufficient, but you have added a depth of consideration for unfamiliar users.  Thanks for this perspective.  There is no need to avoid the space in the name, and "mixed" is too obscure for me.
+</p>
+<p>
+--Dave
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1359200820000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:4" class="follow-up">↓ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-01-26T03%3A47%3A00-08%3A00&amp;precision=second" title="See timeline at 01/26/13 03:47:00">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Dave
+</p>
+<p>
+Thanks for opening this ticket.
+</p>
+<p>
+For the name you propose for the calendar, I would suggest <tt>mixed_julian_gregorian</tt>, to conform with the general CF practice that the possible values of attributes defined by the convention use only letters and underscore.
+</p>
+<p>
+To be clear, it appears you are proposing two things: (1) an alternative name for the default calendar, in addition to its names of <tt>gregorian</tt> and <tt>standard</tt>, (2) a redefinition of that calendar, to disallow years less than one and dates not supported by udunits in the transitional period between Julian and Gregorian. Is that right?
+</p>
+<p>
+I think (1) is fine, but we should be aware that (2) would make it impossible to specify dates BC, even though it is currently possible in CF. But I agree that really we need a clear convention for doing this if it is to be allowed, and since this is not strictly a backward compatibility because it doesn't affect existing data, I think the benefit outweighs the drawbacks.
+</p>
+<p>
+If dates BC are needed for the real world, the conventions that might be considered are <tt>proleptic_gregorian</tt> (already in CF), <tt>proleptic_julian</tt> (which I read in wikipedia is defined by propagating backward from AD 4, which was a leap year, and has no year zero) and <tt>astronomical</tt> (which is the same as <tt>proleptic_julian</tt> but uses year 0 for 1 BC, -1 for 2 BC, etc.). I guess <a class="ext-link" href="http://eclipse.gsfc.nasa.gov/SEatlas/SEatlas.html"><span class="icon">​</span>NASA's solar eclipse website</a>, which gives dates of eclipses back to 2000 BC, uses the proleptic Julian calendar.
+</p>
+<p>
+Another problem is that year 0 is allowed in CF, following COARDS, to indicate climatological time, although CF has a better convention for this (section 7.4). Your change would mean we would have to remove the COARDS convention from CF.  Is that acceptable to everyone?
+</p>
+<p>
+In the email discussion, I made a proposal which goes further than yours, namely: (1) define a new calendar <tt>strict_gregorian</tt>, which does not permit dates or reference dates (in the time units string) before 1582 Oct 15; (2) change the default calendar to <tt>strict_gregorian</tt>. This would mean that dates which precede the introduction of the Gregorian calendar would require an explicit calendar attribute, to make it clear what convention was being used. In particular, it would disallow dates "since 1-1-1" with the default calendar; these are quite common and particularly problematic.
+</p>
+<p>
+I could put this proposal in a separate ticket, but it's closely related and complementary to yours, so I wonder what you think about it.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1359432513000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+        in reply to:
+    <a href="#comment:3">↑ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-01-28T20%3A08%3A33-08%3A00&amp;precision=second" title="See timeline at 01/28/13 20:08:33">8 years ago</a> by Dave.Allured
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./96#comment:3" title="Comment 3">jonathan</a>:
+</p>
+<p>
+Hi Jonathan.  Please let me reply to your name suggestion later, in a separate thread.
+</p>
+<blockquote class="citation">
+<p>
+To be clear, it appears you are proposing two things: (1) an alternative name for the default calendar, in addition to its names of <tt>gregorian</tt> and <tt>standard</tt>, (2) a redefinition of that calendar, to disallow years less than one and dates not supported by udunits in the transitional period between Julian and Gregorian. Is that right?
+</p>
+</blockquote>
+<p>
+Almost right.  You say "an alternative name for the default calendar", when I actually mean a new definition similar to the current default, but distinct.  This current ticket <a class="new ticket" href="./96.html" title="enhancement: Julian/Gregorian calendar name and constraints (new)">#96</a> does not propose to change or redefine the default or any existing named calendar.  It simply establishes a new calendar system with more carefully designed rules, one that could be used to replace or retrofit some of the other calendars, in many use cases.  In this ticket, I would like to focus simply on the careful naming and definition of this possible new calendar.
+</p>
+<blockquote class="citation">
+<p>
+I think (1) is fine, but we should be aware that (2) would make it impossible to specify dates BC, even though it is currently possible in CF.  But I agree that really we need a clear convention for doing this if it is to be allowed, and since this is not strictly a backward compatibility because it doesn't affect existing data, I think the benefit outweighs the drawbacks.
+</p>
+</blockquote>
+<p>
+Yes, deliberately exclude dates BC from this new definition.  There seems to be no current CF-related usage of dates BC.  Recent discussions suggest that the mixed <a class="missing wiki">Julian/Gregorian?</a> calendar is quite a poor choice for scientific encoding of dates BC, and there are better alternatives.
+</p>
+<blockquote class="citation">
+<p>
+If dates BC are needed for the real world, the conventions that might be considered are <tt>proleptic_gregorian</tt> (already in CF), <tt>proleptic_julian</tt> (which I read in wikipedia is defined by propagating backward from AD 4, which was a leap year, and has no year zero) and <tt>astronomical</tt> (which is the same as <tt>proleptic_julian</tt> but uses year 0 for 1 BC, -1 for 2 BC, etc.). I guess <a class="ext-link" href="http://eclipse.gsfc.nasa.gov/SEatlas/SEatlas.html"><span class="icon">​</span>NASA's solar eclipse website</a>, which gives dates of eclipses back to 2000 BC, uses the proleptic Julian calendar.
+</p>
+</blockquote>
+<p>
+Solutions for dates BC are not part of the current proposal.  I think it would be best for CF to defer this issue until an actual use case arises, hopefully with some related expertise in the right kind of chronology.
+</p>
+<blockquote class="citation">
+<p>
+Another problem is that year 0 is allowed in CF, following COARDS, to indicate climatological time, although CF has a better convention for this (section 7.4). Your change would mean we would have to remove the COARDS convention from CF.  Is that acceptable to everyone?
+</p>
+</blockquote>
+<p>
+I had forgotten that year 0 is an explicit part of COARDS, so thank you for pointing this out.  The current proposal does not attempt to incorporate all time functions of COARDS, nor it does not hold a solution for year 0.  On the other hand, it also does not propose removal of COARDS or the COARDS calendar from CF.  So, can you agree to save the COARDS discussion for an appropriate proposal?
+</p>
+<blockquote class="citation">
+<p>
+In the email discussion, I made a proposal which goes further than yours, namely: (1) define a new calendar <tt>strict_gregorian</tt>, which does not permit dates or reference dates (in the time units string) before 1582 Oct 15; (2) change the default calendar to <tt>strict_gregorian</tt>. This would mean that dates which precede the introduction of the Gregorian calendar would require an explicit calendar attribute, to make it clear what convention was being used. In particular, it would disallow dates "since 1-1-1" with the default calendar; these are quite common and particularly problematic.
+</p>
+<p>
+I could put this proposal in a separate ticket, but it's closely related and complementary to yours, so I wonder what you think about it.
+</p>
+</blockquote>
+<p>
+I think the calendar discussion needs to be carefully broken up into focused topics for easier digestion and community participation.  This ticket is one part of that, an attempt to focus *only* on a new calendar definition that may prove to be useful.
+</p>
+<p>
+I think that the future specification of the Gregorian calendar is critical, and deserves its own focused discussion.  Changes to the default (unspecified) calendar may deserve a separate focused disussion.  Please start a separate ticket if you would like.
+</p>
+<p>
+However, please recall <a class="ext-link" href="http://mailman.cgd.ucar.edu/pipermail/cf-metadata/2012/056002.html"><span class="icon">​</span>(my December 6 e-mail)</a> that I want to retract the current loose usage of the calendar name "gregorian" to be reserved only for the actual Gregorian calendar.  So I hope I can convince you to move in that direction, as well.
+</p>
+<p>
+Thank you for your extremely thoughtful comments, here and in previous calendar discussions.
+</p>
+<p>
+--Dave
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1361267680000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:6" class="follow-up">↓ 6</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-02-19T01%3A54%3A40-08%3A00&amp;precision=second" title="See timeline at 02/19/13 01:54:40">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Dave
+</p>
+<p>
+Thanks for the clarification. At the start of the ticket you describe the new calendar name as a synonym and an alternative name. I understand now that the proposal is actually for a new calendar, not a synonym for an existing calendar.
+</p>
+<p>
+It would be fine to have a more informative and correct name for the default calendar. However I wonder what would be achieved by introducing a new, more restrictive, version of that calendar. We would like to disallow use of years before year 1 (except for the COARDS climatological time convention, which we could deprecate), and we would like recommend against using a reference date which is before (or within) the transitional period if the time coordinates are all after the transitional period, because both of these are problematic with the udunits calendar. But a person who is aware that these give problems would not use them with the default calendar, I guess, and therefore does not need a new calendar to prevent/deprecate their use. On the other hand, a person who is unaware of the problems will also be unaware of the new restrictive calendar, and so will not use it. Hence I am not convinced this would really help in the end. Have I missed the point?
+</p>
+<p>
+It seems to me that to prevent the problems we actually need to change the default calendar, as previously discussed. I think it would be tolerable to do that so long as the new default has the same interpretation as the old default for any time units and coordinates that remain legal i.e. the effect of the changed definition is only to make some things illegal or deprecated.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1361304237000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+        in reply to:
+    <a href="#comment:5">↑ 5</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-02-19T12%3A03%3A57-08%3A00&amp;precision=second" title="See timeline at 02/19/13 12:03:57">8 years ago</a> by Dave.Allured
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./96#comment:5" title="Comment 5">jonathan</a>:
+</p>
+<p>
+Yes, this is technically a proposal for a "new calendar".  I should have said this more clearly in the introduction, sorry.
+</p>
+<p>
+My general rationale for the new calendar name is two-fold.   The first purpose is simply to improve the quality of self-documentation of data sets.  CF should have a simple way to declare explicitly and deliberately that the mixed <a class="missing wiki">Julian/Gregorian?</a> calendar is being used.  Currently there is no standardized way to do this.
+</p>
+<p>
+The second purpose is to provide a transitional alternative, a mechanism to make it easier to deprecate previous calendar names and usage, where there can be a consensus that previous usage is bad practice or bad design.  This new calendar name could be easily substituted for previous "inadequate" calendar names in many existing data sets, as needed, with no recomputation of time coordinates or other adjustments.  With a reasonable alternative and the ability to retrofit existing data sets, some people may be able to accept more significant changes, such as removing the default calendar.
+</p>
+<p>
+I tried to explain this rationale in other words above, under "Requirement" and "Benefits".
+</p>
+<p>
+--Dave
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1361716171000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-02-24T06%3A29%3A31-08%3A00&amp;precision=second" title="See timeline at 02/24/13 06:29:31">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Dave
+</p>
+<p>
+You did indeed explain your rationale before. I agree with your concerns over the default calendar and I am sympathetic to the motivation. My concern is whether introducing a new calendar will actually bring about an improvement in practice if there is no incentive to adopt it. Unless we are convinced that it will help this would be an unnecessary complication in the convention.
+</p>
+<p>
+One extra step we could take would be to recommend against relying on the default. The consequence would be that the CF checker would give a warning whenever the calendar attribute was not present for a time coordinate (from the next CF release, so it would not warn about datasets written with CF 1.6 or earlier). This warning might encourage the authors of new datasets to include the attribute.
+</p>
+<p>
+A further step, more serious, would be to deprecate the existing default calendar, even if explicitly called <tt>standard</tt> or <tt>gregorian</tt>. Again, deprecation (i.e. recommendation not to use it) would produce a warning. The warning could at the same time suggest using the new calendar instead for the real world.
+</p>
+<p>
+What do you and others think of that? Would it be beneficial? Would it be too annoying? If we agree to do this, it would be done by inserting text in the definition of this existing calendar.
+</p>
+<p>
+Since udunits refers to the current default as "mixed <a class="missing wiki">Gregorian/Julian?</a>", it would be consistent to call your new calendar <tt>mixed_gregorian_julian</tt>. That would also involve less change to the convention than switching all the occurrences in the text to "<a class="missing wiki">Julian/Gregorian?</a>". I would further suggest that the name should say more explicitly what the calendar is, to distinguish it from <tt>gregorian</tt>. To do that, perhaps the new calendar could instead be called <tt>strict_gregorian_julian</tt>.
+</p>
+<p>
+One aspect of the strictness is to exclude negative years and year zero. Another that you suggest is that transitional dates be excluded, but since CF is defined using udunits for real-world time coordinates, transitional dates are in any case impossible to encode, so they do not need to be excluded. However, we should explicitly exclude 'reference dates' (i.e. 'since' in the units) which are transitional dates. How about this:
+</p>
+<blockquote>
+<p>
+<tt>strict_gregorian_julian</tt>: Mixed <a class="missing wiki">Gregorian/Julian?</a> calendar, with constraints. The reference date (following <tt>since</tt> in the time units) is not allowed to be any of the dates in the transitional period 1582 October 5 through 1582 October 14 inclusive. Neither the reference date nor any date which is encoded with this calendar is allowed to be in year zero or a negative year.
+</p>
+</blockquote>
+<p>
+Finally, you have suggested some useful text describing when the calendar should be used. There is also some existing text about this, however, at the end of 4.4.1. Combining your text and the existing text, I'd propose:
+</p>
+<blockquote>
+<p>
+Because of problems caused by the discontinuity, it is recommended that the <tt>strict_gregorian_julian</tt> calendar be used only in datasets with real-world historical dates which span the change of calendar from Julian to Gregorian.  In datasets with real-world historical dates that all precede the change of calendar, the <tt>julian</tt> calendar should be used.  In datasets with real-world historical dates that all follow the change of calendar, and in simulated datasets in which there is no change of calendar, the <tt>proleptic_gregorian</tt> calendar should be used.
+</p>
+</blockquote>
+<p>
+How would that be?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./96?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./96?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./96?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

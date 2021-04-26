@@ -1,0 +1,2026 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #70 (Connecting coordinates to Grid Mapping variables)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./69.html" title="ticket #69" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./70?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./70?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./70?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./71.html" title="ticket #71" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./69.html" title="ticket #69">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./71.html" title="ticket #71">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2011-11-08T06%3A55%3A46-08%3A00&amp;precision=second" title="See timeline at 11/08/11 06:55:46">9 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2017-05-10T10%3A36%3A29-07%3A00&amp;precision=second" title="See timeline at 05/10/17 10:36:29">4 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./70.html" class="trac-id">#70</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Connecting coordinates to Grid Mapping variables</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=markh">markh</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner"><a href="/trac/query?status=!closed&amp;owner=davidhassell">davidhassell</a></td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~grid_mapping">grid_mapping</a>, <a href="/trac/query?status=!closed&amp;keywords=~coord">coord</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <h1 id="Title">Title</h1>
+<p>
+Connecting coordinates to Grid Mapping variables
+</p>
+<h1 id="Moderator">Moderator</h1>
+<p>
+David Hassell
+</p>
+<h1 id="Requirement">Requirement</h1>
+<p>
+To allow each Coordinate or Auxiliary Coordinate Variable to be explicitly attached to a particular Grid Mapping Variable. 
+</p>
+<h1 id="Proposal">Proposal</h1>
+<p>
+To define a coordinate reference system, a grid_mapping variable is defined, with variable attributes to define the coordinate reference system attributes. <a class="ext-link" href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.5/ch05s06.html"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.5/ch05s06.html</a>
+</p>
+<p>
+To define coordinates, be they coordinate variable or auxiliary coordinates, with respect to a coordinate system an enhanced grid_mapping syntax is proposed. 
+</p>
+<p>
+A data variable's grid_mapping attribute may use a syntax, derived from the cell_methods and cell_measures approach.  Using this model, the Grid Mapping variable name is stated, followed by a ':' followed by a space separated list of Coordinate names; a name finishing with a ':' indicates a new Grid Mapping variable name, to be followed by the coordinates which are linked to it.
+</p>
+<p>
+GRID_MAPPING_VAR: COORD_VAR [COORD_VAR ...] [GRID_MAPPING_VAR: ...]
+</p>
+<p>
+The current grid_mapping attribute syntax is a regressive case of this, so the proposal is backwards compatible.  In the case where the grid_mapping attribute contains no ':' then the grid_mapping is defined by the current methodology.
+</p>
+<p>
+The grid_mapping attribute is interpreted differently if it uses the enhanced syntax, in which case different coordinates may be linked to different Grid Mappings.
+</p>
+<p>
+Section 5.6 should include the text:
+</p>
+<pre class="wiki">A data variable may link Coordinates and Auxiliary Coordinate Variables to 
+Grid Mapping Variables by supplying the name of the Grid Mapping variable, 
+a ':' and a space separated list of Coordinate names:
+  
+GRID_MAPPING_VAR: COORD_VAR [COORD_VAR ...] [GRID_MAPPING_VAR: ...]
+
+within the data variable's grid_mapping attribute.
+</pre><h1 id="UseCase">Use Case</h1>
+<p>
+Consider a file containing a data variable referencing coordinate variables: Easting, Northing, Height (above mean sea level).  These are all defined with respect to the Ordnance Survey of Great Britain coordinate reference system, a parametric transverse Mercator with a defined vertical datum.
+</p>
+<p>
+To be CF compliant I need to include two auxiliary coordinates, latitude and longitude.  I can calculate these for a specifically defined coordinate reference system, using the definition of the transverse Mercator projection.  I will also include the height with respect to this new datum as an auxiliary_coordinate.
+</p>
+<p>
+In the example use case then the data variable's grid_mapping attribute would read:
+"OSGB: Easting Northing Height GeogCS: Lat Lon geogHeight"
+</p>
+<pre class="wiki">dimensions:
+  y = 100000 ;
+  x = 100000 ;
+  z = 100;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:long_name = "Easting"
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:long_name = "Northing"
+    y:units = "m" ;
+  double z(z) ;
+    y:standard_name = "height_above_reference_ellipsoid" ;
+    y:long_name = "height_above_osgb_msl" ;
+    y:units = "m" ;
+  double lat(y, x) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lon(y, x) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float temp(y, x) ;
+    temp:standard_name = "air_temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crsOSGB: x y z GeogCS: lat lon" ;
+  float pres(y, x) ;
+    temp:standard_name = "air_pressure" ;
+    temp:units = "Pa" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crsOSGB: x y z GeogCS: lat lon" ;
+  int crsOSGB ;
+    crs:grid_mapping_name = "transverse_mercator";
+    crs:semi_major_axis = 6377563.396 ;
+    crs:inverse_flattening = 299.3249646 ;
+    crs:latitude_of_projection_origin = 49.0 ;
+    crs:longitude_of_projection_origin = -2.0 ;
+    crs:false_easting = 400000.0 ;
+    crs:false_northing = -100000.0 ;
+    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+    crs:vert_CS = "Newlyn" ;
+    crs:vert_datum = "Ordnance Datum Newlyn, 2005" ;
+    crs:unit = "metre" ;
+  int crsWGS84 ;
+    crs:grid_mapping_name = "latitude_longitude";
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+
+</pre>
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(26)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1320921515000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:2" class="follow-up">↓ 2</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-11-10T02%3A38%3A35-08%3A00&amp;precision=second" title="See timeline at 11/10/11 02:38:35">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I apologise, the example cdl has a couple of errors in it, please use this for reference instead:
+</p>
+<pre class="wiki">dimensions:
+  z = 100;
+  y = 100000 ;
+  x = 100000 ;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:long_name = "Easting"
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:long_name = "Northing"
+    y:units = "m" ;
+  double z(z) ;
+    y:standard_name = "height_above_reference_ellipsoid" ;
+    y:long_name = "height_above_osgb_msl" ;
+    y:units = "m" ;
+  double lat(y, x) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lon(y, x) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float temp(z, y, x) ;
+    temp:standard_name = "air_temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crsOSGB: x y z crsWGS84: lat lon" ;
+  float pres(z, y, x) ;
+    temp:standard_name = "air_pressure" ;
+    temp:units = "Pa" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crsOSGB: x y z crsWGS84: lat lon" ;
+  int crsOSGB ;
+    crs:grid_mapping_name = "transverse_mercator";
+    crs:semi_major_axis = 6377563.396 ;
+    crs:inverse_flattening = 299.3249646 ;
+    crs:latitude_of_projection_origin = 49.0 ;
+    crs:longitude_of_projection_origin = -2.0 ;
+    crs:false_easting = 400000.0 ;
+    crs:false_northing = -100000.0 ;
+    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+    crs:vert_CS = "Newlyn" ;
+    crs:vert_datum = "Ordnance Datum Newlyn, 2005" ;
+    crs:unit = "metre" ;
+  int crsWGS84 ;
+    crs:grid_mapping_name = "latitude_longitude";
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+
+</pre><p>
+(I will request that the ticket description is updated to remove the errors)
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1322817159000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+        in reply to:
+    <a href="#comment:1">↑ 1</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:3" class="follow-up">↓ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-02T01%3A12%3A39-08%3A00&amp;precision=second" title="See timeline at 12/02/11 01:12:39">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark
+</p>
+<p>
+Thanks for making this proposal. It is evident from your use-case that the current <tt>grid_mapping</tt> convention is not sufficient, because the two coordinate systems use different ellipsoids. This implies that latitude and longitude according to OSGB are not the same as latitude and longitude according to your geographic coordinate system, which I presume to be WGS84, from the name you give it. Is that right? It's possible you might also want to record OSGB latitude and longitude in the file, and that would make the use-case more compelling, I think, as you have to indicate which coord ref system each aux coord belongs to. The example would look like this:
+</p>
+<pre class="wiki">dimensions:
+  z = 100;
+  y = 100000 ;
+  x = 100000 ;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:long_name = "Easting"
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:long_name = "Northing"
+    y:units = "m" ;
+  double z(z) ;
+    y:standard_name = "height_above_reference_ellipsoid" ;
+    y:long_name = "height_above_osgb_msl" ;
+    y:units = "m" ;
+  double latOSGB(y, x) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lonOSGB(y, x) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  double latWGS84(y, x) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lonWGS84(y, x) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float temp(z, y, x) ;
+    temp:standard_name = "air_temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "latOSGB lonOSGB latWGS84 lonWGS84" ;
+    temp:grid_mapping = "crsOSGB: x y z latOSGB lonOSGB crsWGS84: latWGS84 lonWGS84" ;
+  float pres(z, y, x) ;
+    temp:standard_name = "air_pressure" ;
+    temp:units = "Pa" ;
+    temp:coordinates = "latOSGB lonOSGB latWGS84 lonWGS84" ;
+    temp:grid_mapping = "crsOSGB: x y z latOSGB lonOSGB crsWGS84: latWGS84 lonWGS84" ;
+  int crsOSGB ;
+    crs:grid_mapping_name = "transverse_mercator";
+    crs:semi_major_axis = 6377563.396 ;
+    crs:inverse_flattening = 299.3249646 ;
+    crs:latitude_of_projection_origin = 49.0 ;
+    crs:longitude_of_projection_origin = -2.0 ;
+    crs:false_easting = 400000.0 ;
+    crs:false_northing = -100000.0 ;
+    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+    crs:unit = "metre" ;
+  int crsWGS84 ;
+    crs:grid_mapping_name = "latitude_longitude";
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+
+</pre><p>
+In the above, I have removed the attributes for the vertical coordinate system, as these are not currently in the CF standard, though they could be the subject of another ticket if they are needed.
+</p>
+<p>
+I'd suggest that we need more detail about how to amend the text. I propose we replace the first paragraph of 5.6 with the following text. It is clearer to show the whole paragraph, although not all of it is changed. In the below, the new or modified text is <strong>bold</strong>:
+</p>
+<blockquote>
+<p>
+When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the coordinates attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, <strong>or to describe the figure of the Earth used to define the latitude and longitude coordinates, a <em>grid mapping variable</em> is required. Such a variable</strong> provides the description of the mapping via a collection of attached attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is <tt>grid_mapping_name</tt>, which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of <tt>grid_mapping_name</tt>. The valid values of <tt>grid_mapping_name</tt> along with the attributes that provide specific map parameter values are described in Appendix F, <em>Grid Mappings</em>.
+</p>
+</blockquote>
+<blockquote>
+<p>
+<strong>The grid mapping variables are associated with the data and coordinate variables by the <tt>grid_mapping</tt> attribute.</strong> This attribute is attached to data variables so that variables with different mappings may be present in a single file. <strong>The attribute takes a string value with two possible formats. In the first format, it is a single word, which names a grid mapping variable. In the second format, it is a blank-separated list of words "<em>grid_mapping_variable</em>: <em>coordinate_variable</em> [<em>coordinate_variable ...</em>] [<em>grid_mapping_variable</em>: ...]", which identifies one or more grid mapping variables, and with each grid mapping associates one or more <em>coordinate_variables</em> i.e. coordinate variables or auxiliary coordinate variables. The second form is required if there is a need to distinguish coordinate information that is defined with respect to different projections or reference ellipsoids, but a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping if required, for instance if two different projections were defined from the same latitude-longitude coordinate system.</strong>
+</p>
+</blockquote>
+<p>
+Would you agree with all that?
+</p>
+<p>
+To complete the proposal, we also need to say exactly what changes would be needed to the conformance requirements, which the CF checker follows.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1323786968000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+        in reply to:
+    <a href="#comment:2">↑ 2</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-13T06%3A36%3A08-08%3A00&amp;precision=second" title="See timeline at 12/13/11 06:36:08">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./70#comment:2" title="Comment 2">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+I'd suggest that we need more detail about how to amend the text. I propose we replace the first paragraph of 5.6 with the following text. It is clearer to show the whole paragraph, although not all of it is changed. In the below, the new or modified text is <strong>bold</strong>:
+</p>
+<blockquote>
+<p>
+When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the coordinates attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, <strong>or to describe the figure of the Earth used to define the latitude and longitude coordinates, a <em>grid mapping variable</em> is required. Such a variable</strong> provides the description of the mapping via a collection of attached attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is <tt>grid_mapping_name</tt>, which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of <tt>grid_mapping_name</tt>. The valid values of <tt>grid_mapping_name</tt> along with the attributes that provide specific map parameter values are described in Appendix F, <em>Grid Mappings</em>.
+</p>
+</blockquote>
+</blockquote>
+<p>
+ 
+This looks sensible to me, clearly offering the required extension.
+</p>
+<blockquote class="citation">
+<blockquote>
+<p>
+<strong>The grid mapping variables are associated with the data and coordinate variables by the <tt>grid_mapping</tt> attribute.</strong> This attribute is attached to data variables so that variables with different mappings may be present in a single file. <strong>The attribute takes a string value with two possible formats. In the first format, it is a single word, which names a grid mapping variable. In the second format, it is a blank-separated list of words "<em>grid_mapping_variable</em>: <em>coordinate_variable</em> [<em>coordinate_variable ...</em>] [<em>grid_mapping_variable</em>: ...]", which identifies one or more grid mapping variables, and with each grid mapping associates one or more <em>coordinate_variables</em> i.e. coordinate variables or auxiliary coordinate variables. The second form is required if there is a need to distinguish coordinate information that is defined with respect to different projections or reference ellipsoids, but a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping if required, for instance if two different projections were defined from the same latitude-longitude coordinate system.</strong>
+</p>
+</blockquote>
+</blockquote>
+<p>
+This seems to clearly define the scope, and the syntax to use.  As with other parts of the convention, an example is very useful, say:
+</p>
+<pre class="wiki">  float pres(y, x) ;
+    temp:standard_name = "air_pressure" ;
+    temp:units = "Pa" ;
+    temp:coordinates = "lat lon" ;
+    temp:grid_mapping = "crsOSGB: x y z GeogCS: lat lon" ;
+</pre><blockquote class="citation">
+<p>
+Would you agree with all that?
+</p>
+</blockquote>
+<p>
+ 
+yes
+</p>
+<blockquote class="citation">
+<p>
+To complete the proposal, we also need to say exactly what changes would be needed to the conformance requirements, which the CF checker follows.
+</p>
+</blockquote>
+<p>
+The changes appear additive to me, as the current grid_mapping syntax is retained as is.
+</p>
+<p>
+An extra case is required to identify the 2nd syntax, the inclusion of spaces in the attribute value seems to be the sign that this has occurred.
+</p>
+<p>
+In this case, the coordinates and grid mapping variables named should be cross checked to ensure that they exist within the file.
+</p>
+<p>
+I think this is all that is required of the checker, is this right?
+ 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1323789685000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:6" class="follow-up">↓ 6</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-13T07%3A21%3A25-08%3A00&amp;precision=second" title="See timeline at 12/13/11 07:21:25">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark
+</p>
+<p>
+Quite right, we need an example. The one you gave seems fine to me, but we could even include the much longer version of it that appears earlier. Have I understood correctly that there might be two sets of lat and lon in the file?
+</p>
+<p>
+For the conformance doc, I agree, the additions are small. We just need some statements in the form of rules, for requirements and recommendations to be checked, like the existing text of the conformance doc.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1328622517000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:7" class="follow-up">↓ 7</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-07T05%3A48%3A37-08%3A00&amp;precision=second" title="See timeline at 02/07/12 05:48:37">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Suggested Additional text for the conformance document:
+</p>
+<pre class="wiki">The type of the grid_mapping attribute is a string whose value is of the following form:
+
+ 
+
+ grid_mapping_name[: coord_var [coord_var ... [grid_mapping_name: [coord_var ...] ...]]
+
+
+
+where brackets indicate optional words.  The grid_mapping_name is the name of a variable and must exist in the file.
+
+The valid values for coord_var are names of coordinate variables in the file.
+
+
+</pre>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1328622662000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+        in reply to:
+    <a href="#comment:4">↑ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-07T05%3A51%3A02-08%3A00&amp;precision=second" title="See timeline at 02/07/12 05:51:02">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./70#comment:4" title="Comment 4">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear Mark
+</p>
+<p>
+Quite right, we need an example. The one you gave seems fine to me, but we could even include the much longer version of it that appears earlier. 
+</p>
+</blockquote>
+<p>
+I think that perhaps the longer example is a better illustration of the use case, so I would agree that this one would be helpful to have in the conventions document
+</p>
+<p>
+Is there a source version of the conventions document that I can use to propose the final changes in? 
+</p>
+<p>
+How may we manage this change getting into the conventions document?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1328689659000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+        in reply to:
+    <a href="#comment:5">↑ 5</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-08T00%3A27%3A39-08%3A00&amp;precision=second" title="See timeline at 02/08/12 00:27:39">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark
+</p>
+<p>
+The text for the conformance document is good, but to be clear we should explain where it goes and how it relates to the existing text. I would say:
+</p>
+<p>
+In section 5.6 of the conformance document, replace the existing two bullets
+</p>
+<ul><li>The type of the grid_mapping attribute is a string whose value is a single variable name.
+</li><li>The specified variable name (known as a grid mapping variable) must exist in the file.
+</li></ul><p>
+with
+</p>
+<ul><li>The type of the grid_mapping attribute is a string whose value is of the following form, in which brackets indicate optional text:
+<pre class="wiki">   grid_mapping_name[: coord_var [coord_var ...]] [grid_mapping_name: [coord_var ... ]]
+</pre>Note that in its simplest form the attribute comprises just a grid_mapping_name as a single word.
+</li><li>Each grid_mapping_name is the name of a variable (known as a grid mapping variable), which must exist in the file.
+</li><li>Each coord_var is the name of a coordinate variable or auxiliary coordinate variable, which must exist in the file.
+</li></ul><p>
+In the remaining bullets of this section of the conformance document, replace "grid mapping variable" (singular) with "grid mapping variables" (plural).
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1328792110000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:16" class="follow-up">↓ 16</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-09T04%3A55%3A10-08%3A00&amp;precision=second" title="See timeline at 02/09/12 04:55:10">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+On this basis, I would like to restate the proposal in its final form:
+</p>
+<p>
+The CF specification should change as follows.
+</p>
+<p>
+Replace the first paragraph of 5.6 with the following text: (It is clearer to show the whole paragraph, although not all of it is changed. In the below, the new or modified text is <strong>bold</strong>:)
+</p>
+<blockquote>
+<p>
+When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the coordinates attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, <strong>or to describe the figure of the Earth used to define the latitude and longitude coordinates, a grid mapping variable is required. Such a variable</strong> provides the description of the mapping via a collection of attached attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is grid_mapping_name, which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of grid_mapping_name. The valid values of grid_mapping_name along with the attributes that provide specific map parameter values are described in Appendix F, Grid Mappings.
+</p>
+</blockquote>
+<blockquote>
+<p>
+<strong>The grid mapping variables are associated with the data and coordinate variables by the grid_mapping attribute.</strong> This attribute is attached to data variables so that variables with different mappings may be present in a single file. <strong>The attribute takes a string value with two possible formats. In the first format, it is a single word, which names a grid mapping variable. In the second format, it is a blank-separated list of words "grid_mapping_variable: coordinate_variable [coordinate_variable ...] [grid_mapping_variable: ...]", which identifies one or more grid mapping variables, and with each grid mapping associates one or more coordinate_variables i.e. coordinate variables or auxiliary coordinate variables. The second form is required if there is a need to distinguish coordinate information that is defined with respect to different projections or reference ellipsoids, but a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping if required, for instance if two different projections were defined from the same latitude-longitude coordinate system.</strong>
+</p>
+</blockquote>
+<p>
+<strong>Example 5.10. British National Grid</strong>
+</p>
+<pre class="wiki">dimensions:
+  z = 100;
+  y = 100000 ;
+  x = 100000 ;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:long_name = "Easting"
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:long_name = "Northing"
+    y:units = "m" ;
+  double z(z) ;
+    y:standard_name = "height_above_reference_ellipsoid" ;
+    y:long_name = "height_above_osgb_msl" ;
+    y:units = "m" ;
+  double latOSGB(y, x) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lonOSGB(y, x) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  double latWGS84(y, x) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lonWGS84(y, x) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float temp(z, y, x) ;
+    temp:standard_name = "air_temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "latOSGB lonOSGB latWGS84 lonWGS84" ;
+    temp:grid_mapping = "crsOSGB: x y z latOSGB lonOSGB crsWGS84: latWGS84 lonWGS84" ;
+  float pres(z, y, x) ;
+    temp:standard_name = "air_pressure" ;
+    temp:units = "Pa" ;
+    temp:coordinates = "latOSGB lonOSGB latWGS84 lonWGS84" ;
+    temp:grid_mapping = "crsOSGB: x y z latOSGB lonOSGB crsWGS84: latWGS84 lonWGS84" ;
+  int crsOSGB ;
+    crs:grid_mapping_name = "transverse_mercator";
+    crs:semi_major_axis = 6377563.396 ;
+    crs:inverse_flattening = 299.3249646 ;
+    crs:latitude_of_projection_origin = 49.0 ;
+    crs:longitude_of_projection_origin = -2.0 ;
+    crs:false_easting = 400000.0 ;
+    crs:false_northing = -100000.0 ;
+    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+    crs:unit = "metre" ;
+  int crsWGS84 ;
+    crs:grid_mapping_name = "latitude_longitude";
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+
+</pre>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1329342450000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:10" class="follow-up">↓ 10</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-15T13%3A47%3A30-08%3A00&amp;precision=second" title="See timeline at 02/15/12 13:47:30">9 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all:
+</p>
+<p>
+It seems like the main purpose is to allow specifying lat/lon coordinates using more than one CRS? More generally, to allow specifying x,y coordinates for more than one CRS? Mark, can you say more about your specific need? Is it just lat/lon or also you need to specify multiple projections?
+</p>
+<p>
+1) This brings up an unstated assumption in the current convention, namely that 2D lat/lon coordinates are in the same CRS as the projection. Not sure if we should make that a stated assumption.
+</p>
+<p>
+2) "The second form is required if there is a need to distinguish coordinate information that is defined with respect to different projections or reference ellipsoids, but a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping if required, for instance if two different projections were defined from the same latitude-longitude coordinate system."
+</p>
+<p>
+Im not sure if im parsing this correctly. is it the same as:
+</p>
+<p>
+"The second form is required if one wants to store coordinate information for more than one coordinate reference system."
+</p>
+<p>
+or is there more to it?
+</p>
+<p>
+3) What is the relationship to the coordinates listed in the grid_mapping to the coordinates listed in the "coordinates" attribute? Presumably a subset, as long as you include the coordinate variables if not explicitly listed in the "coordinates" attribute.
+</p>
+<p>
+4) There is an implication, i assume, that the coordinates listed in one of the grid_mapping's are related in the following way: The grid_mapping defines a transformation from the x,y projection coordinates (if present) to the lat/lon coordinates (must be present(?)). When x,y projection coordinates are not present, then the grid_mapping defines an alternate CRS for the lat/lon coordinates. 
+</p>
+<p>
+In this last, im just trying to clarify what semantic content these [grid_mapping_variable: ...] have to have.
+</p>
+<p>
+John
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1329470581000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+        in reply to:
+    <a href="#comment:9">↑ 9</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:11" class="follow-up">↓ 11</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-17T01%3A23%3A01-08%3A00&amp;precision=second" title="See timeline at 02/17/12 01:23:01">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./70#comment:9" title="Comment 9">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Hi all:
+</p>
+</blockquote>
+<p>
+Hello John
+</p>
+<blockquote class="citation">
+<p>
+It seems like the main purpose is to allow specifying lat/lon coordinates using more than one CRS? More generally, to allow specifying x,y coordinates for more than one CRS? Mark, can you say more about your specific need? Is it just lat/lon or also you need to specify multiple projections?
+</p>
+</blockquote>
+<p>
+The specific need I have identified is to enable coordinates to be explicitly linking to the relevant CRS. This is done through the data variable, which may be defined with respect to multiple CRSs.
+</p>
+<p>
+The use case presented is where a projected CRS is defined with respect to a datum which it would be unusual to use for a geographic CRS.  The latitude and longitude coordinates required by CF would be much more useful if defined with respect to a more conventional datum. 
+</p>
+<blockquote class="citation">
+<p>
+1) This brings up an unstated assumption in the current convention, namely that 2D lat/lon coordinates are in the same CRS as the projection. Not sure if we should make that a stated assumption.
+</p>
+</blockquote>
+<p>
+If this assumption exists for the current syntax, perhaps it should be stated:
+</p>
+<p>
+<strong>2D Latitude and Longitude Coordinates for a projected CRS use the same geographic CRS as the projection is projected from unless otherwise defined</strong>. 
+ 
+</p>
+<blockquote class="citation">
+<p>
+2) "The second form is required if there is a need to distinguish coordinate information that is defined with respect to different projections or reference ellipsoids, but a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping if required, for instance if two different projections were defined from the same latitude-longitude coordinate system." 
+Im not sure if im parsing this correctly. is it the same as:
+"The second form is required if one wants to store coordinate information for more than one coordinate reference system."
+or is there more to it?
+</p>
+</blockquote>
+<p>
+I am not convinced that <strong>a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping</strong> is really required by the use cases I am aware of.
+</p>
+<p>
+I may prefer your wording (with a subtle change): <strong>The [expanded form of the grid_mapping attribute] is required if one wants to store coordinate information for more than one coordinate reference system.</strong>
+ 
+</p>
+<blockquote class="citation">
+<p>
+3) What is the relationship to the coordinates listed in the grid_mapping to the coordinates listed in the "coordinates" attribute? Presumably a subset, as long as you include the coordinate variables if not explicitly listed in the "coordinates" attribute.
+</p>
+</blockquote>
+<p>
+I think this is assumed, which may not be sensible.  A statement:
+</p>
+<p>
+<strong>All coordinates listed in the grid_mapping attribute must be coordinate variables or auxiliary coordinates of the data variable.</strong>
+</p>
+<p>
+could be added to the specification, and the conformance guidelines. 
+ 
+</p>
+<blockquote class="citation">
+<p>
+4) There is an implication, i assume, that the coordinates listed in one of the grid_mapping's are related in the following way: The grid_mapping defines a transformation from the x,y projection coordinates (if present) to the lat/lon coordinates (must be present(?)). When x,y projection coordinates are not present, then the grid_mapping defines an alternate CRS for the lat/lon coordinates. 
+</p>
+<p>
+In this last, im just trying to clarify what semantic content these [grid_mapping_variable: ...] have to have.
+</p>
+</blockquote>
+<p>
+I think I would phrase this that a grid_mapping variable defines a coordinate reference system, which coordinates are defined with respect to.
+</p>
+<p>
+I think this captures the intent of your statement, do you agree?
+</p>
+<p>
+many thanks for all the input
+</p>
+<p>
+mark
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1329612105000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+        in reply to:
+    <a href="#comment:10">↑ 10</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:14" class="follow-up">↓ 14</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-18T16%3A41%3A45-08%3A00&amp;precision=second" title="See timeline at 02/18/12 16:41:45">9 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi mark:
+</p>
+<p>
+Replying to <a class="ticket" href="./70#comment:10" title="Comment 10">markh</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./70#comment:9" title="Comment 9">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Hi all:
+</p>
+</blockquote>
+<p>
+Hello John
+</p>
+<blockquote class="citation">
+<p>
+It seems like the main purpose is to allow specifying lat/lon coordinates using more than one CRS? More generally, to allow specifying x,y coordinates for more than one CRS? Mark, can you say more about your specific need? Is it just lat/lon or also you need to specify multiple projections?
+</p>
+</blockquote>
+<p>
+The specific need I have identified is to enable coordinates to be explicitly linking to the relevant CRS. This is done through the data variable, which may be defined with respect to multiple CRSs.
+</p>
+<p>
+The use case presented is where a projected CRS is defined with respect to a datum which it would be unusual to use for a geographic CRS.  The latitude and longitude coordinates required by CF would be much more useful if defined with respect to a more conventional datum. 
+</p>
+</blockquote>
+<p>
+Can you say more of your specific use case? In principle, an application could take the lat/lon on some datum and recompute them onto some other, more desirable datum, without needing them to be stored in the file.
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+1) This brings up an unstated assumption in the current convention, namely that 2D lat/lon coordinates are in the same CRS as the projection. Not sure if we should make that a stated assumption.
+</p>
+</blockquote>
+<p>
+If this assumption exists for the current syntax, perhaps it should be stated:
+</p>
+<p>
+<strong>2D Latitude and Longitude Coordinates for a projected CRS use the same geographic CRS as the projection is projected from unless otherwise defined</strong>.
+</p>
+</blockquote>
+<p>
+This implies that the lat/lon coordinates on the same CRS as the projection is optional. Eg, one could instead give the lat/lon of some preferred datum. Is that what you intend?
+</p>
+<blockquote class="citation">
+<p>
+ 
+</p>
+<blockquote class="citation">
+<p>
+2) "The second form is required if there is a need to distinguish coordinate information that is defined with respect to different projections or reference ellipsoids, but a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping if required, for instance if two different projections were defined from the same latitude-longitude coordinate system." 
+Im not sure if im parsing this correctly. is it the same as:
+"The second form is required if one wants to store coordinate information for more than one coordinate reference system."
+or is there more to it?
+</p>
+</blockquote>
+<p>
+I am not convinced that <strong>a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping</strong> is really required by the use cases I am aware of.
+</p>
+</blockquote>
+<p>
+im not sure i understand that
+</p>
+<blockquote class="citation">
+<p>
+I may prefer your wording (with a subtle change): <strong>The [expanded form of the grid_mapping attribute] is required if one wants to store coordinate information for more than one coordinate reference system.</strong>
+</p>
+</blockquote>
+<p>
+seems good to me
+</p>
+<blockquote class="citation">
+<p>
+ 
+</p>
+<blockquote class="citation">
+<p>
+3) What is the relationship to the coordinates listed in the grid_mapping to the coordinates listed in the "coordinates" attribute? Presumably a subset, as long as you include the coordinate variables if not explicitly listed in the "coordinates" attribute.
+</p>
+</blockquote>
+<p>
+I think this is assumed, which may not be sensible.  A statement:
+</p>
+<p>
+<strong>All coordinates listed in the grid_mapping attribute must be coordinate variables or auxiliary coordinates of the data variable.</strong>
+</p>
+<p>
+could be added to the specification, and the conformance guidelines. 
+</p>
+</blockquote>
+<p>
+that seems clear to me.
+</p>
+<blockquote class="citation">
+<p>
+ 
+</p>
+<blockquote class="citation">
+<p>
+4) There is an implication, i assume, that the coordinates listed in one of the grid_mapping's are related in the following way: The grid_mapping defines a transformation from the x,y projection coordinates (if present) to the lat/lon coordinates (must be present(?)). When x,y projection coordinates are not present, then the grid_mapping defines an alternate CRS for the lat/lon coordinates. 
+</p>
+<p>
+In this last, im just trying to clarify what semantic content these [grid_mapping_variable: ...] have to have.
+</p>
+</blockquote>
+<p>
+I think I would phrase this that a grid_mapping variable defines a coordinate reference system, which coordinates are defined with respect to.
+</p>
+<p>
+I think this captures the intent of your statement, do you agree?
+</p>
+</blockquote>
+<p>
+it might, but im not sure if most data providers would understand it. im not sure if i do. could you expand it a little for the less savvy?
+</p>
+<blockquote class="citation">
+<p>
+many thanks for all the input
+</p>
+<p>
+mark
+</p>
+</blockquote>
+<p>
+you're welcome.
+</p>
+<p>
+john
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1329752440000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:13" class="follow-up">↓ 13</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-20T07%3A40%3A40-08%3A00&amp;precision=second" title="See timeline at 02/20/12 07:40:40">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John and Mark
+</p>
+<p>
+Thanks for working on this. I am one of the non-savvy regarding coordinate reference systems; in fact, that phrase scares me a bit. Is the proposed text quite correct: "The [expanded form of the grid_mapping attribute] is required if one wants to store coordinate information for more than one coordinate reference system"? The existing form of the attribute is used to relate a projection (or some other transformation such as rotated pole) and a lat-lon (geographical) coordinate system. That is two coordinate systems, but the expanded form is not needed. The expanded form is needed if you have two or more projections/transformations, or two or more horizontal datums (ellipsoid, etc.). Is that right?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1330362708000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+        in reply to:
+    <a href="#comment:12">↑ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-27T09%3A11%3A48-08%3A00&amp;precision=second" title="See timeline at 02/27/12 09:11:48">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./70#comment:12" title="Comment 12">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear John and Mark
+</p>
+<p>
+Thanks for working on this. I am one of the non-savvy regarding coordinate reference systems; in fact, that phrase scares me a bit. Is the proposed text quite correct: "The [expanded form of the grid_mapping attribute] is required if one wants to store coordinate information for more than one coordinate reference system"? The existing form of the attribute is used to relate a projection (or some other transformation such as rotated pole) and a lat-lon (geographical) coordinate system. That is two coordinate systems, but the expanded form is not needed. The expanded form is needed if you have two or more projections/transformations, or two or more horizontal datums (ellipsoid, etc.). Is that right?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+</blockquote>
+<p>
+I think that characterisation is right.
+</p>
+<p>
+A transformation is always between two things; in the current scope one of these is implicit, and a transformation thus defines the other.  By clarifying what is implicit and allowing extension of the syntax to support two (or more) explicit definitions we add required capability and remove some potential confusion.
+</p>
+<p>
+ 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1330439879000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+        in reply to:
+    <a href="#comment:11">↑ 11</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:15" class="follow-up">↓ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-28T06%3A37%3A59-08%3A00&amp;precision=second" title="See timeline at 02/28/12 06:37:59">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./70#comment:11" title="Comment 11">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Can you say more of your specific use case? In principle, an application could take the lat/lon on some datum and recompute them onto some other, more desirable datum, without needing them to be stored in the file.
+</p>
+</blockquote>
+<p>
+This is true, an application could do this, but a data producer cannot encode this information.  It appears an odd imbalance if the data producer can only encode latitude and longitude data on the datum from which a projection or transform is defined from.
+</p>
+<p>
+Another example is where a set of coordinates are used which do not have a mathematical transform to another set.  An arbitrarily defined coordinate system may have a 'model coordinate system' with 'x' and 'y' coordinates with each cell mapping to a defined latitude and longitude value pair.
+</p>
+<p>
+The latitude and longitude are defined with respect to a grid_mapping variable, but the x and y are not, so the data variable's grid_mapping attribute should unambiguously define that the only coordinates which use the grid_mapping are latitude and longitude.
+</p>
+<blockquote class="citation">
+<p>
+This implies that the lat/lon coordinates on the same CRS as the projection is optional. Eg, one could instead give the lat/lon of some preferred datum. Is that what you intend?
+</p>
+</blockquote>
+<p>
+absolutely
+</p>
+<blockquote class="citation">
+<blockquote class="citation">
+<p>
+I am not convinced that <strong>a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping</strong> is really required by the use cases I am aware of.
+</p>
+</blockquote>
+<p>
+im not sure i understand that
+</p>
+</blockquote>
+<p>
+I am highlighting that that particular piece of text giving the capability to link one coordinate to multiple grid_mappings is not a required capability, and may do harm.
+</p>
+<blockquote class="citation">
+<p>
+2) "The second form is required if there is a need to distinguish coordinate information that is defined with respect to different projections or reference ellipsoids, but a coordinate variable or auxiliary coordinate variable may be associated with more than one grid mapping if required, for instance if two different projections were defined from the same latitude-longitude coordinate system." 
+Im not sure if im parsing this correctly. is it the same as:
+"The second form is required if one wants to store coordinate information for more than one coordinate reference system."
+or is there more to it?
+</p>
+</blockquote>
+<p>
+your final statement is the essence of the requirement. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1330443065000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+        in reply to:
+    <a href="#comment:14">↑ 14</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-28T07%3A31%3A05-08%3A00&amp;precision=second" title="See timeline at 02/28/12 07:31:05">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./70#comment:14" title="Comment 14">markh</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./70#comment:11" title="Comment 11">caron</a>:
+</p>
+<blockquote class="citation">
+<p>
+Can you say more of your specific use case? In principle, an application could take the lat/lon on some datum and recompute them onto some other, more desirable datum, without needing them to be stored in the file.
+</p>
+</blockquote>
+<p>
+This is true, an application could do this, but a data producer cannot encode this information.  It appears an odd imbalance if the data producer can only encode latitude and longitude data on the datum from which a projection or transform is defined from.
+</p>
+<p>
+Another example is where a set of coordinates are used which do not have a mathematical transform to another set.  An arbitrarily defined coordinate system may have a 'model coordinate system' with 'x' and 'y' coordinates with each cell mapping to a defined latitude and longitude value pair.
+</p>
+<p>
+The latitude and longitude are defined with respect to a grid_mapping variable, but the x and y are not, so the data variable's grid_mapping attribute should unambiguously define that the only coordinates which use the grid_mapping are latitude and longitude.
+</p>
+</blockquote>
+<p>
+The specification defines the grid_mapping:
+</p>
+<pre class="wiki">When the coordinate variables for a horizontal grid are not longitude and latitude, it is 
+required that the true latitude and longitude coordinates be supplied via the coordinates 
+attribute. If in addition it is desired to describe the mapping between the given coordinate 
+variables and the true latitude and longitude coordinates, the attribute grid_mapping may be 
+used to supply this description.
+</pre><p>
+This indicates that a grid_mapping only relates a list of coordinate variables to the required auxiliary coordinates 'latitude' and 'longitude' if these are not coordinate variables.  
+</p>
+<p>
+Thus the grid_mapping does not provide the facility to define the CRS datum for the latitiude and longitude auxiliary coordinates in this example: 
+</p>
+<pre class="wiki">dimensions:
+	time = 240 ;
+	site_number = 3 ;
+	bnds = 2 ;
+variables:
+	float air_temperature(time, site_number) ;
+		air_temperature:standard_name = "air_temperature" ;
+		air_temperature:long_name = "air_temperature" ;
+		air_temperature:units = "K" ;
+		air_temperature:ukmo__um_stash_source = "m??s03i236" ;
+		air_temperature:cell_methods = "time: mean" ;
+		air_temperature:grid_mapping = "latitude_longitude" ;
+		air_temperature:source = "Data from Met Office Unified Model" ;
+		air_temperature:coordinates = "height latitude longitude" ;
+	int latitude_longitude ;
+		latitude_longitude:grid_mapping_name = "latitude_longitude" ;
+		latitude_longitude:semi_major_axis = 6371229. ;
+		latitude_longitude:semi_minor_axis = 6371229. ;
+	float time(time) ;
+		time:units = "days since 0000-01-01 00:00:00" ;
+		time:standard_name = "time" ;
+		time:calendar = "360_day" ;
+		time:axis = "T" ;
+	float site_number(site_number) ;
+		site_number:units = "1" ;
+		site_number:long_name = "site_number" ;
+	float height ;
+		height:units = "m" ;
+		height:standard_name = "height" ;
+		height:axis = "Z" ;
+	float latitude(site_number) ;
+		latitude:comment = "Data points generated from bounds" ;
+		latitude:bounds = "latitude_bnds" ;
+		latitude:units = "degrees_north" ;
+		latitude:standard_name = "latitude" ;
+		latitude:axis = "Y" ;
+	float latitude_bnds(site_number, bnds) ;
+	float longitude(site_number) ;
+		longitude:comment = "Data points generated from bounds" ;
+		longitude:bounds = "longitude_bnds" ;
+		longitude:units = "degrees_east" ;
+		longitude:standard_name = "longitude" ;
+		longitude:axis = "X" ;
+	float longitude_bnds(site_number, bnds) ;
+</pre>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1330447743000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+        in reply to:
+    <a href="#comment:8">↑ 8</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:19" class="follow-up">↓ 19</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-28T08%3A49%3A03-08%3A00&amp;precision=second" title="See timeline at 02/28/12 08:49:03">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I would like to restate the proposal in its current form:
+</p>
+<p>
+The CF specification should change as follows.
+</p>
+<blockquote>
+<p>
+Replace the first paragraph of 5.6 with the following text: (It is clearer to show the whole paragraph, although not all of it is changed. In the below, the new or modified text is <strong>bold</strong>:)
+</p>
+</blockquote>
+<blockquote>
+<p>
+When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the coordinates attribute. If in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, <strong>or to describe the figure of the Earth used to define the latitude and longitude coordinates, or another coordinate reference system definition used by some coordinates or auxiliary coordinates: a grid mapping variable is required. Such a grid mapping variable</strong> provides the description of the mapping via a collection of attached attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is grid_mapping_name, which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of grid_mapping_name. The valid values of grid_mapping_name along with the attributes that provide specific map parameter values are described in Appendix F, Grid Mappings.
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+<strong>The grid mapping variables are associated with the data and coordinate variables by the grid_mapping attribute.</strong> This attribute is attached to data variables so that variables with different mappings may be present in a single file. <strong>The attribute takes a string value with two possible formats. In the first format, it is a single word, which names a grid mapping variable. In the second format, it is a blank-separated list of words "grid_mapping_variable: coordinate_variable [coordinate_variable ...] [grid_mapping_variable: ...]", which identifies one or more grid mapping variables, and with each grid mapping associates one or more coordinate_variables i.e. coordinate variables or auxiliary coordinate variables.</strong>
+</p>
+</blockquote>
+<blockquote>
+<p>
+<strong>Using the simple form, where the grid_mapping attribute is only the name of a grid_mapping variable,  2D latitude and longitude coordinates for a projected coordinate reference system use the same geographic coordinate reference system (datum and prime meridian) as the projection is projected from.</strong>
+</p>
+</blockquote>
+<blockquote>
+<p>
+When the coordinate variables for a horizontal grid are longitude and latitude, a grid mapping variable with grid_mapping_name of latitude_longitude may be used to specify the ellipsoid and prime meridian.
+</p>
+</blockquote>
+<blockquote>
+<p>
+<strong>The expanded form of the grid_mapping attribute is required if one wants to store coordinate information for more than one coordinate reference system.  In this case each coordinate or auxiliary coordinate is defined explicitly with respect to one and only one grid_mapping variable.  This syntax may be used to explicitly link coordinates and grid mapping variables where only one coordinate reference system is used.  In this case, all coordinates and auxiliary coordinates of the data variable not named in the grid_mapping attribute are unrelated to any grid_mapping variable.  All coordinate names listed in the grid_mapping attribute must be coordinate variables or auxiliary coordinates of the data variable.</strong>
+</p>
+</blockquote>
+<blockquote>
+<p>
+In order to make use of a grid mapping to directly calculate latitude and longitude values it is necessary to associate the coordinate variables with the independent variables of the mapping. This is done by assigning a standard_name to the coordinate variable. The appropriate values of the standard_name depend on the grid mapping and are given in Appendix F, Grid Mappings. 
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+<strong>Example 5.10. British National Grid</strong>
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<pre class="wiki">dimensions:
+  z = 100;
+  y = 100000 ;
+  x = 100000 ;
+variables:
+  double x(x) ;
+    x:standard_name = "projection_x_coordinate" ;
+    x:long_name = "Easting"
+    x:units = "m" ;
+  double y(y) ;
+    y:standard_name = "projection_y_coordinate" ;
+    y:long_name = "Northing"
+    y:units = "m" ;
+  double z(z) ;
+    y:standard_name = "height_above_reference_ellipsoid" ;
+    y:long_name = "height_above_osgb_msl" ;
+    y:units = "m" ;
+  double latWGS84(y, x) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  double lonWGS84(y, x) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
+  float temp(z, y, x) ;
+    temp:standard_name = "air_temperature" ;
+    temp:units = "K" ;
+    temp:coordinates = "latWGS84 lonWGS84" ;
+    temp:grid_mapping = "crsOSGB: x y crsWGS84: latWGS84 lonWGS84" ;
+  float pres(z, y, x) ;
+    temp:standard_name = "air_pressure" ;
+    temp:units = "Pa" ;
+    temp:coordinates = "latWGS84 lonWGS84" ;
+    temp:grid_mapping = "crsOSGB: x y crsWGS84: latWGS84 lonWGS84" ;
+  int crsOSGB ;
+    crs:grid_mapping_name = "transverse_mercator";
+    crs:semi_major_axis = 6377563.396 ;
+    crs:inverse_flattening = 299.3249646 ;
+    crs:latitude_of_projection_origin = 49.0 ;
+    crs:longitude_of_projection_origin = -2.0 ;
+    crs:false_easting = 400000.0 ;
+    crs:false_northing = -100000.0 ;
+    crs:scale_factor_at_projection_origin = 0.9996012717 ;
+    crs:unit = "metre" ;
+  int crsWGS84 ;
+    crs:grid_mapping_name = "latitude_longitude";
+    crs:longitude_of_prime_meridian = 0.0 ;
+    crs:semi_major_axis = 6378137.0 ;
+    crs:inverse_flattening = 298.257223563 ;
+
+</pre><p>
+(n.b. I have removed the latosgb and lonosgb coordinates from the example, as I don't think they materially add to this requirement, merely to the length of the example.)
+</p>
+<p>
+In section 5.6 of the conformance document, replace the existing two bullets
+</p>
+<ul><li>The type of the grid_mapping attribute is a string whose value is a single variable name.
+</li><li>The specified variable name (known as a grid mapping variable) must exist in the file.
+</li></ul><p>
+ 
+with
+</p>
+<ul><li>The type of the grid_mapping attribute is a string whose value is of the following form, in which brackets indicate optional text:
+<pre class="wiki">   grid_mapping_name[: coord_var [coord_var ...]] [grid_mapping_name: [coord_var ... ]]
+</pre><ul><li>Note that in its simplest form the attribute comprises just a grid_mapping_name as a single word.
+</li></ul></li><li>Each grid_mapping_name is the name of a variable (known as a grid mapping variable), which must exist in the file.
+</li><li>Each coord_var is the name of a coordinate variable or auxiliary coordinate variable, which must exist in the file and be linked to the relevant data variable.
+</li></ul><blockquote>
+<p>
+In the remaining bullets of this section of the conformance document, replace "grid mapping variable" (singular) with "grid mapping variables" (plural).
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1330513303000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:18" class="follow-up">↓ 18</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-29T03%3A01%3A43-08%3A00&amp;precision=second" title="See timeline at 02/29/12 03:01:43">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mark
+</p>
+<p>
+Thanks for this restatement. I agree with it. I would like to make some minor (I think) editorial suggestions in this text:
+</p>
+<ul><li>You have a very long sentence, which I think would be easier to read if it was turned round as follows: "A grid mapping variable is required if in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, or to describe the figure of the Earth used to define the latitude and longitude coordinates, or to describe another coordinate reference system definition used by some coordinates or auxiliary coordinates."
+</li></ul><ul><li>In the sentence, "Using the simple form, where the grid_mapping attribute is only the name of a grid_mapping variable, 2D latitude and longitude coordinates for a projected coordinate reference system use the same geographic coordinate reference system (datum and prime meridian) as the projection is projected from.", could we avoid using the word "datum", because (a) this is not a word which CF currently uses and (b) it is word with more than one meaning. What does it mean here, exactly? Would "ellipsoid" be a correct substitution?
+</li></ul><ul><li>"In this case each coordinate or auxiliary coordinate is defined explicitly with respect to one and only one grid_mapping variable." I think that should say, "no more than one grid_mapping variable." As you go on to explain, it is permitted for some coord vars not to be associated with any grid mapping.
+</li></ul><ul><li>In the final bullet of the conformance rules, I would say, "which must exist in the file. If it is an auxiliary coordinate variable, it must be listed in the coordinates attribute." That is, let's be explicit about how it is "linked".
+</li></ul><p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1330534810000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+        in reply to:
+    <a href="#comment:17">↑ 17</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-02-29T09%3A00%3A10-08%3A00&amp;precision=second" title="See timeline at 02/29/12 09:00:10">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./70#comment:17" title="Comment 17">jonathan</a>:
+</p>
+<blockquote class="citation">
+<p>
+Dear Mark
+</p>
+<p>
+Thanks for this restatement. I agree with it. I would like to make some minor (I think) editorial suggestions in this text:
+</p>
+<ul><li>You have a very long sentence, which I think would be easier to read if it was turned round as follows: "A grid mapping variable is required if in addition it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, or to describe the figure of the Earth used to define the latitude and longitude coordinates, or to describe another coordinate reference system definition used by some coordinates or auxiliary coordinates."
+</li></ul></blockquote>
+<p>
+that makes sense, and reads better
+</p>
+<blockquote class="citation">
+<ul><li>In the sentence, "Using the simple form, where the grid_mapping attribute is only the name of a grid_mapping variable, 2D latitude and longitude coordinates for a projected coordinate reference system use the same geographic coordinate reference system (datum and prime meridian) as the projection is projected from.", could we avoid using the word "datum", because (a) this is not a word which CF currently uses and (b) it is word with more than one meaning. What does it mean here, exactly? Would "ellipsoid" be a correct substitution?
+</li></ul></blockquote>
+<p>
+i think we could use <strong>ellipsoid</strong> here
+</p>
+<blockquote class="citation">
+<ul><li>"In this case each coordinate or auxiliary coordinate is defined explicitly with respect to one and only one grid_mapping variable." I think that should say, "no more than one grid_mapping variable." As you go on to explain, it is permitted for some coord vars not to be associated with any grid mapping.
+</li></ul></blockquote>
+<p>
+that seems fine to me
+</p>
+<blockquote class="citation">
+<ul><li>In the final bullet of the conformance rules, I would say, "which must exist in the file. If it is an auxiliary coordinate variable, it must be listed in the coordinates attribute." That is, let's be explicit about how it is "linked".
+</li></ul></blockquote>
+<p>
+agreed, let's be explicit
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1331823778000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+        in reply to:
+    <a href="#comment:16">↑ 16</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-03-15T08%3A02%3A58-07%3A00&amp;precision=second" title="See timeline at 03/15/12 08:02:58">9 years ago</a> by markh
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I would like to restate the proposal in its current form:
+</p>
+<p>
+The CF specification should change as follows.
+</p>
+<blockquote>
+<p>
+Replace the first paragraph of 5.6 with the following text: (It is clearer to show the whole paragraph, although not all of it is changed. In the below, the new or modified text is <strong>bold</strong>:)
+</p>
+</blockquote>
+<blockquote>
+<p>
+When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the coordinates attribute. A grid mapping variable is required if, in addition, it is desired to describe the mapping between the given coordinate variables and the true latitude and longitude coordinates, or to describe the figure of the Earth used to define the latitude and longitude coordinates, or to describe another coordinate reference system definition used by some coordinates or auxiliary coordinates.Such a grid mapping variable<strong> provides the description of the mapping via a collection of attached attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container for the attributes that define the mapping. The one attribute that all grid mapping variables must have is grid_mapping_name, which takes a string value that contains the mapping's name. The other attributes that define a specific mapping depend on the value of grid_mapping_name. The valid values of grid_mapping_name along with the attributes that provide specific map parameter values are described in Appendix F, Grid Mappings.
+</strong></p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+<strong>The grid mapping variables are associated with the data and coordinate variables by the grid_mapping attribute.</strong> This attribute is attached to data variables so that variables with different mappings may be present in a single file. <strong>The attribute takes a string value with two possible formats. In the first format, it is a single word, which names a grid mapping variable. In the second format, it is a blank-separated list of words "grid_mapping_variable: coordinate_variable [coordinate_variable ...] [grid_mapping_variable: ...]", which identifies one or more grid mapping variables, and with each grid mapping associates one or more coordinate_variables i.e. coordinate variables or auxiliary coordinate variables.</strong>
+</p>
+</blockquote>
+<blockquote>
+<p>
+<strong>Using the simple form, where the grid_mapping attribute is only the name of a grid_mapping variable,  2D latitude and longitude coordinates for a projected coordinate reference system use the same geographic coordinate reference system (ellipsoid and prime meridian) as the projection is projected from.</strong>
+</p>
+</blockquote>
+<blockquote>
+<p>
+When the coordinate variables for a horizontal grid are longitude and latitude, a grid mapping variable with grid_mapping_name of latitude_longitude may be used to specify the ellipsoid and prime meridian.
+</p>
+</blockquote>
+<blockquote>
+<p>
+<strong>The expanded form of the grid_mapping attribute is required if one wants to store coordinate information for more than one coordinate reference system.  In this case each coordinate or auxiliary coordinate is defined explicitly with respect to no more than one grid_mapping variable.  This syntax may be used to explicitly link coordinates and grid mapping variables where only one coordinate reference system is used.  In this case, all coordinates and auxiliary coordinates of the data variable not named in the grid_mapping attribute are unrelated to any grid_mapping variable.  All coordinate names listed in the grid_mapping attribute must be coordinate variables or auxiliary coordinates of the data variable.</strong>
+</p>
+</blockquote>
+<blockquote>
+<p>
+In order to make use of a grid mapping to directly calculate latitude and longitude values it is necessary to associate the coordinate variables with the independent variables of the mapping. This is done by assigning a standard_name to the coordinate variable. The appropriate values of the standard_name depend on the grid mapping and are given in Appendix F, Grid Mappings. 
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<blockquote>
+<p>
+<strong>Example 5.10. British National Grid</strong>
+</p>
+</blockquote>
+<p>
+ 
+</p>
+<pre class="wiki">  dimensions:
+    z = 100;
+    y = 100000 ;
+    x = 100000 ;
+  variables:
+    double x(x) ;
+      x:standard_name = "projection_x_coordinate" ;
+      x:long_name = "Easting"
+      x:units = "m" ;
+    double y(y) ;
+      y:standard_name = "projection_y_coordinate" ;
+      y:long_name = "Northing"
+      y:units = "m" ;
+    double z(z) ;
+      z:standard_name = "height_above_reference_ellipsoid" ;
+      z:long_name = "height_above_osgb_newlyn_datum_masl" ;
+      z:units = "m" ;
+    double lat(y, x) ;
+      lat:standard_name = "latitude" ;
+      lat:units = "degrees_north" ;
+    double lon(y, x) ;
+      lon:standard_name = "longitude" ;
+      lon:units = "degrees_east" ;
+    float temp(z, y, x) ;
+      temp:standard_name = "air_temperature" ;
+      temp:units = "K" ;
+      temp:coordinates = "lat lon" ;
+      temp:grid_mapping = "crsOSGB: x y crsWGS84: lat lon" ;
+    float pres(z, y, x) ;
+      temp:standard_name = "air_pressure" ;
+      temp:units = "Pa" ;
+      temp:coordinates = "lat lon" ;
+      temp:grid_mapping = "crsOSGB: x y crsWGS84: lat lon" ;
+    int crsOSGB ;
+      crsOSGB:grid_mapping_name = "transverse_mercator";
+      crsOSGB:semi_major_axis = 6377563.396 ;
+      crsOSGB:inverse_flattening = 299.3249646 ;
+      crsOSGB:longitude_of_prime_meridian = 0.0 ;
+      crsOSGB:latitude_of_projection_origin = 49.0 ;
+      crsOSGB:longitude_of_central_meridian = -2.0 ;
+      crsOSGB:scale_factor_at_central_meridian = 0.9996012717 ;
+      crsOSGB:false_easting = 400000.0 ;
+      crsOSGB:false_northing = -100000.0 ;
+      crsOSGB:unit = "metre" ;
+    int crsWGS84 ;
+      crsWGS84:grid_mapping_name = "latitude_longitude";
+      crsWGS84:longitude_of_prime_meridian = 0.0 ;
+      crsWGS84:semi_major_axis = 6378137.0 ;
+      crsWGS84:inverse_flattening = 298.257223563 ;
+  
+</pre><p>
+ 
+In section 5.6 of the conformance document, replace the existing two bullets
+ 
+</p>
+<ul><li>The type of the grid_mapping attribute is a string whose value is a single variable name.
+</li><li>The specified variable name (known as a grid mapping variable) must exist in the file.
+</li></ul><p>
+  
+with
+ 
+</p>
+<ul><li>The type of the grid_mapping attribute is a string whose value is of the following form, in which brackets indicate optional text:
+<pre class="wiki">   grid_mapping_name[: coord_var [coord_var ...]] [grid_mapping_name: [coord_var ... ]]
+</pre></li><li>Note that in its simplest form the attribute comprises just a grid_mapping_name as a single word.
+</li><li>Each grid_mapping_name is the name of a variable (known as a grid mapping variable), which must exist in the file.
+</li><li>Each coord_var is the name of a coordinate variable or auxiliary coordinate variable, which must exist in the file. If it is an auxiliary coordinate variable, it must be listed in the coordinates attribute.
+</li></ul><p>
+In the remaining bullets of this section of the conformance document, replace "grid mapping variable" (singular) with "grid mapping variables" (plural).
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1331833197000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-03-15T10%3A39%3A57-07%3A00&amp;precision=second" title="See timeline at 03/15/12 10:39:57">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+This looks fine to me, Mark. Thanks.
+</p>
+<p>
+Is it OK for you, John (Caron)?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1333100458000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-03-30T02%3A40%3A58-07%3A00&amp;precision=second" title="See timeline at 03/30/12 02:40:58">9 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I think that the content on this is looking good, the replacement text for the specification and conformance documents is clear and the example is a good illustration.
+</p>
+<p>
+This has been discussed and improved over some months and, if John Caron is in agreement, I propose that this enhancement can be accepted with the ammendments to the specification and conformance documents as stated in Marks post on 03/15/12.
+</p>
+<p>
+Any objections, John?
+</p>
+<p>
+Many thanks,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1337205449000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-05-16T14%3A57%3A29-07%3A00&amp;precision=second" title="See timeline at 05/16/12 14:57:29">9 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+ok with me.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-23-1337243358000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-05-17T01%3A29%3A18-07%3A00&amp;precision=second" title="See timeline at 05/17/12 01:29:18">9 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-conventions@…</em> to <em>davidhassell</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>assigned</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+That's great, this can move to accepted. Thanks, John.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-24-1491505701108247">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:24" class="cnum">
+    <a href="#comment:24">comment:24</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-04-06T12%3A08%3A21-07%3A00&amp;precision=second" title="See timeline at 04/06/17 12:08:21">4 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+in implementing Ticket 70 in the CF Conventions document version 1.7, I saw that it overlaps with tickets 69, 80, and 143.   In order to deal with this, I had to make some changes, to Examples 5.10 and 5.12 and associated text.  My choice was to use Example 5.10 as supplied for Ticket 70, and to combine the old Examples 5.10 and 5.12 to form the new Example 5.12.
+</p>
+<p>
+I would like to invite comments on these changes before they become final.  You may see the proposed new chapter 5 at this url:
+<a class="ext-link" href="https://github.com/cf-convention/cf-conventions/blob/781dea25a986e7d12f294257ec73e817ed544a74/ch05.adoc"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/blob/781dea25a986e7d12f294257ec73e817ed544a74/ch05.adoc</a>
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-25-1492550776095173">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:25" class="cnum">
+    <a href="#comment:25">comment:25</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-04-18T14%3A26%3A16-07%3A00&amp;precision=second" title="See timeline at 04/18/17 14:26:16">4 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+This ticket has been implemented in the draft 1.7 version of the CF Conventions document.  The ticket cannot be closed until the conformance document is also updated.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-26-1494437789805386">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:26" class="cnum">
+    <a href="#comment:26">comment:26</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-05-10T10%3A36%3A29-07%3A00&amp;precision=second" title="See timeline at 05/10/17 10:36:29">4 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>accepted</em> to <em>closed</em>
+    </li>
+  </ul>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./70?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./70?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./70?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

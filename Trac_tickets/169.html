@@ -1,0 +1,564 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #169 (Add support for complex numbers to CF)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./168.html" title="ticket #168" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./169?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./169?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./169?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./170.html" title="ticket #170" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="7e89f8367ba64abb08eecb9b";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./168.html" title="ticket #168">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./170.html" title="ticket #170">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A55%3A11-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:55:11">3 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2019-01-09T14%3A34%3A06-08%3A00&amp;precision=second" title="See timeline at 01/09/19 14:34:06">2 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./169.html" class="trac-id">#169</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Add support for complex numbers to CF</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=mikedixon">mikedixon</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=high">high</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version"></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+      <a href="./169?action=diff&amp;version=3" class="lastmod trac-diff" title="2018-01-04 07:22:56.981682+00:00">
+        (last modified by mikedixon)
+      </a>
+    </h3>
+    <div class="searchable">
+      <h2 id="Motivation">Motivation</h2>
+<p>
+The ongoing development of the <a class="missing wiki">CfRadial?</a> convention, aimed at representing radar and lidar data in CF NetCDF, has highlighted the need to properly represent complex numbers in CF.
+The intention with this proposal is to obtain agreement on adopting a complex number convention that (a) respects the CF approach, (b) satisfies the requirements of the radar and lidar research community and (c) provide a general solution so that complex numbers from any discipline can be accurately and simply represented. 
+</p>
+<h2 id="Thenatureofcomplexnumbers">The nature of complex numbers</h2>
+<p>
+A complex number can be expressed in the form P = X + iY, where X and Y are real numbers, and i is the square root of -1. For the complex number P = X + iY, X is called the real part, and Y is called the imaginary part.
+</p>
+<p>
+Complex numbers can also be represented in a polar or exponential forms.
+</p>
+<p>
+The relationship between the Cartesian form and the polar form is:
+</p>
+<blockquote>
+<p>
+P = X + iY = R(cos(theta) + isin(theta))
+</p>
+</blockquote>
+<p>
+where R is the distance from the origin O to the point P, and theta is the angle between the X axis and the line OP, measured counterclockwise.
+</p>
+<h2 id="Representingcomplexnumbersas2reals">Representing complex numbers as 2 reals</h2>
+<p>
+The above discussion demonstrates that no matter which form you choose to use, a complex number requires the storage of two real numbers, as well as a clear description of which form you are using.
+It seems reasonable to determine the form being used by inspecting 
+the units attribute.
+</p>
+<h2 id="Useofcomplexnumbersinradardata">Use of complex numbers in radar data</h2>
+<p>
+At the most raw level, radars generate time series of I (in-phase) and Q (quadrature) signals. These two signal components are considered to comprise a complex number.
+</p>
+<p>
+Additionally, the spectra and covariances of radar signals are stored as complex numbers.
+</p>
+<p>
+Because of the very large dynamic range of radar signals (up to 10 orders of magnitude), these complex numbers are often stored as power, in log units, and phase, in degrees.
+</p>
+<h2 id="StoringcomplexnumbersinNetCDF">Storing complex numbers in NetCDF</h2>
+<p>
+Because complex numbers must be represented by 2 real numbers, a complex variable will have one extra dimension, of size 2.
+</p>
+<p>
+We propose that this dimension should be the last of the dimensions used for a variable – i.e. the 2 parts of the number are stored immediately one after the other in the array.
+</p>
+<p>
+So, for example, a radar variable holding complex data for an I/Q time series could be represented as follows
+</p>
+<pre class="wiki">time = 3000 ;
+range = 996 ;
+complex = 2;
+float IQ(time, range, complex) ;
+   IQ:is_complex = “true” ;
+   IQ:long_name = "time_series_inphase_and_quadrature" ;
+   IQ:standard_name = "radar_time_series_inphase_and_quadrature" ;
+   IQ:units = "volt" ;
+   IQ:_FillValue = -9999F ;
+   IQ:coordinates = "time range" ;
+</pre><h2 id="Attributeindicatingvariableiscomplex">Attribute indicating variable is complex</h2>
+<p>
+As indicated in the example above, we propose that the string attribute:
+</p>
+<pre class="wiki">is_complex = "true";
+
+</pre><p>
+be attached to any variable that holds complex numbers.
+</p>
+<h2 id="Unitsattributeforrealimaginaryform">Units attribute for real/imaginary form</h2>
+<p>
+If the complex number is stored using real and imaginary parts, the units of both parts will be the same.
+</p>
+<p>
+This is true for the example above, where we have:
+</p>
+<pre class="wiki">IQ:units = "volts";
+</pre><h2 id="Unitsattributeforpolarform">Units attribute for polar form</h2>
+<p>
+If the polar or exponential form is used, the units of the two parts will not be the same.
+</p>
+<p>
+We could use a single units string attribute, but make it comma-delimited to separate the units for the 2 parts.
+</p>
+<p>
+For example:
+</p>
+<pre class="wiki">IQ:units = "dBm,degree";
+</pre><p>
+Or we could have 2 separate units attributes:
+</p>
+<p>
+For example:
+</p>
+<pre class="wiki">IQ:units_first_part = "dBm";
+IQ:units_second_part = "degree";
+</pre><p>
+The full proposal is attached.
+</p>
+<p>
+The documents are maintained at:
+</p>
+<blockquote>
+<p>
+<a class="ext-link" href="https://github.com/NCAR/CfRadial/tree/master/docs"><span class="icon">​</span>https://github.com/NCAR/CfRadial/tree/master/docs</a>
+</p>
+</blockquote>
+
+    </div>
+  </div>
+</div>
+          
+    <div id="attachments">
+        <h3 class="foldable">Attachments <span class="trac-count">(1)</span></h3>
+        <div class="attachments">
+          <dl class="attachments">
+              <dt>
+    <a href="/trac/attachment/ticket/169/CfComplexNumbers.pdf" title="View attachment">CfComplexNumbers.pdf</a><a href="/trac/raw-attachment/ticket/169/CfComplexNumbers.pdf" class="trac-rawlink" title="Download">​</a>
+       (<span title="258928 bytes">252.9 KB</span>) -
+      added by <em>mikedixon</em> <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A55%3A24-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:55:24">3 years ago</a>.
+  </dt>
+          </dl>
+          <p>
+            Download all attachments as: <a rel="nofollow" href="/trac/zip-attachment/ticket/169/">.zip</a>
+          </p>
+          
+        </div>
+    </div>
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(5)</span></h3>
+          <div id="changelog">
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A55%3A24-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:55:24">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/169/CfComplexNumbers.pdf"><em>CfComplexNumbers.pdf</em></a><a href="/trac/raw-attachment/ticket/169/CfComplexNumbers.pdf" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-1-1514907264741429">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-02T07%3A34%3A24-08%3A00&amp;precision=second" title="See timeline at 01/02/18 07:34:24">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mike
+</p>
+<p>
+Thanks for your proposal. It would probably encourage discussion if you could put the text in this ticket. That's more accessible than a linked PDF or GitHub, because the ticket is distributed to everyone by email in plain text. We may change to using GitHub instead of trac, but we're not yet technically set up for that. It's being worked on.
+</p>
+<p>
+As you say, a complex number is a pair of real numbers, where each member of the pair has a distinct function. A way we could accommodate this need in CF without any structural change is to store each complex data variable as a pair of real data variables, where the two members are distinguished by standard names. This is analogous to vector quantities, in which each component is stored as a separate data variable and distinguished by standard name, such as eastward, northward and upward components of sea water velocity. As you say, the components may have different units. A standard name implies canonical units, so components with different units cannot have the same standard name, so cannot be in the same data variable. To remove this restriction would probably raise a lot of potential problems.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1515050364849849">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-03T23%3A19%3A24-08%3A00&amp;precision=second" title="See timeline at 01/03/18 23:19:24">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./169?action=diff&amp;version=2">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-3-1515050576981682">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-03T23%3A22%3A56-08%3A00&amp;precision=second" title="See timeline at 01/03/18 23:22:56">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./169?action=diff&amp;version=3">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-4-1547070085744184">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2019-01-09T13%3A41%3A25-08%3A00&amp;precision=second" title="See timeline at 01/09/19 13:41:25">2 years ago</a> by piyush.agram
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi,
+</p>
+<blockquote>
+<p>
+I wanted to comment on this CF proposal from an implementer's point of view (I apologize if my perspective is HDF5 and GDAL centered). 
+</p>
+</blockquote>
+<ol><li>Representation of complex numbers.
+<ul><li>Would it be possible to consider using compound data types? This is already the case with h5py and storing numpy.complex datatypes. Here is an example h5ls output for a numpy.complex64 array written using h5py
+</li></ul></li></ol><pre class="wiki">f32                      Dataset {5/5, 5/5}
+    Location:  1:1400
+    Links:     1
+    Storage:   200 logical bytes, 200 allocated bytes, 100.00% utilization
+    Type:      struct {
+                   "r"                +0    native float
+                   "i"                +4    native float
+               } 8 bytes
+</pre><ol start="2"><li>Products generated like these are already by GDAL's HDF5 driver and treated as complex data. See <a class="ext-link" href="https://github.com/OSGeo/gdal/blob/master/gdal/frmts/hdf5/hdf5dataset.cpp#L407-L448"><span class="icon">​</span>https://github.com/OSGeo/gdal/blob/master/gdal/frmts/hdf5/hdf5dataset.cpp#L407-L448</a>
+</li></ol><ol start="3"><li>In general, working with an extra complex dimension seems cumbersome since a lot of SAR/InSAR datasets now are represented as data cubes (acquisitiondate, time, range) or (baseline, time, range) or (polarization, time, range) for stacks/ tomograms. It would be lot simpler if queries for dimensions directly returned the sizes instead of us having to check for dimension size of 2 and is_complex. This is a personal preference I guess. 
+</li></ol><ol start="4"><li>I like the idea of is_complex attribute for disambiguation. As an implementer, I would detect a compound data type and confirm with this attribute that the data represents complex numbers.
+</li></ol><ol start="5"><li>I would prefer the usage of a different attribute name than "units". Very often, amplitudes are replaced by a coherence / correlation measure which are unitless. Maybe something like "format" or "representation" which could be used as follows:
+<pre class="wiki"># For real and imaginary parts
+IQ:format = "cartesian"
+
+# For polar representation for fields like coherence/correlation
+IQ:format = "amplitude,degree"
+
+# For db representation
+IQ:format = "dBm,degree"
+</pre></li></ol><p>
+Thanks for starting this discussion. 
+</p>
+<p>
+Piyush
+</p>
+
+    </div>
+  <div class="trac-lastedit ">
+    Last edited <a class="timeline" href="/trac/timeline?from=2019-01-09T14%3A34%3A06-08%3A00&amp;precision=second" title="See timeline at 01/09/19 14:34:06">2 years ago</a>
+        by piyush.agram
+      (<a href="./169?cversion=0&amp;cnum_hist=4#comment:4">previous</a>)
+      (<a href="./169?action=comment-diff&amp;cnum=4&amp;version=1">diff</a>)
+  </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./169?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./169?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./169?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

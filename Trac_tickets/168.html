@@ -1,0 +1,744 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #168 (Addition of grid mapping for radar and lidar data in radial coordinates)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./167.html" title="ticket #167" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./168?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./168?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./168?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./169.html" title="ticket #169" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./167.html" title="ticket #167">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./169.html" title="ticket #169">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A44%3A12-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:44:12">3 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2018-01-05T23%3A42%3A28-08%3A00&amp;precision=second" title="See timeline at 01/05/18 23:42:28">3 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./168.html" class="trac-id">#168</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Addition of grid mapping for radar and lidar data in radial coordinates</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=mikedixon">mikedixon</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version"></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~radar">radar</a> <a href="/trac/query?status=!closed&amp;keywords=~lidar">lidar</a> <a href="/trac/query?status=!closed&amp;keywords=~grid">grid</a> <a href="/trac/query?status=!closed&amp;keywords=~mapping">mapping</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+      <a href="./168?action=diff&amp;version=9" class="lastmod trac-diff" title="2018-01-04 06:38:58.311424+00:00">
+        (last modified by mikedixon)
+      </a>
+    </h3>
+    <div class="searchable">
+      <h2 id="Introduction">Introduction</h2>
+<p>
+Radars and Lidars sample the atmosphere using a pulse of energy transmitted from an instrument along a line of sight away from the instrument, with a specified beam width (solid angle). The received signal is sampled over time, which allows for the estimation of the distance of the target from the instrument. The samples in range are frequently referred to as 'gates'.
+</p>
+<p>
+The raw data is stored in radial (polar) coordinates. The (x,y) location of a gate may be determined using traditional great-circle techniques, since these are line-of-sight instruments and the propagation is assumed to be along a straight line in (x,y). In the vertical (z) dimension, a standard model of atmospheric refractive index is generally assumed for locating the height of the gate.
+</p>
+<p>
+The organization and interpretation of radial data of this type is not supported by any of the standard grid mapping types currently accepted by CF.
+</p>
+<p>
+Therefore, in order for the <a class="missing wiki">CfRadial?</a> radar and lidar format to be formally recognized by the CF user community, we are proposing the addition of a grid mapping specifically for radar and lidar data. 
+</p>
+<h2 id="Proposedgridmappingname">Proposed  grid mapping name</h2>
+<p>
+We propose the use of the name “radar_lidar_radial_scan”.
+</p>
+<h2 id="Gridmappingparameters">Grid mapping parameters</h2>
+<p>
+The following example from a <strong><a class="missing wiki">CfRadial?</a></strong> file shows the proposed parameters:
+</p>
+<pre class="wiki">grid_mapping:grid_mapping_name = "radar_lidar_radial_scan" ;
+grid_mapping:longitude_of_projection_origin = -104.545806884766 ;
+grid_mapping:latitude_of_projection_origin = 39.7866401672363 ;
+grid_mapping:height_of_projection_origin = 1709. ;
+</pre><p>
+The latitude and longitude are in degrees.
+</p>
+<p>
+The height is in meters MSL.
+</p>
+<p>
+The height_of_projection_origin parameter is analogous to the perspective_point_height in the vertical perspective projection.
+</p>
+<p>
+The supporting documents are maintained at:
+</p>
+<blockquote>
+<p>
+<a class="ext-link" href="https://github.com/NCAR/CfRadial/tree/master/docs"><span class="icon">​</span>https://github.com/NCAR/CfRadial/tree/master/docs</a>
+</p>
+</blockquote>
+
+    </div>
+  </div>
+</div>
+          
+    <div id="attachments">
+        <h3 class="foldable">Attachments <span class="trac-count">(1)</span></h3>
+        <div class="attachments">
+          <dl class="attachments">
+              <dt>
+    <a href="/trac/attachment/ticket/168/CfGridMappingRadarLidar.pdf" title="View attachment">CfGridMappingRadarLidar.pdf</a><a href="/trac/raw-attachment/ticket/168/CfGridMappingRadarLidar.pdf" class="trac-rawlink" title="Download">​</a>
+       (<span title="138181 bytes">134.9 KB</span>) -
+      added by <em>mikedixon</em> <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A45%3A37-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:45:37">3 years ago</a>.
+  </dt>
+              <dd>
+                Radar Lidar Radial Scan Grid Mapping Proposal
+              </dd>
+          </dl>
+          <p>
+            Download all attachments as: <a rel="nofollow" href="/trac/zip-attachment/ticket/168/">.zip</a>
+          </p>
+          
+        </div>
+    </div>
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(13)</span></h3>
+          <div id="changelog">
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A45%3A37-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:45:37">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/168/CfGridMappingRadarLidar.pdf"><em>CfGridMappingRadarLidar.pdf</em></a><a href="/trac/raw-attachment/ticket/168/CfGridMappingRadarLidar.pdf" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Radar Lidar Radial Scan Grid Mapping Proposal
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-1-1514872041539732">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A47%3A21-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:47:21">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./168?action=diff&amp;version=1">diff</a>)
+    </li><li class="trac-field-keywords">
+      <strong class="trac-field-keywords">Keywords</strong>
+        <em>radar</em> <em>lidar</em> <em>grid</em> <em>mapping</em> added
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-2-1514872217052255">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A50%3A17-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:50:17">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-priority">
+      <strong class="trac-field-priority">Priority</strong>
+        changed from <em>high</em> to <em>medium</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-3-1514872614417004">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A56%3A54-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:56:54">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-priority">
+      <strong class="trac-field-priority">Priority</strong>
+        changed from <em>medium</em> to <em>high</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-4-1514872665860267">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-01T21%3A57%3A45-08%3A00&amp;precision=second" title="See timeline at 01/01/18 21:57:45">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-priority">
+      <strong class="trac-field-priority">Priority</strong>
+        changed from <em>high</em> to <em>medium</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-5-1514907213495915">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-02T07%3A33%3A33-08%3A00&amp;precision=second" title="See timeline at 01/02/18 07:33:33">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mike
+</p>
+<p>
+Thanks for your proposal. It would probably encourage discussion if you could put the text in this ticket. That's more accessible than a linked PDF or GitHub, because the ticket is distributed to everyone by email in plain text. We may change to using GitHub instead of trac, but we're not yet technically set up for that. It's being worked on.
+</p>
+<p>
+If I understand correctly, this proposal is about recording the conversion of polar coordinates (range and angle) to geolocated XYZ coordinates. Is that right? The conversion depends on measured and variable physical quantities, so it's not like other conversions, which depend on geometry. Therefore I'm not sure it's really like a grid mapping. However I understand that you do need to record the geolocating coordinates. Can they be stored as 2D auxiliary coordinates which are functions of range and angle? That's a general CF mechanism which doesn't depend on grid mapping.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1514952248675122">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-02T20%3A04%3A08-08%3A00&amp;precision=second" title="See timeline at 01/02/18 20:04:08">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./168?action=diff&amp;version=6">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-7-1514953377092247">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-02T20%3A22%3A57-08%3A00&amp;precision=second" title="See timeline at 01/02/18 20:22:57">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan
+</p>
+<p>
+Thanks for your feedback.
+</p>
+<p>
+I have pasted the text from the proposal document into this ticket as you suggest.
+</p>
+<p>
+I don't really follow your assertion that the mapping of a radar return to a location in space is dependent on measured and variable physical quantities. Rather, the mapping does depend on geometries: the pointing angle of the antenna and the location of the antenna in space. The mapping also depends on an assumed standard model of atmospheric refraction, which is analagous to the 'great circle' construct in 3D projections.
+</p>
+<p>
+As such, I believe this proposed grid mapping is similar to the 'vertical perspective' and 'geostationary' grid mappings already supported in CF. Both of these mappings depend on the measured position and orientation of the observing platform. The same is true of radar and lidar data.
+</p>
+<p>
+In September I attended a workshop here in Boulder on NetCDF CF. At that workshop it was recommended that I propose a grid mapping for radars and lidars. Hence this proposal.
+</p>
+<p>
+We already store the location of the radar, and the pointing angles, in the <a class="missing wiki">CfRadial?</a> file. However, it was pointed out at the workshop that to be more consistent with CF we ought to document our grid mapping formally.
+</p>
+<p>
+Kind regards
+</p>
+<p>
+Mike
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1514987480429756">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-03T05%3A51%3A20-08%3A00&amp;precision=second" title="See timeline at 01/03/18 05:51:20">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mike
+</p>
+<p>
+Thanks for pasting in the proposal. That's very helpful.
+</p>
+<blockquote class="citation">
+<p>
+I don't really follow your assertion that the mapping of a radar return to a location in space is dependent on measured and variable physical quantities.
+</p>
+</blockquote>
+<p>
+That was what I understood by your text, "The location in space, especially in the vertical, is dependent on the propagation of the energy through the atmosphere. Vertical gradients of the index of refraction lead to complexities in determining the height of the target." That sounds like some physics is needed to work out the xyz locations, not just geometry - I agree that geometry is needed too, of course. Did I misunderstand this?
+</p>
+<p>
+To be consistent with CF it would be good to include the latitude, longitude and height coordinates in the file, as well as the polar coordinates. That makes the data more easily usable by generic applications. It's the reason why CF requires 2D latitude and longitude auxiliary coordinate variables for data variables which are on map projection planes. Auxiliary coordinates can be understood without a grid_mapping. The grid_mapping additionally provides the information to compute the relationship between the grid coordinates (the polar coordinates, in your case) and the geolocated (auxiliary) coordinates, for software which is able to do that. Perhaps that's your aim. Are your grid_mapping attributes specifying the location of the radar/lidar source? What else is needed to compute the geolocated coordinates from the polar coordinates?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1515047938311424">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-03T22%3A38%3A58-08%3A00&amp;precision=second" title="See timeline at 01/03/18 22:38:58">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./168?action=diff&amp;version=9">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-10-1515049223048448">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-03T23%3A00%3A23-08%3A00&amp;precision=second" title="See timeline at 01/03/18 23:00:23">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan
+</p>
+<p>
+I apologize - you are correct, the initial wording was confusing, and suggested that we make use of atmospheric measurements when computing the location of a radar gate in the z coordinate. In fact this is almost never done, and a standard refraction model is used for almost all radars. Hence a standard grid mapping method is applied to radars in general to compute the location of the measurements in space.
+</p>
+<p>
+I have modified the text to indicate this more clearly.
+</p>
+<p>
+It is true that we could include the lat/lon/height of each gate in the data. The drawback of this is that it would significantly increase the size of the files - many radar fields are stored using just 1 or 2 bytes per gate, specifically to keep the size under control and to facilitate good compression. Lat/lon/height would need to use 4-byte floats at a minimum - i.e. and extra 12 bytes per gate. Often radar volumes are produced every 5 minutes or so, and for many radars across a country, so the data volume grows quickly. And often the data files must be transferred across slow communication lines in remote locations. So it is not likely that the radar/lidar community would support the extra size involved.
+</p>
+<p>
+Radar users are generally familiar with the geometric calculations required to compute the gate locations, and these procedures are well documented in the literature.
+</p>
+<p>
+Having a grid mapping specifically for this type of data would, I believe, help us to get <a class="missing wiki">CfRadial?</a> adopted by the CF community. Organizations such as CEDA in the UK are requiring that the radar data submitted to the archive be CF compliant, and we are working hard to try to meet that requirement. Along with this proposal we are submitting 2 other proposals - <a class="new ticket" href="./169.html" title="enhancement: Add support for complex numbers to CF (new)">#169</a> for complex number support, and a proposal for standard names that will include the quantities (such as azimuth and elevation angles) that describe the geometry referred to in this grid mapping proposal.
+</p>
+<p>
+It would be very helpful to us, and our user community, to be able to get this approved, with any required changes that are needed.
+</p>
+<p>
+Thank you very much for your thoughtful comments, and for your quick response.
+</p>
+<p>
+Kind regards
+</p>
+<p>
+Mike
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1515083879970138">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-04T08%3A37%3A59-08%3A00&amp;precision=second" title="See timeline at 01/04/18 08:37:59">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Mike
+</p>
+<p>
+OK. Thanks for explaining. In that case I agree that it makes sense to add it as a grid mapping. Please could you draft it in the same form as the other entries in Appendix F, and write out the additions to the table of attributes at the end of Appendix F? When we make a change to the convention, we have to agree exactly what text changes are needed, so that implementing them is purely editorial.
+</p>
+<p>
+I guess you may have used the attribute names referring to "projection origin" because they already existed. However, I wonder whether these are really the clearest words you could use, since this isn't really a map projection. Am I right in thinking that these specify the location of the instrument? Also, "height" could be confusing, because that's a CF standard name which means height above the <em>surface</em>. If you want height above the geoid (almost the same as mean sea level) it would be better to use "altitude", which is the standard name for that quantity.
+</p>
+<p>
+You say there's a standard algorithm for doing the conversion. That's good, and it would therefore help to say what it is and give a reference for it in the Appendix F entry. Are there any other possible algorithms which might be used? If so, you could have another attribute to identify how the conversion would be done.
+</p>
+<p>
+For the auxiliary coordinates, is it the case that they would be time-dependent? If they were independent of time, they could be provided once, in a separate file - we could add a mechanism for that. But that won't work if they're different for every data file. In that case, I think we would need to change the start of section 5.6, if you can't require auxiliary coordinates, since it says, "When the coordinate variables for a horizontal grid are not longitude and latitude, it is required that the true latitude and longitude coordinates be supplied via the <tt>coordinates</tt> attribute." For example, you could add another sentence, such as "For radial (polar) coordinate variables for radar and lidar data, it is optional to provide latitude, longitude and vertical coordinates via the <tt>coordinates</tt> attribute, and recommended if practicable." I think it should be encouraged at least, since it makes the data more user-friendly.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1515224548635143">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-05T23%3A42%3A28-08%3A00&amp;precision=second" title="See timeline at 01/05/18 23:42:28">3 years ago</a> by mikedixon
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Jonathan
+</p>
+<p>
+Thanks for the dialogue, and for agreeing to consider the new grid mapping.
+</p>
+<p>
+I agree that projection_origin etc does not make much sense in this case.
+</p>
+<p>
+I think instrument_location is probably the correct way to describe it. And yes, 'altitude' is appropriate too.
+</p>
+<p>
+I'll take a look at the section on auxiliary coords as well.
+</p>
+<p>
+I'm out on a project project at the moment, so it may take a while to get the doc written and submitted.
+</p>
+<p>
+Kind regards
+</p>
+<p>
+Mike
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./168?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./168?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./168?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

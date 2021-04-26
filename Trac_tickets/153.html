@@ -1,0 +1,1007 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #153 (Requirements related to specific standard names)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./152.html" title="ticket #152" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./153?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./153?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./153?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./154.html" title="ticket #154" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./152.html" title="ticket #152">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./154.html" title="ticket #154">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2016-11-03T05%3A33%3A23-07%3A00&amp;precision=second" title="See timeline at 11/03/16 05:33:23">4 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2019-04-16T01%3A47%3A16-07%3A00&amp;precision=second" title="See timeline at 04/16/19 01:47:16">2 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./153.html" class="trac-id">#153</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Requirements related to specific standard names</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=martin.juckes">martin.juckes</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version"></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+      <a href="./153?action=diff&amp;version=16" class="lastmod trac-diff" title="2019-04-16 08:47:16.213238+00:00">
+        (last modified by martin.juckes)
+      </a>
+    </h3>
+    <div class="searchable">
+      <p>
+A significant number of standard names contain, in their definitions, explicit specifications for additional required metadata. For instance, if the standard_name is <tt>region</tt> then there are constraints on the allowed values of the data variable. The standard name descriptions cannot include examples or markup, and the specification of the rules is not as clear as in the convention text. It also appears that the rules are not checked by the CF checker (at least not the few that I have looked at in detail) and I think the best way to get consistent checking would be to first create a well structured summary of these rules in the conventions document.
+</p>
+<p>
+The specific proposal is add a new Appendix which lists the rules with examples where appropriate.
+</p>
+<p>
+It will take some time to complete the list. I propose that we add a provisional list, after agreeing the format and approach, and work towards completion later. 
+</p>
+<h1 id="AppendixD:Rulesassociatedwithstandardnames">Appendix D: Rules associated with standard names</h1>
+<p>
+Some standard names bring additional constraints on the meta-data and/or data values of the variables they are associated with. This appendix list such names, grouped according to the types of constraint, and provides usage examples where needed.
+</p>
+<h2 id="RequiredCoordinates">Required Coordinates</h2>
+<p>
+A common constraint involves the requirement that a particular coordinate or set of coordinates be present.
+ 
+The following table lists the rules and associated standard names. An explanation of each rule follows below.
+</p>
+<table class="wiki">
+<tr><th colspan="2"> Rule </th><th> Description 
+</th></tr><tr><td colspan="2" style="text-align: center">    </td><th> <em>Standard Name(s)</em> 
+</th></tr><tr><td colspan="2" style="text-align: center">    </td><th> <strong>Required coordinate(s)</strong> 
+</th></tr><tr><td> 1 </td><td> Area Fraction </td><td> The fractional area in a cell covered by a particulate area type. 
+</td></tr><tr><td colspan="2"> </td><td> <em>area_fraction</em> 
+</td></tr><tr><td colspan="2"> </td><td> <strong>area_type</strong> 
+</td></tr><tr><td> 2 </td><td> Lifted from </td><td> Parameters defined in terms of lifting from a reference level 
+</td></tr><tr><td colspan="2" style="text-align: center">     </td><td style="text-align: left"><em>atmosphere_convective_available_potential_energy, atmosphere_convective_inhibition, atmosphere_level_of_free_convection, atmosphere_lifting_condensation_level</em> 
+</td></tr><tr><td colspan="2" style="text-align: center">     </td><td> <strong>original_air_pressure_of_lifted_parcel</strong> 
+</td></tr><tr><td> 3 </td><td> Lifting range </td><td> Parameter defined in terms of lifting through a specified range  
+</td></tr><tr><td colspan="2">   </td><td> <em>temperature_difference_between_ambient_air_and_air_lifted_adiabatically</em> 
+</td></tr><tr><td colspan="2">   </td><td> <strong>original_air_pressure_of_lifted_parcel,final_air_pressure_of_lifted_parcel</strong>  
+</td></tr><tr><td> 4 </td><td> Radiances </td><td> For radiance variables a direction must be specified 
+</td></tr><tr><td colspan="2">  </td><td> <em>downwelling_photosynthetic_photon_radiance_in_sea_water</em> and others
+</td></tr><tr><td colspan="2">  </td><td>  <strong>zenith_angle</strong> 
+</td></tr><tr><td> 5 </td><td> Reference state </td><td> Variables which depend on reference air temperature and humidity 
+</td></tr><tr><td colspan="2">   </td><td>  <em>mass_concentration_of_pm_*_ambient_aerosol_in_air,  mass_fraction_of_pm_*_ambient_aerosol_in_air</em> 
+</td></tr><tr><td colspan="2" style="text-align: center">    </td><td>  <strong>air_temperature, relative_humidity</strong> 
+</td></tr><tr><td> 6 </td><td> Wavelength </td><td> Functions of wavelength 
+</td></tr><tr><td colspan="2">   </td><td>  <em>*_per_unit_wavelength_in_air</em> 
+</td></tr><tr><td colspan="2">   </td><td>   <strong>radiation_wavelength</strong> 
+</td></tr></table>
+<p>
+In all cases, the structure follows the same pattern, illustrated by the following examples for case 1. Area Fraction:
+</p>
+<pre class="wiki">   float cropcover(lat,lon);
+      cropcover:standard_name = 'area_fraction';
+      cropcover:coordinates =  'crop';
+      cropcover:units = '1';
+   character crop(nchar);
+      crop:standard_name = 'area_type';
+   data:
+      crop = 'crop';
+</pre><h2 id="Otherrules">Other rules</h2>
+<h3 id="RegionsAreaTypesCyclonekeywords">Regions, Area Types, Cyclone keywords</h3>
+<p>
+If the standard name is in the list below then the variables must either be of character type or use flag values to associate each element to a character string. The string values must match the vocabularies or rules specified below.
+</p>
+<table class="wiki">
+<tr><td> Standard Name </td><td> Vocabulary 
+</td></tr><tr><td> <tt>region</tt> </td><td> CF standard region 
+</td></tr><tr><td> <tt>area_type</tt> </td><td> CF area type 
+</td></tr><tr><td> <tt>scene_type_of_dvorak_</tt> <tt>tropical_cyclone_cloud_region</tt> </td><td> uniform_central_dense_overcast; embedded_center; irregular_central_dense_overcast; curved_band; shear 
+</td></tr><tr><td> <tt>scene_type_of_dvorak_</tt> <tt>tropical_cyclone_eye_region</tt> </td><td> clear_ragged_or_obscured_eye; pinhole_eye; large_eye; no_eye 
+</td></tr><tr><td> <tt>automated_tropical_cyclone_</tt> <tt>forecasting_system_storm_identifier</tt> </td><td> <tt>LLnnnnnn</tt>, <tt>LL</tt>=AL, SL, EP, CP, WP, IO, or SH. <tt>n</tt> an integer 
+</td></tr></table>
+<h3 id="Quantitiesrepresentingalayeraverageorsum">Quantities representing a layer average or sum</h3>
+<p>
+Many "layer" quantities require vertical coordinates with bounds.
+</p>
+<ul><li><em>*_atmosphere_layer[_*]</em>;
+</li><li><em>*_ocean_layer[_*]</em>;
+</li><li><em>*_soil_layer[_*]</em>;
+</li></ul><h3 id="Variationofvariablesinsigmacoordinatesduetosurfacepressurechange">Variation of variables in sigma coordinates due to surface pressure change</h3>
+<blockquote>
+<p>
+change_in_energy_content_of_atmosphere_layer_due_to_change_in_sigma_coordinate_wrt_surface_pressure: must have a vertical coordinate variable (axis=Z). 
+</p>
+</blockquote>
+<pre class="wiki">   float deltae(sig);
+      deltae:standard_name = 'change_in_energy_content_of_atmosphere_layer_due_to_change_in_sigma_coordinate_wrt_surface_pressure';
+      deltae:units = 'J m-2';
+   float sig(sig);
+      sig:axis = 'Z';
+      sig:standard_name = 'atmosphere_sigma_coordinate';
+      sig:bounds = 'sig_bnds';
+      sig:units = '1';
+   float sig_bnds(2,sig);  # required because of _atmosphere_layer
+</pre><h3 id="Temporalchange">Temporal change</h3>
+<p>
+Time rate of change or displacement over time require bounds on time coordinate:
+</p>
+<ul><li><em>change_over_time_*</em>;
+</li><li><em>*_displacement</em>;
+</li></ul><h3 id="Integralsoverthewholeatmosphere">Integrals over the whole atmosphere</h3>
+<p>
+When the quantity is defined to be an integral over the whole atmosphere the spatial coordinates should be absent or defined with bounds representing the whole atmosphere:
+</p>
+<ul><li><em>[tendency_of_]atmosphere_moles_of_*"
+</em></li></ul><hr />
+<h1 id="Commentsfordiscussion">Comments for discussion</h1>
+<p>
+In some cases the wording of standard_name definitions could be interpreted as a recommendation or suggestion rather than a requirement. If some of these are intended only as suggestions, that should be flagged. 
+</p>
+
+    </div>
+  </div>
+</div>
+          
+    <div id="attachments">
+        <h3 class="foldable">Attachments <span class="trac-count">(4)</span></h3>
+        <div class="attachments">
+          <dl class="attachments">
+              <dt>
+    <a href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.xml" title="View attachment">CF_Standard_Name_Rules.xml</a><a href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.xml" class="trac-rawlink" title="Download">​</a>
+       (<span title="1272 bytes">1.2 KB</span>) -
+      added by <em>martin.juckes</em> <a class="timeline" href="/trac/timeline?from=2016-12-22T05%3A17%3A48-08%3A00&amp;precision=second" title="See timeline at 12/22/16 05:17:48">4 years ago</a>.
+  </dt>
+              <dd>
+                CF Standard Name Rules
+              </dd>
+              <dt>
+    <a href="/trac/attachment/ticket/153/CFStandardNameRules-1.1.xsd" title="View attachment">CFStandardNameRules-1.1.xsd</a><a href="/trac/raw-attachment/ticket/153/CFStandardNameRules-1.1.xsd" class="trac-rawlink" title="Download">​</a>
+       (<span title="4898 bytes">4.8 KB</span>) -
+      added by <em>martin.juckes</em> <a class="timeline" href="/trac/timeline?from=2016-12-22T05%3A19%3A00-08%3A00&amp;precision=second" title="See timeline at 12/22/16 05:19:00">4 years ago</a>.
+  </dt>
+              <dd>
+                CF Standard Name Rules Schema (based on CF Standard Name Schema)
+              </dd>
+              <dt>
+    <a href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.2.xml" title="View attachment">CF_Standard_Name_Rules.2.xml</a><a href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.2.xml" class="trac-rawlink" title="Download">​</a>
+       (<span title="1272 bytes">1.2 KB</span>) -
+      added by <em>martin.juckes</em> <a class="timeline" href="/trac/timeline?from=2017-07-20T08%3A39%3A17-07%3A00&amp;precision=second" title="See timeline at 07/20/17 08:39:17">4 years ago</a>.
+  </dt>
+              <dd>
+                Updated XML list of rules
+              </dd>
+              <dt>
+    <a href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.json" title="View attachment">CF_Standard_Name_Rules.json</a><a href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.json" class="trac-rawlink" title="Download">​</a>
+       (<span title="24995 bytes">24.4 KB</span>) -
+      added by <em>martin.juckes</em> <a class="timeline" href="/trac/timeline?from=2017-07-20T08%3A39%3A59-07%3A00&amp;precision=second" title="See timeline at 07/20/17 08:39:59">4 years ago</a>.
+  </dt>
+              <dd>
+                Updated JSON list of rules
+              </dd>
+          </dl>
+          <p>
+            Download all attachments as: <a rel="nofollow" href="/trac/zip-attachment/ticket/153/">.zip</a>
+          </p>
+          
+        </div>
+    </div>
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(20)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1478181402864968">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-03T06%3A56%3A42-07%3A00&amp;precision=second" title="See timeline at 11/03/16 06:56:42">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./153?action=diff&amp;version=1">diff</a>)
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-2-1478183434794213">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-03T07%3A30%3A34-07%3A00&amp;precision=second" title="See timeline at 11/03/16 07:30:34">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./153?action=diff&amp;version=2">diff</a>)
+    </li><li class="trac-field-summary">
+      <strong class="trac-field-summary">Summary</strong>
+        changed from <em>Requires related to specific standard names</em> to <em>Requirements related to specific standard names</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-3-1478187865391575">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-03T08%3A44%3A25-07%3A00&amp;precision=second" title="See timeline at 11/03/16 08:44:25">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+I think this is a good idea, thank you, and I agree with the proposal except that I suggest it would be better to have it as a separate document on the standard name page, like the guidelines, rather than as an appendix in the CF convention document. That is because
+</p>
+<ul><li>It relates to standard names only and does not affect the convention.
+</li><li>As a separate document, it could be updated more easily and frequently than the convention document, and it would make sense to update it with the standard name table.
+</li></ul><p>
+The CF checker could consult it in either case. For use by the CF checker or other software, I suppose that this list of constraints should be made available in an form convenient for reading by programs. Ros's opinion would be useful.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1478190065358239">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-03T09%3A21%3A05-07%3A00&amp;precision=second" title="See timeline at 11/03/16 09:21:05">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+I'm happy with that proposal .. perhaps with one extra line in the conventions document to say that "Use of some standard names introduces additional constraints on the variable attributes and/or values, as detailed in <tt>link to: Requirements Related to Specific Standard Names</tt> . " 
+</p>
+<p>
+I also agree on the need for a machine readable form. I was thinking that something would be needed to assist the proof reading. E.g. a JSON file which can be used to generate a spreadsheet displaying the definitions of all the variables listed under each constraint. 
+</p>
+<p>
+I think the more legible wiki form is also necessary, in order to provide the usage examples. In the earlier email discusion, Roy Lowry suggested encoding the rules in RDF and serving them through the NERC Vocab Server alongside the standard names. This would be neat, but I think it may be worth generating wiki and JSON versions first, in order to get a clearer view of the range of constraints that we are dealing with,
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1478210320653856">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-03T14%3A58%3A40-07%3A00&amp;precision=second" title="See timeline at 11/03/16 14:58:40">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+OK, good. I agree we also need a human-readable version - wiki and JSON would be fine.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1478253832567460">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-04T03%3A03%3A52-07%3A00&amp;precision=second" title="See timeline at 11/04/16 03:03:52">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+On 2nd thoughts, however, in connection with updating "frequently and easily", we need to be careful about backward compatibility. E.g. if we introduce it in parallel with CF-1.7, files which were considered valid under CF-1.6 might become invalid. We want, I think, such files to continue to be considered as vaild under CF-1.6, hence the checker should not use this extension when checking against earlier convention versions. This differs from the policy with the standard name list, for which the latest is always used. This implies, I think, that this document would need to be clearly versioned in a way which makes the link to convention versions clear, eg. we might start with 1.7.00 and increment to 1.7.01 etc until the convention moves to 1.8.
+</p>
+<p>
+I can see that we want flexibility to add rules about new standard names when the standard name table is updated, and this is far more frequent that convention updates. We need to be careful about dealing with rules for existing standard names which might have been overlooked. Once we have a 1.7.00 version, we should not change any rules for existing standard names until 1.8.00 is launched, though we could perhaps add advisory notes where appropriate. 
+</p>
+<p>
+Does this sound workable?
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1478528033784666">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-11-07T06%3A13%3A53-08%3A00&amp;precision=second" title="See timeline at 11/07/16 06:13:53">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+I appreciate your caution but I think we can be a bit more relaxed. This new document does not have any information which isn't already in the standard name table, so it may be regarded as an adjunct to that. Hence I think the new document should have the same version numbers as the standard name table, though it will probably not be updated every time. Although at the moment the CF checker doesn't verify that the constraints are satisfied, it <em>could</em> already have done so - it's a matter of implementation, not the convention. The constraints are not new. We're simply making it easier to check them. We aren't changing anything about the convention. We also have a choice to make about whether the checker would regard not meeting these constraints as an error (i.e. breaking a requirement) or bad practice (i.e. not respecting a recommendation).
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1482246735662361">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-20T07%3A12%3A15-08%3A00&amp;precision=second" title="See timeline at 12/20/16 07:12:15">4 years ago</a> by ros
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Sorry, coming to this rather late.... Happy to have these rules listed in a separate document so long as it is easily readable by the CF Checker.  With the standard-name and area-types tables being in XML that would obviously require the least amount of work, but not against another format if that would be more appropriate to fit other requirements.
+</p>
+<p>
+The extra rules has obviously been overlooked and not made it into the CF Checker document.  I'm happy to add these in in the next release.
+</p>
+<p>
+Cheers,
+Ros.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1482254906795782">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-20T09%3A28%3A26-08%3A00&amp;precision=second" title="See timeline at 12/20/16 09:28:26">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Ros,
+</p>
+<p>
+OK, I think the rules could be expressed in a simple XML format, one element per rule. e.g.
+<tt>&lt;rule target="area_fraction" requiredCoordinate="area_type"/&gt;</tt>  to specify that "area_fraction" must have and area_type variable as a coordinate. Where a variable has more than one required coordinate, I would list this in two separate XML elements.
+Other rules would be of the form  <tt>&lt;rule target="...." requiredAxis="Z"/&gt;</tt>, to specify that a variable must have a dimension or coordinate with "axis=Z" <tt>&lt;rule target="...." requiredBoundAxis="Z"/&gt;</tt> to specify additional that the dimension or coordinate in question must have bounds set.
+</p>
+<p>
+The <tt>region</tt> and <tt>area_type</tt> rules have a choice, which we could encode as follows:
+</p>
+<pre class="wiki">&lt;choice target="region"&gt;
+  &lt;option type="char"\&gt;
+  &lt;option attribute="flag_values"\&gt;
+&lt;\choice&gt;
+&lt;rule target="region" dataValuesIn="CF Standard Region"\&gt;
+</pre><p>
+The data values referred to in the last case should be interpreted as th flag values if present. On the other hand, it may be easier to just have a named test for these two, rather than using a complex schema like this.
+</p>
+<p>
+Cheers,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1482315436273284">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-21T02%3A17%3A16-08%3A00&amp;precision=second" title="See timeline at 12/21/16 02:17:16">4 years ago</a> by ros
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin,
+</p>
+<p>
+I think that would work absolutely fine from my point of view.  (I have just briefly looked at reading JSON, having no experience with it, into python which does look pretty easy if that was deemed to be more appropriate.)
+</p>
+<p>
+One thing we would also need to do is put the Standardised Region List into a readable format as it currently only appears to exist on the website as an HTML list.  I have just discovered that I did put the check of valid regions into the checker but it never got released - I'll include it in the next release.
+</p>
+<p>
+Regards,
+Ros.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1482316865033259">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-21T02%3A41%3A05-08%3A00&amp;precision=second" title="See timeline at 12/21/16 02:41:05">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Ros,
+</p>
+<p>
+Loading json files is trivial ... a one line command and then you get a python object (e.g. a list or a dictionary). You then have to parse the object .. the advantage of XML is that there is a well tested approach to enforcing structure on the object, which, I find, tends to make parsing more reliable. I can easily export it as json as well, as I suspect that will make it more accessible to others. 
+Thinking about defining the structure, it will be easier to have rules of the form:
+<tt>&lt;rule targ="some_standard_name"&gt;&lt;requiredAxis value="Z"&gt;&lt;/rule&gt;</tt>.
+</p>
+<p>
+The <tt>region</tt>/<tt>area_type</tt> rule could be encoded more simply as
+</p>
+<pre class="wiki">&lt;rule targ="region"&gt;&lt;charOrFlagIn value="CF Standard Region"\&gt;&lt;\rule&gt;
+</pre><p>
+This would then give 4 rules to encode: requiredCoordinate, requiredAxis, requiredBoundAxis, charOrFlagIn.
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1482396050259928">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-22T00%3A40%3A50-08%3A00&amp;precision=second" title="See timeline at 12/22/16 00:40:50">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Ros,
+</p>
+<p>
+I agree that we need a machine readable version of the Standardised Region List .. I'll start a new ticket for that,
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-22T05%3A17%3A48-08%3A00&amp;precision=second" title="See timeline at 12/22/16 05:17:48">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.xml"><em>CF_Standard_Name_Rules.xml</em></a><a href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.xml" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+CF Standard Name Rules
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-22T05%3A19%3A00-08%3A00&amp;precision=second" title="See timeline at 12/22/16 05:19:00">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/153/CFStandardNameRules-1.1.xsd"><em>CFStandardNameRules-1.1.xsd</em></a><a href="/trac/raw-attachment/ticket/153/CFStandardNameRules-1.1.xsd" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+CF Standard Name Rules Schema (based on CF Standard Name Schema)
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1482413667246947">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-12-22T05%3A34%3A27-08%3A00&amp;precision=second" title="See timeline at 12/22/16 05:34:27">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello Ros, 
+</p>
+<p>
+After looking at the schema of the standard name list, I've adapted that for the rules, with typical entries of the form:
+</p>
+<pre class="wiki">&lt;rule id="moisture_content_of_soil_layer.boundAxis"&gt;
+      &lt;description&gt;The soil layer must be described by a bounds attribute on a vertical coordinate.&lt;/description&gt;
+      &lt;target&gt;moisture_content_of_soil_layer&lt;/target&gt;
+      &lt;requiredBoundAxis&gt;Z&lt;/requiredBoundAxis&gt;
+   &lt;/rule&gt;
+</pre><p>
+The "id" has to be unique, so may need to be extended beyond the standard name which the rule is intended to apply to. Ideally, the target standard name should be constrained by the schema to be in the CF list, but I haven't implemented that yet. <a class="attachment" href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.xml" title="Attachment 'CF_Standard_Name_Rules.xml' in Ticket #153">attachment:CF_Standard_Name_Rules.xml</a><a class="trac-rawlink" href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.xml" title="Download">​</a> is a demo XML document with 3 rules, and <a class="attachment" href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.json" title="Attachment 'CF_Standard_Name_Rules.json' in Ticket #153">attachment:CF_Standard_Name_Rules.json</a><a class="trac-rawlink" href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.json" title="Download">​</a> is the same in JSON. The schema for the XML is <a class="attachment" href="/trac/attachment/ticket/153/CFStandardNameRules-1.1.xsd" title="Attachment 'CFStandardNameRules-1.1.xsd' in Ticket #153">attachment:CFStandardNameRules-1.1.xsd</a><a class="trac-rawlink" href="/trac/raw-attachment/ticket/153/CFStandardNameRules-1.1.xsd" title="Download">​</a>. 
+</p>
+<p>
+This approach makes it easier to impose the schema rules on the names of the rules and the associated restrictions on the values (e.g. "requiredBoundAxis" should take a value "X", "Y", ...).
+</p>
+<p>
+cheers,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-07-20T08%3A39%3A17-07%3A00&amp;precision=second" title="See timeline at 07/20/17 08:39:17">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.2.xml"><em>CF_Standard_Name_Rules.2.xml</em></a><a href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.2.xml" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Updated XML list of rules
+</p>
+
+    </div>
+
+              </div>
+              <div class="change">
+                
+  <h3 class="change">
+    <span class="threading">
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-07-20T08%3A39%3A59-07%3A00&amp;precision=second" title="See timeline at 07/20/17 08:39:59">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-attachment">
+      <strong class="trac-field-attachment">Attachment</strong>
+        <a href="/trac/attachment/ticket/153/CF_Standard_Name_Rules.json"><em>CF_Standard_Name_Rules.json</em></a><a href="/trac/raw-attachment/ticket/153/CF_Standard_Name_Rules.json" title="Download" class="trac-rawlink">​</a>
+          added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Updated JSON list of rules
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1500565462528713">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-07-20T08%3A44%3A22-07%3A00&amp;precision=second" title="See timeline at 07/20/17 08:44:22">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I've updated the format slightly again, making it a straight list of records, each containing 'rule', 'id', 'label', 'comment', 'target', 'value'. The 'target' is the standard name that this rule applies to, 'rule' identifies the type of rule, and 'value' is additional information needed by the rule. I'm using this now to verify specifications related to these rules in the data request.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1545210868483442">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-12-19T01%3A14%3A28-08%3A00&amp;precision=second" title="See timeline at 12/19/18 01:14:28">2 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./153?action=diff&amp;version=15">diff</a>)
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Adding a rule for names which represent the integral of a quantity over the whole atmosphere and hence should not have spatial coordinates.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1555404436213238">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2019-04-16T01%3A47%3A16-07%3A00&amp;precision=second" title="See timeline at 04/16/19 01:47:16">2 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-description">
+      <strong class="trac-field-description">Description</strong>
+        modified (<a href="./153?action=diff&amp;version=16">diff</a>)
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Extended the rules to cover 3 names holding tropical cyclone keywords.
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./153?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./153?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./153?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

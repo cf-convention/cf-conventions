@@ -1,0 +1,1336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #99 (Taxon Names and Identifiers)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./98.html" title="ticket #98" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./99?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./99?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./99?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./100.html" title="ticket #100" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./98.html" title="ticket #98">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./100.html" title="ticket #100">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2013-04-04T08%3A06%3A02-07%3A00&amp;precision=second" title="See timeline at 04/04/13 08:06:02">8 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2018-11-16T07%3A38%3A29-08%3A00&amp;precision=second" title="See timeline at 11/16/18 07:38:29">2 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./99.html" class="trac-id">#99</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Taxon Names and Identifiers</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=lowry">lowry</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=high">high</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <h2 id="NewsectiontobeaddedtotheConvention">New section to be added to the Convention</h2>
+<p>
+6.1.2 Taxon Names and Identifiers
+A taxon is a named level within a biological classification, such as a class, genus and species.  Within the marine environment there are at least half a million taxa.  However, CF isn't confined to the marine environment and so the number runs into millions, even billions.  When a variable in CF describes a property of a taxon, such as its numeric concentration or abundance one approach would be to incorporate the taxon name into the Standard Name.  However, experience with other parameter vocabularies has shown that this can quickly become unsustainable.
+Consequently, taxonomic names are handled in a similar manner to geographic names using a generic Standard Name for the data variable plus co-ordinate variables to carry the label text. The data variable is labelled using Standard Names of the form 'property_of_taxon_in_medium'.  For example, taxon abundance in a water body would be described by the Standard Name 'number_concentration_of_taxon_in_sea_water'.
+The labelling co-ordinate variables have the Standard Names 'taxon_name' and 'taxon_identifier'. The taxon name included in the data must be taken from a recognised source.  Currently, these are the World Register of Marine Species or WoRMS (<a class="ext-link" href="http://www.marinespecies.org/"><span class="icon">​</span>http://www.marinespecies.org/</a>), which is the preferred resource for the marine environment or the International Taxonomic Information System or ITIS (<a class="ext-link" href="http://www.itis.gov/"><span class="icon">​</span>http://www.itis.gov/</a>) for terrestrial flora and fauna.  Note that the only requirement for CF is that the name used is registered in at least one of the named resources.  It does not have to be designated as 'valid'.
+The taxon_identifier from either WoRMS (the aphia ID) or ITIS (the taxonomic serial number or TSN) need to include namespace strings, which are 'aphia:' or 'tsn:'.  For example, Calanus finmarchicus is encoded as either 'aphia:104464' or 'tsn:85272'. For the marine domain WoRMS has more complete coverage and so aphia Ids are preferred.
+Example 6.3
+This example shows how the taxonomic information would be encoded for a simple time series of abundance for two taxa.  For clarity, a lot of information - such as the time variable has been omitted.
+dimensions;
+</p>
+<blockquote>
+<p>
+time=1000;
+string80=80;
+taxon=2;
+</p>
+</blockquote>
+<p>
+variables:
+</p>
+<blockquote>
+<p>
+float abundance(time,taxon);
+</p>
+<blockquote>
+<p>
+abundance:standard_name=&#34;number_concentration_of_taxon_in_sea_water";
+abundance:coordinates=&#34;taxon_identifier taxon_name";
+</p>
+</blockquote>
+<p>
+char taxon_name(taxon,string80);
+</p>
+<blockquote>
+<p>
+taxon_name:standard_name=&#34;taxon_name";
+</p>
+</blockquote>
+<p>
+char taxon_identifier(taxon,string80);
+</p>
+<blockquote>
+<p>
+taxon_name:standard_name=&#34;taxon_identifier";
+</p>
+</blockquote>
+</blockquote>
+<p>
+data;
+taxon_name = "Calanus finmarchicus", "Calanus helgolandicus"
+taxon_label = "aphia:104464", "aphia:104466"
+</p>
+<h2 id="ConsequencesforStandardNames">Consequences for Standard Names</h2>
+<p>
+The following new Standard Names are required to describe the label variables and to support the bacterial data request that inspired the creation of this ticket. One more has been included in support of the above example.
+taxon_name
+The human-readable label for the taxon such as Calanus finmarchicus.  The label should be registered in either WoRMS or ITIS and spelled exactly as registered.
+taxon_identifier
+The machine-readable identifier for the taxon registration in either WoRMS (the aphia ID) or ITIS (the taxonomic serial number or TSN), including namespace.  The namespace strings are 'aphia:' or 'tsn:'.  For example, Calanus finmarchicus is encoded as either 'aphia:104464' or 'tsn:85272'. For the marine domain WoRMS has more complete coverage and so aphia Ids are preferred.
+colony_forming_unit_number_concentration_of_taxon_in_sea_water
+"Colony Forming Unit" means an estimate of the viable bacterial or fungal numbers determined by counting colonies grown from a sample.  "Number concentration" means the number of particles or other specified objects per unit volume. "Taxon" means an organism named in the taxon_name and taxon_identifier variables.
+number_concentration_of_taxon_in_sea_water
+"Number concentration" means the number of particles or other specified objects per unit volume. "Taxon" means an organism named in the taxon_name and taxon_identifier variables.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(26)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1365584198000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-10T01%3A56%3A38-07%3A00&amp;precision=second" title="See timeline at 04/10/13 01:56:38">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Roy
+</p>
+<p>
+Thanks for making this proposal. You provide good arguments in support of doing this way. I think that quite a lot of the above text is actually the arguments in support of making the change, and we will not need to include it all in the CF standard document. I would suggest that the text might be
+</p>
+<blockquote>
+<p>
+<strong>Taxon names and identifiers</strong>
+</p>
+</blockquote>
+<blockquote>
+<p>
+A taxon is a named level within a biological classification, such as a class, genus and species. Quantities dependent on taxa have generic <tt>standard_name</tt>s containing the word <tt>taxon</tt>, and the taxa are identified by auxiliary coordinate variables.
+</p>
+</blockquote>
+<p>
+Then go on to describe the conventions for names and IDs, and give the example(s).
+</p>
+<p>
+You compare this proposal to geographic regions, and I agree with that, but it's a bit more complicated because of the alternative sets of labels. I propose that we should tidy the CF document by promoting 6.1.1 on "Geographic regions" to 6.3 (i.e. remove it from 6.1), and adding yours as 6.4. Then 6.1 and 6.2 will describe mechanisms in CF, and 6.3 and 6.4 applications of these mechanisms.
+</p>
+<p>
+I am still concerned about the possibility for confusion in identification of taxa, but I accept that we have to work with the best there is! I'd like to suggest something a bit more demanding, however:
+</p>
+<ul><li>We require <tt>taxon_name</tt> from WoRMS on ITIS, as you say.
+</li><li>We require that either <tt>taxon_identifier</tt> (the alphaID) or <tt>taxonomic_serial_number</tt> (from ITIS) should be provided, and we recommend that both should be provided, particularly the aphiaID. Including both will make the dataset more thoroughly self-describing and hence more useful for data exchange.
+</li><li>It is an error if the <tt>taxon_name</tt> does not agree with the <tt>taxon_identifier</tt> or the <tt>taxonomic_serial_number</tt> (this includes the case where the <tt>taxon_identifier</tt> and the <tt>taxonomic_serial_number</tt> are inconsistent). However, this error isn't one the CF checker could detect, because it would require there to exist a cross-reference table between WoRMS and ITIS, and I assume there isn't one of those available.
+</li></ul><p>
+Thus, I would put the two sorts of identifier into separate auxiliary coordinate variables. Since they have different standard names, they wouldn't need the namespace identifier, and the values can be integers, rather than strings. Missing data can be given for any taxon which doesn't have an identifier.
+</p>
+<p>
+What do you think?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1365640326000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-10T17%3A32%3A06-07%3A00&amp;precision=second" title="See timeline at 04/10/13 17:32:06">8 years ago</a> by graybeal
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+A few suggestions on this, which I love to see proposed.
+</p>
+<p>
+The use of the term 'label' with respect to standard names is a bit confusing, since 'label' is something I'd expect the long name to do. An example:  "using a generic Standard Name for the data variable plus co-ordinate variables to carry the label text. The data variable is labelled using Standard Names of the form 'property_of_taxon_in_medium'."  The terms used in the body of the standard when speaking of the standard name are always either 'identify' or 'describe', which is more appropriate for a standard name.
+</p>
+<p>
+I had to reread Jonathan's suggestion, and I think it amounts to this: "Both taxon name and taxon identifier are required, to maximize understanding and interoperability. They may be obtained, as a corresponding pair, from either WORMS or ITIS."
+</p>
+<p>
+First, are we sure we want to specify these are the only two acceptable sources, just because they are the two most prominent/recognizable/acceptable sources at this time? Since the identifier effectively identifies the source, I'm inclined to accept any source the user deems acceptable, perhaps strongly recommending these two. But your judgment works for me here.
+</p>
+<p>
+I'm OK with requiring both name and ID.  I'm a little confused by Jonathan's last paragraph, particularly "missing data can be given for any taxon which doesn't have an identifier".  If they are in ITIS or WORMS, they have an identifier. If they aren't -- and this is partly why I suggested not constraining to ITIS and WORMS -- they need to have an identifier from _somewhere_, or they aren't really a taxon.  I was rather hoping the identifier could be a URL, or at least a URN, but it appears ITIS doesn't provide such a thing. (!?!)
+</p>
+<p>
+In any case, the suggested handling of a missing ID made me wonder if we are talking about two possible usage scenarios.
+(1) The user variable being described is simply a number (number_concentration, for example), with many measurements being taken, and they all have the same taxon info.
+(2) There are 3 variables being described; the measurement number, and one or two variables that describe the taxon for that particular measurement number. In this case the additional variables' values define the meaning of the primary variable, which could be different for each 'row'.
+</p>
+<p>
+Are we proposing this solution for case (1), case (2), or both? 
+</p>
+<p>
+Regarding the conformance of the name to the ID, I think we should stipulate that one of these two values is authoritative, and the other is informative. Since the ID is truly what uniquely specifies the taxon in the database, I think it should be considered authoritative; the other is explanatory text. The name for that ID may even change over time (if those DBs work as I believe them to), wacky as that seems; but I don't think this represents an intolerable conflict.
+</p>
+<p>
+Finally, in the original proposal ' "Taxon" means an organism named in the taxon_name and taxon_identifier variables.' appears twice.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1365710915000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-11T13%3A08%3A35-07%3A00&amp;precision=second" title="See timeline at 04/11/13 13:08:35">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+I am sure you and Roy know more about the available taxonomic databases. If CF isn't going to provide its own, I think we should be explicit about which ones should be used, and it should be as few as possible. That is because, in the limiting case that every data provider used a different taxonomic database, the datasets would no longer be comparable. You wouldn't know whether Graybeal species number 94308 was the same as Lowry species number 612095, even if they did have the same species name, since the names are not regarded as reliable. So I don't think we ought to leave it open to the data writer to use any database they deem to be acceptable.
+</p>
+<p>
+Ideally we would have only one external authority, but Roy says that is not sufficient, and suggests there are two. To maximise portability of data, I therefore suggested that it be recommended for <em>both</em> to be used. However, in some cases the species concerned will be in one but not the other. That is when there will be missing data in one of the auxiliary coordinates. For instance:
+</p>
+<pre class="wiki">variables:
+  int aphiaID(taxa);
+    aphiaID:_FillValue=-1;
+    aphiaID:standard_name="taxon_identifier";
+  int tsn(taxa);
+    tsn:_FillValue=0;
+    tsn:standard_name="taxonomic_serial_number";
+data:
+  taxon_name="Homo sapiens", "Fraxinus excelsior", "Struthio camelus";
+  aphiaID=1,32768,-1;
+  tsn=42,0,7776;
+</pre><p>
+In this entirely made-up example, <em>F. excelsior</em> appears in WoRMS but not ITIS, while <em>S. camelus</em> is in ITIS but not WoRMS, so there are missing data elements in the auxiliary coordinate variables.
+</p>
+<p>
+I think if both are provided, as recommended, they should be consistent and it is an error if they are not. For example, TSN 42 might actually be <em>Pan troglodytes</em> rather than <em>H. sapiens</em>. This would be an error. If we just said, "let WoRMS take precedence", the purpose of providing TSN as well would be undermined. If we provide both and they are consistent, software with a preference for one of them can use that one. If they are not guaranteed to be consistent, you would get different results depending on which identifier you use.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1365712640000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-11T13%3A37%3A20-07%3A00&amp;precision=second" title="See timeline at 04/11/13 13:37:20">8 years ago</a> by graybeal
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thank you for the clarification.  I think this is a critical detail worth additional attention.
+</p>
+<p>
+The premise of semantic interoperability, based on extensive real-world experience, is that interoperability can not be achieved through constraining everyone to use one vocabulary (or two). There are any number of good reasons that the chosen vocabulary(ies) may not be sufficient. With semantics, this weakness is easily overcome by creating relations between vocabularies. In some cases those relations are precise and homomorphic; in other cases they are descriptive instead, but still powerful, and extensible with time.
+</p>
+<p>
+So if you give me *one* taxonomic ID, I don't need a second one, or a name, or a verification of their relationship; I will have, external to CF, the tools and relations that tell me how those are related. (WORMS is a 'best practices' case of this; you can look up a matching entry in ITIS directly from the WORMS entry.) Trying to replicate this functionality makes CF more complex, at no value to CF, because the linked open data and semantic communities will take care of it much more robustly, and much less expensively for everyone.
+</p>
+<p>
+Roy has said these are the two vocabularies, yes, and I am sure he knows more about them than I do. But when I asked a practicing biologist about ITIS, this was the answer I got: "Species 2000 was an umbrella group that combined ITIS and other sources.  SP2000 provides LSIDs (including for ITIS names)."  When I looked at Species 2000, it indicated records are harvested from 3 ITIS databases, a large number of WORMS databases, and about 100 others.  From this I conclude that ITIS and WORMS are indeed very valuable and credible, and there are many other sources of taxonomic data that are valuable and credible.
+</p>
+<p>
+This illustrates a clear choice. We can attempt to collect and summarize the combined wisdom of the biological-technical community to keep abreast over time about which of these taxonomic databases are necessary and sufficient for CF. Or we can defer that judgment to the ongoing efforts in the community, which seem likely to continue to be ongoing. Certainly if we want to encourage interoperability, recommending the most prominent (WORMS, ITIS, SP2000, ?) as a good source of taxa and their unique identifiers seems sensible. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1365751244000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-12T00%3A20%3A44-07%3A00&amp;precision=second" title="See timeline at 04/12/13 00:20:44">8 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks Jonathan for your constructive feedback, with which I have no issues.  I did initially consider a variable for each id, but felt my suggestion in the example would be more acceptable.<br />
+As to John's point I strongly feel that a name given should be from an authoritative source and that source should provide an identifier that does something useful.  I also strongly feel that acceptable sources should be named and that WoRMS and ITIS should be included as both of these offer a governance that provide a mechanism for verifying and adding proposals for new names.  However, I don't believe that the list of two should be prescriptive.  Should the community require it then obviously the list could be extended.  <br />
+On the specific point of whether S2000 should be added depends on whether LSIDs are in active use in the community likely to use CF.  In my community (<a class="missing wiki">SeaDataNet?</a>) they aren't - we use aphiaIDs, but common sense has prevailed and the aphiaID has been incorporated into the LSID.  For example, my favourite copepod C finmarchicus as an LSID of urn:lsid:marinespecies.org:taxname:104464 and an aphiaID of 104464. So, the list could be extended as and when required, but at the moment I don't feel anything is gained by adding S2000.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1366155402000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-16T16%3A36%3A42-07%3A00&amp;precision=second" title="See timeline at 04/16/13 16:36:42">8 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I'm sorry to bother you - this is just a test.  Google seems to be rejecting messages as spam when the originate in the CF Trac system.
+</p>
+<ul><li>Jeff Painter
+</li></ul>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1366395949000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-19T11%3A25%3A49-07%3A00&amp;precision=second" title="See timeline at 04/19/13 11:25:49">8 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Once again I apologize for having to send a test message.
+</p>
+<ul><li>Jeff Painter
+</li></ul>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1366653759000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-22T11%3A02%3A39-07%3A00&amp;precision=second" title="See timeline at 04/22/13 11:02:39">8 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+This is another test message, hopefully the last one.
+</p>
+<ul><li>Jeff Painter
+</li></ul>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1397701193029706">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-04-16T19%3A19%3A53-07%3A00&amp;precision=second" title="See timeline at 04/16/14 19:19:53">7 years ago</a> by graybeal
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I see this ticket, on Taxon Names and Identifiers, has not been addressed since the original discussion over a year ago.
+</p>
+<p>
+I think it is most important that the ticket move forward. Though Roy's team may have moved on, this problem will need to be addressed in CF sooner or later. While only Roy, Jonathan, and I have discussed it, I suspect many CF lurkers have need for this capability.
+</p>
+<p>
+The following issues seem acceptably resolved:
+</p>
+<ul><li>promoting 6.1.1 on "Geographic regions" to 6.3 (i.e. remove it from 6.1), and adding Roy's as 6.4. Then 6.1 and 6.2 will describe mechanisms in CF, and 6.3 and 6.4 applications of these mechanisms.
+</li><li>Initial text rewording by Jonathan: "A taxon is a named level within a biological classification, such as a class, genus and species. Quantities dependent on taxa have generic standard_names containing the word taxon, and the taxa are identified by auxiliary coordinate variables."
+</li><li>Requiring name and identifier is reasonable (to make the description self-contained).
+</li></ul><p>
+The following questions are open:
+</p>
+<ul><li>How many identifier/sources if multiple are available? Roy suggested 1, Jonathan recommends 2, John suggests user's choice.
+</li><li>How many sources? Roy suggested 2 (extensible), John says CF should not limit (and if it does, the 2 suggested are not the best 2).
+</li><li>What kind of identifier? Roy suggested namespace + ':' + local text ID; Jonathan proposed (agreeable to Roy) separate int variables for WORMS aphia ID vs ITIS taxon species name; and  John prefers globally unique identifiers, LSIDs being the common practice (not offered directly by ITIS, only indirectly through Catalog of Life). In Jonathan's scheme each ID type would have a separate int variable, dimensioned to the number of taxa being defined.
+</li></ul><p>
+(Incidentally, <a class="ext-link" href="http://www.jbiomedsem.com/content/2/1/7"><span class="icon">​</span>http://www.jbiomedsem.com/content/2/1/7</a> provides a detailed analysis of the Catalog of Life identifier approach, which integrates the data from ITIS, WORMS, and Species 2000, among many others, and includes thoughts of why the CoL approach wasn't more widely adopted (at that time anyway). Another extended discussion at <a class="ext-link" href="http://soyouthinkyoucandigitize.wordpress.com/2013/01/28/what-gets-linked-to-global-unique-identifiers-guids-in-natural-history-collection-digitization/"><span class="icon">​</span>http://soyouthinkyoucandigitize.wordpress.com/2013/01/28/what-gets-linked-to-global-unique-identifiers-guids-in-natural-history-collection-digitization/</a>. The point is that while going round and round is definitely possible, I want to cleanly account for more than what a specific part of the CF community does today, if we can.)
+</p>
+<p>
+Looking for a common path, the following seems pretty close:
+</p>
+<ul><li>Support multiple identifier sources; specifying those to be provided _if available_ 
+<ul><li>if it isn't available in ITIS or WORMS, it should still be citable
+</li><li>if the user always uses WORMS, we should not force them to translate to ITIS, and vice versa
+</li><li>While I happen to think Catalog of Life is more suitable than ITIS, I'll forego the argument as long as we aren't exclusive
+</li></ul></li><li>Use Jonathan's proposed approach for WORMS and ITIS, but allow the extension for others (e.g., CoL) for other globally unique identifiers; with any globally unique identifier to be given the standard name taxon_global_identifier, and can be text (which most will be) or int (for UUIDs, for example)
+<ul><li>The comparability of identifiers A to B to C etc.  will inevitably be done at a domain-specific application level, well beyond the concern of CF (but readily achievable by domain experts)
+</li><li>It won't be necessary to define unique identifier types for each source, since globally unique identifiers are by their nature distinguishable and uniquely relatable to their source
+</li><li>If we accept this adjustment, we don't have to argue on the merits whether Catalog of Life is better than ITIS (not so much because of LSIDs, but because it includes many more sources than just ITIS).
+</li></ul></li></ul><p>
+So this might give us the following example:
+</p>
+<pre class="wiki">variables:
+  int aphiaID(taxa);
+    aphiaID:_FillValue=-1;
+    aphiaID:standard_name="taxon_identifier";
+  int tsn(taxa);
+    tsn:_FillValue=0;
+    tsn:standard_name="taxonomic_serial_number";
+  string col(taxa);
+    col:_FillValue="null";
+    col:standard_name="taxon_global_identifier";
+    col:comment="LSID from Catalog of Life";
+data:
+  taxon_name="Homo sapiens", "Fraxinus excelsior", "Struthio camelus";
+  aphiaID=1,32768,-1;
+  tsn=42,0,7776;
+  col="urn:lsid:catalogueoflife.org:taxon:f33e0fe1-ac8e-11e3-805d-020044200006:col20140401",
+         "urn:lsid:catalogueoflife.org:taxon:0ad7462a-ac8f-11e3-805d-020044200006:col20140401",
+         "urn:lsid:catalogueoflife.org:taxon:ebff2886-ac8e-11e3-805d-020044200006:col20140401";
+</pre>
+    </div>
+  <div class="trac-lastedit ">
+    Last edited <a class="timeline" href="/trac/timeline?from=2014-04-16T19%3A20%3A53-07%3A00&amp;precision=second" title="See timeline at 04/16/14 19:20:53">7 years ago</a>
+        by graybeal
+      (<a href="./99?cversion=0&amp;cnum_hist=9#comment:9">previous</a>)
+      (<a href="./99?action=comment-diff&amp;cnum=9&amp;version=1">diff</a>)
+  </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1398268039190626">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-04-23T08%3A47%3A19-07%3A00&amp;precision=second" title="See timeline at 04/23/14 08:47:19">7 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear John
+</p>
+<p>
+Thank you for moving this forward. I am not an expert and defer to you and Roy, but what you propose seems fine to me. I think the text for the standard would need to be more specific about the content of a variable containing taxon global identifiers. Wouldn't it have to be string data, in order to be able to say (as a URN) what sort of identifier it is, as in your example? Can it be required to be a URN? If the <tt>col</tt> variable is an array of strings, following the netCDF classic model (as we do so far in CF), it should be a 2D char array.
+</p>
+<p>
+I note with sadness that <em>F. excelsior</em> is currently threatened by a nasty disease in England.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1404407855605013">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:12" class="follow-up">↓ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-07-03T10%3A17%3A35-07%3A00&amp;precision=second" title="See timeline at 07/03/14 10:17:35">7 years ago</a> by graybeal
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+This from Roy via the CF list 2014.04.23:
+</p>
+<p>
+Dear John and Jonathan,
+</p>
+<p>
+Resurrecting Trac ticket 99 has been on my Todo list for some time - thanks John. I'm not in the office until Tuesday and my Trac login credentials are on my work PC. Hence this reply via the normal list.
+</p>
+<p>
+Since the last correspondence on this ticket, <a class="missing wiki">SeaDataNet?</a> have adopted a LSID URI syntax incorporating the AphiaID driven by standards from the OBIS community for identifying taxa. It would make a lot of sense to adopt this in CF. I don't have the details to hand, but if anyone from VLIZ or ICES is watching this thread maybe they could provide the precise syntax of this URI. If not, I'll dig it out next week. As Jonathan says, this will need to be a string array.
+</p>
+<p>
+John - are you able to write draft text for inclusion in the CF documentation?
+</p>
+<p>
+Cheers, Roy.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1404843614917877">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+        in reply to:
+    <a href="#comment:11">↑ 11</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2014-07-08T11%3A20%3A14-07%3A00&amp;precision=second" title="See timeline at 07/08/14 11:20:14">7 years ago</a> by graybeal
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./99#comment:11" title="Comment 11">graybeal</a>:
+</p>
+<blockquote class="citation">
+<p>
+This from Roy via the CF list 2014.04.23: 
+John - are you able to write draft text for inclusion in the CF documentation?
+</p>
+</blockquote>
+<p>
+In theory, yes. I am having trouble making the time right now but will try to get to it.
+</p>
+<p>
+Meanwhile, we got another request on the list that involved chemical names and organism parts. So far CF tends to include chemical names in the standard name, but if amount_of_&lt;substance&gt;_in_&lt;body part&gt; combinations is high I wonder if that is not another candidate for the same treatment. Something I'll keep in the back of my mind if I start writing a draft.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1522750744371538">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-04-03T03%3A19%3A04-07%3A00&amp;precision=second" title="See timeline at 04/03/18 03:19:04">3 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello, I've come to this for the first time today, so apologies if I have missed some points already discussed. This contribution is motivated by an email by Roy to the CF list. The general approach looks good, but I'd like to propose a few modifications.
+</p>
+<p>
+(1) The implied constraint relating taxon_name and taxon_identifier in the current proposal looks untidy to me (the relationship is implied by the fact that they both occur as coordinates of abundance). I suggest a slight modification to place the identifier as a coordinate of the taxon_name array, making the taxon_name array a self-contained structure.
+</p>
+<p>
+(2) taxonomy is a broader science, but "taxon" is a term only used widely in the biological sciences. the proposed is well defined, but I think it would be clearer if the biological nature of the taxonomy was explicitly stated in the standard name: number_concentration_of_biological_taxon_in_sea_water
+</p>
+<p>
+(3) there should be some reference to the classification system being used .. and perhaps that should be restricted to a small collection of approved systems. This would then be another coordinate with a standard name such as "reference_classification";
+</p>
+<p>
+    
+</p>
+<pre class="wiki">  float abundance(time,taxon);
+    abundance:standard_name="number_concentration_of_biological_taxon_in_sea_water";
+    abundance:coordinates="name";
+  char name(taxon,string80);
+    name:standard_name="taxon_name";
+    name:coordinates="identifier classification";
+  char classification(string80);
+    classification:standard_name="reference_classification";
+  char identifier(taxon,string80);
+    identifier:standard_name="taxon_identifier";
+</pre><p>
+cheers,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1522759329005167">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-04-03T05%3A42%3A09-07%3A00&amp;precision=second" title="See timeline at 04/03/18 05:42:09">3 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin,
+</p>
+<p>
+This work is coming back to life after lying fallow for four years. I hope to finish the job this time.
+</p>
+<p>
+Regarding your comments:
+</p>
+<p>
+1) Any improvements on the simple idea of two arrays of dimension taxon that are co-ordinates of abundance are most welcome. I don't see any problem with your suggestion. If anybody else sees any issues please holler.
+</p>
+<p>
+2) I plan to put in a Standard Names proposal in a week or so. Before then I propose to consult with some people in the OBIS community as to whether 'taxon' is the appropriate term to include in the Standard Name and if so how it should be defined. I suggest we defer this discussion until I put in the proposal including that input.
+</p>
+<p>
+3) LSIDs are governed URNs with the format:
+</p>
+<p>
+urn:lsid:&lt;Authority&gt;:&lt;Namespace&gt;:&lt;ObjectID&gt;[:&lt;Version&gt;]
+</p>
+<p>
+This includes the reference classification in the &lt;Authority&gt; element and these are restricted by the LSID governance, which is well respected. Your suggestion restricts a given abundance data set to a single reference classification, but some datasets could require the coverage of both WoRMS and ITIS. Using LSIDs permits this. Consequently, I disagree with you on this point.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1522762554842727">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-04-03T06%3A35%3A54-07%3A00&amp;precision=second" title="See timeline at 04/03/18 06:35:54">3 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Roy,
+</p>
+<p>
+(1) Thanks
+(2) OK
+(3) Sorry, I hadn't understood all the implications of the LSID discussion. I'll wait to see your revised proposal,
+</p>
+<p>
+regards, 
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1522947901219866">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-04-05T10%3A05%3A01-07%3A00&amp;precision=second" title="See timeline at 04/05/18 10:05:01">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Roy and Martin
+</p>
+<p>
+Regarding point (1) above, I think the initial proposal is consistent with CF. <tt>taxon_identifier</tt> and <tt>taxon_name</tt> are both string-valued auxiliary coordinate variables of the data variable of <tt>abundance</tt>, with the same single dimension <tt>taxon</tt>, which implicitly associates them. Martin's suggestion has the <tt>coordinates</tt> attribute on <tt>name</tt>, which is an auxiliary coordinate variable. That isn't consistent with CF, since only data variables have this attribute, so it would require a new convention and implies a change to the CF data model. I think that's a problem and would favour the initial proposal.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1522953497313956">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-04-05T11%3A38%3A17-07%3A00&amp;precision=second" title="See timeline at 04/05/18 11:38:17">3 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+I don't want to hold up the discussion on this point, but I still believe that an explicit link between <tt>taxon_identifier</tt> and <tt>taxon_name</tt> would be an improvement on the implicit link which the current proposal provides. The CF convention states that a "coordinate may be represented as a scalar variable (i.e. a data variable which has no netCDF dimensions)", which implies that a data variable may be a coordinate variable -- I could not find anything in the convention text relating to the assertion that a coordinate variable cannot be a data variable, but this may be due to the fact that I have not looked in the right place. Is there anything in the text of the convention to say that a coordinate variable is not a data variable? 
+</p>
+<p>
+Cheers,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1523022247559119">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-04-06T06%3A44%3A07-07%3A00&amp;precision=second" title="See timeline at 04/06/18 06:44:07">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+You're right, a coordinate variable of one data variable could be a data variable in its own right. However the CF convention is centred on the idea of "data variable", and as far as Roy's data variable is concerned the variables named by its <tt>coordinates</tt> attribute are coordinate variables. Software based on the CF convention would not expect them to have a <tt>coordinates</tt> attribute of their own, so it would not follow it to find more coordinate variables. A <tt>coordinates</tt> attribute of a coordinate variable has no defined meaning in CF - it's not illegal, but not part of the CF convention.
+</p>
+<p>
+Another point is that in my mind <tt>taxon_identifier</tt> and <tt>taxon_name</tt> are of equivalent status, so it seems to me they should be linked to the data variable in the same way.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1524828477719262">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-04-27T04%3A27%3A57-07%3A00&amp;precision=second" title="See timeline at 04/27/18 04:27:57">3 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Draft text for CF Conventions to complete this ticket
+</p>
+<p>
+<strong>Taxon names and identifiers</strong>
+</p>
+<p>
+A taxon is a named level within a biological classification, such as a class, genus and species. Quantities dependent on taxa have generic standard_names containing the phrase biological_taxon, and the taxa are identified by auxiliary coordinate variables.
+The taxon co-ordinate variables consist of a plain language name (biological_taxon_name) plus one or more identifiers referring to internet resources from sources agreed by discussion on the CF list. The currently accepted identifiers and their Standard Names are:
+</p>
+<ul><li>       Life Science Identifier (LSID): biological_taxon_lsid. This is a URN with the syntax urn:lsid:&lt;Authority&gt;:&lt;Namespace&gt;:&lt;ObjectID&gt;[:&lt;Version&gt;]. This includes the reference classification in the &lt;Authority&gt; element and these are restricted by the LSID governance. It is strongly recommended in CF that the authority chosen is World Register of Marine Species (WoRMS) for oceanographic data and Integrated Taxonomic Information System (ITIS) for freshwater and terrestrial data. WoRMS LSIDs are built from the AphiaID such as urn:lsid:marinespecies.org:taxname:104464 for AphiaID 104464. This may be converted to a URL by adding prefixes such as <a class="ext-link" href="http://lsid.twg.org/"><span class="icon">​</span>http://lsid.twg.org/</a>. ITIS LSIDs are built from the TSN, such as urn:lsid:itis.gov:itis_tsn:180543.
+</li></ul><p>
+It is an error if the biological_taxon_name does not agree with the name resolved from the biological_taxon_lsid or other accepted identifier.  Missing data can be given for any taxon which doesn't have an identifier.
+</p>
+<p>
+A skeleton example for taxonomic abundance time series is:
+</p>
+<pre class="wiki">time=100; string80=80; taxon=2;
+variables:
+float time (time)
+time:standard_name="time"
+float abundance(time,taxon);
+abundance:standard_name="number_concentration_of_biological_taxon_in_sea_water"; abundance:coordinates="taxon_lsid taxon_name";
+char taxon_name(taxon,string80);
+taxon_name:standard_name="biological_taxon_name";
+char taxon_lsid(taxon,string80);
+taxon_lsid:standard_name="biological_taxon_lsid";
+data; time = ……100 values
+abundance = ….200 values
+taxon_name = "Calanus finmarchicus", "Calanus helgolandicus" 
+taxon_lsid = "urn:lsid:marinespecies.org:taxname:104464", "urn:lsid:marinespecies.org:taxname:104466"
+</pre>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1525190851320001">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-05-01T09%3A07%3A31-07%3A00&amp;precision=second" title="See timeline at 05/01/18 09:07:31">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Roy
+</p>
+<p>
+Thanks for the text.
+</p>
+<ul><li>What is the proposed number of this new section?
+</li></ul><ul><li>In the email list, I suggest that <tt>organisms_from_biological_taxon</tt> would be a better phrase than <tt>biological_taxon</tt> in the standard names.
+</li></ul><ul><li>Since there is only one bullet, I think it would be better not to have a list. If another kind of identifier is allowed later, the text can be modified to introduce a list. At the moment, I would suggest
+</li></ul><blockquote>
+<p>
+The taxon auxiliary coordinate variables are string-valued. The plain-language name of the taxon may be contained in a variable with <tt>standard_name</tt> of <tt>biological_taxon_name</tt>. A Life Science Identifier may be contained in a variable with <tt>standard_name</tt> of <tt>biological_taxon_lsid</tt>. This is a URN ..."
+</p>
+</blockquote>
+<ul><li>I'm not clear whether one or both of these must be present. We should clarify this.
+</li></ul><ul><li>The example doesn't appear to be in correct CDL - at least, not the dialect we use in other examples, which have only one statement per line, and every line ends with <tt>;</tt>.
+</li></ul><p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1542289248634823">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-11-15T05%3A40%3A48-08%3A00&amp;precision=second" title="See timeline at 11/15/18 05:40:48">2 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+<em>Hopefully the final rewrite of ticket 99 to address Jonathan’s comments. Only issue where there is still a difference of opinion is the positioning of the section in the document.
+</em></p>
+<p>
+<em>Jonathan Gregory proposed that we should tidy the CF document by promoting 6.1.1 on "Geographic regions" to 6.3 (i.e. remove it from 6.1), and adding yours as 6.4. Then 6.1 and 6.2 will describe mechanisms in CF, and 6.3 and 6.4 applications of these mechanisms.</em>
+</p>
+<p>
+<em>My interpretation is that this section is an application of the ‘Alternative co-ordinates’ CF mechanism (Section 6.2) in the same way as ‘Geographic Regions’ are an application of the ‘Labels’ CF mechanism (Section 6.1).  Example 6.3. (Model level numbers) is also an application of ‘Alternative co-ordinates’. Consequently, I would make Example 6.3 Section 6.1.1 and the following ‘Taxon names and identifiers’ text Section 6.1.2.<strong>' 
+</strong></em></p>
+<p>
+<strong>6.1.2. Taxon names and identifiers</strong>
+</p>
+<p>
+A taxon is a named level within a biological classification, such as a class, genus and species. Quantities dependent on taxa have generic standard_names containing the phrase organisms_in_taxon, and the taxa are identified by auxiliary coordinate variables.
+</p>
+<p>
+The taxon auxiliary coordinate variables are string-valued. The plain-language name of the taxon must be contained in a variable with standard_name of biological_taxon_name. A Life Science Identifier may be contained in a variable with standard_name of biological_taxon_lsid. This is a URN with the syntax urn:lsid:&lt;Authority&gt;:&lt;Namespace&gt;:&lt;ObjectID&gt;[:&lt;Version&gt;]. This includes the reference classification in the &lt;Authority&gt; element and these are restricted by the LSID governance. It is strongly recommended in CF that the authority chosen is World Register of Marine Species (WoRMS) for oceanographic data and Integrated Taxonomic Information System (ITIS) for freshwater and terrestrial data. WoRMS LSIDs are built from the AphiaID such as urn:lsid:marinespecies.org:taxname:104464 for AphiaID 104464. This may be converted to a URL by adding prefixes such as <a class="ext-link" href="http://lsid.twg.org/"><span class="icon">​</span>http://lsid.twg.org/</a>. ITIS LSIDs are built from the TSN, such as urn:lsid:itis.gov:itis_tsn:180543.
+</p>
+<p>
+The biological_taxon_name co-ordinate included for human readability is mandatory. The biological_taxon_lsid co-ordinate included for software agent readability is optional, but strongly recommended. If both are present the biological_taxon_name must match the name resolved from the biological_taxon_lsid exactly.  If LSIDs are available for some taxa in a dataset then the biological_taxon_lsid co-ordinate should be included and missing data given for those taxa that do not have an identifier.
+</p>
+<p>
+A skeleton example for taxonomic abundance time series is:
+</p>
+<pre class="wiki">time=100; 
+string80=80; 
+taxon=2;
+variables;
+float time (time);
+time:standard_name="time";
+float abundance(time,taxon);
+abundance:standard_name="number_concentration_of_organisms_in_taxon_in_sea_water"; 
+abundance:coordinates="taxon_lsid taxon_name";
+char taxon_name(taxon,string80);
+taxon_name:standard_name="biological_taxon_name";
+char taxon_lsid(taxon,string80);
+taxon_lsid:standard_name="biological_taxon_lsid";
+data; time = ……100 values;
+abundance = ….200 values;
+taxon_name = "Calanus finmarchicus", "Calanus helgolandicus" 
+taxon_lsid = "urn:lsid:marinespecies.org:taxname:104464", "urn:lsid:marinespecies.org:taxname:104466";
+</pre>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1542305639114573">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-11-15T10%3A13%3A59-08%3A00&amp;precision=second" title="See timeline at 11/15/18 10:13:59">2 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Roy
+</p>
+<p>
+Thanks. That looks fine to me! Am I right that you propose the order of sections to be
+</p>
+<p>
+6 Labels and alternative coordinates
+6.1 Labels
+6.1.1 Geographic regions
+6.1.2 Taxon names and identifiers
+6.2 Alternative coordinates
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-23-1542314972084764">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-11-15T12%3A49%3A32-08%3A00&amp;precision=second" title="See timeline at 11/15/18 12:49:32">2 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks Jonathan,
+</p>
+<p>
+Sorting me out yet again - I knew I'd get a typo (or two) in there somewhere!!!
+</p>
+<p>
+What I intended to suggest is:
+</p>
+<blockquote>
+<p>
+6 Labels and alternative coordinates
+</p>
+</blockquote>
+<blockquote>
+<p>
+6.1 Labels
+</p>
+<blockquote>
+<p>
+6.1.1 Geographic regions
+</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<p>
+6.2 Alternative co-ordinates
+</p>
+<blockquote>
+<p>
+6.2.1 Model level numbers
+</p>
+</blockquote>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>
+6.2.2 Taxon names and identifiers
+</p>
+</blockquote>
+</blockquote>
+<p>
+Hope that now makes more sense.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-24-1542376419509284">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:24" class="cnum">
+    <a href="#comment:24">comment:24</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-11-16T05%3A53%3A39-08%3A00&amp;precision=second" title="See timeline at 11/16/18 05:53:39">2 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Roy
+</p>
+<p>
+Ah, I see. Thanks!
+</p>
+<p>
+I've never liked 6.1 having one subsection. It makes me uncomfortable. Although it's nothing to do with this proposal, I thought we might take advantage of the opportunity to change it. Since labels and alternative coordinates are very similar concepts, would it look OK to take the para which introduces the current 6.2 "In some situations a dimension may have alternative sets ..." and put it as a third para to the preamble of the current 6.1. Then we could eliminate one of the levels:
+</p>
+<p>
+6 Labels and alternative coordinates [with preamble introducing both of them in three paras]
+</p>
+<blockquote>
+<p>
+6.1 Geographic regions
+</p>
+</blockquote>
+<blockquote>
+<p>
+6.2 Model level numbers
+</p>
+</blockquote>
+<blockquote>
+<p>
+6.3 Taxon names and identifiers
+</p>
+</blockquote>
+<p>
+How would that be? If you think this would derail the conclusion of this ticket, I'll delay it to another time.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-25-1542377987128181">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:25" class="cnum">
+    <a href="#comment:25">comment:25</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-11-16T06%3A19%3A47-08%3A00&amp;precision=second" title="See timeline at 11/16/18 06:19:47">2 years ago</a> by lowry
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I don't have strong feelings either way, but feel that others might. I would be much happier getting the new section added and closing this ticket to get clear of Trac. How about making your suggested restructuring a <a class="missing wiki">GitHub?</a> ticket once this is all done and dusted?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-26-1542382709976150">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:26" class="cnum">
+    <a href="#comment:26">comment:26</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-11-16T07%3A38%3A29-08%3A00&amp;precision=second" title="See timeline at 11/16/18 07:38:29">2 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Yes, that's perfectly fine. We will leave it as you propose in this ticket. Jonathan
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./99?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./99?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./99?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

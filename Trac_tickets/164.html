@@ -1,0 +1,962 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #164 (Simple Geometries in CF)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./163.html" title="ticket #163" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./164?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./164?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./164?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./165.html" title="ticket #165" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./163.html" title="ticket #163">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./165.html" title="ticket #165">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2017-08-15T11%3A25%3A40-07%3A00&amp;precision=second" title="See timeline at 08/15/17 11:25:40">4 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2018-06-25T07%3A31%3A11-07%3A00&amp;precision=second" title="See timeline at 06/25/18 07:31:11">3 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./164.html" class="trac-id">#164</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Simple Geometries in CF</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=whiteaker">whiteaker</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version"></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~geometry">geometry</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+Dave Blodgett, others, and I have developed a contribution which augments Chapter 7 of the CF conventions with the ability to describe simple geometries such as lines and polygons. This is useful when encoding feature geometries for data variables like average precipitation over a watershed or velocity in a river segment.
+</p>
+<p>
+We proposed this contribution on <a class="missing wiki">GitHub?</a> via a pull request, in part to help test the <a class="missing wiki">GitHub?</a> workflow for making changes to CF.  This has been a bit of a struggle as we iron out the <a class="missing wiki">GitHub?</a> kinks.  In the meantime, Jonathan Gregory suggested that to move the process along, we open a trac ticket for this as a proposed change to 1.7.
+</p>
+<p>
+<a class="missing wiki">GitHub?</a> pull request and discussion:
+<a class="ext-link" href="https://github.com/cf-convention/cf-conventions/pull/115"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/pull/115</a>
+</p>
+<p>
+Rendered proposal (the Geometries section is at the end):
+<a class="ext-link" href="https://github.com/dblodgett-usgs/cf-conventions/blob/7768e33e7edff459482e8ef8057ea6b8e015c9eb/ch07.adoc"><span class="icon">​</span>https://github.com/dblodgett-usgs/cf-conventions/blob/7768e33e7edff459482e8ef8057ea6b8e015c9eb/ch07.adoc</a>
+</p>
+<p>
+I appreciate your consideration of this proposal. If more discussion of this proposal is required, I ask that you continue the discussion in <a class="missing wiki">GitHub?</a>.  Thanks!
+</p>
+<p>
+Tim Whiteaker
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(24)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1502886319055506">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-08-16T05%3A25%3A19-07%3A00&amp;precision=second" title="See timeline at 08/16/17 05:25:19">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thank you for your hard work on this proposal, which I support in its current form.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1507799922804427">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-10-12T02%3A18%3A42-07%3A00&amp;precision=second" title="See timeline at 10/12/17 02:18:42">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Thanks indeed, Tim et al.
+</p>
+<p>
+I'd like to volunteer to moderate this discussion, and shall shortly post a summary of what I think are the outstanding issues.
+</p>
+<p>
+All the best, David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1507978753769162">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-10-14T03%3A59%3A13-07%3A00&amp;precision=second" title="See timeline at 10/14/17 03:59:13">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello,
+</p>
+<p>
+As far as I can tell, the only conceptual outstanding issue with this ticket is whether multi- and single-part geometry types should be combined into a single type - i.e. all geometries could be "multi", with the current "single" instances being a special case of multi. This is discussed here:  
+<a class="ext-link" href="https://github.com/cf-convention/cf-conventions/pull/115/files/5f8c0859b7158fd3ebe94a898bbd2837233a22a3#r122266537"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/pull/115/files/5f8c0859b7158fd3ebe94a898bbd2837233a22a3#r122266537</a>
+</p>
+<p>
+I think that the arguments presented against a sole type are reduced interoperability and increased software complexity. The argument for is reduced conventions complexity (although Chris Little might want to add to this?).
+</p>
+<p>
+Related to this single/multi issue is that the proposal currently allows different cells to have different geometry types. Is this actively desired? or required? Is there a case for insisting that all cells have the same type, for simplicity? I would have thought that we do not need to constrain the proposal in this way, but it's worth mentioning to see what others think. 
+</p>
+<p>
+A minor point: A table defining each of the geometry types would be useful - it seems that   currently they are introduced with the assumption that you arlready know what they are.
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1510676213563041">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-11-14T08%3A16%3A53-08%3A00&amp;precision=second" title="See timeline at 11/14/17 08:16:53">3 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello - forwarding a comment from Chris Little that didn't make it here:
+</p>
+<blockquote class="citation">
+<p>
+As David mentioned me, I though it worth adding an argument for 'Multi' types - they clarify  some inherent potential parallelism in the structures, and the structures, and their processing, are ones that map to the parallel hardware found in GPUs. GPUs have evolved over the last 30 years to process exactly these kinds of structures.
+</p>
+<p>
+As a provocative aside, this strikes me like an "Assembler is faster than Fortran so we stick with Assembler" kind of debate.
+</p>
+<p>
+Chris, running for cover.
+</p>
+</blockquote>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1510676555393755">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-11-14T08%3A22%3A35-08%3A00&amp;precision=second" title="See timeline at 11/14/17 08:22:35">3 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello,
+</p>
+<p>
+It seems from comments at ​<a class="ext-link" href="https://github.com/cf-convention/cf-conventions/pull/115/files/5f8c0859b7158fd3ebe94a898bbd2837233a22a3#r122266537"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/pull/115/files/5f8c0859b7158fd3ebe94a898bbd2837233a22a3#r122266537</a>] and on this ticket that all geometries being "multi" is acceptable to everyone - does anyone disagree?
+</p>
+<p>
+Assuming this is the case, do the "single" lines need to be removed from the table that was added: <a class="ext-link" href="https://github.com/dblodgett-usgs/cf-conventions/blob/7768e33e7edff459482e8ef8057ea6b8e015c9eb/ch07.adoc"><span class="icon">​</span>https://github.com/dblodgett-usgs/cf-conventions/blob/7768e33e7edff459482e8ef8057ea6b8e015c9eb/ch07.adoc</a>
+</p>
+<p>
+If that is so, we ought to be close to wrapping this ticket up (subject to modifications to the conformance document).
+</p>
+<p>
+Many thanks,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1511274896227375">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-11-21T06%3A34%3A56-08%3A00&amp;precision=second" title="See timeline at 11/21/17 06:34:56">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+In October I consolidated the items in the table to simply: point, line, and polygon. I also edited the rest of the text to reflect this consolidation.  You can view the latest version of the files here:
+<a class="ext-link" href="https://github.com/cf-convention/cf-conventions/pull/115/files"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/pull/115/files</a>
+</p>
+<p>
+I created a branch for conformance updates with most of the new text here:
+<a class="ext-link" href="https://github.com/twhiteaker/Conformance/blob/Geometry_Conformance/conformance.adoc#75-geometries"><span class="icon">​</span>https://github.com/twhiteaker/Conformance/blob/Geometry_Conformance/conformance.adoc#75-geometries</a>
+</p>
+<p>
+...plus a mention of geometry node coordinates here:
+<a class="ext-link" href="https://github.com/twhiteaker/Conformance/blob/Geometry_Conformance/conformance.adoc#4-coordinate-types"><span class="icon">​</span>https://github.com/twhiteaker/Conformance/blob/Geometry_Conformance/conformance.adoc#4-coordinate-types</a>
+</p>
+<p>
+Does that address all outstanding issues on this proposal?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1512491745607089">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-12-05T08%3A35%3A45-08%3A00&amp;precision=second" title="See timeline at 12/05/17 08:35:45">3 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello,
+</p>
+<p>
+It would be great if any interested parties could review Tim's latest changes on this ticket. In particular the many conformance requirements.
+</p>
+<p>
+I have a minor suggestion:
+</p>
+<p>
+In paragraph 2, a polygon has that <strong>it should be assumed that the first and last node are connected. Note that CF does not require the first and last node to be identical but allows them to be coincident if desired</strong>. However, in table 7.1 it says <strong>a polygon is &lt;snip&gt; a closed line (i.e., the first point in the line is coincident with the last point)</strong>. 
+</p>
+<p>
+Also the conformance recommends (not insists) that <strong>the coordinates of the first and last node in a given ring of a polygon geometry should be coincident</strong>.
+</p>
+<p>
+This is a bit confusing to me. I think that table 7.1 should be made consistent with paragraph 2, and the recommendation should be removed.
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1513104136729872">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-12-12T10%3A42%3A16-08%3A00&amp;precision=second" title="See timeline at 12/12/17 10:42:16">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Tim
+</p>
+<p>
+Thanks for doing such a thorough and careful job of these documents. I have a few comments, which are all small.
+</p>
+<ul><li>In appendix A, it would be helpful to introduce a new possible value in the Use column, to indicate geometry container variable, so that these don't have to be -.
+</li></ul><ul><li>It would be good to add some words in the preamble of Sect 7 pointing to the simple geometries Sect 7.5 as an alternative to bounds.
+</li></ul><ul><li>In the text of 7.5, "but in that case every cell must have the same number of vertices and must be single polygon rings" - this sentence is confused about singular/plural.
+</li></ul><ul><li>To "Lines and polygons are also nearly the same except that it should be assumed that the first and last node are connected", append "for a polygon".
+</li></ul><ul><li>You write, "The only legal values of geometry_type are point, line, and polygon (case sensitive)". Must it be case-sensitive? CF attributes are not usually case-sensitive. Requiring case-sensitivity means more possibility for mistakes, and it doesn't seem helpful, because you wouldn't define a convention that depended on case to distinguish possibilities - that would be a recipe for confusion!
+</li></ul><ul><li>In the conformance doc, you recommend, "The coordinates of the first and last node in a given ring of a polygon geometry should be coincident". Why is this recommended? It's redundant and it doesn't seem preferable to me. I think David is also suggesting omitting this.
+</li></ul><p>
+Best wishes and thanks again
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1513205085343014">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-12-13T14%3A44%3A45-08%3A00&amp;precision=second" title="See timeline at 12/13/17 14:44:45">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Those suggestions make sense to me.  I've implemented them in my forks.  For the CF conventions, I've got a pull request in to Dave Blodgett's repo, which when accepted would then be ready to absorb in the official CF conventions. For conformance, I've got a geometry_conformance branch that I can create a pull request for once this ticket is closed (or would you prefer I do it now?).
+</p>
+<p>
+Conformance:
+<a class="ext-link" href="https://github.com/twhiteaker/Conformance/blob/Geometry_Conformance/conformance.adoc"><span class="icon">​</span>https://github.com/twhiteaker/Conformance/blob/Geometry_Conformance/conformance.adoc</a>
+</p>
+<p>
+Conventions (for now, until Dave accepts my pull request):
+<a class="ext-link" href="https://github.com/dblodgett-usgs/cf-conventions/pull/6"><span class="icon">​</span>https://github.com/dblodgett-usgs/cf-conventions/pull/6</a>
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1516116474902518">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-16T07%3A27%3A54-08%3A00&amp;precision=second" title="See timeline at 01/16/18 07:27:54">3 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello,
+</p>
+<p>
+I am wondering about how <tt>node_coordinates</tt> and <tt>coordinates</tt> can be correctly paired. For example in this case:
+</p>
+<pre class="wiki">float geometry_container ;
+    geometry_container:geometry_type = "polygon" ;
+    geometry_container:node_count = "node_count" ;
+    geometry_container:node_coordinates = "x y" ;
+    geometry_container:coordinates = "lat lon"
+</pre><p>
+how do we know which of <tt>x</tt> and <tt>y</tt> goes with <tt>lat</tt>? The answer is, of course, that the netCDF variables <tt>x</tt>, <tt>y</tt>, <tt>lat</tt> and <tt>lon</tt> must have sufficient metadata, but I'm can't see that this is specified in the text.  
+</p>
+<p>
+The proposed text already says <strong>The geometry node coordinate variables must each have an axis attribute whose allowable values are X, Y, and Z</strong>.
+</p>
+<p>
+Can we also say that if <tt>coordinates</tt> are provided then those which correspond to <tt>node_coordinates</tt> <strong>must</strong> also have the axis attribute? In this way, there will be no ambiguity.
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1516201773251546">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-17T07%3A09%3A33-08%3A00&amp;precision=second" title="See timeline at 01/17/18 07:09:33">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi David.  What's the motivation for having <tt>y</tt> paired with <tt>lat</tt>?  In other words, how might the ambiguity hurt us?  <tt>node_coordinates</tt> and <tt>coordinates</tt> are two distinct representations of the feature's geometry, and they would be interpreted independently of each other. For a polygon, <tt>coordinates</tt> would represent a point while <tt>node_coordinates</tt> would represent a polygon, so you'd be pairing all the y-coordinates from a polygon with a single latitude value.
+Thanks,
+Tim
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1516206827188352">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-17T08%3A33%3A47-08%3A00&amp;precision=second" title="See timeline at 01/17/18 08:33:47">3 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Tim,
+</p>
+<p>
+My motivation came from considering how the simple geometries could fit into the CF data model (CFDM).
+</p>
+<p>
+In the CFDM, coordinates and their bounds are bundled up into a single construct (the "auxiliary coordinate construct" in this case). In the usual case, matching coordinates with their bounds is unambiguous, via the <tt>bounds</tt> attribute. The node coordinates are essentially bounds (albeit complex ones) to the coordinates, so I was looking to extend the definition of coordinate bounds to allow for these geometries. For this to work, I was looking for a similarly robust way of pairing up coordinates with their node coordinates (i.e. "bounds"). We can't rely on standard names, for example, because they are optional; nor units, for example, because they could be the same for both  X and Y coordinates.
+</p>
+<p>
+I hope that I'm making sense,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1516209276808089">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-17T09%3A14%3A36-08%3A00&amp;precision=second" title="See timeline at 01/17/18 09:14:36">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi David,
+</p>
+<p>
+I've been trying to specify simple geometries while minimizing impact on existing CF standards such as how coordinate variables are represented; however I do recognize that in some cases (CF 1.8 Section 3.1, second paragraph) latitude and longitude units could both be <tt>degrees</tt> rather than <tt>degrees_east</tt> and <tt>degrees_north</tt>, potentially resulting in ambiguity.  I'm OK with the addition to the geometry section that you mentioned. If there is no dissent in the next couple of days, I'll make the change in the pull request.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1516816471331548">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-24T09%3A54%3A31-08%3A00&amp;precision=second" title="See timeline at 01/24/18 09:54:31">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi David,
+</p>
+<p>
+I've made your requested change. Conformance doc is updated in my fork:
+<a class="ext-link" href="https://github.com/twhiteaker/Conformance/blob/master/conformance.adoc"><span class="icon">​</span>https://github.com/twhiteaker/Conformance/blob/master/conformance.adoc</a>
+</p>
+<p>
+CH7 and history are updated in conventions in my fork, and should show up in pull request 115 to the conventions on <a class="missing wiki">GitHub?</a> as soon as Dave Blodgett accepts my changes.  You can also view my fork directly here:
+<a class="ext-link" href="https://github.com/twhiteaker/cf-conventions"><span class="icon">​</span>https://github.com/twhiteaker/cf-conventions</a>
+</p>
+<p>
+Does anyone have any more comments on the geometries contribution?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1516907446931562">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-01-25T11%3A10%3A46-08%3A00&amp;precision=second" title="See timeline at 01/25/18 11:10:46">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+No more comments from me, thanks. I think this proposal is fine. Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1518462346575580">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-02-12T11%3A05%3A46-08%3A00&amp;precision=second" title="See timeline at 02/12/18 11:05:46">3 years ago</a> by david.arctur
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Glad to see Jonathan’s comment. Does anyone else have any issues with this? Can we bring it to completion / adoption?
+</p>
+<p>
+dka
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1518545380241670">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-02-13T10%3A09%3A40-08%3A00&amp;precision=second" title="See timeline at 02/13/18 10:09:40">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+The rule is that if no more comments are made within three weeks following the last response (which was 24th Jan, comment 14 above) the ticket is accepted. Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1518545432707929">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-02-13T10%3A10%3A32-08%3A00&amp;precision=second" title="See timeline at 02/13/18 10:10:32">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+That'll be tomorrow, I see.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1519157382433087">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-02-20T12%3A09%3A42-08%3A00&amp;precision=second" title="See timeline at 02/20/18 12:09:42">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Is this now accepted?  If so, I'll start updating the text in the Python reference implementation [1] to reflect the accepted conventions. I'll also submit a pull request to the conformance rules on <a class="missing wiki">GitHub?</a>.
+</p>
+<p>
+[1] <a class="ext-link" href="https://github.com/twhiteaker/netCDF-CF-simple-geometry"><span class="icon">​</span>https://github.com/twhiteaker/netCDF-CF-simple-geometry</a>
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1519234262896613">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-02-21T09%3A31%3A02-08%3A00&amp;precision=second" title="See timeline at 02/21/18 09:31:02">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Yes, the ticket is now accepted and should be included in CF 1.8. Thanks very much for your work on it! We will keep this ticket open until 1.8 is released.
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1519307934681553">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-02-22T05%3A58%3A54-08%3A00&amp;precision=second" title="See timeline at 02/22/18 05:58:54">3 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+When this ticket is implemented in the CF standard document, Dave Blodgett and Tim Whiteaker should be added as additional authors of the convention. Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1525789439382754">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-05-08T07%3A23%3A59-07%3A00&amp;precision=second" title="See timeline at 05/08/18 07:23:59">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+There's a requirement in the proposal such that if a coordinates attribute is carried by the geometry container variable, then those coordinate variables which correspond to node coordinate variables must also have the axis attribute.  I think this was originally put in place because David Hassell requested it for conformance or data model reasons.  Since then, David has requested to me that instead of requiring the axis attribute on the coordinate variables, we instead include a bounds attribute pointing to the node coordinate variables.  The node coordinates serve as the bounds for coordinate variables. For example, if features are represented as polygons with node coordinates x and y, and the centroids of those polygons with coordinates lon and lat, then the lon coordinate variable would have a bounds attribute naming the x node coordinate variable.
+</p>
+<p>
+Notwithstanding any objections, I'll update the Pull Request to the conventions in <a class="missing wiki">GitHub?</a> to reflect this change.  I will also update the conformance pull request to reflect this and some other non-breaking changes requested by David.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-23-1529936181216308">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-06-25T07%3A16%3A21-07%3A00&amp;precision=second" title="See timeline at 06/25/18 07:16:21">3 years ago</a> by whiteaker
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Though the three week rule should have applied after the 24th Jan comment, the pull request was never merged in <a class="missing wiki">GitHub?</a>. Since then, we've addressed typos and other cleaning up of the revision, and pull request 115 has been accepted by three reviewers. So here again we potentially start the 3-week process, and hopefully by the end of that time, we will have worked out how to go about merging changes in <a class="missing wiki">GitHub?</a> (see separate issue <a class="ext-link" href="https://github.com/cf-convention/cf-conventions/issues/130"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/issues/130</a>). 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-24-1529937071166773">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:24" class="cnum">
+    <a href="#comment:24">comment:24</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2018-06-25T07%3A31%3A11-07%3A00&amp;precision=second" title="See timeline at 06/25/18 07:31:11">3 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Sounds good to me. As moderator of github 130 I'll try and keep that discussion going...
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./164?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./164?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./164?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

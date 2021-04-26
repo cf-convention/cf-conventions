@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #101 (Correct error in introductory text of Section 4.4 -- definition of 'year')
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./100.html" title="ticket #100" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./101?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./101?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./101?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./102.html" title="ticket #102" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./100.html" title="ticket #100">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./102.html" title="ticket #102">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2013-04-24T09%3A04%3A16-07%3A00&amp;precision=second" title="See timeline at 04/24/13 09:04:16">8 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2013-05-20T01%3A24%3A41-07%3A00&amp;precision=second" title="See timeline at 05/20/13 01:24:41">8 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./101.html" class="trac-id">#101</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=new">new</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=defect">defect</a>
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Correct error in introductory text of Section 4.4 -- definition of 'year'</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=stevehankin">stevehankin</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <h2 id="a1.Title">1. Title</h2>
+<p>
+Correct error in introductory text of Section 4.4 -- definition of 'year'
+</p>
+<h2 id="a2.Moderator">2. Moderator</h2>
+<p>
+Steve Hankin
+</p>
+<h2 id="a3.Requirement">3. Requirement</h2>
+<p>
+just a factual error that out to be corrected.  The change will have no further impacts.
+</p>
+<h2 id="a4.InitialStatementofTechnicalProposal">4. Initial Statement of Technical Proposal</h2>
+<p>
+The intro to 4.4. Time Coordinate in CF is wrong where it says "<em>The Udunits package defines a year to be exactly 365.242198781 days</em>".  This line should be corrected to say "<em>The Udunits package defines a year to be exactly 365.2425 days</em>"
+</p>
+<p>
+Explanation:
+Udunits merely comments on the year length of 365.242198781 days.  It actually defines the Gregorian year length to be 365.2425
+</p>
+<blockquote>
+<p>
+See text at <a class="ext-link" href="http://www.unidata.ucar.edu/software/udunits/udunits-1/udunits.txt"><span class="icon">​</span>http://www.unidata.ucar.edu/software/udunits/udunits-1/udunits.txt</a>.
+</p>
+</blockquote>
+<pre class="wiki"># Interval between 2 successive passages of sun through vernal equinox
+# (365.242198781 days -- see 
+# http://www.ast.cam.ac.uk/pubinfo/leaflets/,
+# http://aa.usno.navy.mil/AA/
+# and http://adswww.colorado.edu/adswww/astro_coord.html):
+tropical_year		P 3.15569259747e7 second
+lunar_month		P 29.530589 day
+
+common_year		P 365 day		# exact: 3.153600e7 seconds
+leap_year		P 366 day		# exact
+Julian_year		P 365.25 day		# exact
+Gregorian_year		P 365.2425 day		# exact
+</pre>
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(5)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1366821468000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-24T09%3A37%3A48-07%3A00&amp;precision=second" title="See timeline at 04/24/13 09:37:48">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Steve
+</p>
+<p>
+Thanks for proposing this correction. Perhaps I overlooked earlier that udunits.dat (my copy of it, anyway), defines year=tropical_year. So that means udunits defines a year as 3.15569259747e7 seconds. It's awkward to convert this number into days! udunits defines a day as 86400 seconds exactly. So we have to divide 3.15569259747e7 by 86400 with 12 digits of precision. I can't get it to equal exactly what the existing text says, but it's not exactly 365.2425 either, because a year isn't a Gregorian year. Is your udunits the same?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1366822678000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-24T09%3A57%3A58-07%3A00&amp;precision=second" title="See timeline at 04/24/13 09:57:58">8 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Jonathan,
+</p>
+<p>
+I think we may be opening a Pandora's box that we only closed recently with some difficulty.  Didn't we agree that the default interpretation of 'year' in CF should be Gregorian year?
+</p>
+<p>
+If you agree this this is the case then I will follow up by proposing further word-smith modifications to the Section 4.4 introduction.  At present the text merely gives a general caution about using units of 'year'.  It should instead advise that Gregorian_year is the preferred udunit to choose if the concept of 'year' as a unit is desired. (Or have we already captured this thought elsewhere in the text?) 
+</p>
+<ul><li>Steve
+</li></ul>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1366833639000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-24T13%3A00%3A39-07%3A00&amp;precision=second" title="See timeline at 04/24/13 13:00:39">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Steve
+</p>
+<p>
+I don't remember that. It might be a good idea to adopt Gregorian years, but I think that would arguably be a change to the convention, rather than correcting a mistake or clarifying the intention, because it would be a departure from udunits. In a CF version of the udunits database, which we have discussed but not so far provided, we could define year as Gregorian_year. I think we would need to do that, to be consistent, because of the use of udunits in conjunction with CF.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1366844314000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-24T15%3A58%3A34-07%3A00&amp;precision=second" title="See timeline at 04/24/13 15:58:34">8 years ago</a> by stevehankin
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Section 4.4.1. Calendar of CF 1.6 <a class="ext-link" href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html#calendar"><span class="icon">​</span>http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html#calendar</a> states:
+<em>Mixed <a class="missing wiki">Gregorian/Julian?</a> calendar as defined by Udunits. <strong>This is the default.</strong></em>
+</p>
+<p>
+It seems only reasonable to interpret the unit 'year' in the context of the current calendar.  Any other definition of 'year' introduces internal contradictions.  Of course, the mixed <a class="missing wiki">Gregorian/Julian?</a> calendar creates a unique ambiguity, since it offers up two different definitions for 'year' (in parentheses here imagine an image of a human brain exploding).
+</p>
+<p>
+CF has to specify <strong>some</strong> definition for 'year' in the mixed <a class="missing wiki">Gregorian/Julian?</a> calendar.  I'll assert (comments please) that the Gregorian definition of 'year' is the best choice.  If agreed, this fact should be documented in the corrections to the introduction to section 4.4 (the topic of this ticket).
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1369038281000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-05-20T01%3A24%3A41-07%3A00&amp;precision=second" title="See timeline at 05/20/13 01:24:41">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Steve
+</p>
+<p>
+Sorry to be awkward, but I don't think we can do that. CF adopted udunits as the arbiter of how units should be interpreted, and redefining the unit of <tt>year</tt> would therefore be a backward-incompatible change. It would affect existing files if it was interpreted as applying retrospectively, even if that was not the intention.
+</p>
+<p>
+In CF section 4.4 we currently recommend that caution is necessary with the units of <tt>year</tt> and <tt>month</tt>, because of the definition, which catches people out. I'd like to suggest that we change this recommendation to a <strong>prohibition</strong> of the units of <tt>year</tt> and <tt>month</tt> in the next version of CF. The CF checker could detect that, and we could remove these units from a CF version of the udunits database.
+</p>
+<p>
+For uses where <tt>year</tt> and <tt>month</tt> are to be interpreted in a calendar-dependent way, we could introduce an alternative syntax for units of time, not related to udunits. John Caron suggested one a while ago, and has implemented it in Java I think, but it's not been put forward as a CF convention. This involves some extra rules e.g. to decide what is meant by 31 Jan 2013 plus 1 calendar month, or 29 Feb 2012 plus 1 calendar year.
+</p>
+<p>
+Neither of the above could be done as a defect ticket, because they change the convention. If you or others think we should proceed with this, we could change the status of this ticket to make a new proposal, or start a new ticket.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./101?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./101?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./101?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

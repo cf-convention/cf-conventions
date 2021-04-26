@@ -1,0 +1,1058 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #31 (Proposal for standard attributes actual_min and actual_max)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./30.html" title="ticket #30" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./31?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./31?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./31?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./32.html" title="ticket #32" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./30.html" title="ticket #30">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./32.html" title="ticket #32">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2008-06-23T06%3A44%3A25-07%3A00&amp;precision=second" title="See timeline at 06/23/08 06:44:25">13 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2016-07-27T07%3A56%3A33-07%3A00&amp;precision=second" title="See timeline at 07/27/16 07:56:33">5 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/trac/timeline?from=2016-07-27T08%3A05%3A13-07%3A00&amp;precision=second" title="See timeline at 07/27/16 08:05:13">5 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./31.html" class="trac-id">#31</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Proposal for standard attributes actual_min and actual_max</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=jonblower">jonblower</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+<strong>Summary</strong>
+</p>
+<p>
+It is very useful for data mining and visualization applications to know the minimum and maximum values of a particular variable in a NetCDF file, without needing to extract the entire variable and calculate this in the application. Here we propose a new pair of standard variables <tt>actual_min</tt> and <tt>actual_max</tt> that contain the min and max values of a variable.
+</p>
+<p>
+<strong>Advantages</strong>
+</p>
+<p>
+The proposed new attributes would prevent misuse of the <tt>valid_min</tt> and <tt>valid_max</tt> attributes, which are intended to be used to delimit a valid data range, but in fact are often used to denote the <em>actual</em> range of data in a variable.  The latter (mis)use leads to incorrect assessment of missing values by tools.
+</p>
+<p>
+<em>Supports data mining:</em> It is a quick operation to find, say, all those data files that contain temperature values above 30degC.
+</p>
+<p>
+<em>Supports visualization:</em> Visualization tools can use the <tt>actual_min/max</tt> to generate a sensible colour scale range for displaying the contents of a file.  (However see caveats below.)
+</p>
+<p>
+In the context of aggregations (by NcML or otherwise), the <tt>actual_min/max</tt> could be easily calculated by taking the minimum/maximum of the attributes of the components of the aggregation.
+</p>
+<p>
+<strong>Disadvantages</strong>
+</p>
+<p>
+The new attributes represent redundant metadata and could be incorrectly generated or otherwise become inconsistent.  <em>Mitigation: Allow the CF-checker to check these attribute values if they are present in a file.</em>
+</p>
+<p>
+<strong>Caveats</strong>
+</p>
+<p>
+These attribute values would not be correct for a <em>subset</em> of data from the file and so any data subsetting tools must be aware of this and recalculate or remove these attributes from any data product subset.
+</p>
+<p>
+Data values outside the <tt>valid_range</tt> would not be counted in the <tt>actual_min/max</tt>.  An alternative nomenclature could be <tt>actual_valid_min/max</tt> (although personally I find this more confusing).
+</p>
+<p>
+For visualization, the <tt>actual_min/max</tt> will not always represent the <em>optimal</em> scale range, particularly if examining a restricted geographical area, or when looking at data from a particular elevation.  A more sophisticated solution could involve expressing <tt>actual_min/max</tt> as an array quantity, with a value pair for each elevation in the data volume.  This increases the complexity of the solution and places extra burdens on data providers and tool developers (and does not completly solve the problems described).
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(23)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1214241752000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-06-23T10%3A22%3A32-07%3A00&amp;precision=second" title="See timeline at 06/23/08 10:22:32">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jon
+</p>
+<p>
+Thanks for making this proposal. Please could you supply the exact amendments you propose should be made to the text of the CF conventions document and conformance document.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1214466088000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-06-26T00%3A41%3A28-07%3A00&amp;precision=second" title="See timeline at 06/26/08 00:41:28">13 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+This proposal needs a moderator. According to the rules, "A member of the conventions committee, or another suitably qualified person, volunteers to moderate the discussion. If no-one volunteers, the chairman of the committee will ask someone to do it."
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1214957940000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2008-07-01T17%3A19%3A00-07%3A00&amp;precision=second" title="See timeline at 07/01/08 17:19:00">13 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jon,
+</p>
+<p>
+Thank you for taking the time to submit a ticket on this.  Also for suggesting how the process might be streamlined.  I hope we will soon be able to begin modifying the website to make it easier.
+</p>
+<p>
+I can see that it would be convenient for graphics to have the actual_min and actual_max available.  It would be nice to know whether, in practice, determining the max &amp; min from the data itself significantly slows the graphical display of typical output.  I would have thought that calculating the contours, etc. would take much longer than deteriming the extremes.  
+</p>
+<p>
+The data mining advantage is clear, but only if you are interested in exceedence near the extremes, which I see as a rather special case.
+</p>
+<p>
+I hope there will be graphics tool designers who might weigh in with an opinion of how important these new attributes would be for their graphics packages.
+</p>
+<p>
+with regards,
+Karl
+</p>
+<p>
+P.S. I will appoint a moderator for this ticket unless someone on the Conventions Committee volunteers soon.  
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1271774367000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-04-20T07%3A39%3A27-07%3A00&amp;precision=second" title="See timeline at 04/20/10 07:39:27">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Id like to advocate that we accept this change. Users often instead use valid_min/max which has the undesirable side effect of requiring conforming software to examine data values to see if they are outside of the range. When they really just want to document the actual range in the file, this gives a clear way to do so. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1275153777000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-05-29T10%3A22%3A57-07%3A00&amp;precision=second" title="See timeline at 05/29/10 10:22:57">11 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+I propose that we accept this proposal. The valid_min/max attribute keeps tripping people up, lets do what we an to fix that.
+</p>
+<p>
+If we need to go through the formal process, I am willing to be moderator. 
+</p>
+<p>
+So, if there are any objections or concerns, please speak up!
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1275492101000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2010-06-02T08%3A21%3A41-07%3A00&amp;precision=second" title="See timeline at 06/02/10 08:21:41">11 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Enough people have already supported it, and long enough has passed without objection, for this proposal to be accepted now. However, it can't be implemented unless someone writes down in this ticket exactly the changes in text proposed to be made to the standards and conformance documents. Could Jon do that?
+</p>
+<p>
+To clarify this, is it required that the actual_min and actual_max have to equal exactly the minimum and maximum value in the data variable, or is it legal for them to indicate a wider range? If exact equality is required, which makes sense given the intention, then these attributes must have the same data type as their data variable, I suppose, and that should also be stated in the convention and conformance documents.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1319642134000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:8" class="follow-up">↓ 8</a>
+    <a href="#comment:11" class="follow-up">↓ 11</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-10-26T08%3A15%3A34-07%3A00&amp;precision=second" title="See timeline at 10/26/11 08:15:34">9 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi,
+</p>
+<p>
+I support this proposal too. However, I wonder if it would be preferable to conflate the two attributes <tt>actual_min</tt> and <tt>actual_max</tt> into a single attribute called <tt>actual_range</tt>, mirroring the existing NUG-derived attribute <tt>valid_range</tt>, and based on the assumption that one would always wish to specify both ends of the range. It also has the advantage of being a bit more compact: one attribute rather than two :-)
+</p>
+<p>
+As with <tt>valid_range</tt>, the value of the <tt>actual_range</tt> attribute would be a two-element vector whose data type matched the data variable to which it is attached. For example:
+</p>
+<pre class="wiki">float tas(time, lat, long) ;
+   ...
+   tas:actual_range = -75.1, 49.6 ;
+   ...
+</pre><p>
+Regards,
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1319684860000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+        in reply to:
+    <a href="#comment:7">↑ 7</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:9" class="follow-up">↓ 9</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-10-26T20%3A07%3A40-07%3A00&amp;precision=second" title="See timeline at 10/26/11 20:07:40">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <blockquote class="citation">
+<p>
+I support this proposal too. However, I wonder if it would be preferable to conflate the two attributes <tt>actual_min</tt> and <tt>actual_max</tt> into a single attribute called <tt>actual_range</tt>, mirroring the existing NUG-derived attribute <tt>valid_range</tt>, and based on the assumption that one would always wish to specify both ends of the range. It also has the advantage of being a bit more compact: one attribute rather than two :-)
+</p>
+</blockquote>
+<p>
+Yes, that looks like a good idea to me as well. What do you think about whether the range should be exactly as wide as the data range used, or could it be wider?
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1319704572000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+        in reply to:
+    <a href="#comment:8">↑ 8</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-10-27T01%3A36%3A12-07%3A00&amp;precision=second" title="See timeline at 10/27/11 01:36:12">9 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./31#comment:8" title="Comment 8">jonathan</a>:
+ 
+</p>
+<blockquote class="citation">
+<p>
+Yes, that looks like a good idea to me as well. What do you think about whether the range should be exactly as wide as the data range used, or could it be wider?
+</p>
+</blockquote>
+<p>
+Yep, I'd concur with your earlier comment 6 - the range should specify the exact minimum and maximum. Then client tools can choose whether or not to 'add a bit extra' for, say, plotting purposes.
+</p>
+<p>
+If possible, I reckon it would be good if we could slip this small addition into the next version of the CF conventions. It might only need an extra row added to the head of Table A.1.
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1319828045000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-10-28T11%3A54%3A05-07%3A00&amp;precision=second" title="See timeline at 10/28/11 11:54:05">9 years ago</a> by ngalbraith
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <blockquote class="citation">
+<p>
+the range should specify the exact minimum and maximum.
+</p>
+</blockquote>
+<p>
+Should be "the exact minimum and maximum that are within the valid range" or something similar, so that any unusual null values (e.g. -999) are not included in the calculation. Sorry if I'm belaboring the point!
+</p>
+<ul><li>Nan
+</li></ul>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1319832399000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+        in reply to:
+    <a href="#comment:7">↑ 7</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:12" class="follow-up">↓ 12</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-10-28T13%3A06%3A39-07%3A00&amp;precision=second" title="See timeline at 10/28/11 13:06:39">9 years ago</a> by dmurray
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./31#comment:7" title="Comment 7">pbentley</a>:
+</p>
+<blockquote class="citation">
+<p>
+As with <tt>valid_range</tt>, the value of the <tt>actual_range</tt> attribute would be a two-element vector whose data type matched the data variable to which it is attached. For example:
+</p>
+<pre class="wiki">float tas(time, lat, long) ;
+   ...
+   tas:actual_range = -75.1, 49.6 ;
+   ...
+</pre></blockquote>
+<p>
+What should the data type of actual_range be for data packed with scale_factor and add_offset?  With valid_range, the type must be the same as the packed type (e.g. short). Your proposal here seems to indicate that actual_range should also be short if the data are packed into shorts.  If the goal is to have this value be available for visualizations, then it would seem that it should be the data type of the unpacked values to be most useful.  I think that would be okay as long as it is documented.
+</p>
+<p>
+Don
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1320065673000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+        in reply to:
+    <a href="#comment:11">↑ 11</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:15" class="follow-up">↓ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-10-31T05%3A54%3A33-07%3A00&amp;precision=second" title="See timeline at 10/31/11 05:54:33">9 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./31#comment:11" title="Comment 11">dmurray</a>:
+ 
+</p>
+<blockquote class="citation">
+<p>
+What should the data type of actual_range be for data packed with scale_factor and add_offset?  With valid_range, the type must be the same as the packed type (e.g. short). Your proposal here seems to indicate that actual_range should also be short if the data are packed into shorts.  If the goal is to have this value be available for visualizations, then it would seem that it should be the data type of the unpacked values to be most useful.  I think that would be okay as long as it is documented.
+</p>
+</blockquote>
+<p>
+Yes, I think we'd want to add the clarification you suggest to the CF doc. As with scale_factor and add_offset, the values for actual_range "should be of the type intended for the unpacked data" (to quote the NUG).
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1323283292000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-07T10%3A41%3A32-08%3A00&amp;precision=second" title="See timeline at 12/07/11 10:41:32">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all, especially Phil, Nan, Jon and John
+</p>
+<p>
+It would be nice to conclude this ticket now so it can go into CF 1.7, which is about to be compiled. Are we agreed that we should have a two-element <tt>actual_range</tt> attribute of a data variable, whose values are packed into the same data type as the data if the data is packed, and when unpacked are within the valid range if specified, and exactly equal to the minimum and the maximum values of the data when unpacked? I think that summarises the above. Lack of objections will be interpreted as agreement, according to the rules.
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1323313119000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-07T18%3A58%3A39-08%3A00&amp;precision=second" title="See timeline at 12/07/11 18:58:39">9 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Im good with this, with caveat of clarifying the interaction with scale/offset packing. Did we get the actual amendment wording?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1323313307000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+        in reply to:
+    <a href="#comment:12">↑ 12</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:16" class="follow-up">↓ 16</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-07T19%3A01%3A47-08%3A00&amp;precision=second" title="See timeline at 12/07/11 19:01:47">9 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./31#comment:12" title="Comment 12">pbentley</a>:
+ 
+</p>
+<blockquote class="citation">
+<p>
+Yes, I think we'd want to add the clarification you suggest to the CF doc. As with scale_factor and add_offset, the values for actual_range "should be of the type intended for the unpacked data" (to quote the NUG).
+</p>
+<p>
+Phil
+</p>
+</blockquote>
+<p>
+Im confused by this, where do you find it? I am seeing this wording at
+</p>
+<p>
+<a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Attribute-Conventions.html#Attribute-Conventions"><span class="icon">​</span>http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Attribute-Conventions.html#Attribute-Conventions</a>:
+</p>
+<p>
+"If the variable is packed using scale_factor and add_offset attributes (see below), the _FillValue, missing_value, valid_range, valid_min, or valid_max attributes should have the data type of the packed data."
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1323338004000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+        in reply to:
+    <a href="#comment:15">↑ 15</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:18" class="follow-up">↓ 18</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-08T01%3A53%3A24-08%3A00&amp;precision=second" title="See timeline at 12/08/11 01:53:24">9 years ago</a> by pbentley
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./31#comment:15" title="Comment 15">caron</a>:
+</p>
+<p>
+Hi John,
+ 
+</p>
+<blockquote class="citation">
+<p>
+Im confused by this, where do you find it? I am seeing this wording at
+</p>
+<p>
+<a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Attribute-Conventions.html#Attribute-Conventions"><span class="icon">​</span>http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Attribute-Conventions.html#Attribute-Conventions</a>:
+</p>
+</blockquote>
+<p>
+The snippet of text I quoted came from the last sentence of the description of the <tt>add_offset</tt> attribute in Appendix B. I was looking at my treeware version of the NUG v4, though I notice that the same wording is in the online version you mention above. Anyhows, my reply was merely concurring with <a class="ticket" href="./31#comment:11" title="Comment 11">Don's</a> original comment - that <tt>actual_range</tt> should always reflect regular, unpacked data values - so probably best to completely ignore my follow up if it confuses matters :-)
+</p>
+<p>
+Phil
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1323356679000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:20" class="follow-up">↓ 20</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-08T07%3A04%3A39-08%3A00&amp;precision=second" title="See timeline at 12/08/11 07:04:39">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+OK, so the actual range is of the unpacked type. Sorry. We do need wording for the proposed change, as John says. Here is my suggestion:
+</p>
+<ul><li>Change the title of section 2.5.1 from <em>Missing data</em> to <em>Missing data, valid and actual range of data</em>.
+</li></ul><ul><li>Append the following paragraph to section 2.5.1: This convention defines a two-element vector attribute <tt>actual_range</tt> for variables containing numeric data. If the variable is packed using the <tt>scale_factor</tt> and <tt>add_offset</tt> attributes (see section 8.1), the elements of the <tt>actual_range</tt> should have the type intended for the unpacked data. The elements of <tt>actual_range</tt> must be exactly equal to the minimum and the maximum data values which occur in the variable (when unpacked if packing is used), and both must be within the <tt>valid_range</tt> if specified. If the data is all missing or invalid, the <tt>actual_range</tt> attribute cannot be used.
+</li></ul><ul><li>Add an entry to Appendix A for <tt>actual_range</tt>, numeric type, applicable to coordinates and data, reference section 2.5.1, text: "The smallest and the largest valid non-missing values occurring in the variable".
+</li></ul><p>
+Is that correct? Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1323366877000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+        in reply to:
+    <a href="#comment:16">↑ 16</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-08T09%3A54%3A37-08%3A00&amp;precision=second" title="See timeline at 12/08/11 09:54:37">9 years ago</a> by caron
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./31#comment:16" title="Comment 16">pbentley</a>:
+</p>
+<blockquote class="citation">
+<p>
+Replying to <a class="ticket" href="./31#comment:15" title="Comment 15">caron</a>:
+</p>
+<p>
+Hi John,
+ 
+</p>
+<blockquote class="citation">
+<p>
+Im confused by this, where do you find it? I am seeing this wording at
+</p>
+<p>
+<a class="ext-link" href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Attribute-Conventions.html#Attribute-Conventions"><span class="icon">​</span>http://www.unidata.ucar.edu/software/netcdf/docs/netcdf/Attribute-Conventions.html#Attribute-Conventions</a>:
+</p>
+</blockquote>
+<p>
+The snippet of text I quoted came from the last sentence of the description of the <tt>add_offset</tt> attribute in Appendix B. I was looking at my treeware version of the NUG v4, though I notice that the same wording is in the online version you mention above. Anyhows, my reply was merely concurring with <a class="ticket" href="./31#comment:11" title="Comment 11">Don's</a> original comment - that <tt>actual_range</tt> should always reflect regular, unpacked data values - so probably best to completely ignore my follow up if it confuses matters :-)
+</p>
+<p>
+Phil
+</p>
+</blockquote>
+<p>
+Yes, this is indeed confusing. Im pretty sure the following is true:
+</p>
+<p>
+1) scale_factor and add_offset should have the data type of the unpacked data
+</p>
+<p>
+2) _FillValue, missing_value, valid_range, valid_min, or valid_max attributes should have the data type of the packed data
+</p>
+<p>
+The reason for 2) is to identify missing values without having to apply the scale/offset.
+</p>
+<p>
+As for actual_range, I can see both sides of the argument. Probably using the unpacked data type is easier, so Im good with the proposal as Jonathan states it.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1325252039000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2011-12-30T05%3A33%3A59-08%3A00&amp;precision=second" title="See timeline at 12/30/11 05:33:59">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+There is no moderator for this ticket. Enough support has been expressed, there are no answered objections since the last summary and enough time has elapsed according to the rules. I assert therefore that this ticket should be accepted and included in the next release.
+</p>
+<p>
+We need an addition to the requirements in section 2.5.1 of the conformance document, which I propose as follows:
+</p>
+<ul><li>The <tt>actual_range</tt> attribute must be of the same type as its associated variable unless there is a <tt>scale_factor</tt> and/or <tt>add_offset</tt> attribute, in which case it must be of the same type as those attributes.
+</li><li>The <tt>actual_range</tt> attribute must have two elements, of which the first exactly equals the minimum non-missing value occurring in the associated variable after any <tt>scale_factor</tt> and <tt>add_offset</tt> are applied, and the second exactly equals the maximum value in the same way.
+</li><li>There must not be an <tt>actual_range</tt> attribute if all the data values of the associated variable equal the missing value.
+</li><li>If both the <tt>actual_range</tt> and <tt>valid_range</tt>/<tt>valid_min</tt>/<tt>valid_max</tt> are specified, the values of the <tt>actual_range</tt> must be valid values.
+</li></ul><p>
+The above will be assumed to be correct unless anyone objects.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1469630001646775">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+        in reply to:
+    <a href="#comment:17">↑ 17</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-27T07%3A33%3A21-07%3A00&amp;precision=second" title="See timeline at 07/27/16 07:33:21">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Changes to convention implemented in <a class="ext-link" href="https://github.com/cf-convention/cf-conventions/pull/78"><span class="icon">​</span>https://github.com/cf-convention/cf-conventions/pull/78</a>
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1469631346110051">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-27T07%3A55%3A46-07%3A00&amp;precision=second" title="See timeline at 07/27/16 07:55:46">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Changes to conformance requirements had already been made by mattben - thank you. Change to the title of 2.5.1 in the conformance document made by <a class="ext-link" href="https://github.com/cf-convention/cf-convention.github.io/pull/50"><span class="icon">​</span>https://github.com/cf-convention/cf-convention.github.io/pull/50</a>.
+</p>
+<p>
+David and Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1469631393266292">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-27T07%3A56%3A33-07%3A00&amp;precision=second" title="See timeline at 07/27/16 07:56:33">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>closed</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-23-1469631913326668">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-07-27T08%3A05%3A13-07%3A00&amp;precision=second" title="See timeline at 07/27/16 08:05:13">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Added Jon Blower as an additional author of the CF convention
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./31?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./31?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./31?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,921 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #86 (Allow coordinate variables to be scaled integers)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./85.html" title="ticket #85" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./86?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./86?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./86?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./87.html" title="ticket #87" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./85.html" title="ticket #85">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./87.html" title="ticket #87">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2012-04-21T13%3A02%3A19-07%3A00&amp;precision=second" title="See timeline at 04/21/12 13:02:19">9 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2017-03-28T09%3A34%3A28-07%3A00&amp;precision=second" title="See timeline at 03/28/17 09:34:28">4 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./86.html" class="trac-id">#86</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=enhancement">enhancement</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">Allow coordinate variables to be scaled integers</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable">rhorne@…</td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner"><a href="/trac/query?status=!closed&amp;owner=davidhassell">davidhassell</a></td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=medium">medium</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/trac/query?status=!closed&amp;keywords=~coordinate">coordinate</a> <a href="/trac/query?status=!closed&amp;keywords=~variables">variables</a>, <a href="/trac/query?status=!closed&amp;keywords=~scaled">scaled</a> <a href="/trac/query?status=!closed&amp;keywords=~integers">integers</a>
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+Currently, a coordinate variable that makes use of the standard NetCDF scaled integer convention is not CF metadata compliant.
+</p>
+<p>
+In addition to the reduction in NetCDF dataset (file) size, there are other advantaged to allowing it including simplifying product formatting software, and having an attribute (scale_factor) that provides insight into the spatial resolution of the data variable.
+</p>
+<p>
+To update the CF metadata conventions standard document requires changing a two rows in Table A.1 Attributes in Appendix A.
+</p>
+<p>
+(1)
+In the "add_offset" row, the "Use" column needs to change from "D" to "C, D"
+</p>
+<p>
+(2)
+In the "scale_factor"  row, the "Use" column needs to change from "D" to "C, D"
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(17)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1335277553000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2012-04-24T07%3A25%3A53-07%3A00&amp;precision=second" title="See timeline at 04/24/12 07:25:53">9 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Randy
+</p>
+<p>
+Thanks for opening this ticket. The email discussion on this subject suggested that this change would be seen by most people not to be a material change to the convention, in which case it's fine to propose correcting it as a defect. If anyone does think this is a material change and they are concerned about it, they should comment on this ticket. Otherwise, silence indicates acceptance - that's the rule for correcting defects!
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1363782801000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:3" class="follow-up">↓ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-20T05%3A33%3A21-07%3A00&amp;precision=second" title="See timeline at 03/20/13 05:33:21">8 years ago</a> by rhorne@…
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Is there anything left to be done for getting for this trac item approved ?
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1363790648000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+        in reply to:
+    <a href="#comment:2">↑ 2</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-20T07%3A44%3A08-07%3A00&amp;precision=second" title="See timeline at 03/20/13 07:44:08">8 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./86#comment:2" title="Comment 2">rhorne@excaliburlabs.com</a>:
+</p>
+<blockquote class="citation">
+<p>
+Is there anything left to be done for getting for this trac item approved ?
+</p>
+</blockquote>
+<p>
+Hello Randy,
+</p>
+<p>
+Many apologies for jumping in so late - I've not thought about this for a while, but should have done so.
+</p>
+<p>
+I support the proposed change which allows for the reduction in netCDF dataset (file) size, but I have a concern about its other suggested purpose.
+</p>
+<p>
+From the e-mail list discussion, it sounds like you would like to know what the real coordinate values are but not use them, i.e. you would like to <em>not</em> apply the additive offset or scale factor at the time of reading.
+</p>
+<p>
+If that's right, how would the software reading the data know, when presented with add_offset or scale_factor, whether or not to unpack values? <a class="ext-link" href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.6/cf-conventions.html#packed-data"><span class="icon">​</span>8.1 of the conventions</a> suggest to me that unpacking is to be expected at the time of reading.  
+</p>
+<p>
+Assuming I'm still holding the right end of the stick, could I re-suggest that using scaled and offset units for this purpose is more appropriate? For example:
+</p>
+<pre class="wiki">        float longitude(longitude) ;
+                longitude:units = "0.5 degrees_east @ 98" ;
+                longitude:standard_name = "longitude" ;
+
+data:
+
+ longitude = 0, 1, 2, 3 ;
+</pre><p>
+is completely equivalent to:
+</p>
+<pre class="wiki">        float longitude(longitude) ;
+                longitude:units = "degrees_east" ;
+                longitude:standard_name = "longitude" ;
+
+data:
+
+ longitude = 49.0, 49.5, 50.0, 50.5
+</pre><p>
+By using the units property in this way, it seems to me that the issue of "do I or don't I unpack" goes away and you still have the flexibility you require in your software - because you can choose whether or not to convert the units back to 'degrees_east'. The offset and scale are easily extracted from the units string.
+</p>
+<blockquote class="citation">
+<p>
+One of these products spans the 180 degrees_east longitude (i.e. -180 degrees_east longitude) line.  The implication being that the software resolving the scale factor and additive offset needs to be cognizant of the longitude coordinate variable "units".
+</p>
+</blockquote>
+<p>
+Using the units property should also solve this, I think.
+</p>
+<p>
+If I have misunderstood your use case, please let me know!
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1363821044000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-20T16%3A10%3A44-07%3A00&amp;precision=second" title="See timeline at 03/20/13 16:10:44">8 years ago</a> by Dave.Allured
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Randy,
+</p>
+<p>
+I am concerned that this proposal would require updates and increase complexity for many existing Netcdf readers, including general purpose software as well as my own code.  In my case, I read coordinate variables directly through the Netcdf API, not through a general purpose data interface that would automatically unpack.  I have never included the unpacking code in my coordinate readers.  I acknowledge that the added software complexity would be slight in each individual case, but it adds up.
+</p>
+<p>
+Also consider that the whole concept of scale/offset packing, just for data arrays alone, is confusing to some Netcdf beginners, generating significant amounts of user list and help desk traffic.  The latter is in part from local experience within my work group.
+</p>
+<p>
+For spatial resolution, I would suggest adding a simple non-CF attribute such as "resolution = 0.5" or "delta_x = 0.5" or "step = 0.5", or perhaps "step_range = 0.44, 0.5" for non-rectilinear coordinates.  IMO this is easier for human understanding than "scale_factor = 0.5", for the specific purpose that you cited.
+</p>
+<p>
+Given that one of your justifications is simplifying writer software, I am left wondering whether the value added is worth the trouble.  The status quo for coordinate variables seems to be working very well for a long time (excepting time coordinates, ouch, different topic).
+</p>
+<p>
+Do you have a particular situation where the reduction in file size would be significant?  Do you know of any general purpose software that <strong>already</strong> handles packed coordinate variables?
+</p>
+<p>
+--Dave
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1363891076000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:6" class="follow-up">↓ 6</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-21T11%3A37%3A56-07%3A00&amp;precision=second" title="See timeline at 03/21/13 11:37:56">8 years ago</a> by rhorne@…
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dave:
+</p>
+<p>
+As it turns out, we have come to conclude there is no need for the user applications (at least in our use cases) to know the "packed" coordinate variable values, but the other rationales still apply.
+</p>
+<p>
+I would also tend to believe that there is no need for any user application to need to know the packed coordinate variable value because of its inherent correspondence with the data variable.
+</p>
+<p>
+This topic was also taken up on the CF message board (<a class="ext-link" href="http://mailman.cgd.ucar.edu/pipermail/cf-metadata/2012/055468.html"><span class="icon">​</span>http://mailman.cgd.ucar.edu/pipermail/cf-metadata/2012/055468.html</a>).  Note that this capability is provided by the netcdf-Java library
+</p>
+<p>
+very respectfully,
+</p>
+<p>
+randy
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1363988102000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+        in reply to:
+    <a href="#comment:5">↑ 5</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-22T14%3A35%3A02-07%3A00&amp;precision=second" title="See timeline at 03/22/13 14:35:02">8 years ago</a> by Dave.Allured
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Randy,
+</p>
+<p>
+Thank you for the link to the original discussion, that was helpful.  My concerns about existing software were already mentioned 11 months ago by Jonathan Gregory and Mike Grant.  Common libraries or tools that do not unpack coordinates automatically include netcdf-fortran, NCL, and NCO utilities, as well as netcdf-C which was mentioned earlier.
+</p>
+<p>
+If you could somehow include a caveat that packed coordinates should only be used for particular applications with significant file size improvement, there might be fewer user cases needing code updates.  The previously mentioned swath data is an example.
+</p>
+<p>
+--Dave
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1364138261000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+          <span>follow-ups:</span>
+    <a href="#comment:8" class="follow-up">↓ 8</a>
+    <a href="#comment:9" class="follow-up">↓ 9</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-24T08%3A17%3A41-07%3A00&amp;precision=second" title="See timeline at 03/24/13 08:17:41">8 years ago</a> by rhorne@…
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dave:
+</p>
+<p>
+Will the following revision to the proposed update to the CF standard alleviate the concern ?
+</p>
+<p>
+To update the CF metadata conventions standard document requires changing a two rows in Table A.1 Attributes in Appendix A.
+</p>
+<p>
+(1) In the "add_offset" row, the "Use" column needs to change from "D" to "C, D"
+</p>
+<p>
+(2) In the "scale_factor" row, the "Use" column needs to change from "D" to "C, D"
+</p>
+<p>
+In addition in the following statement will be added to the "Description"  cell in Table A.1 Attributes for attributes scale_factor and add_offset.
+</p>
+<p>
+"The use of packed coordinate variables is allowed, but not preferred to primarily support use cases where dataset sizing constraints exist."
+</p>
+<p>
+very respectfully,
+</p>
+<p>
+randy
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1364150150000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+        in reply to:
+    <a href="#comment:7">↑ 7</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-24T11%3A35%3A50-07%3A00&amp;precision=second" title="See timeline at 03/24/13 11:35:50">8 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello Randy,
+</p>
+<p>
+I'm fine with this.
+</p>
+<p>
+Many thanks and all the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1364236432000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+        in reply to:
+    <a href="#comment:7">↑ 7</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-03-25T11%3A33%3A52-07%3A00&amp;precision=second" title="See timeline at 03/25/13 11:33:52">8 years ago</a> by Dave.Allured
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./86#comment:7" title="Comment 7">rhorne@excaliburlabs.com</a>:
+</p>
+<p>
+Randy,
+</p>
+<p>
+That will be sufficient.  Thank you for including this caveat.
+</p>
+<p>
+--Dave
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1366640682000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-22T07%3A24%3A42-07%3A00&amp;precision=second" title="See timeline at 04/22/13 07:24:42">8 years ago</a> by rhorne@…
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Folks: 
+</p>
+<p>
+Almost a month has elapsed since the last correspondence.  The subject of this trac item captures the intent of this change "Allow coordinate variables to be scaled integers".
+</p>
+<p>
+To update the CF metadata conventions standard document requires changing a two rows in Table A.1 Attributes in Appendix A. 
+</p>
+<p>
+(1) In the "add_offset" row, the "Use" column needs to change from "D" to "C, D" 
+</p>
+<p>
+(2) In the "scale_factor" row, the "Use" column needs to change from "D" to "C, D" 
+</p>
+<p>
+In addition, the following statement will be added to the "Description" cell in Table A.1 Attributes for attributes scale_factor and add_offset. 
+</p>
+<p>
+"The use of packed coordinate variables is allowed, but not preferred to primarily support use cases where dataset sizing constraints exist." 
+</p>
+<p>
+I support this enhancement. Does the conventions committee support this enhancement ?
+</p>
+<p>
+very respectfully,
+</p>
+<p>
+randy
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1366648920000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-22T09%3A42%3A00-07%3A00&amp;precision=second" title="See timeline at 04/22/13 09:42:00">8 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Randy
+</p>
+<p>
+The rule for defect tickets is that if no-one objects for three weeks, they are accepted by default. That seems to be the case here.
+</p>
+<p>
+Reading your sentence, though, I find I am not quite sure what it means! "The use of packed coordinate variables is allowed, but not preferred to primarily support use cases where dataset sizing constraints exist." Does it mean, "In cases where there is a strong constraint on dataset size, it is allowed to pack the coordinate variables (using <tt>add_offset</tt> and/or <tt>scale_factor</tt>), but this is not recommended in general."
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1366651387000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-22T10%3A23%3A07-07%3A00&amp;precision=second" title="See timeline at 04/22/13 10:23:07">8 years ago</a> by rhorne@…
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Jonathan:
+</p>
+<p>
+Thanks for the clarification on the rules.  I think your wording of the caveat is more clear.  Here is the update.
+</p>
+<p>
+To update the CF metadata conventions standard document requires changing a two rows in Table A.1 Attributes in Appendix A. 
+</p>
+<p>
+(1) In the "add_offset" row, the "Use" column needs to change from "D" to "C, D" 
+</p>
+<p>
+(2) In the "scale_factor" row, the "Use" column needs to change from "D" to "C, D" 
+</p>
+<p>
+In addition, the following statement will be added to the "Description" cell in Table A.1 Attributes for attributes scale_factor and add_offset. 
+</p>
+<p>
+"In cases where there is a strong constraint on dataset size, it is allowed to pack the coordinate variables (using add_offset and/or scale_factor), but this is not recommended in general."
+</p>
+<p>
+very repspectfully,
+</p>
+<p>
+randy
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1366651772000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:14" class="follow-up">↓ 14</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-22T10%3A29%3A32-07%3A00&amp;precision=second" title="See timeline at 04/22/13 10:29:32">8 years ago</a> by mggrant
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+No objections and no intent to delay this, but if you're tinkering with the recommendation line, you could also add a note that activating netcdf-4 internal compression is also preferable as a first option, where this is practical, e.g.
+</p>
+<p>
+"In cases where there is a strong constraint on dataset size and netcdf-4 internal compression is unavailable or insufficient, it is allowed to pack the coordinate variables (using add_offset and/or scale_factor), but this is not recommended in general."
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1366672416000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+        in reply to:
+    <a href="#comment:13">↑ 13</a>
+        ;
+          <span>follow-up:</span>
+    <a href="#comment:15" class="follow-up">↓ 15</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-22T16%3A13%3A36-07%3A00&amp;precision=second" title="See timeline at 04/22/13 16:13:36">8 years ago</a> by Dave.Allured
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-keywords">
+      <strong class="trac-field-keywords">Keywords</strong>
+        <em>integers</em> added; <em>inetegers</em> removed
+    </li><li class="trac-field-type">
+      <strong class="trac-field-type">Type</strong>
+        changed from <em>defect</em> to <em>enhancement</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./86#comment:13" title="Comment 13">mggrant</a>:
+</p>
+<p>
+Mike,
+</p>
+<p>
+It seems to me that the advice to consider netcdf-4 compression is too general to be used in the specific context of coordinate variables.  Does this need to be restated for every other space-saving method within CF?
+</p>
+<p>
+--Dave
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1366822394000000">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+        in reply to:
+    <a href="#comment:14">↑ 14</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2013-04-24T09%3A53%3A14-07%3A00&amp;precision=second" title="See timeline at 04/24/13 09:53:14">8 years ago</a> by mggrant
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Replying to <a class="ticket" href="./86#comment:14" title="Comment 14">Dave.Allured</a>:
+</p>
+<p>
+I have no issue with that comment not being included - I mentioned it only as packing is a method that breaks "normal" usage and is something that people in my field tend to reach for without thinking about other, perhaps better options first.  The general advice not to use packing is ok.
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1483541904753075">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-01-04T06%3A58%3A24-08%3A00&amp;precision=second" title="See timeline at 01/04/17 06:58:24">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-owner">
+      <strong class="trac-field-owner">Owner</strong>
+        changed from <em>cf-conventions@…</em> to <em>davidhassell</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>accepted</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-17-1490718868662205">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-28T09%3A34%3A28-07%3A00&amp;precision=second" title="See timeline at 03/28/17 09:34:28">4 years ago</a> by painter1
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>accepted</em> to <em>closed</em>
+    </li>
+  </ul>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./86?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./86?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./86?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>

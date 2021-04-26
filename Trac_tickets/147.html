@@ -1,0 +1,1643 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  <head>
+    <title>
+      #147 (clarification of standard and correction of conformance doc: formula_terms)
+     – CF Metadata
+    </title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!--[if IE]><script type="text/javascript">
+      if (/^#__msie303:/.test(window.location.hash))
+        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
+    </script><![endif]-->
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="./146.html" title="ticket #146" />
+        <link rel="last" href="./176.html" title="ticket #176" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="./147?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" /><link rel="alternate" href="./147?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="./147?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" />
+        <link rel="next" href="./148.html" title="ticket #148" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="./1.html" title="ticket #1" />
+        <link rel="shortcut icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+        <link rel="icon" href="/trac/chrome/common/trac.ico" type="image/x-icon" />
+    <style id="trac-noscript" type="text/css">.trac-noscript { display: none !important }</style>
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search CF Metadata" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="b8aeac20bf7fd49b63339caa";
+      var comments_prefs={"comments_only":"false","comments_order":"oldest"};
+    </script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="/trac/chrome/common/js/auto_preview.js"></script>
+    <script type="text/javascript">
+      jQuery("#trac-noscript").remove();
+      jQuery(document).ready(function($) {
+        $(".trac-autofocus").focus();
+        $(".trac-target-new").attr("target", "_blank");
+        setTimeout(function() { $(".trac-scroll").scrollToTop() }, 1);
+        $(".trac-disable-on-submit").disableOnSubmit();
+      });
+    </script>
+    <script type="text/javascript" src="/trac/chrome/common/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#attachments").toggleClass("collapsed");
+        $("#trac-up-attachments").click(function () {
+          $("#attachments").removeClass("collapsed");
+          return true;
+        });
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        function setRevertHandler() {
+          $("button.trac-revert").click(function() {
+            var div = $("div", this);
+            var field_name = div[0].id.substr(7);
+            var field_value = div.text();
+            var input = $("#propertyform *[name=field_" + field_name + "]");
+            if (input.length > 0) {
+              if (input.filter("input[type=radio]").length > 0) {
+                input.val([field_value]);
+              } else if (input.filter("input[type=checkbox]").length > 0) {
+                input.val(field_value == "1" ? [field_value] : []);
+              } else {
+                input.val(field_value);
+              }
+            } else { // Special case for CC checkbox
+              input = $("#propertyform input[name=cc_update]").val([]);
+            }
+            input.change();
+            $(this).closest("li").remove();
+            return false;
+          });
+        }
+        setRevertHandler();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          // Update ticket box
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          // Update changelog with original order
+          $("#changelog").replaceWith(items.filter("#changelog"));
+          // Reorder comments
+          applyCommentsOrder(
+            $('#prefs input[name="trac-comments-order"]:checked').val());
+          // Show warning
+          var new_changes = $("#changelog .trac-new");
+          $("#trac-edit-warning").toggle(new_changes.length != 0);
+          if (new_changes.length != 0)
+            $("#changelog").parent().show().removeClass("collapsed");
+          // Update view time
+          $("#propertyform input[name='view_time']").replaceWith(items.filter("input[name='view_time']"));
+          // Update preview
+          var preview = $("#ticketchange").html(items.filter('#preview').children());
+          var show_preview = preview.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          setRevertHandler();
+          // Collapse property form if comment editor has focus
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+          // Execute scripts to load stylesheets
+          items.filter("script").appendTo("head");
+        }, "#ticketchange .trac-loading");
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        }, "#changelog .trac-loading");
+        /*]]>*/
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://cf-trac.llnl.gov/trac"><img src="/trac/chrome/site/cf_logo.png" alt="CF Metadata Trac" height="80" width="400" /></a>
+      </div>
+      <form id="search" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/about">About Trac</a></li><li><a href="/trac/prefs">Preferences</a></li><li class="last"><a href="/trac/wiki/TracGuide">Help/Guide</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first active"><a href="/trac/query">View Tickets</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/search">Search</a></li><li class="last"><a href="/trac/wiki">Wiki</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+        <ul>
+          <li class="first"><span>&larr; <a class="prev" href="./146.html" title="ticket #146">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="./148.html" title="ticket #148">Next Ticket</a> &rarr;</span></li>
+        </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+        <div id="ticket" class="trac-content ">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/trac/timeline?from=2015-12-14T14%3A58%3A05-08%3A00&amp;precision=second" title="See timeline at 12/14/15 14:58:05">5 years ago</a></p>
+    <p>Closed <a class="timeline" href="/trac/timeline?from=2017-05-30T08%3A22%3A21-07%3A00&amp;precision=second" title="See timeline at 05/30/17 08:22:21">4 years ago</a></p>
+  </div>
+  <h2>
+    <a href="./147.html" class="trac-id">#147</a>
+    <span class="trac-status">
+      <a href="/trac/query?status=closed">closed</a>
+    </span>
+    <span class="trac-type">
+      <a href="/trac/query?status=!closed&amp;type=defect">defect</a>
+    </span>
+    <span class="trac-resolution">
+      (<a href="/trac/query?status=closed&amp;resolution=fixed">fixed</a>)
+    </span>
+  </h2>
+  <h1 id="trac-ticket-title" class="searchable">
+    <span class="summary">clarification of standard and correction of conformance doc: formula_terms</span>
+  </h1>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable"><a href="/trac/query?status=!closed&amp;reporter=taylor13">taylor13</a></td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">cf-conventions@…</td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/trac/query?status=!closed&amp;priority=high">high</a>
+        </td>
+        <th id="h_milestone" class="missing">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="missing milestone"></a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/trac/query?status=!closed&amp;component=cf-conventions">cf-conventions</a>
+        </td>
+        <th id="h_version" class="missing">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/trac/query?status=!closed&amp;version="></a>
+        </td>
+    </tr><tr>
+        <th id="h_keywords" class="missing">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+        </td>
+        <th id="h_cc" class="missing">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <div class="searchable">
+      <p>
+Based on a statement appearing in the conformance document, the CF checker raises an error when the formula_terms attribute is attached to a variable other than a coordinate variable.  It turns out that formula_terms are essential for interpreting the bounds on dimensionless vertical coordinates, so formula_terms should be provided whenever a variable with one of the standard_names listed in Appendix C appears in a file.  The formula terms associated with bounds are needed, for example, to compute the pressure-thickness of model atmospheric layers (needed to compute the grid cell mass).  
+</p>
+<p>
+To correct this defect (and remove any impression that the formula_terms can *only* be attached to coordinate variables (as formally defined by the NUG), I propose:
+</p>
+<ol><li>In section 1.3 Overview, the standard states:  "The definitions are associated with a coordinate variable via the standard_name and formula_terms attributes." I would revise the sentence to read:  "The definitions are associated with variables containing dimensionless coordinate values via the standard_name and formula_terms attributes."
+</li></ol><ol start="2"><li>Similarly in section 1.4 Relationship to the COARDS Conventions, the standard states:   "But we recommend that the standard_name and formula_terms attributes be used to identify the appropriate definition of the dimensionless vertical coordinate ...".  I would revise the sentence to read:  "But we recommend that the standard_name and formula_terms attributes be used to identify the appropriate definition of a variable storing dimensionless vertical coordinate values ...". 
+</li></ol><ol start="3"><li> In Chapter 4 Coordinate Variables.   The standard states "The definitions are associated with a coordinate variable via the standard_name and formula_terms attributes." I would revise the sentence to read: "The definitions are associated with variables containing dimensionless vertical coordinate values via the standard_name and formula_terms attributes."
+</li></ol><ol start="4"><li> In section 4.3.2. Dimensionless Vertical Coordinates, the standard states: "A new attribute, formula_terms, is used to associate terms in the definitions with variables in a netCDF file."  I would add to this sentence the phrase ", as described in Appendix D".
+</li></ol><ol start="5"><li> In Appendix D. Dimensionless Vertical Coordinates, the standard states: "A coordinate variable is associated with its definition by the value of the standard_name attribute. The terms in the definition are associated with file variables by the formula_terms attribute. The formula_terms attribute takes a string value, the string being comprised of blank-separated elements of the form "term: variable", where term is a keyword that represents one of the terms in the definition, and variable is the name of the variable in a netCDF file that contains the values for that term. The order of elements is not significant."  I would add to this paragraph the sentence:  "Use of the standard_names and formula_terms defined in this Appendix is not limited to coordinate variables (as defined in section 2.3.1 of the NUG); it is recommended that they be included for any variable storing dimensionless vertical coordinate values."
+</li></ol><ol start="6"><li>The CF Conformance Requirements and Recommendations document currently states: "The formula_terms attribute is only allowed on a coordinate variable which has a standard_name listed in Appendix C."  In addition to correcting "Appendix C" to read "Appendix D", I suggest modifying the sentence as follows:  "The formula_terms attribute is only allowed on a variable that has a standard_name listed in Appendix D or contains coordinates bounds for a coordinate variable defined in Appendix D."  [Note that this means we can have formula_terms associated with *any* variable that has a standard_name listed in the Appendix.]
+</li></ol><ol start="7"><li> The current CF checker(s) should be revised to be consistent with the above change in the conformance document.
+</li></ol><p>
+A final note:  In CMIP5 (and as planned for CMIP6), formula_terms are defined for vertical dimensionless coordinates and also for the bounds on those coordinates.  If the CF checker is modified as suggested above, it will no longer raise an error in checking CMIP output files.
+</p>
+
+    </div>
+  </div>
+</div>
+          
+
+        <div>
+          <div class="trac-noscript" style="position: relative">
+            <form id="prefs" method="get" action="/trac/prefs" style="position: absolute; right: 0">
+              <div id="trac-comments-order">
+                <input type="radio" id="trac-comments-oldest" name="trac-comments-order" value="oldest" checked="checked" />
+                <label for="trac-comments-oldest">Oldest first</label>
+                <input type="radio" id="trac-comments-newest" name="trac-comments-order" value="newest" />
+                <label for="trac-comments-newest">Newest first</label>
+                <span id="trac-threaded-toggle" style="display: none">
+                  <input type="radio" id="trac-comments-threaded" name="trac-comments-order" value="threaded" />
+                  <label for="trac-comments-threaded">Threaded</label>
+                </span>
+              </div>
+              <div>
+                <input id="trac-comments-only-toggle" type="checkbox" />
+                <label for="trac-comments-only-toggle">Comments only</label>
+              </div>
+            </form>
+          </div>
+          <h3 class="foldable">Change History <span class="trac-count">(26)</span></h3>
+          <div id="changelog">
+              <div class="change" id="trac-change-1-1450199256610138">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:1" class="cnum">
+    <a href="#comment:1">comment:1</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-15T09%3A07%3A36-08%3A00&amp;precision=second" title="See timeline at 12/15/15 09:07:36">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl
+</p>
+<p>
+Thanks for this proposal. I have a few comments.
+</p>
+<ul><li>In your preamble, you mean appendix D, I think.
+</li></ul><ul><li>In ticket 143, we have agreed to rename "dimensionless vertical coordinate variables" as "parametric vertical coordinate variables", because they are not necessarily dimensionless. That is a simple substitution which affects your proposed text.
+</li></ul><ul><li>On point 5, perhaps it would be simpler to replace "A coordinate variable" at the start with "A variable containing coordinate data". In Appendix A, we already have this approach. There we put "C" for "variables which contain coordinate data", and <tt>formula_terms</tt> is marked "C". I think we used that phrase in order to include Unidata coordinate variables, auxiliary coordinate variables and scalar variables, and you would argue that bounds variables should also be included in it.
+</li></ul><ul><li>This also relates to ticket 140, in which David Hassell proposed that boundary variables should generally <strong>not</strong> have attributes which can be inherited from their coordinate variables, or if they do, they must be exactly the same. However, he didn't include <tt>formula_terms</tt> in that, so it doesn't conflict with yours. The <tt>formula_terms</tt> attribute does have to be different for bounds, because the variables it names are different from the <tt>formula_terms</tt> of its parent variable.
+</li></ul><ul><li>If we can express it, we ought to have some requirement that the <tt>formula_terms</tt> of the bounds and the coordinate variable are consistent. They must be the same formula, or it wouldn't make sense. I think that means they must have the same <tt>standard_name</tt>, or if the bounds don't have one, it can be inherited (ticket 140). See also next point.
+</li></ul><ul><li>I don't follow your final remark in point 6. Surely the <tt>standard_name</tt> of the bounds variable must be the same as of the coordinate variable (see also ticket 140)? I don't think we can allow a variable to have <tt>formula_terms</tt> unless it's one of those in Appendix D, because it's only those which have a defined formula.
+</li></ul><ul><li>We could make a requirement of consistency that the variables named by the <tt>bounds</tt> of the <tt>formula_terms</tt> of the vertical coordinate variable must be the same ones as named by the <tt>formula_terms</tt> of the <tt>bounds</tt> of the vertical coordinate variable! That is, you can get to the same place by two routes.
+</li></ul><p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2-1450303400054775">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:2" class="cnum">
+    <a href="#comment:2">comment:2</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-16T14%3A03%3A20-08%3A00&amp;precision=second" title="See timeline at 12/16/15 14:03:20">5 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello Karl,
+</p>
+<p>
+Thanks for thinking about this. In the spirit of <a class="closed ticket" href="./140.html" title="enhancement: Clarifying the role of attributes on boundary variables. (closed: fixed)">#140</a>, I prefer a different emphasis, one which recommends there not to be <tt>formula_terms</tt> on bounds variables, but defines how a formula may be assumed to apply to bounds variable if omitted. This is to reduce redundancy. I propose that (incorporating Jonathan's last point, probably less well put ...):
+</p>
+<p>
+If a coordinate variable has a <tt>formula_terms</tt> attribute then by default it is assumed that the same formula applies to the coordinate variable's bounds, but each term with a coordinate variable value is replaced with the corresponding bounds variable. If a bounds variable has a <tt>formula_terms</tt> attribute then it must be the same as for the parent coordinate variable but with term values of bounds variables instead of the corresponding coordinate variables, and this would be checked by the checker.
+</p>
+<p>
+For example, in CDL, this:
+</p>
+<pre class="wiki">float atmosphere_hybrid_height_coordinate(atmosphere_hybrid_height_coordinate);
+    standard_name: "atmosphere_hybrid_height_coordinate";
+    formula_terms: "a: a b: b orog: orog";
+    bounds: "atmosphere_hybrid_height_coordinate_bounds";
+
+float atmosphere_hybrid_height_coordinate_bounds(atmosphere_hybrid_height_coordinate, 2);
+</pre><p>
+would be exactly equivalent to:
+</p>
+<pre class="wiki">float atmosphere_hybrid_height_coordinate(atmosphere_hybrid_height_coordinate);
+    standard_name: "atmosphere_hybrid_height_coordinate";
+    formula_terms: "a: a b: b orog: orog";
+    bounds: "atmosphere_hybrid_height_coordinate_bounds";
+
+float atmosphere_hybrid_height_coordinate_bounds(atmosphere_hybrid_height_coordinate, 2);
+    formula_terms = "a: a_bounds b: b_bounds orog: orog";
+</pre><p>
+assuming that coordinate variables <tt>a</tt> and <tt>b</tt> have bounds variables <tt>a_bounds</tt> and <tt>b_bounds</tt> respectively.
+</p>
+<p>
+What do you think?
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3-1450374750634203">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:3" class="cnum">
+    <a href="#comment:3">comment:3</a>
+  </span>
+          <span>follow-up:</span>
+    <a href="#comment:4" class="follow-up">↓ 4</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-17T09%3A52%3A30-08%3A00&amp;precision=second" title="See timeline at 12/17/15 09:52:30">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Just to clarify this, David, I think that when you say "assuming that coordinate variables <tt>a</tt> and <tt>b</tt> have bounds variables <tt>a_bounds</tt> and <tt>b_bounds</tt> respectively" you mean that they do <strong>explicitly</strong> have those bounds. That is, in both cases, the CDL also includes
+</p>
+<pre class="wiki">   float a(atmosphere_hybrid_height_coordinate);
+     a:bounds="a_bounds";
+   float a_bounds(atmosphere_hybrid_height_coordinate,2);
+   float b(atmosphere_hybrid_height_coordinate);
+     b:bounds="b_bounds";
+   float b_bounds(atmosphere_hybrid_height_coordinate,2);
+</pre><p>
+Is that right? The point is that you don't need the <tt>formula_terms</tt> on the bounds of the coordinate variable, because you can use the <tt>formula_terms</tt> on the coordinate variable to find the bounds of the terms.
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4-1450377460500885">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:4" class="cnum">
+    <a href="#comment:4">comment:4</a>
+  </span>
+        in reply to:
+    <a href="#comment:3">↑ 3</a>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-17T10%3A37%3A40-08%3A00&amp;precision=second" title="See timeline at 12/17/15 10:37:40">5 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Jonathan,
+</p>
+<p>
+That is indeed what I meant. Much better to spell it out to avoid confusion - thank you!
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-5-1450384561857688">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:5" class="cnum">
+    <a href="#comment:5">comment:5</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-17T12%3A36%3A01-08%3A00&amp;precision=second" title="See timeline at 12/17/15 12:36:01">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear all,
+</p>
+<p>
+Thanks for thinking about this.
+</p>
+<p>
+Responses and further comments to the previous discussion:
+</p>
+<p>
+I agree with Jonathan’s first 5 bullet points.
+</p>
+<p>
+Concerning Jonathan’s point 6:  Would it be clearer if this simply read:  “The formula_terms attribute may be attached to any variable that has a standard_name listed in Appendix D (or to a variable directly associated with another variable with that standard_name, as might be the case with cell bounds variables).”
+</p>
+<p>
+Concerning Jonathan’s point 7, and subsequent discussion:  For consistency with the rest of the convention, there would be no restrictions placed on actual variable names (e.g., a_bounds, and b_bounds  would not have to start with “a” and “b” or end in the suffix “bounds”.) .    Thus, it would be perfectly acceptable to have CDL like the following (paralleling previous examples):
+</p>
+<p>
+float h(h);     
+</p>
+<blockquote>
+<p>
+h:standard_name = "atmosphere_hybrid_height_coordinate";
+</p>
+</blockquote>
+<blockquote>
+<p>
+h: formula_terms = "a: x b: y orog: orog";
+</p>
+</blockquote>
+<blockquote>
+<p>
+h: bounds = "hbnds";  
+</p>
+</blockquote>
+<p>
+float hbnds(h, 2);
+</p>
+<blockquote>
+<p>
+hbnds:formula_terms = "a: xxx b: yyy orog: orog"
+</p>
+</blockquote>
+<p>
+float x(h);
+</p>
+<blockquote>
+<p>
+x:bounds=&#34;xxx";
+</p>
+</blockquote>
+<p>
+float xxx(h,2);
+</p>
+<p>
+float y(h);
+</p>
+<blockquote>
+<p>
+y:bounds=&#34;yyy";
+</p>
+</blockquote>
+<p>
+float yyy(h,2); 
+</p>
+<p>
+In my original proposal, I omitted the bounds attached to x and y because that seems both redundant and I think the bounds attribute should only be allowed for variables containing coordinate values  (nb. in the above example “x” and “y” are not coordinate values).    The formula_terms are needed to translate some (usually) dimensionless value to an actual geophysical vertical position.  In this sense they are needed to interpret the bounds positions just as they are needed to interpret the coordinate positions.  It seems natural then to attach them to the bounds, as well as to the coordinate.  I don’t see any added value to attaching a bounds attribute to the any of the variables appearing in formula_terms.  So I favor eliminating the following two lines from the above example:
+</p>
+<blockquote>
+<p>
+x:bounds=&#34;xxx";
+</p>
+</blockquote>
+<blockquote>
+<p>
+y:bounds=&#34;yyy";
+</p>
+</blockquote>
+<p>
+Thanks for quickly providing input on this,
+</p>
+<p>
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-6-1450455356430482">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:6" class="cnum">
+    <a href="#comment:6">comment:6</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-18T08%3A15%3A56-08%3A00&amp;precision=second" title="See timeline at 12/18/15 08:15:56">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl
+</p>
+<p>
+I think that any variable containing coordinate data should be allowed to have bounds (as currently indicated by Appendix A), which I understand to include the formula terms of a coordinate variable. I think this makes them more independently interpretable, and the convention therefore more robust. I understand your point, that if a variable is used only as a formula term of a coordinate variable, you could find its bounds by looking at the <tt>formula_terms</tt> of the bounds of the coordinate variable. But this is rather indirect. There is nothing that points "up" from a formula term variable to the coordinate variable. You can only see this link from the top down. A general feature of CF is that things are self-describing. Consistent with this idea, I would like to be able to find the bounds of any variable by inspecting that variable alone.
+</p>
+<p>
+Another argument, which is weaker but I think valid, is that a formula terms variable might also serve as a coordinate variable in its own right. It is contrived, but possible that pressure might be both a coordinate variable, and a formula term for a hybrid sigma-pressure coordinate variable, for example. Allowing this possibility means that we can't prevent formula terms from having bounds.
+</p>
+<p>
+You prefer that formula terms should not have bounds. David and I prefer that bounds should not have formula terms. I suggest, therefore, that the best solution is to allow both, but insist that they must be consistent if both present. This was the last point of my comment above. It is a rule we can write down in the conformance document to be implemented in the CF checker. (By the way, I've been aware that we disagreed about this for at least a decade. I thought it might come to a head one day. :-)
+</p>
+<p>
+On the other point, perhaps this would be even plainer, although repetitive: "The <tt>formula_terms</tt> attribute may be attached to any variable that has a <tt>standard_name</tt> listed in Appendix D, or which is the bounds variable of a coordinate variable with a <tt>standard_name</tt> listed in Appendix D."
+</p>
+<p>
+I agree, there are no implied names for bounds. They have to be named explicitly by a <tt>bounds</tt> attribute.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-7-1450457189734848">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:7" class="cnum">
+    <a href="#comment:7">comment:7</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-18T08%3A46%3A29-08%3A00&amp;precision=second" title="See timeline at 12/18/15 08:46:29">5 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello All,
+</p>
+<p>
+while there is some value in Jonathan's compromise, I'm concerned that it will make life very difficult for the struggling software developer. When my software encounters a variable with formula terms and bounds, it should, perhaps, start looking for the bounds associated with the formula terms. In Karl's approach the formula terms attribute on the bounds variable explicitly states that one component of the formula shares the same variable as the parent coordinate variable (i.e. <tt>orog</tt>) but in David's approach this information is implicit through the absence of a bounds attribute on <tt>orog</tt>. While the information is complete in theory, I don't like the idea of constructing the formula based on presence or absence of an attribute which is optional (i.e. the bounds attribute of the formula terms. I probably have not fully understood the spirit of <a class="closed ticket" href="./140.html" title="enhancement: Clarifying the role of attributes on boundary variables. (closed: fixed)">#140</a>, but perhaps that spirit could be better supported by making a clear statement that the <tt>formula_terms</tt> attribute is an exception to the general rule because there will generally be good reasons for it to have different values. 
+</p>
+<p>
+Regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-8-1450459483551856">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:8" class="cnum">
+    <a href="#comment:8">comment:8</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-18T09%3A24%3A43-08%3A00&amp;precision=second" title="See timeline at 12/18/15 09:24:43">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Martin
+</p>
+<p>
+My aim is to make things easy for users of the data and writers of software for analysis, by providing everyone with the information they need under their noses. If you want the formula terms of a variable, whether it is a coordinate variable or a bounds variable, you can use its <tt>formula_terms</tt> attribute (Karl's preference). If you want the bounds of a variable, whether it is a coordinate variable or a formula terms variable, you can use its <tt>bounds</tt> attribute (David's preference and mine). Nothing is implicit or indirect. I think that it should be mandatory to provide both, so that users of data can rely on it. The disadvantage of this proposal is that it is redundant, because there are two routes from the coordinate variable to the bounds of its formula terms. But it would be easy to write down a test for consistency that can be put in the CF checker.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-9-1450551831654521">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:9" class="cnum">
+    <a href="#comment:9">comment:9</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-19T11%3A03%3A51-08%3A00&amp;precision=second" title="See timeline at 12/19/15 11:03:51">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan, Martin, and all,
+</p>
+<p>
+My fundamental objection to defining bounds for formula terms is that it extends what is meant by “cell bounds” to a more abstract concept.  I think “cell bounds” should mean the location (either in physical space, or some model representation of physical space) of the edges (or vertices) of grid cells. In the case of vertical coordinates, the values should monotonically change and the cell "centers" should fall between the bounds.  The difference between two cell bounds should be some measure of the cell “thickness”.  I would note that the formula terms do not have to change monotonically, so if we allowed the terms to have bounds (as you and Mark favor), the “thickness” could be 0 or negative.  The terms are in no way analogous to coordinates so should not have bounds.
+</p>
+<p>
+Also, I think it would be extraordinarily rare that someone would want to obtain the formula terms for the bounds unless they were interested in interpreting the bounds themselves.   Consider someone analyzing temperature (T) that has been saved on model levels (say a sigma coordinate system).  If you wanted to compute the (pressure-weighted) mean temperature over some layer (say from 400 to 500 hPa), you would need to recover the pressure on each of the sigma cell bounds.   I think the natural way to proceed would be:
+</p>
+<p>
+1) Look at T and see that sigma is the vertical coordinate.
+2) Look at sigma and see that it has cell bounds stored in the variable pointed to by the “bounds” attribute. 
+3)  Extract those sigma bounds
+4)  convert the sigma values to pressure values using the coefficients (and surface pressure) pointed to by the bounds attribute.
+</p>
+<p>
+For the above straight-forward approach to work, it seems essential that formula_terms be attached to the coordinate bounds variable (and it isn’t essential that they be attached to the formula terms associated with the coordinate values):
+</p>
+<p>
+float lev(lev);
+</p>
+<blockquote>
+<p>
+lev:bounds=”levbnds”;
+</p>
+</blockquote>
+<p>
+float levbnds(lev,2);
+</p>
+<blockquote>
+<p>
+levbnds:formula_terms = "sigma: levbnds ps: PS ptop: PTOP" ;
+</p>
+</blockquote>
+<p>
+Note also, that sometimes there are several formula term coefficients that are a function of the vertical coordinate.  Wouldn’t it always be more trouble to go to each coefficient to learn what the formula_terms are for the coordinate bounds?  Why not just go to the cell bounds and find all the formula terms you need to interpret your cell bounds?
+</p>
+<p>
+In summary, I don’t think there are any good use cases where one would prefer the formula_terms for bounds be found by looking at each of the formula_terms for the coordinate values.  Furthermore, placing bounds on variables that are not actually coordinates is confusing (especially since this can lead to wierd interpretations like zero “thicknesses” for the coefficients). 
+</p>
+<p>
+best wishes,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-10-1450716887367847">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:10" class="cnum">
+    <a href="#comment:10">comment:10</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-21T08%3A54%3A47-08%3A00&amp;precision=second" title="See timeline at 12/21/15 08:54:47">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl
+</p>
+<p>
+CF cell bounds aren't only about physical space. Every coordinate can have bounds to indicate its range, and all sorts of quantities can be coordinate variables e.g. temperature, density, wavelength, precipitation amount. So I don't see any inconsistency with allowing formula terms to have bounds, although they are not coordinate variables. However, you agree with that actually. I agree that often you go via the route you describe and that therefore it is useful for the coordinate variable bounds to have a <tt>formula_terms</tt> attribute. I don't object to that. I think that it may be useful sometimes to have a <tt>bounds</tt> attribute on the formula terms as an alternative. I don't think we have to choose one approach or the other. We can follow both, since it's easy to test whether they're inconsistent.
+</p>
+<p>
+If I understand correctly, you are referring to an extension of Example 4.3:
+</p>
+<pre class="wiki">float lev(lev) ;
+  lev:long_name = "sigma at layer midpoints" ;
+  lev:positive = "down" ;
+  lev:standard_name = "atmosphere_sigma_coordinate" ;
+  lev:formula_terms = "sigma: lev ps: PS ptop: PTOP" ;
+  lev:bounds="levbnds";
+float levbnds(lev,2);
+  levbnds:formula_terms = "sigma: levbnds ps: PS ptop: PTOP" ;
+float T(lev,lat,lon);
+  T:standard_name="air_temperature";
+  T:units="K";
+</pre><p>
+In your procedure above, you don't look at the formula terms of the bounds. You find <tt>levbnds</tt> by looking at the <tt>bounds</tt> attribute of <tt>lev</tt>. This is the attribute I am recommending should be included, but I think it's also OK to include <tt>formula_terms</tt> on <tt>levbnds</tt>, as you advocate (I think). In the case of the sigma coordinate, the formula terms are self-referential, and there is only one route you can follow. In other cases e.g. the hybrid sigma-pressure coordinate, the coordinate variable itself is not one of the terms, and then you have two routes. I don't see why we should exclude the possibility of examining the sigma part or the pressure part separately to see what their bounds are.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-11-1450749778340446">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:11" class="cnum">
+    <a href="#comment:11">comment:11</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-21T18%3A02%3A58-08%3A00&amp;precision=second" title="See timeline at 12/21/15 18:02:58">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+The example you provide is for the special case where one of the variables appearing in the formula_terms (“lev”) is also a needed coordinate variable to define the air_temperature variable.  I think here it is clearly appropriate for bounds to appear with “lev” because it <strong><em>is</em></strong> a coordinate variable (as well as a formula_term).  
+</p>
+<p>
+In the case of atmosphere hybrid-sigma pressure coordinates: 
+formula_terms = "a: var1 b: var2 ps: var3 p0: var4"
+and the example corresponding to yours would be:
+</p>
+<pre class="wiki">float eta(eta) ;
+   eta:long_name = "eta at layer midpoints" ;
+   eta:positive = "down" ;
+   eta:standard_name = " atmosphere_hybrid_sigma_pressure_coordinate" ;
+   eta:formula_terms = "a: a b: b ps: ps p0:p0”;
+   eta:bounds="etabnds";
+ float etabnds(eta,2);
+   etabnds:formula_terms = " a: abnds b: bbnds ps: ps p0:p0" ;
+ float T(eta,lat,lon);
+   T:standard_name="air_temperature";
+   T:units="K";
+ float a(eta);
+   b:long_name = "’a’ coefficient for vertical coordinate (at full levels)";
+   a:units = ‘Pa’ 
+   a:bounds = “abnds”;    ***** I don’t think this should be allowed.
+ float b(eta);
+   b:long_name = "’b’ coefficient for vertical coordinate (at full levels)";
+   b:units = ‘Pa Pa-1’
+   b:bounds = “abnds”;    ***** I don’t think this should be allowed
+ float abnds(eta,2);
+   abnds:long_name = "’a’ coefficient for vertical coordinate (at half-levels)";
+ float bbnds(eta,2);
+   bbnds:long_name = "’b’ coefficient for vertical coordinate (at half-levels)";
+</pre><p>
+Although lots of variables can be used as a vertical coordinate, ‘a’ and ‘b’ cannot because they are not monotonic (and they would not ever appear in a “coordinates” attribute).  For example, here are the values of ‘a’ for the 60-level ERA40 reanalysis model:
+</p>
+<pre class="wiki">a (Pa)
+------- 
+ 10.
+ 28.
+ 49.
+ 78.
+ 113.
+ .
+ .
+ .
+ .
+
+ 19991.
+ 20330.
+ 20412.
+ 20247.
+ 19847. 
+ 19231.
+ 18420.
+ .
+ .
+ .
+ 
+ 661.
+ 339.
+ 138.
+ 36.
+ 3.
+ 0.
+</pre><p>
+The values do not change monotonically.  Although not indicated by the above, I also note that the value of  ‘a’ for the bound between the grid-cells with ‘a’ values of 20412 and 20247 is 20429, so the bound value doesn’t even lie in between the values at the cell “centers”, which to me doesn’t seem right for a reasonably defined set of values and bounds.
+</p>
+<p>
+I think our convention should stipulate that bounds be normally reserved for use with a variable that is a coordinate in the file, or which by itself might be used as a coordinate in geo-locating data.  Any one-dimensional variable that varied monotonically could then have bounds (because it would qualify as a coordinate variable), and a variable such as lat(i) for an unstructured grid could also have bounds even though it would not in general vary monotonically (and could not qualify as at least a <em>potential</em> coordinate variable). 
+</p>
+<p>
+[<strong>Aside</strong>: Note that the zonal mean surface northward wind component is (normally) carried by a latxlon gridded model on cell bounds, and it might be reported at cell centers, but I don’t think we would want to ever see the following file construction:
+</p>
+<pre class="wiki">coordinates:
+   lat=180;
+
+variables:
+   float lat(lat);
+      lat:bounds = “latbnds”;
+   float latbnds(lat,2);
+   float vs(lat);
+      vs:bounds=”vbnds”;
+   float vbnds(lat,2);
+      vbnds:coordinates=”latbnds”
+</pre><p>
+This construction would clearly not extend to a 2-d field (latxlon), and I think it really confuses what we intend “bounds” to represent.  I think allowing bounds on formula terms (in general) would be like allowing bounds on “vs” in the above example.  If we wanted to store the values of vs at both cell centers and cell bounds, wouldn’t we just construct a file along the following lines?
+</p>
+<pre class="wiki">coordinates:
+   lat=180;
+   latbnds=181
+
+variables:
+   float lat(lat);
+   float latbnds(latbnds)
+   float vs_at_centers(lat);
+   float vs_at_bounds(vbnds);
+</pre><p>
+If we allow bounds to be applied to <strong><em>any</em></strong> variable in a file, then the first way of representing the “vs” field at cell centers and at cell bounds would be allowed, which I wouldn’t like.  Similarly, I don’t like allowing cell bounds on the “a’s” and “b’s” in formula terms.
+</p>
+<p>
+<strong>end aside</strong>]
+</p>
+<p>
+I am arguing then to reserve bounds for any variable that is used (or the user intends to use) as a coordinate. That would rule out use of “bounds” with many (but not all) formula terms.
+</p>
+<p>
+Best regards,
+Karl
+</p>
+<p>
+P.S.
+</p>
+<p>
+I note in the introduction to chapter 7 of the standard we state: “When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.”  
+I think this is well put.  And I think that when gridded data <strong><em>does</em></strong> represent  point values, then the concept of “cell volume” makes no sense, and such things as grid bounds make no sense.  In the case of the “a” and “b” coefficients of hybrid sigma pressure coordinates, these apply at points and do <strong><em>not</em></strong> represent some characteristic of a grid cell, so I don’t think “a” and “b” should have bounds. 
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-12-1450888788455933">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:12" class="cnum">
+    <a href="#comment:12">comment:12</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-23T08%3A39%3A48-08%3A00&amp;precision=second" title="See timeline at 12/23/15 08:39:48">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl
+</p>
+<p>
+I agree that <tt>a</tt> and <tt>b</tt> of hybrid sigma-pressure can't be used as coordinates in general (because they are not generally monotonic). However, they <strong>do</strong> have bounds. You point at their bounds from the <tt>formula_terms</tt> of <tt>etabnds</tt> in your example. Your objection is not to their having bounds, which are meaningful because they jointly define the extent of the cell in physical space, but to pointing at these bounds using the <tt>bounds</tt> attributes you have marked with <tt>*****</tt>.
+</p>
+<p>
+I can't present any new argument. As I said before, I don't see the harm in having this attribute (provided we can check for consistency, which is easy), and I think it's useful. Although <tt>a</tt> is not a coordinate, you might wish to do coordinate-like things with it. If I give <tt>a</tt> its bounds, it makes it self-contained, which I feel is a naturally CF way to go. For instance, I could hand the varid of <tt>a</tt> to a subroutine with the request to compute the width of the intervals in <tt>a</tt>, in just the same way as I might do with <tt>eta</tt> in your example, or with <tt>sigma</tt> in the previous example. Under your scheme, the subroutine won't be able to process <tt>a</tt>, however, because there is no pointer from <tt>a</tt> to <tt>eta</tt>, without which you can't find the bounds of <tt>a</tt>. Are there other cases where CF <strong>forbids</strong> the data-writer to provide potentially useful information? It seems unnecessarily obstructive to me. So I think we should continue to allow bounds on formula terms, with a consistency check.
+</p>
+<p>
+I agree that it would not be right to use the bounds of a coordinate variable as a coordinate variable in their own right. I think it would almost be illegal anyway, and certainly very peculiar, since the dimension sized 2 (in your aside) would need a coordinate variable to describe it; if a data variable is multidimensional, we expect each of its dimensions to correspond to a physical axis.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-13-1450976345655984">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:13" class="cnum">
+    <a href="#comment:13">comment:13</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-24T08%3A59%3A05-08%3A00&amp;precision=second" title="See timeline at 12/24/15 08:59:05">5 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+Christmas is nigh, so I'll try to be brief; one more try at explaining my position.
+</p>
+<p>
+In Section "7.1 Cell Boundaries", we state:  "To represent cells we add the attribute bounds to the appropriate coordinate variable(s)."  I think the important part of this sentence is that the bounds attribute is used to provide information about the *cell*; this is more important than mentioning that they get attached to coordinates.  
+</p>
+<p>
+Currently, the standard clearly limits its discussion of "cells" to grids (of 1 or more dimensions).  I would argue we should keep it that way because it keeps the concept simple.
+</p>
+<p>
+In short my argument is:
+</p>
+<ol><li> keep the current definition of "cells"
+</li><li> continue to limit the use of "bounds" to describing cells.
+</li></ol><p>
+I see no compelling use case for modifying (and complicating) this beautifully-constructed aspect of CF.
+</p>
+<p>
+If we generally allowed bounds to be attached to variables appearing in formula terms (that are not themselves coordinate variables), we would have to modify our definition of a "cell" or define "bounds" in a way that does not relate them to cells.
+</p>
+<p>
+As we both agree, we can find the terms needed to interpret parametrically defined coordinates through the formula_terms, which under my proposal can be attached to the coordinate values themselves and to their bounds.  Why complicate things? 
+</p>
+<p>
+If you want to complicate things, I think you will have to rewrite at least section 7.1 and the introduction to section 7.  Do you propose to do that?  (I hope not.)   
+</p>
+<p>
+best wishes for the holidays,
+Karl  
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-14-1451218087937388">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:14" class="cnum">
+    <a href="#comment:14">comment:14</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2015-12-27T04%3A08%3A07-08%3A00&amp;precision=second" title="See timeline at 12/27/15 04:08:07">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl
+</p>
+<p>
+I've always understood the formula terms to be part of the definition of the cells. In hybrid sigma-pressure, for example, the eta coordinate has bounds, which are useful for plotting, but you can't use them for many purposes. To do calculations, you need the bounds of the sigma and pressure terms separately. We agree that the formula terms have bounds and that these are needed for the definition of the cell. We disagree only about exposing this link in a <tt>bounds</tt> attribute. In CF-netCDF files, I have always written a <tt>bounds</tt> attribute for the formula terms because it's useful, as I've already said, to have a direct link from the formula terms to its bounds for some calculations, because otherwise you have to search the file to find it. I think it's natural; you think it's objectionable!
+</p>
+<p>
+In fact not <strong>all</strong> formula terms have bounds. For instance, it wouldn't make sense for the p* field in hybrid sigma-pressure. I think that the ones which have bounds are those which have the vertical dimension - do you think that's right? The p* variable will be the same one in the <tt>formula_terms</tt> of the coordinate variable and of its boundary variable.
+</p>
+<p>
+My interpretation of 7.1 implicitly allows <tt>bounds</tt> of formula terms when they contain coordinate data. On the other hand, unlike you, I didn't interpret 4.3.2 or 7.1 as indicating that boundary variables could have <tt>formula_terms</tt>, since this is not mentioned, but I don't object to it.
+</p>
+<p>
+In view of the above two paragraphs, I think both our points of view require further changes to the existing text to allow them explicitly. I suggest:
+</p>
+<ul><li>In 4.3.2, you propose a modified sentence, "A new attribute, <tt>formula_terms</tt>, is used to associate terms in the definitions with variables in a netCDF file, as described in Appendix D." I would insert a further sentence, "The <tt>formula_terms</tt> attribute is also permitted for boundary variables of variables containing parametric vertical coordinate data (see Section 7.1, <em>Cell boundaries</em>). For a boundary variable, those terms which do not have the vertical coordinate dimension must be identical to the corresponding terms of the coordinate variable, while those terms which do have the vertical coordinate dimension are boundary variables for the formula terms concerned." We can write a check for this in the conformance document.
+</li></ul><ul><li>By the way, since we are modifying this sentence, I suggest we change "A new attribute, <tt>formula_terms</tt>" to "The <tt>formula_terms</tt> attribute." It is new in CF compared with COARDS, but it's no longer new in absolute terms!
+</li></ul><ul><li>The bounds of <tt>sigma</tt> should be inserted in Example 4.3.
+</li></ul><ul><li>I would append the following to 7.1 as a new paragraph. "Variables which are named by <tt>formula_terms</tt> of a parametric coordinate variable (see Section 4.3.2, <em>Parametric vertical coordinate</em>) and which have the vertical coordinate dimension may have a <tt>bounds</tt> attribute. If the parametric coordinate variable has a boundary variable with a <tt>formula_terms</tt> attribute, its terms should be consistent with the bounds of the terms of the coordinate variable." We can write a check for that too. This paragraph should be followed by a new example to illustrate the situation when the coordinate variable is not also one of the formula terms. We could use the hybrid sigma-pressure example which you wrote down in comment 11 (including the starred lines which you don't like).
+</li></ul><p>
+Making these changes would reconcile our views, I think, by allowing both methods.
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-15-1451923291436138">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:15" class="cnum">
+    <a href="#comment:15">comment:15</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-01-04T08%3A01%3A31-08%3A00&amp;precision=second" title="See timeline at 01/04/16 08:01:31">5 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello,
+</p>
+<p>
+A minor point, which relates to the checker: If a formula term is not a coordinate variable and  has a <tt>bounds</tt> attribute but is not an auxiliary coordinate variable (i.e. is not referenced by the parent data variable's <tt>coordinates</tt> attribute) then a warning should issued, because the <tt>bounds</tt> attribute has no reserved CF meaning on variables which are not auxiliary coordinate variables or coordinate variables.
+</p>
+<p>
+It has to be a warning and not an error because there's nothing wrong, of course, in setting an attribute called "bounds", with any value, on an arbitrary variable.
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-16-1451929674558937">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:16" class="cnum">
+    <a href="#comment:16">comment:16</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-01-04T09%3A47%3A54-08%3A00&amp;precision=second" title="See timeline at 01/04/16 09:47:54">5 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear David
+</p>
+<p>
+In my last point above, I'm suggesting that <tt>bounds</tt> on formula terms will be explicitly allowed by CF, so no warning would be needed. Are you happy with that?
+</p>
+<p>
+Best wishes
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-17-1451945201279705">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:17" class="cnum">
+    <a href="#comment:17">comment:17</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2016-01-04T14%3A06%3A41-08%3A00&amp;precision=second" title="See timeline at 01/04/16 14:06:41">5 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan,
+</p>
+<p>
+Ah, OK, I think that I misinterpreted what you had written. However, I'm not sure about that. How is the <tt>bounds</tt> attribute to be interpreted when such a formula terms variable is used outside of the conversion formula?
+</p>
+<p>
+All the best,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-18-1489859784931493">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:18" class="cnum">
+    <a href="#comment:18">comment:18</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-18T10%3A56%3A24-07%3A00&amp;precision=second" title="See timeline at 03/18/17 10:56:24">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan and all,
+</p>
+<p>
+As you know, we are about to write petabytes of hopefully CF-compliant CMIP6 data.  There is an urgent need to agree on how to proceed on this ticket.  If possible, I would like to squeeze it into CF 1.7.  
+</p>
+<p>
+To summarize this ticket:  Data stored on model levels for CMIP5 was non-compliant with the standard because formula_terms was attached to the variable providing bounds for the vertical parametric coordinate, and currently CF forbids this.  (A formula_terms can only be attached to a coordinate variable.)  We plan to include formula_terms for bounds in CMIP6 too, so it will also be non-compliant unless we change the standard.
+</p>
+<p>
+I proposed that formula_terms should be allowed to be attached to variables containing bounds of coordinates as well as being attached to variables containing the coordinates themselves.
+</p>
+<p>
+You thought that was a good idea, but also wanted to go further and allow the bounds to be attached to the (parameter) variables pointed to by formula_terms, even though these variables cannot in general be considered coordinates.  You thought this was “implicitly allowed by section 7.1”.   But that section is introduced with: 
+</p>
+<blockquote>
+<p>
+“To represent cells we add the attribute bounds to the appropriate coordinate variable(s). The value of bounds is the name of the variable that contains the vertices of the cell boundaries. We refer to this type of variable as a "boundary variable.”  A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.”
+</p>
+</blockquote>
+<p>
+This would seem to explicitly rule out use of formula_terms with any variable other than a coordinate variable (and the parameters appearing in formula_terms aren’t generally coordinate variables).
+</p>
+<p>
+So, I think that however we record the values of the parameters needed to convert the bounds of a parametric coordinate to a vertical location in physical space, we will have to modify the current convention.
+</p>
+<p>
+You have also argued that “it's useful to have a direct link from the formula terms to its bounds for some calculations, because otherwise you have to search the file to find it.”  Earlier you expanded on this:
+</p>
+<blockquote>
+<p>
+“… I think it's useful. Although "a" [one of the parameters needed to define hybrid sigma coordinates] is not a coordinate, you might wish to do coordinate-like things with it. If I give "a" its bounds, it makes it self-contained, which I feel is a naturally CF way to go. For instance, I could hand the varid of "a" to a subroutine with the request to compute the width of the intervals in "a", in just the same way as I might do with eta in your example, or with sigma in the previous example. Under your scheme, the subroutine won't be able to process "a", however, because there is no pointer from "a" to eta, without which you can't find the bounds of "a".”
+</p>
+</blockquote>
+<p>
+You say you might want to compute the width of “a”, but I can’t think of any reason to do that (I noted earlier that the so-called “width” can turn out to be 0 for some parameters.)  I can’t think of any use for operating on the values of parameters at cell bounds other than to compute the position in space of the vertical coordinate.  I would note that both eta and sigma are actual parametric coordinates, and it clearly is sometimes useful to compute the width of coordinate cells. 
+</p>
+<p>
+In any case, I can see no added convenience of attaching a bounds attribute to the parameters themselves, rather than to the variable containing the bounds coordinate variable.  When you come across a variable that is a function of a parametric vertical coordinate, you would presumably look at the formula_term to determine what “containers” needed defining.  At that time you could note whether or not there were bounds defined for that parametric vertical coordinate, and if there were, you could easily extract and associate the variables containing the parameter values at the bounds of the vertical coordinate with the variables containing the parameter values at the coordinate nodes.  This would be quite straight-forward I should think.
+</p>
+<p>
+Note that I don’t think we can interpret the “value of the parameter at the bounds of a parametric vertical coordinate’s grid cell” as the “bounds of the parameter” because cells can’t intrinsically be defined by the parameter.  The cells are defined by the parametric vertical coordinate (which therefore have bounds).  Like other variables (e.g., temperature, humidity, etc.) that can be defined both at the coordinate locations and the cell bounds, the parameter values can be defined at both places.  But the cell (along with its bounds) is defined by the coordinate, not the variables that are a function of that coordinate.  Do you agree?
+</p>
+<p>
+The reason I have been so forceful in arguing against your position is that I think it requires us to redefine what we’ve meant by a “cell”.  Up to now, a cell has been defined by the bounds attached to a variable used as a coordinate variable.  This meant that the grid cell bounds would always have values between the values of the two cells they separated.  The concept of a physical cell (like intervals on the number lines taught us in elementary school) is easy to grasp.   If we modify this simple concept and allow bounds for the parameters associated with parametric vertical coordinates, I think we make it much harder for novices to understand what we’re talking about.  How can the bounds defining contiguous cells in 1 dimension not be monotonic?  That is what would be required if we allowed bounds be attached to parameters rather than limiting their use to coordinates. 
+</p>
+<p>
+I guess if you still don’t see why I’m so opposed to allowing both options, and there are no other opinions expressed, we have two choices:
+</p>
+<blockquote>
+<p>
+1) We allow both options
+</p>
+</blockquote>
+<blockquote>
+<p>
+2) We remain unable to reach consensus, and CMIP6, like CMIP5, will produce non-CF-compliant files
+</p>
+</blockquote>
+<p>
+I anxiously await your thoughts.
+</p>
+<p>
+best wishes,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-19-1489938422922398">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:19" class="cnum">
+    <a href="#comment:19">comment:19</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-19T08%3A47%3A02-07%3A00&amp;precision=second" title="See timeline at 03/19/17 08:47:02">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Jonathan and all,
+</p>
+<p>
+[THE FOLLOWING PARAGRAPH WAS INSERTED 1-DAY AFTER THE ORIGINAL COMMENT WAS POSTED.  PLEASE READ THIS PARAGRAPH AND COMMENT ON IT EVEN IF YOU DON'T HAVE TIME TO READ THE REST OF THE COMMENT:  
+</p>
+<p>
+It occurs to me that there is a stop-gap measure we should take immediately.  Modify the conformance document such that it won't raise an error if a formula_terms is attached to a variable that is not a coordinate variable.  I have reread the standard, and I can't see any place where it specifically forbids using formula_terms outside the usage discussed.  Like other attributes, I would think this means it might also be used in unorthodox ways without making a file inconsistent with the standard.  (For example, 'bounds' can only be expected to be interpreted by software when attached to a coordinate variable, but, as David noted and as Jonathan has done in practice, this does not forbid its use elsewhere.)  Similarly, I think we should be able to attach the formula_terms attribute to to a cell bounds variable without raising an error.  So, I propose that the CF checker *not* raise an error in this case.  This could be done in time for the CF 1.7 release, I think, and would make CMIP5 and CMIP6 data pass the CF checker's checks.  I might note that no one has complained about CMIP5 files being out of compliance with CF, so I don't think there is any software out there that relies on a restriction of formula_terms to coordinate variables.  We didn't discover the problem until late last year when we ran the CF checker on some CMIP5 files.
+</p>
+<p>
+NOW BACK TO THE ORIGINAL POST:]
+</p>
+<p>
+As you know, we are about to write petabytes of hopefully CF-compliant CMIP6 data.  There is an urgent need to agree on how to proceed on this ticket.  If possible, I would like to squeeze it into CF 1.7.  
+</p>
+<p>
+To summarize this ticket:  Data stored on model levels for CMIP5 was non-compliant with the standard because formula_terms was attached to the variable providing bounds for the vertical parametric coordinate, and currently CF forbids this.  (A formula_terms can only be attached to a coordinate variable.)  We plan to include formula_terms for bounds in CMIP6 too, so it will also be non-compliant unless we change the standard.
+</p>
+<p>
+I proposed that formula_terms should be allowed to be attached to variables containing bounds of coordinates as well as being attached to variables containing the coordinates themselves.
+</p>
+<p>
+You thought that was a good idea, but also wanted to go further and allow the bounds to be attached to the (parameter) variables pointed to by formula_terms, even though these variables cannot in general be considered coordinates.  You thought this was “implicitly allowed by section 7.1”.   But that section is introduced with: 
+</p>
+<blockquote>
+<p>
+“To represent cells we add the attribute bounds to the appropriate coordinate variable(s). The value of bounds is the name of the variable that contains the vertices of the cell boundaries. We refer to this type of variable as a "boundary variable.”  A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.”
+</p>
+</blockquote>
+<p>
+This would seem to explicitly rule out use of formula_terms with any variable other than a coordinate variable (and the parameters appearing in formula_terms aren’t generally coordinate variables).
+</p>
+<p>
+So, I think that however we record the values of the parameters needed to convert the bounds of a parametric coordinate to a vertical location in physical space, we will have to modify the current convention.
+</p>
+<p>
+You have also argued that “it's useful to have a direct link from the formula terms to its bounds for some calculations, because otherwise you have to search the file to find it.”  Earlier you expanded on this:
+</p>
+<blockquote>
+<p>
+“… I think it's useful. Although "a" [one of the parameters needed to define hybrid sigma coordinates] is not a coordinate, you might wish to do coordinate-like things with it. If I give "a" its bounds, it makes it self-contained, which I feel is a naturally CF way to go. For instance, I could hand the varid of "a" to a subroutine with the request to compute the width of the intervals in "a", in just the same way as I might do with eta in your example, or with sigma in the previous example. Under your scheme, the subroutine won't be able to process "a", however, because there is no pointer from "a" to eta, without which you can't find the bounds of "a".”
+</p>
+</blockquote>
+<p>
+You say you might want to compute the width of “a”, but I can’t think of any reason to do that (I noted earlier that the so-called “width” can turn out to be 0 for some parameters.)  I can’t think of any use for operating on the values of parameters at cell bounds other than to compute the position in space of the vertical coordinate.  I would note that both eta and sigma are actual parametric coordinates, and it clearly is sometimes useful to compute the width of coordinate cells. 
+</p>
+<p>
+In any case, I can see no added convenience of attaching a bounds attribute to the parameters themselves, rather than to the variable containing the bounds coordinate variable.  When you come across a variable that is a function of a parametric vertical coordinate, you would presumably look at the formula_term to determine what “containers” needed defining.  At that time you could note whether or not there were bounds defined for that parametric vertical coordinate, and if there were, you could easily extract and associate the variables containing the parameter values at the bounds of the vertical coordinate with the variables containing the parameter values at the coordinate nodes.  This would be quite straight-forward I should think.
+</p>
+<p>
+Note that I don’t think we can interpret the “value of the parameter at the bounds of a parametric vertical coordinate’s grid cell” as the “bounds of the parameter” because cells can’t intrinsically be defined by the parameter.  The cells are defined by the parametric vertical coordinate (which therefore have bounds).  Like other variables (e.g., temperature, humidity, etc.) that can be defined both at the coordinate locations and the cell bounds, the parameter values can be defined at both places.  But the cell (along with its bounds) is defined by the coordinate, not the variables that are a function of that coordinate.  Do you agree?
+</p>
+<p>
+The reason I have been so forceful in arguing against your position is that I think it requires us to redefine what we’ve meant by a “cell”.  Up to now, a cell has been defined by the bounds attached to a variable used as a coordinate variable.  This meant that the grid cell bounds would always have values between the values of the two cells they separated.  The concept of a physical cell (like intervals on the number lines taught us in elementary school) is easy to grasp.   If we modify this simple concept and allow bounds for the parameters associated with parametric vertical coordinates, I think we make it much harder for novices to understand what we’re talking about.  How can the bounds defining contiguous cells in 1 dimension not be monotonic?  That is what would be required if we allowed bounds be attached to parameters rather than limiting their use to coordinates. 
+</p>
+<p>
+I guess if you still don’t see why I’m so opposed to allowing both options, and there are no other opinions expressed, we have two choices:
+</p>
+<blockquote>
+<p>
+1) We allow both options
+</p>
+</blockquote>
+<blockquote>
+<p>
+2) We remain unable to reach consensus, and CMIP6, like CMIP5, will produce non-CF-compliant files
+</p>
+</blockquote>
+<p>
+I anxiously await your thoughts.
+</p>
+<p>
+best wishes,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-20-1490002537523960">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:20" class="cnum">
+    <a href="#comment:20">comment:20</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-20T02%3A35%3A37-07%3A00&amp;precision=second" title="See timeline at 03/20/17 02:35:37">4 years ago</a> by martin.juckes
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello All,
+</p>
+<p>
+I think there are 4 ways that the CF-Checker could deal with this: when the CF-checker encounters <tt>formula_terms</tt> on a variable which is not a coordinate, it could:
+</p>
+<ol><li>issue an error,
+</li><li>issue a warning that the attribute has no meaning in this context,
+</li><li>issue an information message that the attribute has no meaning in this context,
+</li><li>do nothing.
+</li></ol><ol><li>is what currently happens, but I would support Karl's arguments for moving away from this. The main problem which I can see with the other extreme, 4., is related to the point David raised, that the attribute is being used with no clear meaning: this may mean that the author of the file has tried to put information in and failed. 
+</li></ol><p>
+How about option 3., which would at least give the author a hint that the attribute is not where it is expected?
+</p>
+<p>
+regards,
+Martin
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-21-1490007177774176">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:21" class="cnum">
+    <a href="#comment:21">comment:21</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-20T03%3A52%3A57-07%3A00&amp;precision=second" title="See timeline at 03/20/17 03:52:57">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi Karl,
+</p>
+<p>
+Do these sum up the two cases?
+</p>
+<p>
+If a coordinate variable has bounds and formula terms but its bounds variable does not have formula_terms:
+</p>
+<pre class="wiki">dimensions:
+    z = 19 ;
+    y = 73 ;
+    x = 96 ;
+    bound = 2 ;
+variables:
+    double hybrid_sigma(z) ;
+           hybrid_sigma.standard_name = "atmosphere_hybrid_sigma_pressure_coordinate" ;
+           hybrid_sigma.formula_terms = "a: A b: B ps: PS" ;
+           hybrid_sigma.bounds = "hybrid_sigma_bounds" ;
+    double A(z) ;                      // HAS bounds
+    	   A.bounds = "A_bounds" ;  
+    double B(z) ;                      // HAS bounds
+       	   B.bounds = "B_bounds" ;
+    double PS(y, x) ;
+    double hybrid_sigma_bounds(z, bounds) ;
+    double A_bounds(z, bounds) ;
+    double B_bounds(z, bounds) ;
+</pre><p>
+If a coordinate variable has bounds and formula terms and its bounds variable also has formula_terms:
+</p>
+<pre class="wiki">dimensions:
+    z = 19 ;
+    y = 73 ;
+    x = 96 ;
+    bound = 2 ;
+variables:
+    double hybrid_sigma(z) ;
+           hybrid_sigma.standard_name = "atmosphere_hybrid_sigma_pressure_coordinate" ;
+           hybrid_sigma.formula_terms = "a: A b: B ps: PS" ;
+           hybrid_sigma.bounds = "hybrid_sigma_bounds" ;
+    double A(z) ;                // DOES NOT HAVE bounds 
+    double B(z) ;                // DOES NOT HAVE bounds 
+    double PS(y, x) ;
+    double hybrid_sigma_bounds(z, bounds) ;
+           hybrid_sigma.formula_terms = "a: A_bounds b: B_bounds ps: PS" ;
+    double A_bounds(z, bounds) ; // NOT explicitly attached to A 
+    double B_bounds(z, bounds) ; // NOT explicitly attached to B
+</pre><p>
+The checker has a bit of work to do, in each case, checking whether or not bounds exist on certain of the terms.
+</p>
+<p>
+Thanks,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-22-1490030919261526">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:22" class="cnum">
+    <a href="#comment:22">comment:22</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-20T10%3A28%3A39-07%3A00&amp;precision=second" title="See timeline at 03/20/17 10:28:39">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Dear Karl
+</p>
+<p>
+At the start of this ticket, you said, "Based on a statement appearing in the conformance document, the CF checker raises an error when the formula_terms attribute is attached to a variable other than a coordinate variable." Which statement is that? Is it this one?
+</p>
+<blockquote>
+<p>
+The <tt>formula_terms</tt> attribute is only allowed on a coordinate variable which has a <tt>standard_name</tt> listed in Appendix C.
+</p>
+</blockquote>
+<p>
+If so, perhaps this is a misunderstanding. I think that point of that statement is not that the variable is a coordinate variable, but that it has a <tt>standard_name</tt> from App C, because without that you can't know what formula applies. So I would suggest amending the statement to
+</p>
+<blockquote>
+<p>
+The <tt>formula_terms</tt> attribute is only allowed on a variable which has a <tt>standard_name</tt> listed in Appendix C.
+</p>
+</blockquote>
+<p>
+To make CMIP6 data compliant, you'd have to add a <tt>standard_name</tt> to bounds variables. That would be legal, but it would be unnecessary if David's ticket 140 was accepted. Could you support ticket 140? If both this ticket and ticket 140 were accepted now and put in CF 1.7 (which is still under construction - we agreed a deadline of end of Jan for tickets, but that was to meet the needs of CMIP6), I would suggest modifying the conformance document to satisfy both this ticket and that ticket thus:
+</p>
+<blockquote>
+<p>
+The <tt>formula_terms</tt> attribute is only allowed on a variable which has a <tt>standard_name</tt> listed in Appendix C, or on a bounds variable of a variable which has a <tt>standard_name</tt> listed in Appendix C.
+</p>
+</blockquote>
+<p>
+In that case, <tt>formula_terms</tt> on bounds will not cause an error. The CF document does not prohibit bounds on <tt>formula_terms</tt> at present, and I don't think it should, as we've discussed earlier in this ticket. You're not convinced about that, I know. One of your objections is monotonicity, but I would point out that we allow bounds on auxiliary coordinate variables, which aren't necessarily monotonic. For example, a trajectory in 1D might reverse direction at one of its cell boundaries; this boundary would then not lie between the points that it separates. Formula terms aren't as bad as that anyway: they might not be strictly monotonic (i.e. they might have repeated values) but I expect they're monotonic.
+</p>
+<p>
+I continue to think we should allow bounds on formula terms or formula terms on bounds, because it's convenient. This is not replication of metadata, but it allows two possible routes to the metadata. Since both would need to be supported, they may as well be allowed together. In that case, the CF checker could detect an inconsistency quite easily, starting from the coordinate variable. That's a third case to add to David's two.
+</p>
+<pre class="wiki">dimensions:
+    z = 19 ;
+    y = 73 ;
+    x = 96 ;
+    bound = 2 ;
+variables:
+    double hybrid_sigma(z) ;
+           hybrid_sigma.standard_name = "atmosphere_hybrid_sigma_pressure_coordinate" ;
+           hybrid_sigma.formula_terms = "a: A b: B ps: PS" ;
+           hybrid_sigma.bounds = "hybrid_sigma_bounds" ;
+    double A(z) ;                      // HAS bounds
+    	   A.bounds = "A_bounds" ;  
+    double B(z) ;                      // HAS bounds
+       	   B.bounds = "B_bounds" ;
+    double PS(y, x) ;
+    double hybrid_sigma_bounds(z, bounds) ;
+           hybrid_sigma_bounds.formula_terms = "a: A_bounds b: B_bounds ps: PS" ;
+    double A_bounds(z, bounds) ;
+    double B_bounds(z, bounds) ;
+</pre><p>
+Here, starting from hybrid_sigma, you can reach A_bounds via hybrid_sigma.formula_terms and A.bounds, or via hybrid_sigma.bounds and hybrid_sigma_bounds.formula_terms. (NB David's second example should have hybrid_sigma_bounds.formula_terms in the third line from the end.)
+</p>
+<p>
+Cheers
+</p>
+<p>
+Jonathan
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-23-1490183448056882">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:23" class="cnum">
+    <a href="#comment:23">comment:23</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-22T04%3A50%3A48-07%3A00&amp;precision=second" title="See timeline at 03/22/17 04:50:48">4 years ago</a> by davidhassell
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hello Karl, Jonathan,
+</p>
+<p>
+I'm happy with all the three cases described in CDL in the previous two posts being allowed. I'm also fine with Jonathan's proposed text changes, and (naturally, as I propsed it!) <a class="closed ticket" href="./140.html" title="enhancement: Clarifying the role of attributes on boundary variables. (closed: fixed)">#140</a> being accepted.
+</p>
+<p>
+There is one further detail - is it allowed for a term variable to have bounds but for that variable to <em>not</em> be listed in the <tt>coordinates</tt> attribute of a data variable with uses the formula terms?
+</p>
+<pre class="wiki">dimensions:
+    z = 19 ;
+    y = 73 ;
+    x = 96 ;
+    bound = 2 ;
+variables:
+    double hybrid_sigma(z) ;
+           hybrid_sigma.standard_name = "atmosphere_hybrid_sigma_pressure_coordinate" ;
+           hybrid_sigma.formula_terms = "a: A b: B ps: PS" ;
+           hybrid_sigma.bounds = "hybrid_sigma_bounds" ;
+    double A(z) ;                      // HAS bounds
+    	   A.bounds = "A_bounds" ;  
+    double B(z) ;                      // HAS bounds
+       	   B.bounds = "B_bounds" ;
+    double PS(y, x) ;
+    double lat(y, x) ;
+    double lon(y, x) ;
+    double hybrid_sigma_bounds(z, bounds) ;
+           hybrid_sigma_bounds.formula_terms = "a: A_bounds b: B_bounds ps: PS" ;
+    double A_bounds(z, bounds) ;
+    double B_bounds(z, bounds) ;
+    double air_temperature(z, y, x):
+           air_temperature.coordinates = "lat lon" // no A nor B, here
+</pre><p>
+I think that this would be OK, as even though it A is not identified as an auxiliary coordinate variable (and so on the face of it the <tt>bounds</tt> attribute is non-standardised), its reference from a formula terms means that it may be viewed as containing coordinate data (and so its <tt>bounds</tt> attribute is, in fact, properly meaningful).
+</p>
+<p>
+Thanks,
+</p>
+<p>
+David
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-24-1490216986387177">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:24" class="cnum">
+    <a href="#comment:24">comment:24</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-22T14%3A09%3A46-07%3A00&amp;precision=second" title="See timeline at 03/22/17 14:09:46">4 years ago</a> by taylor13
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Hi all,
+</p>
+<p>
+There seems to be agreement (among the 4 of us who have expressed an opinion) that attaching formula_terms to a parametric coordinate's "boundary variable" should not raise an error (i.e., not be considered out of conformance).  I would be o.k. with either option 2 or 3 suggested by Martin, but would favor 3: issue an information message that the attribute has no meaning in this context.  We could do this immediately. It is not absolutely essential at this time to agree to the rest of the proposal.  [Note: I originally submitted this ticket to correct what I considered a defect in the conformance document.]
+</p>
+<p>
+That being said, I think we also agree that attaching formula_terms to a "boundary variable" should be sanctioned by CF, so perhaps that also could be implemented now.  What we haven't yet reached consensus on is whether Jonathan's alternative approach should also be allowed.  As I've said I’m against this because it would require redefinition of a "boundary variable" in the conventions.  A "boundary variable" is defined in section 1.2 ("Terminology"):
+</p>
+<blockquote>
+<p>
+A boundary variable is associated with a variable that contains coordinate data. When a data value provides information about conditions in a cell occupying a region of space/time or some other dimension, the boundary variable provides a description of cell extent.
+</p>
+</blockquote>
+<p>
+I don’t think the parameters defined in formula terms are anything like coordinate data; many of them are just coefficients (which do not have to vary with location).  They don’t define meaningful intervals (or cell extents).  I don’t think any compelling use case has been proposed which would warrant complicating the very straight-forward meaning of a “boundary variable” in the current conventions.  
+</p>
+<p>
+When we come upon a parametric coordinate variable, we might want to find out the vertical location pointed to by that coordinate, and we would consult the formula_terms to extract the parameters needed to do that.  Similarly, when we come upon a variable containing the bounds of a parametric coordinate variable, we might want to find out the vertical locations associated with these bounds, and we would consult the formula_terms attached to it.  Codes operating on the data could treat both the coordinates and their bounds in exactly the same way.   I can see no need for an alternative pathway.
+</p>
+<p>
+So, I would advocate further discussion before possibly implementing Jonathan’s alternative.
+</p>
+<p>
+In the mean time I hope this won’t hold up correcting the defect in the CF conformance document and possibly also agreeing to use of formula_terms with a parametric coordinate’s boundary variable. 
+</p>
+<p>
+best regards,
+Karl
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-25-1490293107003349">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:25" class="cnum">
+    <a href="#comment:25">comment:25</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-03-23T11%3A18%3A27-07%3A00&amp;precision=second" title="See timeline at 03/23/17 11:18:27">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+    <div class="comment searchable">
+      <p>
+Please see <a class="ext-link" href="https://cf-trac.llnl.gov./140#comment:7"><span class="icon">​</span>https://cf-trac.llnl.gov./140#comment:7</a>
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-26-1496157741078935">
+                
+  <h3 class="change">
+    <span class="threading">
+      <span id="comment:26" class="cnum">
+    <a href="#comment:26">comment:26</a>
+  </span>
+    </span>
+        Changed <a class="timeline" href="/trac/timeline?from=2017-05-30T08%3A22%3A21-07%3A00&amp;precision=second" title="See timeline at 05/30/17 08:22:21">4 years ago</a> by jonathan
+  </h3>
+  <div class="trac-ticket-buttons">
+  </div>
+  <ul class="changes">
+    <li class="trac-field-resolution">
+      <strong class="trac-field-resolution">Resolution</strong>
+        set to <em>fixed</em>
+    </li><li class="trac-field-status">
+      <strong class="trac-field-status">Status</strong>
+        changed from <em>new</em> to <em>closed</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+This ticket is no longer needed because it has been superseded by an agreement in <a class="ext-link" href="https://cf-trac.llnl.gov./140"><span class="icon">​</span>ticket 140</a>.
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="./147?format=rss" class="rss">RSS Feed</a>
+        </li><li>
+          <a rel="nofollow" href="./147?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="./147?format=tab" class="tab">Tab-delimited Text</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="https://trac.edgewall.org/"><img src="/trac/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/trac/about"><strong>Trac 1.0.20</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the CF Metadata home page at<br /><a href="http://cf-convention.github.io">http://cf-convention.github.io</a><br><font color="#0000ff" size="3"><b>The CF Metadata Trac issue tracker is read-only and will soon be shut down permanently</b></font></p>
+    </div>
+  </body>
+</html>
