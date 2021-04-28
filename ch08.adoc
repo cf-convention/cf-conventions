@@ -81,9 +81,7 @@ In addition to the tie point variables themselves, metadata defining the coordin
 
 The metadata that define the interpolation formula and its inputs are complete, so that the results of the coordinate reconstitution process are well defined and of a predictable accuracy.
 
-The data variable coordinate interpolation attributes may also be used on a domain variable (domain-variables) with the same effect.
-
-Test...........
+The data variable coordinate interpolation attribute may also be used on a domain variable (domain-variables) with the same effect.
 
 [[compression-by-coordinate-sampling-tie-points-and-interpolation-zones, Section 8.3.1, "Tie Points and Interpolation Zones"]]
 ==== Tie Points and Interpolation Zones
@@ -135,193 +133,7 @@ image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,a
 
 To indicate that coordinate interpolation is required, a **`tie_points`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables `lat` and `lon` are to be interpolated according to the interpolation variable `bi_linear` could be indicated with `lat: lon: bi_linear`.
 
-[[compression-by-coordinate-sampling-dimensions,Section 8.3.3, "Interpolation and Non-Interpolation Dimensions"]]
-==== Interpolation and Non-Interpolation Dimensions
-
-For each interpolation variable identified in the **`tie_points`** attribute, all corresponding tie point variables must share the same set of one or more dimensions. This set of dimensions must contain at least one __tie point interpolation dimension__ that corresponds to an __interpolation dimension__, i.e. a target domain dimension for which coordinate interpolation is required; and may additionally contain one or more __non-interpolation dimensions__, i.e. those of the target domain for which no coordinate interpolation is required. The size of a tie point interpolation dimension must be less than or equal to the size of its corresponding interpolation dimension. 
-
-An interpolation dimension typically differs in size from the corresponding tie point interpolation dimension. For example, if the target domain dimensions are `xc = 30` and `yc = 10`,  interpolation could be applied in both of these dimensions, based on tie point variables of the dimensions `tp_xc = 4` and `tp_yc = 2`. Here, `tp_xc` is the tie point interpolation dimension related to the interpolation dimension `xc`, and `tp_yc` is the tie point interpolation dimension related to the interpolation dimension `yc`.
-
-The presence of non-interpolation dimensions in the tie point variable impacts the interpolation process in that there must be a separate application of the interpolation method for each combination of indices of the non-interpolation dimensions. For example, if the target domain dimensions are `xc = 30` and `yc = 10`, interpolation could be applied in the `xc` dimension only, based on tie point variables of the dimensions `tp_xc = 4` and `yc = 10`. The interpolation in the `xc` dimension would then be repeated for each of the 10 indices of the `yc` dimension.
-
-[[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.4, "Tie Point Dimensions Attribute"]]
-==== Tie Point Dimensions Attribute
-
-Each interpolation dimension must be associated with its corresponding
-tie point interpolation dimension and, if required, its corresponding
-__interpolation zone dimension__ that defines the number of
-interpolation zones which partition the interpolation
-dimension. Regardless of its size, an interpolation zone dimension is
-only required if it is spanned by an interpolation parameter variable,
-as described in
-<<compression-by-coordinate-sampling-interpolation-variable>>. The
-association is stored in the data variable's
-**`tie_point_dimensions`** attribute that contains a blank-separated
-list of words of the form __"interpolation_dimension:
-tie_point_interpolation_dimension [interpolation_zone_dimension]
-[interpolation_dimension: ...]"__. If an interpolation zone dimension
-is provided then it must be the second of the two named dimensions
-following the interpolation dimension.
-
-An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
-
-Note that an interpolation zone dimension has, by definition, the same size as the corresponding tie point interpolation dimension, minus the number of interpolation areas.
-
-
-[[ci_dimensions_overview, figure 2]]
-[.text-center]
-.Overview of the different dimensions for coordinate interpolation.
-image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
-
-
-A single interpolation dimension may be associated with multiple tie
-point interpolation dimensions by repeating the interpolation
-dimension in the **`tie_point_dimensions`** attribute. For instance,
-interpolation dimension `dimension1` could be mapped to two different
-tie point interpolation dimensions with `dimension1: tp_dimension1
-dimension1: tp_dimension2`. This is necessary when different tie point
-variables for a particular interpolation dimension do not contain the
-same number of tie points, and therefore define different numbers of
-interpolation zones, as is the case in <<example-VIIRS>>. A tie point
-variable must span at most one of the tie point interpolation
-dimensions associated with a given interpolation dimension.
-
-The same interpolation variable may be multiply mapped from the
-different sets of tie point variables. For instance, if tie point
-variables lat and lon span dimension `tp_dimension1` and time spans
-dimension `tp_dimension2`, and all three are to interpolated according
-to interpolation variable `linear`, then the **`tie_points`**
-attribute could be `lat: lon: linear time: linear`. In this case it is
-not possible to simultaneously map all three tie point variables to
-the linear interpolation variable because they do not all span the
-same axes.
-
-[[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.5, "Tie Point Indices"]]
-==== Tie Point Indices
-
-The relationship between a tie point interpolation dimension and its
-corresponding interpolation dimension is defined with a __tie point
-index variable__. This contains zero-based indices that relate each
-element of a tie point interpolation dimension to its related location
-in the corresponding interpolation dimension. The tie point index
-variable is a one-dimensional integer variable that must span the tie
-point interpolation dimension specified by the
-**`tie_point_dimensions`** attribute. The tie point index values must
-be strictly monotonically increasing within interpolation areas. An
-interpolation zone must span at least two points of each of its
-corresponding interpolation dimensions, therefore the tie point
-indices that define an interpolation zone must all be different. When
-two adjacent values are equal, or differ by one, it indicates the
-location (in index space) of an interpolation area boundary relating
-to a grid discontinuity
-(<<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>).
-
-Each value of the tie point index variable is the index of the 
-interpolation dimension that corresponds to the corresponding 
-tie point interpolation dimension.
-
-For instance, in example <<example-Two-dimensional-tie-point-interpolation>>
-the tie point variables represent a subset of the target domain and
-the tie point index variable `int x_indices(tp_xc)` contains the
-indices `x_indices = 0, 9, 19, 29` that identify the location in the
-interpolation dimension `xc` of size 30.
-
-To indicate which tie point index variable applies to each
-interpolation dimension, a **`tie_point_indices`** attribute must be
-defined for the data variable. This is a string attribute that maps
-the interpolation dimensions to the corresponding tie point index
-variables. It is a blank-separated list of words of the form
-"__interpolation_dimension: tie_point_index_variable
-[interpolation_dimension: tie_point_index_variable ...]__".
-Continuing the above example, specifying that the target dimension
-`xc` and `yc` are associated with the tie point index variables
-`x_indices` and `y_indices` respectively, could be indicated with `xc:
-x_indices yc: y_indices`.
-
-[[example-Two-dimensional-tie-point-interpolation]]
-[caption="Example 8.3. "]
-.Two-dimensional tie point interpolation
-====
-----
-dimensions:
-  xc = 30;
-  yc = 10;
-  tp_xc = 4 ; 
-  tp_yc = 2 ;
-
-variables:
-  // Interpolation variables
-  char bi_linear ;
-    interpolation:interpolation_name = "bi_linear" ;
-
-  // Tie point variables
-  double lat(tp_yc, tp_xc) ;
-    lat:units = "degrees_north" ;
-    lat:standard_name = "latitude" ;
-  double lon(tp_yc, tp_xc) ;
-    lon:units = "degrees_east" ;
-    lon:standard_name = "longitude" ;
- 
-  // Tie point index variables
-  int y_indices(tp_yc) ;
-  int x_indices(tp_xc) ;
-
-  // Data variable    	       
-  float Temperature(yc, xc) ;
-    Temperature:standard_name = "air_temperature" ;
-    Temperature:units = "K" ;
-    Temperature:tie_points = "lat: lon: bi_linear" ;
-    Temperature:tie_point_dimensions = "xc: tp_xc  yc: tp_y"  ;
-    Temperature:tie_point_indices = "yc: y_indices xc: x_indices" ;
-
-data:
-  x_indices = 0, 9, 19, 29 ;
-  y_indices = 0, 9 ;
-  ...
-----
-====
-
-[[example-1d-interpolation-of-2d-domain]]
-[caption="Example 8.4. "]
-.One-dimensional tie point interpolation of two-dimensional domain.
-====
-----
-dimensions:
-  xc = 30;
-  yc = 10;
-  tp_xc = 4 ; 
-
-variables:
-  // Interpolation variables
-  char linear ;
-    interpolation:interpolation_name = "linear" ;
-
-  // Tie point variables
-  double lat(yc, tp_xc) ;
-    lat:units = "degrees_north" ;
-    lat:standard_name = "latitude" ;
-  double lon(yc, tp_xc) ;
-    lon:units = "degrees_east" ;
-    lon:standard_name = "longitude" ;
- 
-  // Tie point index variables
-  int x_indices(tp_xc) ;
-
-  // Data variable    	       
-  float Temperature(yc, xc) ;
-    Temperature:standard_name = "air_temperature" ;
-    Temperature:units = "K" ;
-    Temperature:tie_points = "lat: lon: linear" ;
-    Temperature:tie_point_dimensions = "xc: tp_xc"  ;
-    Temperature:tie_point_indices = "xc: x_indices" ;
-
-data:
-  x_indices = 0, 9, 19, 29 ;
-  ...
-----
-====
-
-[[compression-by-coordinate-sampling-interpolation-variable, Section 8.3.6, "Interpolation Variable"]]
+[[compression-by-coordinate-sampling-interpolation-variable, Section 8.3.3, "Interpolation Variable"]]
 ==== Interpolation Variable
 
 The method used to uncompress the tie point variables is described by
@@ -366,6 +178,197 @@ Note that the interpolation method is always applied on a per
 interpolation zone basis, for which the construction of the
 uncompressed coordinates may only access those tie points that define
 the extent of the of the interpolation zone.
+
+In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>, <<compression-by-coordinate-sampling-tie-point-indices>> and <<compression-by-coordinate-sampling-interpolation-parameters>>.
+
+[[compression-by-coordinate-sampling-dimensions,Section 8.3.4, "Interpolation and Non-Interpolation Dimensions"]]
+==== Interpolation and Non-Interpolation Dimensions
+
+For each interpolation variable identified in the **`tie_points`** attribute, all corresponding tie point variables must share the same set of one or more dimensions. This set of dimensions must contain at least one __tie point interpolation dimension__ that corresponds to an __interpolation dimension__, i.e. a target domain dimension for which coordinate interpolation is required; and may additionally contain one or more __non-interpolation dimensions__, i.e. those of the target domain for which no coordinate interpolation is required. The size of a tie point interpolation dimension must be less than or equal to the size of its corresponding interpolation dimension. 
+
+An interpolation dimension typically differs in size from the corresponding tie point interpolation dimension. For example, if the target domain dimensions are `xc = 30` and `yc = 10`,  interpolation could be applied in both of these dimensions, based on tie point variables of the dimensions `tp_xc = 4` and `tp_yc = 2`. Here, `tp_xc` is the tie point interpolation dimension related to the interpolation dimension `xc`, and `tp_yc` is the tie point interpolation dimension related to the interpolation dimension `yc`.
+
+The presence of non-interpolation dimensions in the tie point variable impacts the interpolation process in that there must be a separate application of the interpolation method for each combination of indices of the non-interpolation dimensions. For example, if the target domain dimensions are `xc = 30` and `yc = 10`, interpolation could be applied in the `xc` dimension only, based on tie point variables of the dimensions `tp_xc = 4` and `yc = 10`. The interpolation in the `xc` dimension would then be repeated for each of the 10 indices of the `yc` dimension.
+
+[[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.5, "Tie Point Dimensions Attribute"]]
+==== Tie Point Dimensions Attribute
+
+Each interpolation dimension must be associated with its corresponding
+tie point interpolation dimension and, if required, its corresponding
+__interpolation zone dimension__ that defines the number of
+interpolation zones which partition the interpolation
+dimension. Regardless of its size, an interpolation zone dimension is
+only required if it is spanned by an interpolation parameter variable,
+as described in
+<<compression-by-coordinate-sampling-interpolation-variable>>. The
+association is stored in the interpolation variable's
+**`tie_point_dimensions`** attribute that contains a blank-separated
+list of words of the form __"interpolation_dimension:
+tie_point_interpolation_dimension [interpolation_zone_dimension]
+[interpolation_dimension: ...]"__. If an interpolation zone dimension
+is provided then it must be the second of the two named dimensions
+following the interpolation dimension.
+
+An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
+
+Note that an interpolation zone dimension has, by definition, the same size as the corresponding tie point interpolation dimension, minus the number of interpolation areas.
+
+
+[[ci_dimensions_overview, figure 2]]
+[.text-center]
+.Overview of the different dimensions for coordinate interpolation.
+image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
+
+
+A single interpolation dimension may be associated with multiple tie
+point interpolation dimensions by repeating the interpolation
+dimension in the **`tie_point_dimensions`** attribute. For instance,
+interpolation dimension `dimension1` could be mapped to two different
+tie point interpolation dimensions with `dimension1: tp_dimension1
+dimension1: tp_dimension2`. This is necessary when different tie point
+variables for a particular interpolation dimension do not contain the
+same number of tie points, and therefore define different numbers of
+interpolation zones, as is the case in <<example-VIIRS>>. A tie point
+variable must span at most one of the tie point interpolation
+dimensions associated with a given interpolation dimension.
+
+The same interpolation variable may be multiply mapped from the
+different sets of tie point variables. For instance, if tie point
+variables lat and lon span dimension `tp_dimension1` and time spans
+dimension `tp_dimension2`, and all three are to interpolated according
+to interpolation variable `linear`, then the **`tie_points`**
+attribute could be `lat: lon: linear time: linear`. In this case it is
+not possible to simultaneously map all three tie point variables to
+the linear interpolation variable because they do not all span the
+same axes.
+
+[[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.6, "Tie Point Indices"]]
+==== Tie Point Indices
+
+The relationship between a tie point interpolation dimension and its
+corresponding interpolation dimension is defined with a __tie point
+index variable__. This contains zero-based indices that relate each
+element of a tie point interpolation dimension to its related location
+in the corresponding interpolation dimension. The tie point index
+variable is a one-dimensional integer variable that must span the tie
+point interpolation dimension specified by the
+**`tie_point_dimensions`** attribute. The tie point index values must
+be strictly monotonically increasing within interpolation areas. An
+interpolation zone must span at least two points of each of its
+corresponding interpolation dimensions, therefore the tie point
+indices that define an interpolation zone must all be different. When
+two adjacent values are equal, or differ by one, it indicates the
+location (in index space) of an interpolation area boundary relating
+to a grid discontinuity
+(<<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>).
+
+Each value of the tie point index variable is the index of the 
+interpolation dimension that corresponds to the corresponding 
+tie point interpolation dimension.
+
+For instance, in example <<example-Two-dimensional-tie-point-interpolation>>
+the tie point variables represent a subset of the target domain and
+the tie point index variable `int x_indices(tp_xc)` contains the
+indices `x_indices = 0, 9, 19, 29` that identify the location in the
+interpolation dimension `xc` of size 30.
+
+To indicate which tie point index variable applies to each
+interpolation dimension, a **`tie_point_indices`** attribute must be
+defined for the interpolation variable. This is a string attribute that maps
+the interpolation dimensions to the corresponding tie point index
+variables. It is a blank-separated list of words of the form
+"__interpolation_dimension: tie_point_index_variable
+[interpolation_dimension: tie_point_index_variable ...]__".
+Continuing the above example, specifying that the target dimension
+`xc` and `yc` are associated with the tie point index variables
+`x_indices` and `y_indices` respectively, could be indicated with `xc:
+x_indices yc: y_indices`.
+
+[[example-Two-dimensional-tie-point-interpolation]]
+[caption="Example 8.3. "]
+.Two-dimensional tie point interpolation
+====
+----
+dimensions:
+  xc = 30;
+  yc = 10;
+  tp_xc = 4 ; 
+  tp_yc = 2 ;
+
+variables:
+  // Data variable    	       
+  float Temperature(yc, xc) ;
+    Temperature:standard_name = "air_temperature" ;
+    Temperature:units = "K" ;
+    Temperature:tie_points = "lat: lon: bl_interpolation" ;
+
+  // Interpolation variable
+  char bl_interpolation ;
+    bl_interpolation:interpolation_name = "bi_linear" ;
+    bl_interpolation:tie_point_dimensions = "xc: tp_xc  yc: tp_y"  ;
+    bl_interpolation:tie_point_indices = "yc: y_indices xc: x_indices" ;
+
+  // Tie point variables
+  double lat(tp_yc, tp_xc) ;
+    lat:units = "degrees_north" ;
+    lat:standard_name = "latitude" ;
+  double lon(tp_yc, tp_xc) ;
+    lon:units = "degrees_east" ;
+    lon:standard_name = "longitude" ;
+ 
+  // Tie point index variables
+  int y_indices(tp_yc) ;
+  int x_indices(tp_xc) ;
+
+data:
+  x_indices = 0, 9, 19, 29 ;
+  y_indices = 0, 9 ;
+  ...
+----
+====
+
+[[example-1d-interpolation-of-2d-domain]]
+[caption="Example 8.4. "]
+.One-dimensional tie point interpolation of two-dimensional domain.
+====
+----
+dimensions:
+  xc = 30;
+  yc = 10;
+  tp_xc = 4 ; 
+
+variables:
+  // Data variable    	       
+  float Temperature(yc, xc) ;
+    Temperature:standard_name = "air_temperature" ;
+    Temperature:units = "K" ;
+    Temperature:tie_points = "lat: lon: l_interpolation" ;
+
+  // Interpolation variables
+  char l_interpolation ;
+    l_interpolation:interpolation_name = "linear" ;
+    l_interpolation:tie_point_dimensions = "xc: tp_xc"  ;
+    l_interpolation:tie_point_indices = "xc: x_indices" ;
+
+  // Tie point variables
+  double lat(yc, tp_xc) ;
+    lat:units = "degrees_north" ;
+    lat:standard_name = "latitude" ;
+  double lon(yc, tp_xc) ;
+    lon:units = "degrees_east" ;
+    lon:standard_name = "longitude" ;
+ 
+  // Tie point index variables
+  int x_indices(tp_xc) ;
+
+data:
+  x_indices = 0, 9, 19, 29 ;
+  ...
+----
+====
+
+[[compression-by-coordinate-sampling-interpolation-parameters, Section 8.3.7, "Interpolation Parameters"]]
+==== Interpolation Parameters
 
 The interpolation variable attribute **`interpolation_parameters`**
 may be used to provide extra information to the interpolation
@@ -417,7 +420,7 @@ interpolation zones that it does not span.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
-[[compression-by-coordinate-sampling-bounds, Section 8.3.6, "Interpolation of Tie Point Bounds"]]
+[[compression-by-coordinate-sampling-bounds, Section 8.3.8, "Interpolation of Tie Point Bounds"]]
 ==== Interpolation of Tie Point Bounds
 
 If reconstituted coordinates have cell boundaries, then the corresponding tie point variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. The bounds of a tie point must be the same as the bounds of the corresponding target grid cells. It is therefore likely that tie point cells will be non-contiguous.
@@ -432,112 +435,52 @@ Note that an implementation of the interpolation method is free to calculate the
 ====
 ----
 dimensions :
-  // VIIRS M-Band (750 m resolution imaging) 
-  m_track = 768 ;
-  m_scan = 3200 ;
-  m_channel = 16 ;
-
   // VIIRS I-Band (375 m resolution imaging)
-  i_track = 1536 ;
-  i_scan = 6400 ; 
-  i_channel = 5 ;
-
-  // Tie points and interpolation zones (shared between VIIRS M-Band and I-Band)
+  track = 1536 ;
+  scan = 6400 ; 
+  // Tie points and interpolation zones
   tp_track = 96 ;  // 48 VIIRS scans
   tp_scan = 205 ;
   zone_track = 48 ;   // track interpolation zone 
   zone_scan= 200 ;    // scan interpolation zone 
-
   // Time, stored at scan-start and scan-end of each scan
   tp_time_scan = 2;
 
 variables:
-  // VIIRS M-Band 
-  float m_radiance(m_track, m_scan, m_channel) ;
-    m_radiance:tie_points =
-         "m_lat: m_lon: m_sen_azi_ang: m_sen_zen_ang: m_sol_azi_ang: m_sol_zen_ang: tp_interpolation
-          t: time_interpolation" ;
-    m_radiance:tie_point_dimensions = "m_track: tp_track zone_track
-                                       m_scan: tp_scan zone_scan
-                                       m_scan: tp_time_scan"  ;
-    m_radiance:tie_point_indices = "m_track: m_track_indices
-                                    m_scan: m_scan_indices
-                                    m_scan: m_time_scan_indices" ;
+  // VIIRS I-Band Channel 01 and 04
+  float I01_radiance(track, scan) ;
+    I01_radiance:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I01_radiance:standard_name = "toa_outgoing_radiance_per_unit_wavelength" ;
+    I01_radiance:units = "W m-2 sr-1 m-1" ;
+  float I01_reflectance(track, scan) ;
+    I01_reflectance:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I01_reflectance:long_name = "reflectance" ;
+    I01_reflectance:units = "1" ;
 
-  // VIIRS I-Band 
-  float i_radiance(i_track, i_scan, i_channel) ;
-    i_radiance:tie_points =
-         "i_lat: i_lon: i_sen_azi_ang: i_sen_zen_ang: i_sol_azi_ang: i_sol_zen_ang: tp_interpolation
-          t: time_interpolation" ;
-    i_radiance:tie_point_dimensions = "i_track: tp_track zone_track
-                                       i_scan: tp_scan zone_scan
-                                       i_scan: tp_time_scan"  ;
-    i_radiance:tie_point_indices = "i_track: i_track_indices zone_track
-                                    i_scan: i_scan_indices zone_scan
-                                    i_scan: i_time_scan_indices" ;
-
-  // Tie point index variables
-  int m_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
-  int m_scan_indices(tp_scan) ;     
-  int m_time_scan_indices(tp_time_scan) 
-  int i_track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
-  int i_scan_indices(tp_scan) ;     
-  int i_time_scan_indices(tp_time_scan) 
-
-  // Tie points
-  float m_lat(tp_track, tp_scan) ;
-    m_lat : standard_name = "latitude" ;
-    m_lat : units = "degrees_north" ;
-  float m_lon(tp_track, tp_scan) ;
-    m_lon : standard_name = "longitude" ;
-    m_lon : units = "degrees_east" ;
-  float m_sen_azi_ang(tp_track, tp_scan) ;
-    m_sen_azi_ang : standard_name = "sensor_azimuth_angle" ;
-    m_sen_azi_ang : units = "degrees" ;
-  float m_sen_zen_ang(tp_track, tp_scan) ;
-    m_sen_zen_ang : standard_name = "sensor_zenith_angle" ;
-    m_sen_zen_ang : units = "degrees" ;
-  float m_sol_azi_ang(tp_track, tp_scan) ;
-    m_sol_azi_ang : standard_name = "solar_azimuth_angle" ;
-    m_sol_azi_ang : units = "degrees" ;
-  float m_sol_zen_ang(tp_track, tp_scan) ;
-    m_sol_zen_ang : standard_name = "solar_zenith_angle" ;
-    m_sol_zen_ang : units = "degrees" ;
-
-  float i_lat(tp_track, tp_scan) ;
-    i_lat : standard_name = "latitude" ;
-    i_lat : units = "degrees_north" ;
-  float i_lon(tp_track, tp_scan) ;
-    i_lon : standard_name = "longitude" ;
-    i_lon : units = "degrees_east" ;
-  float i_sen_azi_ang(tp_track, tp_scan) ;
-    i_sen_azi_ang : standard_name = "sensor_azimuth_angle" ;
-    i_sen_azi_ang : units = "degrees" ;
-  float i_sen_zen_ang(tp_track, tp_scan) ;
-    i_sen_zen_ang : standard_name = "sensor_zenith_angle" ;
-    i_sen_zen_ang : units = "degrees" ;
-  float i_sol_azi_ang(tp_track, tp_scan) ;
-    i_sol_azi_ang : standard_name = "solar_azimuth_angle" ;
-    i_sol_azi_ang : units = "degrees" ;
-  float i_sol_zen_ang(tp_track, tp_scan) ;
-    i_sol_zen_ang : standard_name = "solar_zenith_angle" ;
-    i_sol_zen_ang : units = "degrees" ;
+  float I04_radiance(track, scan) ;
+    I04_radiance:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I04_radiance:standard_name = "toa_outgoing_radiance_per_unit_wavelength" ;
+    I04_radiance:units = "W m-2 sr-1 m-1" ;
+  float I04_brightness_temperature(track, scan) ;
+    I04_brightness_temperature:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I04_brightness_temperature:standard_name = "brightness_temperature" ;
+    I04_brightness_temperature:units = "K" ;
 
   // Interpolation variable
   char tp_interpolation ;
-    tp_interpolation:interpolation_name = "bi_quadratic_1" ;
-    tp_interpolation:interpolation_parameters =
-         "exp1: expansion1
-          align1: alignment1
-          exp2: expansion2
-          align2:alignment2 
-          flags: interpolation_zone_flags" ;
+    tp_interpolation:interpolation_name = "bi_quadratic_remote_sensing" ;
+    tp_interpolation:tie_point_dimensions = "track: tp_track zone_track
+                                             scan: tp_scan zone_scan
+;
+    tp_interpolation:tie_point_indices = "track: track_indices
+                                          scan: scan_indices
+;
+    tp_interpolation:interpolation_parameters = "ce1: ce1  ca2: ca2  ce3: ce3 flags: interpolation_zone_flags" ;
 
-  // Interpolation coefficient and configuration variables
-  short expansion1(zone_track , tp_scan) ;
-  short alignment1(zone_track , tp_scan) ;
-  short expansion2(tp_track, zone_scan) ;
-  short alignment2(tp_track, zone_scan) ;
+  // Interpolation parameters
+  short ce1(tp_track , zone_scan) ;
+  short ca2(zone_track , tp_scan) ;
+  short ce3(zone_track, zone_scan) ;
   byte interpolation_zone_flags(zone_track , zone_scan) ;
     interpolation_zone_flags : valid_range = "1b, 7b" ;
     interpolation_zone_flags : flag_masks = "1b, 2b, 4b" ;
@@ -546,14 +489,31 @@ variables:
           sensor_direction_use_cartesian
           solar_direction_use_cartesian" ;
 
-  // Time tie points
-  double t(tp_track, tp_time_scan) ;
-    t : long_name = "time" ;
-    t : units = "days since 1990-1-1 0:0:0" ;
+  // Tie point index variables
+  int track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
+  int scan_indices(tp_scan) ;     
+  int time_scan_indices(tp_time_scan) 
+
+  // Tie points
+  float lat(tp_track, tp_scan) ;
+    lat:standard_name = "latitude" ;
+    lat:units = "degrees_north" ;
+  float lon(tp_track, tp_scan) ;
+    lon:standard_name = "longitude" ;
+    lon:units = "degrees_east" ;
 
   // Time interpolation variable
   char time_interpolation ;
-    time_interpolation : interpolation_name = "bi_linear" ;
+    time_interpolation:interpolation_name = "bi_linear" ;
+    time_interpolation:tie_point_dimensions = "track: tp_track 
+                                               scan: tp_time_scan"  ;
+    time_interpolation:tie_point_indices = "track: track_indices 
+                                            scan: time_scan_indices" ;
+
+  // Time tie points
+  double t(tp_track, tp_time_scan) ;
+    t:standard_name = "time" ;  ;
+    t:units = "days since 1990-1-1 0:0:0" ;
 ----
 
 This example demonstrates the use of multiple interpolation variables,
@@ -577,7 +537,14 @@ dimensions:
   tp_y = 58;
   tp_x = 52;
 
-variables:
+variables:	       
+  // Data variable    
+  float Temperature(time, y, x) ;
+    Temperature:standard_name = "air_temperature" ;
+    Temperature:units = "K" ;
+    Temperature:grid_mapping = "lambert_conformal" ;
+    Temperature:tie_points = "lat: lon: bi_linear y: x: linear" ;
+
   int lambert_conformal ;
     lambert_conformal:grid_mapping_name = "lambert_conformal_conic" ;
     lambert_conformal:standard_parallel = 25.0 ;
@@ -585,10 +552,15 @@ variables:
     lambert_conformal:latitude_of_projection_origin = 25.0 ;
 
   // Interpolation variables
-  char spherical_bilinear ;
-    spherical_bilinear:interpolation_name = "spherical_bilinear" ;
+  char bi_linear ;
+    bi_linear:interpolation_name = "bi_linear" ;
+    bi_linear:tie_point_dimensions = "y: tp_y  x: tp_x"  ;
+    bi_linear:tie_point_indices = "y: y_indices x: x_indices" ;
+
   char linear ;			
     linear:interpolation_name = "linear" ;
+    linear:tie_point_dimensions = "y: tp_y  x: tp_x"  ;
+    linear:tie_point_indices = "y: y_indices x: x_indices" ;
 
   // Tie point variables
   double time(time) ;
@@ -614,14 +586,6 @@ variables:
   int x_indices(tp_x) ;
     x_indices.long_name = "Mapping of x dimension to its ",
                           "corresponding tie point dimension" ;
-
-  // Data variable    	       
-  float Temperature(time, y, x) ;
-    Temperature:standard_name = "air_temperature" ;
-    Temperature:units = "K" ;
-    Temperature:grid_mapping = "lambert_conformal" ;
-    Temperature:tie_points = "lat: lon: spherical_bilinear y: x: linear" ;
-    Temperature:tie_point_indices = "y: y_indices x: x_indices" ;
 ----
 
 In this the projection coordinates are two-dimensional, but are only
