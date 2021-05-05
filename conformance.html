@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.12">
+<meta name="generator" content="Asciidoctor 2.0.15">
 <title>CF Conformance Requirements and Recommendations 1.8</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -94,9 +94,6 @@ dl dd{margin-bottom:1.25em}
 abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
 abbr{text-transform:none}
 blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
-blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
-blockquote cite::before{content:"\2014 \0020"}
-blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
 blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
 @media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
 h1{font-size:2.75em}
@@ -261,7 +258,7 @@ pre.pygments .lineno::before{content:"";margin-right:-.125em}
 .quoteblock.excerpt>blockquote,.quoteblock .quoteblock{padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
 .quoteblock.excerpt,.quoteblock .quoteblock{margin-left:0}
 .quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
-.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;font-size:.85rem;text-align:left;margin-right:0}
 p.tableblock:last-child{margin-bottom:0}
 td.tableblock>.content{margin-bottom:1.25em;word-wrap:anywhere}
 td.tableblock>.content>:last-child{margin-bottom:-1.25em}
@@ -485,7 +482,8 @@ material required for completeness or clarity.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>CF attributes that take string values must be 1D character arrays.</p>
+<p>CF attributes that take string values must be 1D character arrays or single
+atomic strings.</p>
 </li>
 </ul>
 </div>
@@ -1057,10 +1055,10 @@ must exist in the file.</p>
 <li>
 <p>The dimensions of each auxiliary coordinate must be a subset of the
 dimensions of the variable they are attached to, with two exceptions.
-First, a label variable which will have a trailing dimension for the
-maximum string length. Second a ragged array (Chapter 9, Discrete
-sampling geometries and Appendix H) uses special, more indirect, methods
-to connect the data and coordinates.<br></p>
+First, a label variable of type <strong><code>char</code></strong> will have a trailing dimension
+for the maximum string length.
+Second, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H)
+uses special, more indirect, methods to connect the data and coordinates.</p>
 </li>
 </ul>
 </div>
@@ -1199,11 +1197,14 @@ which are also marked as applicable to domain variables.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>A variable of character type that is named by a <strong><code>coordinates</code></strong> attribute
-is a label variable. This variable must have one or two dimensions. The
-trailing (CDL order) or sole dimension is for the maximum string length.
-If there are two dimensions, leading dimension (CDL order) must match
-one of those of the data variable.</p>
+<p>A string variable that is named by a <strong><code>coordinates</code></strong> attribute is a label
+variable.
+If the variable is of type <strong><code>string</code></strong> it must have at most one dimension,
+which must match one of those of the data variable.
+If the variable is of type <strong><code>char</code></strong> it must have one or two dimensions, where
+the trailing (CDL order) or sole dimension is for the maximum string length.
+If there are two dimensions, the leading dimension (CDL order) must match one
+of those of the data variable.</p>
 </li>
 </ul>
 </div>
@@ -1301,17 +1302,23 @@ or more blank separated word lists, each with the form</p>
 </div>
 </div>
 <div class="paragraph">
-<p>where brackets indicate optional words. The valid values for <strong><code>dim1</code></strong> [<strong><code>dim2</code></strong>
-[<strong><code>dim3</code></strong> &#8230;&#8203;] ] are the names of dimensions of the data variable, names of
-scalar coordinate variables of the data variable, valid standard names,
-or the word <strong><code>area</code></strong>. The valid values of <strong><code>method</code></strong> are contained in Appendix E. The valid values
-for <strong><code>type1</code></strong> are the name of a string-valued auxiliary
-or scalar coordinate variable with a <strong><code>standard_name</code></strong> of <strong><code>area_type</code></strong>, or any
-string value allowed for a variable of <strong><code>standard_name</code></strong> of <strong><code>area_type</code></strong>. If
-<strong><code>type2</code></strong> is a string-valued auxiliary coordinate variable, it is not
-allowed to have a leading dimension (the number of strings) of more than
-one. When the method refers to a climatological time axis, the suffixes
-for within and over may be appended.</p>
+<p>where brackets indicate optional words.
+The valid values for <strong><code>dim1</code></strong> [<strong><code>dim2</code></strong> [<strong><code>dim3</code></strong> &#8230;&#8203;] ] are the names of
+dimensions of the data variable, names of scalar coordinate variables of the
+data variable, valid standard names, or the word <strong><code>area</code></strong>.
+The valid values of <strong><code>method</code></strong> are contained in Appendix E.
+The valid values for <strong><code>type1</code></strong> are the name of a string-valued auxiliary  or
+scalar coordinate variable with a <strong><code>standard_name</code></strong> of <strong><code>area_type</code></strong>, or
+any string value allowed for a variable of <strong><code>standard_name</code></strong> of
+<strong><code>area_type</code></strong>.
+If <strong><code>type2</code></strong> is a string-valued auxiliary coordinate variable, it must be
+sized to contain a single string.
+If it is a variable of type <strong><code>string</code></strong>, it must be scalar or one-dimensional
+with a length of one.
+If it is a variable of type <strong><code>char</code></strong>, it must be one-dimensional or
+two-dimensional with a leading dimension (the number of strings) of length one.
+When the method refers to a climatological time axis, the suffixes for within
+and over may be appended.</p>
 </div>
 </li>
 <li>
@@ -1542,7 +1549,7 @@ sizes minus 1 (CDL index conventions).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-03 09:00:19 UTC
+Last updated 2021-04-30 10:56:27 UTC
 </div>
 </div>
 </body>
