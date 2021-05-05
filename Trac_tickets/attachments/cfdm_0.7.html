@@ -1,0 +1,459 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>Draft CF data model, proposed version 0.7</title>
+</head>
+<body bgcolor="#efefdf">
+
+<h1 align="center">Draft CF data model</h1>
+<h2 align="center">Proposed version <font color="green">0.7</font></h2>
+
+<hr>
+<p>In <a href="https://cf-pcmdi.llnl.gov/trac/ticket/88">CF trac
+ticket 88</a>, proposed by Mark Hedley and accepted on 5th August
+2012, it has been decided that CF should adopt a data model. The data
+model will be a logical abstraction of the concepts of CF data and
+metadata, and the relationships that exist between these concepts, but
+will not define an application programming interface (API) for CF.
+Adopting a data model is believed to offer the following benefits:
+</p><ul>
+<li>Providing an orientation guide to the CF Conventions Document.
+</li><li>Guiding the development of software compatible with CF.
+</li><li>Facilitating the creation of an API which
+"behaves" or "feels" like CF and is intuitive to use.
+</li><li>Providing a reference point
+for gap analysis and conflict analysis of the CF specification.
+</li><li>Providing a communication tool for discussing CF concepts and
+proposals for changes to the CF specification.
+</li><li>Setting the groundwork to expand CF beyond netCDF files.
+</li></ul>
+
+<p>The present document proposes a data model corresponding to
+the <a href="http://cf-pcmdi.llnl.gov/documents/cf-conventions/1.5">CF
+metadata standard</a> (version 1.5). The data model avoids prescribing
+more than is needed for interpreting CF as it stands, in order to
+avoid inconsistency with future developments of CF. This document is
+illustrated by
+the <a href="http://www.met.rdg.ac.uk/%7Edavid/newCF_0.7.pdf">accompanying
+UML diagram</a> of the data model.
+
+</p><p>As well as describing the CF data model, this document also
+comments on how it is implemented in netCDF. Since the CF data model
+could be implemented in file formats other than netCDF, it would be
+logically better to put the information about CF-netCDF in a separate
+document, but when introducing the data model for the first time, we
+feel that this document would be harder to understand if it omitted
+reference to the netCDF information. We propose that these functions
+should be separated in a later version of the data model. Some parts
+of the CF standard arise specifically from the requirements or
+restrictions of the netCDF file format, or are concerned with
+efficient ways of storing data on disk; these parts are not logically
+part of the data model and are only briefly mentioned in this
+document.
+
+</p><p>In this document, we use the word "construct" because we feel
+it to be a more language-neutral term than "object" or "structure".
+The constructs of this data model might correspond to objects in an OO
+language.
+
+</p><h2>Field construct</h2>
+
+The central concept of the data model is a <b>field construct</b>. In
+a dataset contained in a single netCDF file, each data variable
+usually corresponds to a field construct, but a field construct might
+be a combination of several data variables. In a dataset comprising
+several netCDF files, a field construct may span data variables in
+more than one file, for instance from different ranges of a time
+coordinate (to be introduced by Gridspec in CF version 1.7). Rules for
+aggregating data variables from one or several files into a single
+field construct are needed but are not defined by CF version 1.5; such
+rules are regarded as the concern of data processing software.
+
+<p>This data model makes a central assumption that each field
+construct is independent. Data variables stored in CF-netCDF files are
+often not independent, because they share coordinate variables.
+However, we view this solely as a means of saving disk space, and we
+assume that software will be able to alter any field construct in
+memory without affecting other field constructs. For instance, if the
+coordinates of one field construct are modified, it will not affect
+any other field construct. Explicit tests of equality will be required
+to establish whether two data variables have the same
+coordinates. Such tests are necessary in general if CF is applied to a
+dataset comprising more than one file, because different variables may
+then reside in different files, with their own coordinate
+variables. <font color="green">In a netCDF file, tests for the
+equality of coordinates between different data variables may be
+simplified if the data variables refer to the same coordinate
+variable.</font>
+
+</p><p>Each field construct may have
+</p>
+<ul>
+<li><font color="green">An ordered list of zero or more <b>domain axis
+    constructs</b>.</font>
+</li>
+<li>A <b>data array</b> whose shape is determined by
+    the <font color="green">domain axes</font> in the order listed,
+    optionally omitting any <font color="green">domain axes</font> of
+    size one. If there are no <font color="green">domain axes</font>
+    of greater size than one, the data array may be a
+    scalar. <font color="green">If there are no domain axes then data
+    array must be a scalar.</font> <font color="green">Domain
+    axes</font> of size one can be omitted because their position in
+    the order of <font color="green">domain axes</font> makes no
+    difference to the order of data elements in the array. The
+    elements of the data array must all be of the same data type,
+    which may be numeric, character or string.
+</li>
+<li><font color="green">An unordered collection of <b>dimension
+    coordinate constructs</b>.</font>
+</li>
+<li>An unordered collection of <b>auxiliary coordinate constructs</b>.
+</li>
+<li>An unordered collection of <b>cell measure constructs</b>.
+</li><li>A <b>cell methods construct</b>, which refers to
+the <font color="green">domain axes</font> (but not their sizes).
+</li><li>An unordered collection of <b>transform constructs</b>.
+</li>
+<li>Other <b>properties</b>, which are metadata that do not refer to
+    the <font color="green">domain axes</font>, and serve to describe
+    the data the field contains. Properties may be of any data type
+    (numeric, character or string) and can be scalars or arrays. They
+    are attributes in the netCDF file, but we use the term "property"
+    instead because not all CF-netCDF attributes are properties in
+    this sense.
+</li>
+<li>A list of <b>ancillary fields</b>. This corresponds to the
+    CF-netCDF <tt>ancillary_variables</tt> attribute, which identifies
+    other fields that provide metadata.
+</li>
+</ul>
+
+All the components of the field construct bar the data array are
+optional. 
+<p>
+<font color="green">
+Collectively, the domain axis, dimension coordinate, auxiliary
+coordinate, cell measure and cell method constructs describe
+the <b>domain</b> in which the data resides. Thus a field construct
+can be regarded as a domain with data in that domain.
+<p></font>
+
+<p>The CF-netCDF <tt>formula_terms</tt> (see also <b>Transform
+constructs</b>) and
+<tt>ancillary_variables</tt> attributes make links between field constructs.
+These links are fragile.
+If a field construct is written to a file, it is not required that any
+other field constructs to which it is linked are also written to the file.
+If an operation alters one field
+construct in a way which could invalidate a relationship with another field
+construct, the link should be broken. The user of software will have to be
+aware of these relationships and remake them if applicable and useful.
+
+<font color="green"></p><h2>Domain axis construct</h2>
+
+A domain axis construct must contain
+<ul>
+<li>A <b>size</b> (an integer greater than zero), which can be equal
+    to one.
+</li></ul>
+</font>
+
+<font color="green"></p><h2>Dimension coordinate construct</h2>
+
+A dimension coordinate construct indicates the physical meaning and
+locations of the cells for a unique <b>domain axis</b> of the field.
+<p>
+</font>
+<font color="green">A dimension coordinate construct may
+contain</font>
+<ul>
+<li>A scalar or one-dimensional numerical <b>coordinate array</b> of
+    the size specified for the <font color="green">domain
+    axis</font>. The elements of the coordinate array must all be of
+    the same numeric data type, they must all have different
+    non-missing values, and they must be monotonically increasing or
+    decreasing. Dimension coordinate constructs cannot have
+    string-valued coordinates. In this data model, a CF-netCDF
+    string-valued coordinate variable or string-valued scalar
+    coordinate variable corresponds to an auxiliary coordinate
+    construct (not a dimension coordinate construct), with
+    a <font color="green">domain axis</font> which is not associated
+    with a <font color="green">dimension coordinate construct</font>.
+</li>
+<li>A two-dimensional <b>boundary coordinate array</b>, whose
+    slow-varying (second in Fortran) dimension equals the size
+    specified by the <font color="green">domain axis</font> construct,
+    and whose fast-varying dimension is two, indicating the extent of
+    the cell. For climatological time dimensions, the bounds are
+    interpreted in a special way indicated by the cell methods.
+</li>
+<li>Properties (in the same sense as for the field construct) serving
+    to describe the coordinates.
+</li>
+</ul>
+
+<p>In this data model we permit a domain axis not to have a coordinate
+array if there is no appropriate numeric monotonic coordinate. That is
+the case for a dimension that runs over ocean basins or area types,
+for example, or for a domain axis that indexes timeseries at scattered
+points. Such domain axes do not correspond to a continuous physical
+quantity. (They will be called <b>index dimensions</b> in CF version
+1.6.)
+
+</p><h2>Auxiliary coordinate construct</h2>
+
+<font color="green">
+An auxiliary coordinate construct provides auxiliary information for
+interpreting the cells of an ordered list of one or more <b>domain
+axes</b> of the field.</font>
+<p>
+An auxiliary coordinate construct must contain
+<ul>
+</li>
+<li>A coordinate array <font color="green">whose shape is determined
+by the domain axes in the order listed, optionally omitting any domain
+axes of size one</font>. The elements of the coordinate array must all
+be of the same data type (numeric, character or string), but they do
+not have to be distinct or monotonic. Missing values are not allowed
+(in CF version 1.5).
+</li>
+</ul>
+and may also contain
+<ul>
+<li>A boundary coordinate array with all the dimensions, in the same
+order, as the coordinate array, and a fastest-varying dimension (first
+dimension in Fortran) equal to the number of vertices of each cell.
+</li>
+<li>Properties serving to describe the coordinates.
+</li>
+</ul>
+
+Auxiliary coordinate constructs correspond to auxiliary coordinate
+variables named by the <tt>coordinates</tt> attribute of a data
+variable in a CF-netCDF file. CF recommends there to be auxiliary
+coordinate constructs of latitude and longitude if there is
+two-dimensional horizontal variation but the horizontal coordinates
+are not latitude and longitude. As for dimension constructs,
+auxiliary coordinate constructs of different field constructs are
+independent in the data model.
+
+<h2>Cell measure construct</h2>
+
+<font color="green">A cell measure construct provides information
+about the size, shape or location of the cells defined by an ordered
+list of one or more <b>domain axes</b> of the field.</font>
+<p>
+A cell measure construct may contain
+<ul>
+<li>Properties to describe itself.
+</li>
+</ul>
+and must contain
+<ul>
+<li>A <b>measure property</b>, which indicates which metric of the space
+it supplies e.g. cell areas.
+</li>
+<li>A <b>units property</b> consistent with the measure property
+e.g. m2.
+</li>
+<li>A numeric array of metric values <font color="green"> whose shape
+    is determined by the domain axes in the order listed, optionally
+    omitting any domain axes of size one.</font> The array must all be
+    of the same data type. It is assumed that the metric does not
+    depend on any of the domain axes of the field which are not
+    specified<font color="green">, along which the values are
+    implicitly propagated.</font>
+</li>
+</ul>
+In CF-netCDF files, cell measures constructs correspond to variables
+named by the <tt>cell_measures</tt> attribute of the data variable.
+As for dimensions, cell measures constructs of different field
+constructs are independent in the data model.
+
+<h2>Cell methods construct</h2>
+
+The cell methods construct describes how the data values represent
+variation of the quantity within cells. It corresponds to
+the <tt>cell_methods</tt> attribute of the data variable in CF-netCDF
+files. It is an ordered list, because the methods specified are not
+necessarily commutative. Each entry of the list specifies either one
+or more dimensions, or a CF standard name (to describe variation with
+respect to a quantity which is not recorded as a dimension of the
+field), and a method e.g. <tt>mean</tt> (CF Appendix E). Special
+methods indicate climatological time processing.
+
+<h2>Transform constructs</h2>
+
+<font color="green">
+A transform construct defines a formula for transforming one group of
+dimension or auxiliary coordinates into another, consistent group of
+dimension or auxiliary coordinates for the same domain.<p>
+
+Either of these groups of coordinates may not exist, in which case it
+may be created by applying the transformation, inverting the formula
+if necessary.
+</font>
+<!--
+<font color="green">
+A transform also serves to connect consistent dimension coordinate and
+auxiliary coordinate constructs (which have an implied common
+transformation formula) and to provide coordinate system metadata
+(which would be used in any transformation) to a dimension coordinate
+or auxiliary coordinate construct.
+</font>
+-->
+<p>
+A transform construct contains
+<ul>
+<li>A <b>transform name</b> which indicates the nature of the
+    transformation and implies the formulae to be used. A CF-netCDF
+    file does not explicitly record the formulae; it depends on the
+    application software knowing what to do.
+</li>
+<li>An unordered collection
+    of <b>terms</b> <font color="green">corresponding to the variables
+    of the transformation formula</font>. These variables may be
+    scalar parameters, pointers to dimension or auxiliary coordinate
+    constructs of the field construct, or pointers to other field
+    constructs. Each member of the collection has a particular role in
+    the formula <font color="green">, necessarily including all
+    existing coordinates which relate to this transformation</font>.
+</li>
+</ul>
+<p>Transform constructs correspond to the functions of the CF-netCDF
+attributes
+<tt>formula_terms</tt>, which describes how to compute a vertical coordinate
+variable from components (CF Appendix D),
+and <tt>grid_mapping</tt>, which describes how to transform between
+longitude-latitude field and the horizontal coordinates of the field construct
+(CF Appendix F).
+The transform name is the <tt>standard_name</tt> of a vertical coordinate
+variable with <tt>formula_terms</tt>, and the <tt>grid_mapping_name</tt>
+of a <tt>grid_mapping</tt> variable.
+The scalar parameters are scalar data variables (which should
+have <tt>units</tt> if dimensional) named by <tt>formula_terms</tt>,
+and attributes of <tt>grid_mapping</tt> variables
+(for which the units are specified by the transform construct).
+The role of each term in the formulae of the transform construct is
+identified by its keyword in a <tt>formula_terms</tt> attribute,
+or its attribute name in a <tt>grid_mapping</tt> variable.
+
+</p><h2>Other properties</h2>
+
+The other properties recognised by this CF data model correspond to attributes
+listed in CF Appendix A.
+For field constructs, the allowed properties are
+<tt>comment</tt>,
+<tt>history</tt>,
+<tt>institution</tt>,
+<tt>long_name</tt>,
+<tt>references</tt>,
+<tt>source</tt>,
+<tt>standard_error_multiplier</tt>,
+<tt>standard_name</tt>,
+<tt>title</tt>,
+<tt>units</tt>.
+Some of these can be global attributes in a CF-netCDF file.
+In this data model, it is assumed that any relevant global attribute
+is also an
+attribute of every data variable, although it is superseded if the data
+variable has its own attribute.
+Each field construct in the model has its own independent set of properties.
+For dimensions and auxiliary coordinate constructs, the allowed properties are
+<tt>axis</tt>,
+<tt>calendar</tt>,
+<tt>leap_month</tt>,
+<tt>leap_year</tt>,
+<tt>long_name</tt>,
+<tt>month_lengths</tt>,
+<tt>positive</tt>,
+<tt>standard_name</tt>,
+<tt>units</tt>.
+Coordinate constructs of time are optionally climatological;
+this property is indicated by the presence of the <tt>climatology</tt>
+attribute.
+In any field, any given value of the <tt>axis</tt> attribute can occur
+no more than once among all the dimension and auxiliary coordinates of
+that field.
+The CF data model allows field, dimension
+and auxiliary coordinate constructs
+to have other properties not defined by CF, provided they do not
+conflict with CF, but since they are not part of the
+CF standard, the data model does not provide any interpretation of them.
+
+<p>The attributes
+<tt>valid_max</tt>,
+<tt>valid_min</tt> and
+<tt>valid_range</tt>
+of data variables and coordinate variables are checks on the validity of
+the values, which could be verified on input and written on output.
+In this CF data model we assume they do not constrain any manipulations
+which might be done on the data in memory,
+and they are not part of the data model.
+
+</p><p>The attributes
+<tt>_FillValue</tt> and
+<tt>missing_value</tt>
+of data variables specify how missing data is indicated in the data array.
+This data model supports the idea of missing data, but does not depend on
+any particular method of indicating it, so these attributes
+are not part of the model.
+
+</p><p>The attributes
+<tt>add_offset</tt>,
+<tt>compress</tt>,
+<tt>flag_masks</tt>,
+<tt>flag_meanings</tt>,
+<tt>flag_values</tt> and
+<tt>scale_factor</tt>
+are all used in methods of compressing the data to save space
+in CF-netCDF files,
+with or without loss of information.
+They are not part of this data model because these operations do not
+logically alter the data,
+except that the <tt>compress</tt> attribute implies two alternative
+interpretations of coordinates (compressed or uncompressed).
+The "feature type" attribute and associated new conventions,
+to be introduced in CF version 1.6,
+will provide a way of packing multiple
+fields of the same kind of discrete sampling geometry
+(timeseries, trajectories, etc.) into a single CF-netCDF data variable,
+in order to save space, since a multidimensional representation with
+common coordinate variables is typically very wasteful in such cases.
+This is a kind of compression. The data model would regard each instance
+of the feature type as an independent field construct.
+However, the "feature type" attribute itself is also a metadata property
+that would be a property of the field construct and part of the data model.
+
+</p><p>The attributes
+<tt>bounds</tt>,
+<tt>cell_measures</tt>,
+<tt>cell_methods</tt>,
+<tt>climatology</tt>,
+<tt>Conventions</tt>,
+<tt>coordinates</tt>,
+<tt>formula_terms</tt> and
+<tt>grid_mapping</tt>
+have various special or structural functions in the CF-netCDF file format.
+Their functions and
+the relationships they indicate are reflected in the structure
+of this data model,
+and these attributes do not correspond directly to
+properties in the data model.
+
+</p><p></p><hr>
+17th December 2012
+<br><a href="http://www.met.rdg.ac.uk/%7Edavid/cfdm_recast_0.6.html">Version 0.6 of 12th December 2012</a>
+<br><a href="http://www.met.rdg.ac.uk/%7Ejonathan/CF_metadata/cfdm_0.5.html">Version 0.5 of 16th October 2012</a>
+<br><a href="http://www.met.rdg.ac.uk/%7Ejonathan/CF_metadata/cfdm_0.4.html">Version 0.4 of 5th August 2012</a>
+<br><a href="http://www.met.rdg.ac.uk/%7Ejonathan/CF_metadata/cfdm_0.3.html">Version 0.3 of 6th February 2012</a>
+<br><a href="http://www.met.rdg.ac.uk/%7Ejonathan/CF_metadata/cfdm_0.2.html">Version 0.2 of 1st August 2011</a>
+<br><a href="http://www.met.rdg.ac.uk/%7Ejonathan/CF_metadata/cfdm_0.1.html">Original version 0.1 of 10th January 2011</a>
+
+<address>
+<p><a href="http://www.met.reading.ac.uk/%7Ejonathan">Jonathan Gregory</a>,
+David Hassell and Mark Hedley
+</p></address>
+
+
+</body></html>

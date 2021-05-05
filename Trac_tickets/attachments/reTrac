@@ -1,0 +1,115 @@
+The following document describes suggested changes to the CF
+Conventions document to describe the proposed enhancement of
+the Flags definition to support bit field notation using a
+flag_masks attribute.
+
+There are four sections to be modified:
+  (1) Table of Contents
+  (2) Section 3.5, Flags
+  (3) Appendix A, Attributes
+  (4) Appendix C, Standard name Modifiers
+
+These changes are described in the following sections:
+
+================================================================
+
+(1) Table of Contents
+
+FROM:
+
+  List of Examples
+    3.3 A flag variable
+
+TO:
+
+  List of Examples
+    3.3 A flag variable, using flag_values
+    3.4 A flag variable, using flag_masks
+    3.5 A flag variable, using flag_values and flag_masks
+
+================================================================
+
+(2) Section 3.5, Flags
+
+FROM:
+
+3.5. Flags
+
+The attributes flag_values and flag_meanings are intended to make variables that contain flag values self describing. The flag_values attribute is the same type as the variable to which it is attached, and contains a list of the possible flag values. The flag_meanings attribute is a string whose value is a blank separated list of descriptive words or phrases, one for each flag value. If multi-word phrases are used to describe the flag values, then the words within a phrase should be connected with underscores.
+
+Example 3.3. A flag variable
+
+  byte current_speed_qc(time, depth, lat, lon) ;
+    current_speed_qc:long_name = "Current Speed Quality" ;
+    current_speed_qc:_FillValue = -128b ;
+    current_speed_qc:valid_range = -127b, 127b ;
+    current_speed_qc:flag_values = 0b, 1b, 2b ;
+    current_speed_qc:flag_meanings = "quality_good sensor_nonfunctional 
+                                                     outside_valid_range" ;
+
+TO:
+
+3.5. Flags
+
+The attributes flag_values, flag_masks and flag_meanings are intended to make variables that contain flag values self describing. Status codes and Boolean (binary) condition flags may be expressed with different combinations of flag_values and flag_masks attribute definitions.
+
+The flag_values and flag_meanings attributes describe a status flag consisting of mutually exclusive coded values.  The flag_values attribute is the same type as the variable to which it is attached, and contains a list of the possible flag values.  The flag_meanings attribute is a string whose value is a blank separated list of descriptive words or phrases, one for each flag value.  If multi-word phrases are used to describe the flag values, then the words within a phrase should be connected with underscores.  Example 3.3 illustrates the use of flag values to express a speed quality with an enumerated status code.
+
+Example 3.3.  A flag variable, using flag_values
+
+byte current_speed_qc(time, depth, lat, lon) ;
+     current_speed_qc:long_name = "Current Speed Quality" ;
+     current_speed_qc:_FillValue = -128b ;
+     current_speed_qc:valid_range = -127b, 127b ;
+     current_speed_qc:flag_values = 0b, 1b, 2b ;
+     current_speed_qc:flag_meanings = "quality_good sensor_nonfunctional 
+                                       outside_valid_range" ;
+
+The flag_masks and flag_meanings attributes describe a number of independent Boolean conditions using bit field notation by setting unique bits in each flag_masks value.  The flag_masks attribute is the same type as the variable to which it is attached, and contains a list of values matching unique bit fields.  The flag_meanings attribute is defined as above, one for each flag_masks value.  A flagged condition is identified by performing a bitwise AND of the variable value and each flag_masks value; a non-zero result indicates a true condition.  Thus, any or all of the flagged conditions may be true, depending on the variable bit settings. Example 3.4 illustrates the use of flag_masks to express six sensor status conditions:
+
+Example 3.4.  A flag variable, using flag_masks
+
+byte sensor_status_qc(time, depth, lat, lon) ;
+     sensor_status_qc:long_name = "Sensor Status" ;
+     sensor_status_qc:_FillValue = 0b ;
+     sensor_status_qc:valid_range = 1b, 127b ;
+     sensor_status_qc:flag_masks = 1b, 2b, 4b, 8b, 16b, 32b ;
+     sensor_status_qc:flag_meanings = "low_battery processor_fault
+                                       memory_fault disk_fault
+                                       software_fault
+                                       maintenance_required" ;
+
+The flag_masks, flag_values and flag_meanings attributes, used together, describe a blend of independent Boolean conditions and enumerated status codes.  The flag_masks and flag_values attributes are both the same type as the variable to which they are attached.  A flagged condition is identified by a bitwise AND of the variable value and each flag_masks value; a result that matches the flag_values value indicates a true condition.  Repeated flag_masks define a bit field mask that identifies a number of status conditions with different flag_values.  The flag_meanings attribute is defined as above, one for each flag_masks bit field and flag_values definition.  Each flag_values and flag_masks value must coincide with a flag_meanings value.  Example 3.5 illustrates the use of flag_masks and flag_values to express two sensor status conditions and and one enumerated status code.
+
+Example 3.5.  A flag variable, using flag_masks and flag_values
+
+byte sensor_status_qc(time, depth, lat, lon) ;
+     sensor_status_qc:long_name = "Sensor Status" ;
+     sensor_status_qc:_FillValue = 0b ;
+     sensor_status_qc:valid_range = 1b, 127b ;
+     sensor_status_qc:flag_masks = 1b, 2b, 12b, 12b, 12b ;
+     sensor_status_qc:flag_values = 1b, 2b, 4b, 8b, 12b ;
+     sensor_status_qc:flag_meanings = "low_battery hardware_fault
+                                       offline_mode calibration_mode
+                                       maintenance_mode";
+
+================================================================
+
+(3) Appendix A, Attributes
+
+ADD:
+
+[flag_masks] [D] [D] [Section 3.5, "Flags"] [Provides a list of bit fields expressing Boolean or enumerated flags.]
+
+================================================================
+
+(4) Appendix C, Standard Name Modifiers
+
+FROM:
+
+[status_flag] [ ] [Flag values indicating the quality or other status of the data values. The variable should have flag_values and flag_meanings attributes to show how it should be interpreted (Section 3.5, “Flags”).]
+
+TO:
+
+[status_flag] [ ] [Flag values indicating the quality or other status of the data values.  The variable should have flag_values or flag_masks (or both) and flag_meanings attributes to show how it should be interpreted (Section 3.5, “Flags”).]
+

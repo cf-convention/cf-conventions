@@ -1,0 +1,92 @@
+Changes to section 5.6
+
+<at the end of 1st paragraph>
+
+The translation of CF coordinate variables to/from OGC Well-Known Text (WKT) format is shown in Examples 5.9 and 5.10 below and described in detail in <link1>.
+
+<Example 5.9. Latitude and longitude on the WGS 1984 datum>
+
+<After the CDL example, insert>
+
+OGC WKT:
+
+GEOGCS["WGS 84",
+        DATUM["WGS_1984",
+        SPHEROID["WGS 84",6378137,298.257223563]],
+    PRIMEM["Greenwich",0],
+    UNIT["degree",0.0174532925199433]]
+
+<Example 5.10. British National Grid>
+
+<Modify the crs definition in the CDL example to read>
+
+        char crs ;
+                crs:grid_mapping_name = "transverse_mercator" ;
+                crs:longitude_of_central_meridian = -2. ;
+                crs:false_easting = 400000. ;
+                crs:false_northing = -100000. ;
+                crs:latitude_of_projection_origin = 49. ;
+                crs:scale_factor_at_central_meridian = 0.9996012717 ;
+                crs:longitude_of_prime_meridian = 0. ;
+                crs:semi_major_axis = 6377563.396 ;
+                crs:inverse_flattening = 299.324964600004 ;
+                crs:projected_coordinate_system_name = "OSGB 1936 / British National Grid" ;
+                crs:geographic_coordinate_system_name = "OSGB 1936" ;
+                crs:horizontal_datum_name = "OSGB_1936" ;
+                crs:reference_ellipsoid_name = "Airy 1830" ;
+                crs:prime_meridian_name = "Greenwich" ;
+                crs:towgs84 = 375., -111., 431., 0., 0., 0., 0. ;
+
+<Then insert>
+
+OGC WKT:
+
+PROJCS["OSGB 1936 / British National Grid",
+    GEOGCS["OSGB 1936",
+        DATUM["OSGB_1936",
+            SPHEROID["Airy 1830",6377563.396,299.3249646000044],
+            TOWGS84[375,-111,431,0,0,0,0]],
+        PRIMEM["Greenwich",0],
+        UNIT["degree",0.0174532925199433]],
+    PROJECTION["Transverse_Mercator"],
+    PARAMETER["latitude_of_origin",49],
+    PARAMETER["central_meridian",-2],
+    PARAMETER["scale_factor",0.9996012717],
+    PARAMETER["false_easting",400000],
+    PARAMETER["false_northing",-100000],
+    UNIT["metre",1]]
+
+
+Changes to Table F1
+
+Attribute       Type    Description
+
+horizontal_datum_name   S       The name of the geodetic (horizontal) datum, which corresponds to the procedure used to measure positions on the surface of the Earth. Valid datum names and their associated parameters are given in <link1> (horiz_datum.csv, OGC_DATUM_NAME column) and are obtained by transforming the EPSG name using the following rules (used by OGR and Cadcorp): convert all non alphanumeric characters (including +) to underscores, then strip any leading, trailing or repeating underscores. This is to ensure that named datums can be correctly identified for precise datum transformations (see <link2> for more details). Corresponds to a OGC WKT DATUM node name.
+
+towgs84 N       This indicates a list of up to 7 Bursa Wolf transformation parameters., which can be used to approximate a transformation from the horizontal datum to the WGS84 datum. More precise datum transformations can be done with datum shift grids. Represented as a double-precision array, with 3, 6 or 7 values (if there are less than 7 values the remaining are considered to be zero). Corresponds to a OGC WKT TOWGS84 node.
+
+prime_meridian_name     S       The name of the prime meridian associated with the geodetic datum. Valid names are given in <link1> (prime_meridian.csv). Corresponds to a OGC WKT PRIMEM node name.
+
+reference_ellipsoid_name        S       The name of the reference ellipsoid. Valid names are given in <link1> (ellipsoid.csv). Corresponds to a OGC WKT SPHEROID node name.
+
+geographic_crs_name     S       The name of the geographic coordinate reference system. Corresponds to a OGC WKT GEOGCS node name.
+
+projected_crs_name      S       The name of the projected coordinate reference system. Corresponds to a OGC WKT PROJCS node name.
+
+latitude_of_projection_origin   N        The latitude (degrees_north) chosen as the origin of rectangular coordinates for a map projection. Domain: -90.0 <= latitude_of_projection_origin <= 90.0
+
+longitude_of_central_meridian   N        The line of longitude (degrees_east) at the center of a map projection generally used as the basis for constructing the projection. Domain: -180.0 <= longitude_of_central_meridian < 180.0
+
+longitude_of_prime_meridian     N        Specifies the longitude (degrees_east) [...]
+
+longitude_of_projection_origin  N        The longitude (degrees_east) chosen as the origin of rectangular coordinates for a map projection. Domain: -180.0 <= longitude_of_projection_origin < 180.0
+
+straight_vertical_longitude_from_pole   N        The longitude (degrees_east) to be oriented straight up from the North or South Pole. Domain: -180.0 <= straight_vertical_longitude_from_pole < 180.0
+
+Notes: (1) The various *_name attributes are optional but recommended when known as they allow for a better description and interoperability with WKT definitions. (2) reference_ellipsoid_name, prime_meridian_name, horizontal_datum_name and geographic_crs_name must be all defined if any one is defined, and if projected_crs_name is defined then geographic_crs_name must be also. (3) The following attributes should be included when there is a CRS (Coordinate Reference System) definition: longitude_of_prime_meridian (if different than 0), semi_major_axis and inverse_flattening or semi_minor_axis.
+
+Changes to References
+
+<link1> https://cf-pcmdi.llnl.gov/trac/wiki/Cf2CrsWkt
+<link2> http://home.gdal.org/projects/opengis/wktproblems.html
+<CT> OpenGIS Coordinate Transformation Service Implementation Specification 1.0 http://www.opengeospatial.org/standards/ct
