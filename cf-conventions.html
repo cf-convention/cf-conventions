@@ -6279,6 +6279,9 @@ been defined for <code>C</code> or <code>depth_c</code>.</p>
 </div>
 <div class="sect2">
 <h3 id="_ocean_sigma_over_z_coordinate"><a class="anchor" href="#_ocean_sigma_over_z_coordinate"></a>Ocean sigma over z coordinate</h3>
+<div class="paragraph">
+<p><strong>The description of this type of parametric vertical coordinate is defective in version 1.8 and earlier versions of the standard, in that it does not state what values the vertical coordinate variable should contain. Therefore, in accordance with the rules, all versions of the standard before 1.9 are deprecated for datasets that use the "ocean sigma over z" coordinate.</strong></p>
+</div>
 <div class="listingblock">
 <div class="content">
 <pre>standard_name = "ocean_sigma_z_coordinate"</pre>
@@ -6290,11 +6293,11 @@ been defined for <code>C</code> or <code>depth_c</code>.</p>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre>for k &lt;= nsigma:
+<pre>for levels k where sigma(k) has a defined value and zlev(k) is not defined:
 
   z(n,k,j,i) = eta(n,j,i) + sigma(k)*(min(depth_c,depth(j,i))+eta(n,j,i))
 
-for k &gt; nsigma:
+for levels k where zlev(k) has a defined value and sigma(k) is not defined:
 
   z(n,k,j,i) = zlev(k)</pre>
 </div>
@@ -6303,17 +6306,13 @@ for k &gt; nsigma:
 </dl>
 </div>
 <div class="paragraph">
-<p>where <code>z(n,k,j,i)</code> is height (positive upwards) relative to the datum (e.g.
-mean sea level) at gridpoint <code>(n,k,j,i)</code>, <code>eta(n,j,i)</code> is the height of the sea
-surface (positive upwards) relative to the datum at gridpoint <code>(n,j,i)</code>,
-<code>sigma(k)</code> is the dimensionless coordinate at vertical gridpoint <code>(k)</code> for <code>k
-&lt;= nsigma</code>, and <code>depth(j,i)</code> is the distance (a positive value) from the
-datum to the sea floor at horizontal gridpoint <code>(j,i)</code>. Above depth <code>depth_c</code>
-there are <code>nsigma</code> layers and below this depth the levels are surfaces of
-constant height <code>zlev</code> (positive upwards) relative to the datum.</p>
+<p>where <code>z(n,k,j,i)</code> is height, positive upwards, relative to ocean datum (e.g. mean sea level) at gridpoint <code>(n,k,j,i)</code>, <code>eta(n,j,i)</code> is the height of the ocean surface, positive upwards, relative to ocean datum at gridpoint <code>(n,j,i)</code>, and <code>depth(j,i)</code> is the distance from ocean datum to sea floor (positive value) at horizontal gridpoint <code>(j,i)</code>.</p>
 </div>
 <div class="paragraph">
-<p>The format for the <strong><code>formula_terms</code></strong> attribute is</p>
+<p>The parameter <code>sigma(k)</code> is defined only for the <code>nsigma</code> layers nearest the ocean surface, while <code>zlev(k)</code> is defined for the <code>nlayer - nsigma</code> deeper layers, where <code>0 &lt;= nsigma &lt;= nlayer</code> and <code>nlayer</code> is the size of the dimension of the vertical coordinate variable. Both <code>sigma</code> and <code>zlev</code> must have this dimension. For any <code>k</code>, whichever of <code>sigma(k)</code> or <code>zlev(k)</code> is undefined must contain missing data, while the other must not.</p>
+</div>
+<div class="paragraph">
+<p>The format for the <code>formula_terms</code> attribute is</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -6322,10 +6321,10 @@ constant height <code>zlev</code> (positive upwards) relative to the datum.</p>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>standard_name</code>s for <code>eta</code>, <code>depth</code>, <code>zlev</code> and the
-<code>computed_standard_name</code> must be one of the consistent sets shown in
-<a href="#table-computed-standard-names">Table D.1</a>. No <code>standard_name</code> has been
-defined for <code>depth_c</code> or <code>nsigma</code>.</p>
+<p>The <code>standard_name</code>s for <code>eta</code>, <code>depth</code>, <code>zlev</code> and the <code>computed_standard_name</code> must be one of the consistent sets shown in <a href="#table-computed-standard-names">Table D.1</a>. The <code>standard_name</code> for <code>sigma</code> is <code>ocean_sigma_coordinate</code>. No <code>standard_name</code> has been defined for <code>depth_c</code> or <code>nsigma</code>. The <code>nsigma</code> parameter is deprecated and optional in <code>formula_terms</code>; if supplied, it must equal the number of elements of <code>zlev</code> which contain missing data.</p>
+</div>
+<div class="paragraph">
+<p>The <code>standard_name</code> for the vertical coordinate variable is <code>ocean_sigma_z_coordinate</code>. This variable should contain <code>sigma(k)*depth_c</code> for the layers where <code>sigma</code> is defined and <code>zlev(k)</code> for the other layers, with units of length. The layers must be arranged so that the vertical coordinate variable contains a monotonic set of indicative values for the heights of the levels relative to the datum, either increasing or decreasing, and the direction must be indicated by the <code>positive</code> attribute, in the usual way for a vertical coordinate variable.</p>
 </div>
 </div>
 <div class="sect2">
@@ -10733,6 +10732,14 @@ node coordinate variables to be one of the dimensions of the data variable.</p>
 </li>
 </ol>
 </div>
+<div class="olist arabic">
+<div class="title">24 May 2021</div>
+<ol class="arabic">
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/314">Issue #314</a>: Correction to the definition of "ocean sigma over z coordinate" in Appendix D</p>
+</li>
+</ol>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -10801,7 +10808,7 @@ UNIDATA Program Center of the University Corporation for Atmospheric Research .<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-30 10:56:27 UTC
+Last updated 2021-06-12 14:35:55 UTC
 </div>
 </div>
 </body>
