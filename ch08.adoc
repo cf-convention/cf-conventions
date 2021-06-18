@@ -204,24 +204,39 @@ In addition to the **`interpolation_name`** and **`interpolation_description`** 
 ==== Interpolation and Non-Interpolation Dimensions
 
 For each interpolation variable identified in the **`coordinate_interpolation`**
-attribute, all corresponding tie point variables must share the same
-set of one or more dimensions. This set of dimensions must contain at
-least one __tie point interpolation dimension__ that corresponds to an
-interpolation dimension; and may additionally contain one or more
-__non-interpolation dimensions__, i.e. those of the target domain for
-which no coordinate interpolation is required. The size of a tie point
-interpolation dimension must be less than or equal to the size of its
-corresponding interpolation dimension.
+attribute, all of the associated tie point coordinate
+variables must share the same set of one or more dimensions. Each of
+the dimensions of a tie point coordinate variable must be either a
+dimension of the coordinate variable, or a dimension which is to be
+interpolated to a dimension of the coordinate variable. Dimensions of the
+tie point coordinate variable which are to be interpolated are called
+__tie point interpolation dimensions__, and the corresponding coordinate
+variable dimensions are called __interpolated dimensions__, while those
+for which no interpolation is required, being the same in the coordinate
+variable and the tie point coordinate variable, are called
+__non-interpolated dimensions__. The dimensions of a tie point
+coordinate variable must contain at least one tie point interpolation
+dimension, for each of which the corresponding interpolated dimension
+cannot be included.
 
-An interpolation dimension typically differs in size from the corresponding tie point interpolation dimension. For example, if the target domain dimensions are `xc = 30` and `yc = 10`,  interpolation could be applied in both of these dimensions, based on tie point variables of the dimensions `tp_xc = 4` and `tp_yc = 2`. Here, `tp_xc` is the tie point interpolation dimension related to the interpolation dimension `xc`, and `tp_yc` is the tie point interpolation dimension related to the interpolation dimension `yc`.
+The size of a tie point interpolation dimension will be less than the 
+size of the corresponding interpolated dimension. For example, if the 
+interpolated dimensions are `xc = 30` and `yc = 10`,  interpolation 
+could be applied in both of these dimensions, based on tie point 
+variables of the dimensions `tp_xc = 4` and `tp_yc = 2`. Here, 
+`tp_xc` is the tie point interpolation dimension related to the 
+interpolated dimension `xc`, and `tp_yc` is the tie point 
+interpolation dimension related to the interpolated dimension `yc`.
 
-The presence of non-interpolation dimensions in the tie point variable
+The presence of non-interpolated dimensions in the tie point variable
 impacts the interpolation process in that there must be a separate
 application of the interpolation method for each combination of
-indices of the non-interpolation dimensions. For example, if the
-target domain dimensions are `xc = 30` and `yc = 10`, interpolation
-could be applied in the `xc` dimension only, based on tie point
-variables that have dimensions `tp_xc = 4` and `yc = 10`. The
+indices of the non-interpolated dimensions. For example, if the
+target domain `xc = 30` is an interpolated dimension and `yc = 10` 
+is a non-interpolated dimension, interpolation
+would be applied in the `xc` dimension only, based on tie point
+variables that have the interpolation dimension `tp_xc = 4` and the 
+non-interpolated dimension `yc = 10`. The
 interpolation in the `xc` dimension would then be repeated for each of
 the 10 indices of the `yc` dimension.
 
@@ -264,9 +279,7 @@ tie point interpolation dimensions with `dimension1: tp_dimension1
 dimension1: tp_dimension2`. This is necessary when different tie point
 variables for a particular interpolation dimension do not contain the
 same number of tie points, and therefore define different numbers of
-interpolation zones, as is the case in <<example-VIIRS>>. A tie point
-variable must span at most one of the tie point interpolation
-dimensions associated with a given interpolation dimension.
+interpolation zones, as is the case in <<example-VIIRS>>.
 
 The same interpolation variable may be multiply mapped from the
 different sets of tie point variables. For instance, if tie point
