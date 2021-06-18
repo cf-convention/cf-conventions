@@ -147,10 +147,10 @@ For each interpolation dimension, the number of interpolation zones is equal to 
 .Process for generating the interpolation zones for a grid without discontinuities and for a grid with discontinuities.
 image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,align="center"] 
 
-[[compression-by-coordinate-sampling-tie-points-attribute, Section 8.3.2, "Tie Points Attribute"]]
-==== Tie Points Attribute
+[[compression-by-coordinate-sampling-tie-points-attribute, Section 8.3.2, "Coordinate Interpolation Attribute"]]
+==== Coordinate Interpolation Attribute
 
-To indicate that coordinate interpolation is required, a **`tie_points`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables `lat` and `lon` are to be interpolated according to the interpolation variable `bi_linear` could be indicated with `lat: lon: bi_linear`.
+To indicate that coordinate interpolation is required, a **`coordinate_interpolation`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables `lat` and `lon` are to be interpolated according to the interpolation variable `bi_linear` could be indicated with `lat: lon: bi_linear`.
 
 [[compression-by-coordinate-sampling-interpolation-variable, Section 8.3.3, "Interpolation Variable"]]
 ==== Interpolation Variable
@@ -203,7 +203,7 @@ In addition to the **`interpolation_name`** and **`interpolation_description`** 
 [[compression-by-coordinate-sampling-dimensions,Section 8.3.4, "Interpolation and Non-Interpolation Dimensions"]]
 ==== Interpolation and Non-Interpolation Dimensions
 
-For each interpolation variable identified in the **`tie_points`**
+For each interpolation variable identified in the **`coordinate_interpolation`**
 attribute, all corresponding tie point variables must share the same
 set of one or more dimensions. This set of dimensions must contain at
 least one __tie point interpolation dimension__ that corresponds to an
@@ -273,7 +273,7 @@ different sets of tie point variables. For instance, if tie point
 variables `lat` and `lon` span dimension `tp_dimension1` and tie point
 variable `time` spans dimension `tp_dimension2`, and all three are to
 interpolated according to interpolation variable `linear`, then the
-**`tie_points`** attribute could be `lat: lon: linear time:
+**`coordinate_interpolation`** attribute could be `lat: lon: linear time:
 linear`. In this case it is not possible to simultaneously map all
 three tie point variables to the linear interpolation variable because
 they do not all span the same axes.
@@ -332,7 +332,7 @@ variables:
   float Temperature(yc, xc) ;
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
-    Temperature:tie_points = "lat: lon: bl_interpolation" ;
+    Temperature:coordinate_interpolation = "lat: lon: bl_interpolation" ;
 
   // Interpolation variable
   char bl_interpolation ;
@@ -374,7 +374,7 @@ variables:
   float Temperature(yc, xc) ;
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
-    Temperature:tie_points = "lat: lon: l_interpolation" ;
+    Temperature:coordinate_interpolation = "lat: lon: l_interpolation" ;
 
   // Interpolation variables
   char l_interpolation ;
@@ -481,20 +481,20 @@ dimensions :
 variables:
   // VIIRS I-Band Channel 01 and 04
   float I01_radiance(track, scan) ;
-    I01_radiance:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I01_radiance:coordinate_interpolation = "lat: lon: tp_interpolation  t: time_interpolation" ;
     I01_radiance:standard_name = "toa_outgoing_radiance_per_unit_wavelength" ;
     I01_radiance:units = "W m-2 sr-1 m-1" ;
   float I01_reflectance(track, scan) ;
-    I01_reflectance:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I01_reflectance:coordinate_interpolation = "lat: lon: tp_interpolation  t: time_interpolation" ;
     I01_reflectance:long_name = "reflectance" ;
     I01_reflectance:units = "1" ;
 
   float I04_radiance(track, scan) ;
-    I04_radiance:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I04_radiance:coordinate_interpolation = "lat: lon: tp_interpolation  t: time_interpolation" ;
     I04_radiance:standard_name = "toa_outgoing_radiance_per_unit_wavelength" ;
     I04_radiance:units = "W m-2 sr-1 m-1" ;
   float I04_brightness_temperature(track, scan) ;
-    I04_brightness_temperature:tie_points = "lat: lon: tp_interpolation  t: time_interpolation" ;
+    I04_brightness_temperature:coordinate_interpolation = "lat: lon: tp_interpolation  t: time_interpolation" ;
     I04_brightness_temperature:standard_name = "brightness_temperature" ;
     I04_brightness_temperature:units = "K" ;
 
@@ -575,7 +575,7 @@ variables:
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
     Temperature:grid_mapping = "lambert_conformal" ;
-    Temperature:tie_points = "lat: lon: bi_linear y: x: linear" ;
+    Temperature:coordinate_interpolation = "lat: lon: bi_linear y: x: linear" ;
 
   int lambert_conformal ;
     lambert_conformal:grid_mapping_name = "lambert_conformal_conic" ;
