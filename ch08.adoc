@@ -241,7 +241,7 @@ interpolation in the `xc` dimension would then be repeated for each of
 the 10 indices of the `yc` dimension.
 
 [[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.5, "Tie Point Dimensions Attribute"]]
-==== Tie Point Dimensions Attribute
+==== Tie Point Mapping Attribute
 
 Each interpolation dimension must be associated with its corresponding
 tie point interpolation dimension and, if required, its corresponding
@@ -253,7 +253,7 @@ dimension is spanned by an interpolation parameter variable, as
 described in
 <<compression-by-coordinate-sampling-interpolation-parameters>>. The
 association is stored in the interpolation variable's
-**`tie_point_dimensions`** attribute that contains a blank-separated
+**`tie_point_mapping`** attribute that contains a blank-separated
 list of words of the form __"interpolation_dimension:
 tie_point_interpolation_dimension [interpolation_zone_dimension]
 [interpolation_dimension: ...]"__. If an interpolation zone dimension
@@ -273,7 +273,7 @@ image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
 
 A single interpolation dimension may be associated with multiple tie
 point interpolation dimensions by repeating the interpolation
-dimension in the **`tie_point_dimensions`** attribute. For instance,
+dimension in the **`tie_point_mapping`** attribute. For instance,
 interpolation dimension `dimension1` could be mapped to two different
 tie point interpolation dimensions with `dimension1: tp_dimension1
 dimension1: tp_dimension2`. This is necessary when different tie point
@@ -298,7 +298,7 @@ The relationship between a tie point interpolation dimension and its
 corresponding interpolation dimension is defined with a __tie point
 index variable__. The tie point index variable is a one-dimensional
 integer variable that must span the tie point interpolation dimension
-specified by the **`tie_point_dimensions`** attribute. Each tie point
+specified by the **`tie_point_mapping`** attribute. Each tie point
 index variable value is a zero-based index of the related
 interpolation dimension which maps an element of that interpolation
 dimension to the corresponding location in the tie point interpolation
@@ -350,7 +350,7 @@ variables:
   // Interpolation variable
   char bl_interpolation ;
     bl_interpolation:interpolation_name = "bi_linear" ;
-    bl_interpolation:tie_point_dimensions = "xc: tp_xc  yc: tp_y"  ;
+    bl_interpolation:tie_point_mapping = "xc: tp_xc  yc: tp_y"  ;
     bl_interpolation:tie_point_indices = "yc: y_indices xc: x_indices" ;
 
   // Tie point variables
@@ -392,7 +392,7 @@ variables:
   // Interpolation variables
   char l_interpolation ;
     l_interpolation:interpolation_name = "linear" ;
-    l_interpolation:tie_point_dimensions = "xc: tp_xc"  ;
+    l_interpolation:tie_point_mapping = "xc: tp_xc"  ;
     l_interpolation:tie_point_indices = "xc: x_indices" ;
 
   // Tie point variables
@@ -465,7 +465,7 @@ interpolation zones that it does not span.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
-[[compression-by-coordinate-sampling-bounds, Section 8.3.8, "Interpolation of Tie Point Bounds"]]
+[[compression-by-coordinate-sampling-bounds, Section 8.3.9, "Interpolation of Tie Point Bounds"]]
 ==== Interpolation of Tie Point Bounds
 
 If reconstituted coordinates have cell boundaries, then the corresponding tie point variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. The bounds of a tie point must be the same as the bounds of the corresponding target grid cells. It is therefore likely that tie point cells will be non-contiguous.
@@ -514,7 +514,7 @@ variables:
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_remote_sensing" ;
-    tp_interpolation:tie_point_dimensions = "track: tp_track zone_track
+    tp_interpolation:tie_point_mapping = "track: tp_track zone_track
                                              scan: tp_scan zone_scan
 ;
     tp_interpolation:tie_point_indices = "track: track_indices
@@ -550,7 +550,7 @@ variables:
   // Time interpolation variable
   char time_interpolation ;
     time_interpolation:interpolation_name = "bi_linear" ;
-    time_interpolation:tie_point_dimensions = "track: tp_track 
+    time_interpolation:tie_point_mapping = "track: tp_track 
                                                scan: tp_time_scan"  ;
     time_interpolation:tie_point_indices = "track: track_indices 
                                             scan: time_scan_indices" ;
@@ -599,12 +599,12 @@ variables:
   // Interpolation variables
   char bi_linear ;
     bi_linear:interpolation_name = "bi_linear" ;
-    bi_linear:tie_point_dimensions = "y: tp_y  x: tp_x"  ;
+    bi_linear:tie_point_mapping = "y: tp_y  x: tp_x"  ;
     bi_linear:tie_point_indices = "y: y_indices x: x_indices" ;
 
   char linear ;			
     linear:interpolation_name = "linear" ;
-    linear:tie_point_dimensions = "y: tp_y  x: tp_x"  ;
+    linear:tie_point_mapping = "y: tp_y  x: tp_x"  ;
     linear:tie_point_indices = "y: y_indices x: x_indices" ;
 
   // Tie point variables
