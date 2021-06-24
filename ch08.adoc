@@ -89,9 +89,9 @@ through the degree of subsampling and the choice of interpolation
 method, see <<Appendix J>>.
 
 The sampled coordinates are called __tie points__ and are stored in
-__tie point variables__.
+__tie point coordinate variables__.
 
-In addition to the tie point variables themselves, metadata defining the coordinate interpolation method is stored in attributes of the data variable and of the associated __interpolation variable__. The partitioning of metadata between the data variable and the interpolation variable has been designed to minimise redundancy and maximise the reusability of the interpolation variable within a dataset.
+In addition to the tie point coordinate variables themselves, metadata defining the coordinate interpolation method is stored in attributes of the data variable and of the associated __interpolation variable__. The partitioning of metadata between the data variable and the interpolation variable has been designed to minimise redundancy and maximise the reusability of the interpolation variable within a dataset.
 
 The metadata that define the interpolation formula and its inputs are complete, so that the results of the coordinate reconstitution process are well defined and of a predictable accuracy.
 
@@ -150,12 +150,12 @@ image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,a
 [[compression-by-coordinate-sampling-tie-points-attribute, Section 8.3.2, "Coordinate Interpolation Attribute"]]
 ==== Coordinate Interpolation Attribute
 
-To indicate that coordinate interpolation is required, a **`coordinate_interpolation`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point variables `lat` and `lon` are to be interpolated according to the interpolation variable `bi_linear` could be indicated with `lat: lon: bi_linear`.
+To indicate that coordinate interpolation is required, a **`coordinate_interpolation`** attribute must be defined for a data variable. This is a string attribute that both identifies the tie point coordinate variables, and maps non-overlapping subsets of them to their corresponding interpolation variables. It is a blank-separated list of words of the form "__tie_point_variable: [tie_point_variable: ...] interpolation_variable [tie_point_variable: [tie_point_variable: ...] interpolation_variable ...]__". For example, to specify that the tie point coordinate variables `lat` and `lon` are to be interpolated according to the interpolation variable `bi_linear` could be indicated with `lat: lon: bi_linear`.
 
 [[compression-by-coordinate-sampling-interpolation-variable, Section 8.3.3, "Interpolation Variable"]]
 ==== Interpolation Variable
 
-The method used to uncompress the tie point variables is described by
+The method used to uncompress the tie point coordinate variables is described by
 an interpolation variable that acts as a container for the attributes
 that define the interpolation technique and the parameters that should
 be used. The variable should be a scalar (i.e. it has no dimensions)
@@ -190,7 +190,7 @@ coordinates simultaneously, if such tie points are present. For
 example, there are cases where longitudes cannot be interpolated
 without considering the corresponding latitudes. It is up to the
 interpolation description to describe how such coordinates are to be
-identified (e.g. it may be that such tie point variables require
+identified (e.g. it may be that such tie point coordinate variables require
 particular units or standard names).
 
 Note that the interpolation method is always applied on a per
@@ -228,7 +228,7 @@ variables of the dimensions `tp_xc = 4` and `tp_yc = 2`. Here,
 interpolated dimension `xc`, and `tp_yc` is the tie point 
 interpolation dimension related to the interpolated dimension `yc`.
 
-The presence of non-interpolated dimensions in the tie point variable
+The presence of non-interpolated dimensions in the tie point coordinate variable
 impacts the interpolation process in that there must be a separate
 application of the interpolation method for each combination of
 indices of the non-interpolated dimensions. For example, if the
@@ -282,13 +282,13 @@ same number of tie points, and therefore define different numbers of
 interpolation zones, as is the case in <<example-VIIRS>>.
 
 The same interpolation variable may be multiply mapped from the
-different sets of tie point variables. For instance, if tie point
+different sets of tie point coordinate variables. For instance, if tie point
 variables `lat` and `lon` span dimension `tp_dimension1` and tie point
 variable `time` spans dimension `tp_dimension2`, and all three are to
 interpolated according to interpolation variable `linear`, then the
 **`coordinate_interpolation`** attribute could be `lat: lon: linear time:
 linear`. In this case it is not possible to simultaneously map all
-three tie point variables to the linear interpolation variable because
+three tie point coordinate variables to the linear interpolation variable because
 they do not all span the same axes.
 
 [[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.6, "Tie Point Indices"]]
@@ -312,7 +312,7 @@ an interpolation area boundary relating to a grid discontinuity
 (<<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>).
 
 For instance, in example <<example-Two-dimensional-tie-point-interpolation>>
-the tie point variables represent a subset of the target domain and
+the tie point coordinate variables represent a subset of the target domain and
 the tie point index variable `int x_indices(tp_xc)` contains the
 indices `x_indices = 0, 9, 19, 29` that identify the location in the
 interpolation dimension `xc` of size 30.
@@ -353,7 +353,7 @@ variables:
     bl_interpolation:tie_point_mapping = "xc: tp_xc  yc: tp_y"  ;
     bl_interpolation:tie_point_indices = "yc: y_indices xc: x_indices" ;
 
-  // Tie point variables
+  // tie point coordinate variables
   double lat(tp_yc, tp_xc) ;
     lat:units = "degrees_north" ;
     lat:standard_name = "latitude" ;
@@ -395,7 +395,7 @@ variables:
     l_interpolation:tie_point_mapping = "xc: tp_xc"  ;
     l_interpolation:tie_point_indices = "xc: x_indices" ;
 
-  // Tie point variables
+  // tie point coordinate variables
   double lat(yc, tp_xc) ;
     lat:units = "degrees_north" ;
     lat:standard_name = "latitude" ;
@@ -436,7 +436,7 @@ parameters may always be provided to non-standardized interpolation
 methods.
 
 The dimensions of an interpolation parameter variable must be a subset
-of zero or more the tie point variable dimensions, with the
+of zero or more the tie point coordinate variable dimensions, with the
 possibility of a tie point interpolation dimension being replaced with
 the corresponding interpolation zone dimension. The interpretation of
 an interpolation parameter variable depends on which of its dimensions
@@ -468,9 +468,9 @@ image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="cente
 [[compression-by-coordinate-sampling-bounds, Section 8.3.9, "Interpolation of Tie Point Bounds"]]
 ==== Interpolation of Tie Point Bounds
 
-If reconstituted coordinates have cell boundaries, then the corresponding tie point variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. The bounds of a tie point must be the same as the bounds of the corresponding target grid cells. It is therefore likely that tie point cells will be non-contiguous.
+If reconstituted coordinates have cell boundaries, then the corresponding tie point coordinate variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. The bounds of a tie point must be the same as the bounds of the corresponding target grid cells. It is therefore likely that tie point cells will be non-contiguous.
 
-The target domain cell bounds are calculated by interpolating each cell bound position independently of the others, using the same interpolation method and tie point index variables as used for the cell coordinates. In this case, though, the tie point index variables are the identifying target domain cells to which the bounds apply, rather than bounds values themselves. For instance, in the case of a two-dimensional tie point variable with four-sided cells, the target domain cell bounds would be calculated with four separate interpolations, one for each of the bounds positions (following the notation of <<cell-boundaries>>) `(j-1,i-1)`, `(j-1,i+1)`, `(j+1,i+1)`, `(j+1,i-1)`.
+The target domain cell bounds are calculated by interpolating each cell bound position independently of the others, using the same interpolation method and tie point index variables as used for the cell coordinates. In this case, though, the tie point index variables are the identifying target domain cells to which the bounds apply, rather than bounds values themselves. For instance, in the case of a two-dimensional tie point coordinate variable with four-sided cells, the target domain cell bounds would be calculated with four separate interpolations, one for each of the bounds positions (following the notation of <<cell-boundaries>>) `(j-1,i-1)`, `(j-1,i+1)`, `(j+1,i+1)`, `(j+1,i-1)`.
 
 Note that an implementation of the interpolation method is free to calculate the uncompressed bounds locations in the manner of its choosing, as a long as the result is formally equivalent to each bounds position being treated independently.
 
@@ -607,7 +607,7 @@ variables:
     linear:tie_point_mapping = "y: tp_y  x: tp_x"  ;
     linear:tie_point_indices = "y: y_indices x: x_indices" ;
 
-  // Tie point variables
+  // tie point coordinate variables
   double time(time) ;
     time:standard_name = "time" ;
     time:units = "days since 2021-03-01" ;
