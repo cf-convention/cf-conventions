@@ -97,24 +97,24 @@ In addition to the tie point coordinate variables themselves, metadata defining 
 
 The metadata that define the interpolation formula and its inputs are complete, so that the results of the coordinate reconstitution process are well defined and of a predictable accuracy.
 
-[[compression-by-coordinate-sampling-tie-points-and-interpolation-zones, Section 8.3.1, "Tie Points and Interpolation Zones"]]
-==== Tie Points and Interpolation Zones
+[[compression-by-coordinate-sampling-tie-points-and-interpolation-subareas, Section 8.3.1, "Tie Points and Interpolation Subareas"]]
+==== Tie Points and Interpolation Subareas
 
 Reconstitution of the uncompressed coordinate and auxiliary coordinate
 variables is based on interpolation. To accomplish this, the target
-domain is segmented into smaller __interpolation zones__, for each of
+domain is segmented into smaller __interpolation subareas__, for each of
 which the interpolation method is applied independently. For
-one-dimensional interpolation, an interpolation zone is defined by two
-tie points, one at each end of the interpolation zone; for
-two-dimensional interpolation, an interpolation zone is defined by
+one-dimensional interpolation, an interpolation subarea is defined by two
+tie points, one at each end of the interpolation subarea; for
+two-dimensional interpolation, an interpolation subarea is defined by
 four tie points, one at each corner of a rectangular area aligned with
 the domain axes; etc. For the reconstitution of the uncompressed
 coordinate and auxiliary coordinate variables within an interpolation
-zone, the interpolation method is permitted to access its defining tie
+subarea, the interpolation method is permitted to access its defining tie
 points, and no others.
 
 As an interpolation method relies on the regularity and continuity of
-the coordinate values within each interpolation zone, special
+the coordinate values within each interpolation subarea, special
 attention must be given to the case when uncompressed coordinates
 contain discontinuities. A discontinuity could be an overlap or a gap
 in the coordinates' coverage, or a change in cell size or cell
@@ -122,28 +122,28 @@ alignment. As an example, such discontinuities are common in remote
 sensing data and may be caused by combinations of the instrument scan
 motion, the motion of the sensor platform and changes in the
 instrument scan mode. When discontinuities are present, the domain is
-first divided into multiple __interpolation areas__, each of which is
+first divided into multiple __continuous areas__, each of which is
 free of discontinuities. When no discontinuities are present, the
-whole domain is a single interpolation area. Following this step, each
-interpolation area is segmented into interpolation zones. The
-processes of generating interpolation zones for a domain without
+whole domain is a single continuous area. Following this step, each
+continuous area is segmented into interpolation subareas. The
+processes of generating interpolation subareas for a domain without
 discontinuities and for a domain with discontinuities is illustrated
-in <<interpolation_zone_generation>>, and described in more detail in
+in <<interpolation_subarea_generation>>, and described in more detail in
 <<Appendix J>>.
 
-Within an interpolation area, interpolation zones must share tie points with neighbouring interpolation zones. Between interpolation areas, interpolation zones are not permitted to share tie points. This results in a different number of tie points in the two cases shown in <<interpolation_zone_generation>>.
+Within an continuous area, interpolation subareas must share tie points with neighbouring interpolation subareas. Between continuous areas, interpolation subareas are not permitted to share tie points. This results in a different number of tie points in the two cases shown in <<interpolation_subarea_generation>>.
 
 For each __interpolation dimension__, i.e. a target domain dimension
 for which coordinate interpolation is required, the location of the
 tie points is defined by a corresponding __tie point index variable__,
-which also indicates the location of the interpolation areas
+which also indicates the location of the continuous areas
 (<<compression-by-coordinate-sampling-tie-point-indices>>).
 
-For each interpolation dimension, the number of interpolation zones is equal to the number of tie points minus the number of interpolation areas.
+For each interpolation dimension, the number of interpolation subareas is equal to the number of tie points minus the number of continuous areas.
 
-[[interpolation_zone_generation, figure 1]]
+[[interpolation_subarea_generation, figure 1]]
 [.text-center]
-.Process for generating the interpolation zones for a grid without discontinuities and for a grid with discontinuities.
+.Process for generating the interpolation subareas for a grid without discontinuities and for a grid with discontinuities.
 image::images/ci_interpolation_zone_generation_process.svg[,100%,pdfwidth=50vw,align="center"] 
 
 [[compression-by-coordinate-sampling-tie-points-attribute, Section 8.3.2, "Coordinate Interpolation Attribute"]]
@@ -193,9 +193,9 @@ identified (e.g. it may be that such tie point coordinate variables require
 particular units or standard names).
 
 Note that the interpolation method is always applied on a per
-interpolation zone basis, for which the construction of the
+interpolation subarea basis, for which the construction of the
 uncompressed coordinates may only access those tie points that define
-the extent of the of the interpolation zone.
+the extent of the of the interpolation subarea.
 
 In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>, <<compression-by-coordinate-sampling-tie-point-indices>> and <<compression-by-coordinate-sampling-interpolation-parameters>>.
 
@@ -246,24 +246,24 @@ the 10 indices of the `yc` dimension.
 
 Each interpolation dimension must be associated with its corresponding
 tie point interpolation dimension and, if required, its corresponding
-__interpolation zone dimension__ that defines the number of
-interpolation zones which partition the interpolation dimension. It is
-only required to associate an interpolation zone dimension to an
-interpolation dimension in the case that the interpolation zone
+__interpolation subarea dimension__ that defines the number of
+interpolation subareas which partition the interpolation dimension. It is
+only required to associate an interpolation subarea dimension to an
+interpolation dimension in the case that the interpolation subarea
 dimension is spanned by an interpolation parameter variable, as
 described in
 <<compression-by-coordinate-sampling-interpolation-parameters>>. The
 association is stored in the interpolation variable's
 **`tie_point_mapping`** attribute that contains a blank-separated
 list of words of the form __"interpolation_dimension:
-tie_point_interpolation_dimension [interpolation_zone_dimension]
-[interpolation_dimension: ...]"__. If an interpolation zone dimension
+tie_point_interpolation_dimension [interpolation_subarea_dimension]
+[interpolation_dimension: ...]"__. If an interpolation subarea dimension
 is provided then it must be the second of the two named dimensions
 following the interpolation dimension.
 
 An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
 
-Note that an interpolation zone dimension has, by definition, the same size as the corresponding tie point interpolation dimension, minus the number of interpolation areas.
+Note that an interpolation subarea dimension has, by definition, the same size as the corresponding tie point interpolation dimension, minus the number of continuous areas.
 
 
 [[ci_dimensions_overview, figure 2]]
@@ -303,14 +303,14 @@ index variable value is a zero-based index of the related
 interpolation dimension which maps an element of that interpolation
 dimension to the corresponding location in the tie point interpolation
 dimension. The tie point index values must be strictly monotonically
-increasing within interpolation areas. An interpolation zone must span
+increasing within continuous areas. An interpolation subarea must span
 at least two points of each of its corresponding interpolated
 dimensions in the target domain, therefore the tie point indices that 
 define an
-interpolation zone must all be different. When two adjacent values are
+interpolation subarea must all be different. When two adjacent values are
 equal, or differ by one, it indicates the location (in index space) of
-an interpolation area boundary relating to a grid discontinuity
-(<<compression-by-coordinate-sampling-tie-points-and-interpolation-zones>>).
+an continuous area boundary relating to a grid discontinuity
+(<<compression-by-coordinate-sampling-tie-points-and-interpolation-subareas>>).
 
 For instance, in example <<example-Two-dimensional-tie-point-interpolation>>
 the tie point coordinate variables represent a subset of the target domain and
@@ -440,13 +440,13 @@ The interpolation parameter variable dimensions must include, for all of the int
 
 The application of an interpolation parameter variable is independent of its non-interpolation dimensions, but depends on its set of tie point interpolation dimensions and interpolation subarea dimensions: 
 
-* If the set only contains tie point interpolation dimensions, then the variable provides values for every tie point and therefore equally applicable to the interpolation zones that share that tie point, see example a) in figure 3;
-* If the set only contains interpolation subarea dimensions, then the variable provides values for every interpolation zone and therefore only applicable to that interpolation zone, see example b) in figure 3;
-* If the set contains both tie point interpolation dimensions and interpolation zone dimensions, then the variable’s values are to be shared by the interpolation zones that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at the interpolation zone boundaries, and therefore equally applicable to the interpolation zones that share that boundary, see example c) and d) in figure 3;
+* If the set only contains tie point interpolation dimensions, then the variable provides values for every tie point and therefore equally applicable to the interpolation subareas that share that tie point, see example a) in figure 3;
+* If the set only contains interpolation subarea dimensions, then the variable provides values for every interpolation subarea and therefore only applicable to that interpolation subarea, see example b) in figure 3;
+* If the set contains both tie point interpolation dimensions and interpolation subarea dimensions, then the variable’s values are to be shared by the interpolation subareas that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at the interpolation subarea boundaries, and therefore equally applicable to the interpolation subareas that share that boundary, see example c) and d) in figure 3;
 
 [[ci_interpolation_parameters, figure 3]]
 [.text-center]
-.Through combination of dimensions, interpolation parameter variables may provide values for each interpolation zone, for couples of neighbouring interpolation zones or for multiple interpolation zones sharing a boundary.
+.Through combination of dimensions, interpolation parameter variables may provide values for each interpolation subarea, for couples of neighbouring interpolation subareas or for multiple interpolation subareas sharing a boundary.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
@@ -470,11 +470,11 @@ dimensions :
   // VIIRS I-Band (375 m resolution imaging)
   track = 1536 ;
   scan = 6400 ; 
-  // Tie points and interpolation zones
+  // Tie points and interpolation subareas
   tp_track = 96 ;  // 48 VIIRS scans
   tp_scan = 205 ;
-  zone_track = 48 ;   // track interpolation zone 
-  zone_scan= 200 ;    // scan interpolation zone 
+  subarea_track = 48 ;   // track interpolation subarea 
+  subarea_scan= 200 ;    // scan interpolation subarea 
   // Time, stored at scan-start and scan-end of each scan
   tp_time_scan = 2;
 
@@ -492,22 +492,22 @@ variables:
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_remote_sensing" ;
-    tp_interpolation:tie_point_mapping = "track: tp_track zone_track
-                                             scan: tp_scan zone_scan
+    tp_interpolation:tie_point_mapping = "track: tp_track subarea_track
+                                             scan: tp_scan subarea_scan
 ;
     tp_interpolation:tie_point_indices = "track: track_indices
                                           scan: scan_indices
 ;
-    tp_interpolation:interpolation_parameters = "ce1: ce1  ca2: ca2  ce3: ce3 flags: interpolation_zone_flags" ;
+    tp_interpolation:interpolation_parameters = "ce1: ce1  ca2: ca2  ce3: ce3 flags: interpolation_subarea_flags" ;
 
   // Interpolation parameters
-  short ce1(tp_track , zone_scan) ;
-  short ca2(zone_track , tp_scan) ;
-  short ce3(zone_track, zone_scan) ;
-  byte interpolation_zone_flags(zone_track , zone_scan) ;
-    interpolation_zone_flags : valid_range = "1b, 7b" ;
-    interpolation_zone_flags : flag_masks = "1b, 2b, 4b" ;
-    interpolation_zone_flags : flag_meanings =
+  short ce1(tp_track , subarea_scan) ;
+  short ca2(subarea_track , tp_scan) ;
+  short ce3(subarea_track, subarea_scan) ;
+  byte interpolation_subarea_flags(subarea_track , subarea_scan) ;
+    interpolation_subarea_flags : valid_range = "1b, 7b" ;
+    interpolation_subarea_flags : flag_masks = "1b, 2b, 4b" ;
+    interpolation_subarea_flags : flag_meanings =
          "location_use_cartesian
           sensor_direction_use_cartesian
           solar_direction_use_cartesian" ;
