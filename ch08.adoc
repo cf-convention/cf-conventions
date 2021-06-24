@@ -199,24 +199,26 @@ the extent of the of the interpolation zone.
 
 In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>, <<compression-by-coordinate-sampling-tie-point-indices>> and <<compression-by-coordinate-sampling-interpolation-parameters>>.
 
-[[compression-by-coordinate-sampling-dimensions,Section 8.3.4, "Interpolation and Non-Interpolation Dimensions"]]
-==== Interpolation and Non-Interpolation Dimensions
+[[compression-by-coordinate-sampling-dimensions,Section 8.3.4, "Interpolation, Interpolated and Non-Interpolated Dimensions"]]
+==== Interpolation, Interpolated and Non-Interpolated Dimensions
 
-For each interpolation variable identified in the **`coordinate_interpolation`**
-attribute, all of the associated tie point coordinate
-variables must share the same set of one or more dimensions. Each of
-the dimensions of a tie point coordinate variable must be either a
-dimension of the coordinate variable, or a dimension which is to be
-interpolated to a dimension of the coordinate variable. Dimensions of the
-tie point coordinate variable which are to be interpolated are called
-__tie point interpolation dimensions__, and the corresponding coordinate
-variable dimensions are called __interpolated dimensions__, while those
-for which no interpolation is required, being the same in the coordinate
-variable and the tie point coordinate variable, are called
-__non-interpolated dimensions__. The dimensions of a tie point
-coordinate variable must contain at least one tie point interpolation
-dimension, for each of which the corresponding interpolated dimension
-cannot be included.
+For each interpolation variable identified in the 
+**`coordinate_interpolation`** attribute, all of the associated tie point
+coordinate variables must share the same set of one or more dimensions. 
+This set of dimensions must correspond to the set of dimensions of the 
+uncompressed coordinate or auxiliary coordinate variables, such that each 
+of these dimensions must be either the uncompressed dimension itself, or 
+a dimension that is to be interpolated to the uncompressed dimension.
+
+Dimensions of the tie point coordinate variable which are to be 
+interpolated are called __tie point interpolation dimensions__, and 
+the corresponding data variable dimensions are called __interpolated 
+dimensions__, while those for which no interpolation is required, 
+being the same in the data variable and the tie point coordinate 
+variable, are called __non-interpolated dimensions__. The dimensions 
+of a tie point coordinate variable must contain at least one tie 
+point interpolation dimension, for each of which the corresponding 
+interpolated dimension cannot be included.
 
 The size of a tie point interpolation dimension will be less than the 
 size of the corresponding interpolated dimension. For example, if the 
@@ -230,10 +232,10 @@ interpolation dimension related to the interpolated dimension `yc`.
 The presence of non-interpolated dimensions in the tie point coordinate variable
 impacts the interpolation process in that there must be a separate
 application of the interpolation method for each combination of
-indices of the non-interpolated dimensions. For example, if the
-target domain `xc = 30` is an interpolated dimension and `yc = 10` 
+indices of the non-interpolated dimensions. For example, if
+`xc = 30` is an interpolated dimension and `yc = 10` 
 is a non-interpolated dimension, interpolation
-would be applied in the `xc` dimension only, based on tie point
+could be applied in the `xc` dimension only, based on tie point
 variables that have the interpolation dimension `tp_xc = 4` and the 
 non-interpolated dimension `yc = 10`. The
 interpolation in the `xc` dimension would then be repeated for each of
@@ -277,9 +279,7 @@ interpolation dimensions by repeating the interpolated dimension in the
 dimensions with `dimension1: tp_index_variable1  tp_dimension1 dimension1: 
 tp_index_variable2 tp_dimension2`. This is necessary when two or more tie 
 point coordinate variables have different tie point index variables 
-corresponding to the same interpolated dimension. A tie point coordinate 
-variable must span at most one of the tie point interpolation dimensions 
-associated with a given interpolation dimension. 
+corresponding to the same interpolated dimension.
 
 The same interpolation variable may be multiply mapped from the
 different sets of tie point coordinate variables. For instance, if tie point
