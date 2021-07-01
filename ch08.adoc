@@ -137,7 +137,7 @@ For each __interpolated dimension__, i.e. a target domain dimension
 for which coordinate interpolation is required, the location of the
 tie points is defined by a corresponding __tie point index variable__,
 which also indicates the location of the continuous areas
-(<<compression-by-coordinate-sampling-tie-point-indices>>).
+(<<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>).
 
 For each interpolated dimension, the number of interpolation subareas is equal to the number of tie points minus the number of continuous areas.
 
@@ -197,7 +197,7 @@ interpolation subarea basis, for which the construction of the
 uncompressed coordinates may only access those tie points that define
 the extent of the of the interpolation subarea.
 
-In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>, <<compression-by-coordinate-sampling-tie-point-indices>> and <<compression-by-coordinate-sampling-interpolation-parameters>>.
+In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>> and <<compression-by-coordinate-sampling-interpolation-parameters>>.
 
 [[compression-by-coordinate-sampling-dimensions,Section 8.3.4, "Subsampled, Interpolated and Non-Interpolated Dimensions"]]
 ==== Subsampled, Interpolated and Non-Interpolated Dimensions
@@ -241,36 +241,37 @@ non-interpolated dimension `yc = 10`. The
 interpolation in the `xc` dimension would then be repeated for each of
 the 10 indices of the `yc` non-interpolated dimension.
 
-[[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.5, "Tie Point Dimensions Attribute"]]
+[[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.5, "Tie Point Mapping Attribute"]]
 ==== Tie Point Mapping Attribute
 
-Each interpolated dimension must be associated with its corresponding
-subsampled dimension and, if required, its corresponding
+The **`tie_point_mapping`** attribute provides mapping at two levels. It associates
+subsampled dimensions with the corresponding target dimensions, and for each 
+of these sets of corresponding dimensions, it associates index values
+of the subsampled dimension with index values of the target dimension, thereby 
+uniquely associating the tie points with their corresponding location in the 
+target domain.
+
+The mappings are stored in the interpolation variable's
+**`tie_point_mapping`** attribute that contains a blank-separated
+list of words of the form __"interpolated_dimension: tie_point_index_variable
+subsampled_dimension [interpolation_subarea_dimension]
+[interpolated_dimension: ...]"__, the details of which are described in the following two sections.
+
+[[compression-by-coordinate-sampling-tie-point-dimension-mapping, Section 8.3.6, "Tie Point Dimension Mapping"]]
+==== Tie Point Dimension Mapping
+
+The **`tie_point_mapping`** attribute defined above associates 
+each subsampled dimension and, if required, its corresponding
 __interpolation subarea dimension__ that defines the number of
-interpolation subareas which partition the interpolated dimension. It is
+interpolation subareas which partition the interpolated dimension, 
+with their corresponding interpolated dimension. It is
 only required to associate an interpolation subarea dimension to an
 interpolated dimension in the case that the interpolation subarea
 dimension is spanned by an interpolation parameter variable, as
 described in
-<<compression-by-coordinate-sampling-interpolation-parameters>>. The
-association is stored in the interpolation variable's
-**`tie_point_mapping`** attribute that contains a blank-separated
-list of words of the form __"interpolated_dimension:
-subsampled_dimension [interpolation_subarea_dimension]
-[interpolated_dimension: ...]"__. If an interpolation subarea dimension
-is provided then it must be the second of the two named dimensions
-following the interpolated dimension.
-
-An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
-
-Note that an interpolation subarea dimension has, by definition, the same size as the corresponding subsampled dimension, minus the number of continuous areas.
-
-
-[[ci_dimensions_overview, figure 2]]
-[.text-center]
-.Overview of the different dimensions for coordinate interpolation.
-image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
-
+<<compression-by-coordinate-sampling-interpolation-parameters>>.
+If an interpolation subarea dimension is provided then it must be 
+the second of the two named dimensions following the tie point index variable.
 
 A single interpolated dimension may be associated with multiple 
 subsampled dimensions by repeating the interpolated dimension in the
@@ -281,24 +282,37 @@ tp_index_variable2 tp_dimension2`. This is necessary when two or more tie
 point coordinate variables have different tie point index variables 
 corresponding to the same interpolated dimension.
 
-[[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.6, "Tie Point Indices"]]
-==== Tie Point Indices
+An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>. 
 
-The relationship between a subsampled dimension and its
-corresponding interpolated dimension is defined with a __tie point
-index variable__. The tie point index variable is a one-dimensional
-integer variable that must span the subsampled dimension
-specified by the **`tie_point_mapping`** attribute. Each tie point
+[[ci_dimensions_overview, figure 2]]
+[.text-center]
+.Overview of the different dimensions for coordinate interpolation.
+image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
+
+Note that an interpolation subarea dimension has, by definition, the same size as the corresponding subsampled dimension, minus the number of continuous areas.
+
+[[compression-by-coordinate-sampling-tie-point-index-mapping, Section 8.3.7, "Tie Point Index Mapping"]]
+==== Tie Point Index Mapping
+
+The **`tie_point_mapping`** attribute defined in 
+<<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>
+identifies for each subsampled dimension a tie point index variable. The tie 
+point index variable defines the relationship between the indices of 
+the subsampled dimension and the indices of its
+corresponding interpolated dimension. 
+
+A tie point index variable is a one-dimensional
+integer variable that must span the subsampled dimension. Each tie point
 index variable value is a zero-based index of the related
 interpolated dimension which maps an element of that interpolated
 dimension to the corresponding location in the subsampled
 dimension. The tie point index values must be strictly monotonically
-increasing within continuous areas. An interpolation subarea must span
+increasing. An interpolation subarea must span
 at least two points in each of its corresponding interpolated
 dimensions, therefore the tie point indices that 
 define an
-interpolation subarea must all be different. When two adjacent values are
-equal, or differ by one, it indicates the location (in index space) of
+interpolation subarea must all be different. When two adjacent values differ 
+by one, it indicates the location (in index space) of
 an continuous area boundary relating to a grid discontinuity
 (<<compression-by-coordinate-sampling-tie-points-and-interpolation-subareas>>).
 
@@ -306,19 +320,7 @@ For instance, in example <<example-Two-dimensional-tie-point-interpolation>>
 the tie point coordinate variables represent a subset of the target domain and
 the tie point index variable `int x_indices(tp_xc)` contains the
 indices `x_indices = 0, 9, 19, 29` that identify the location in the
-interpolated dimension `xc` of size 30.
-
-To indicate which tie point index variable applies to each
-interpolated dimension, a **`tie_point_indices`** attribute must be
-defined for the interpolation variable. This is a string attribute that maps
-the interpolated dimensions to the corresponding tie point index
-variables. It is a blank-separated list of words of the form
-"__interpolated_dimension: tie_point_index_variable
-[interpolated_dimension: tie_point_index_variable ...]__".
-Continuing the above example, specifying that the target dimension
-`xc` and `yc` are associated with the tie point index variables
-`x_indices` and `y_indices` respectively, could be indicated with `xc:
-x_indices yc: y_indices`.
+interpolated dimension `xc` of size 30.  The corresponding **`tie_point_mapping`** attribute of the interpolation variable is `xc: x_indices tp_xc  yc: y_indices tp_yc`. 
 
 [[example-Two-dimensional-tie-point-interpolation]]
 [caption="Example 8.3. "]
@@ -341,8 +343,7 @@ variables:
   // Interpolation variable
   char bl_interpolation ;
     bl_interpolation:interpolation_name = "bi_linear" ;
-    bl_interpolation:tie_point_mapping = "xc: tp_xc  yc: tp_y"  ;
-    bl_interpolation:tie_point_indices = "yc: y_indices xc: x_indices" ;
+    bl_interpolation:tie_point_mapping = "xc: x_indices tp_xc  yc: y_indices tp_yc"  ;
 
   // tie point coordinate variables
   double lat(tp_yc, tp_xc) ;
@@ -383,8 +384,7 @@ variables:
   // Interpolation variables
   char l_interpolation ;
     l_interpolation:interpolation_name = "linear" ;
-    l_interpolation:tie_point_mapping = "xc: tp_xc"  ;
-    l_interpolation:tie_point_indices = "xc: x_indices" ;
+    l_interpolation:tie_point_mapping = "xc: x_indices tp_xc"  ;
 
   // tie point coordinate variables
   double lat(yc, tp_xc) ;
@@ -403,7 +403,7 @@ data:
 ----
 ====
 
-[[compression-by-coordinate-sampling-interpolation-parameters, Section 8.3.7, "Interpolation Parameters"]]
+[[compression-by-coordinate-sampling-interpolation-parameters, Section 8.3.8, "Interpolation Parameters"]]
 ==== Interpolation Parameters
 
 The interpolation variable attribute **`interpolation_parameters`**
@@ -436,7 +436,7 @@ The application of an interpolation parameter variable is independent of its non
 
 [[ci_interpolation_parameters, figure 3]]
 [.text-center]
-.Through combination of dimensions, interpolation parameter variables may provide values for each interpolation subarea, for couples of neighbouring interpolation subareas or for multiple interpolation subareas sharing a boundary.
+.Through combination of dimensions, interpolation parameter variables may provide values for a) interpolation subareas sharing a tie point, b) each interpolation subarea,  c) and d) interpolation subareas sharing a boundary.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
@@ -482,12 +482,9 @@ variables:
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_remote_sensing" ;
-    tp_interpolation:tie_point_mapping = "track: tp_track subarea_track
-                                             scan: tp_scan subarea_scan
-;
-    tp_interpolation:tie_point_indices = "track: track_indices
-                                          scan: scan_indices
-;
+    tp_interpolation:tie_point_mapping = "track: track_indices tp_track subarea_track
+                                             scan: scan_indices tp_scan subarea_scan
+;;
     tp_interpolation:interpolation_parameters = "ce1: ce1  ca2: ca2  ce3: ce3 flags: interpolation_subarea_flags" ;
 
   // Interpolation parameters
@@ -518,10 +515,8 @@ variables:
   // Time interpolation variable
   char time_interpolation ;
     time_interpolation:interpolation_name = "bi_linear" ;
-    time_interpolation:tie_point_mapping = "track: tp_track 
-                                               scan: tp_time_scan"  ;
-    time_interpolation:tie_point_indices = "track: track_indices 
-                                            scan: time_scan_indices" ;
+    time_interpolation:tie_point_mapping = "track: track_indices tp_track 
+                                            scan: time_scan_indices tp_time_scan"  ;
 
   // Time tie points
   double t(tp_track, tp_time_scan) ;
@@ -567,13 +562,11 @@ variables:
   // Interpolation variables
   char bi_linear ;
     bi_linear:interpolation_name = "bi_linear" ;
-    bi_linear:tie_point_mapping = "y: tp_y  x: tp_x"  ;
-    bi_linear:tie_point_indices = "y: y_indices x: x_indices" ;
+    bi_linear:tie_point_mapping = "y: y_indices tp_y  x: x_indices tp_x"  ;
 
   char linear ;			
     linear:interpolation_name = "linear" ;
-    linear:tie_point_mapping = "y: tp_y  x: tp_x"  ;
-    linear:tie_point_indices = "y: y_indices x: x_indices" ;
+    linear:tie_point_mapping = "y: y_indices tp_y  x: x_indices tp_x"  ;
 
   // tie point coordinate variables
   double time(time) ;
@@ -603,6 +596,6 @@ variables:
 
 In this the projection coordinates are two-dimensional, but are only
 linearly interpolated in one of their dimensions - the one which is
-given by the **`tie_point_indices`** attribute.
+given by the **`tie_point_mapping`** attribute.
 
 ====
