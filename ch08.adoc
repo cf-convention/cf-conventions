@@ -133,13 +133,13 @@ in <<interpolation_subarea_generation>>, and described in more detail in
 
 Within an continuous area, interpolation subareas must share tie points with neighbouring interpolation subareas. Between continuous areas, interpolation subareas are not permitted to share tie points. This results in a different number of tie points in the two cases shown in <<interpolation_subarea_generation>>.
 
-For each __interpolation dimension__, i.e. a target domain dimension
+For each __interpolated dimension__, i.e. a target domain dimension
 for which coordinate interpolation is required, the location of the
 tie points is defined by a corresponding __tie point index variable__,
 which also indicates the location of the continuous areas
 (<<compression-by-coordinate-sampling-tie-point-indices>>).
 
-For each interpolation dimension, the number of interpolation subareas is equal to the number of tie points minus the number of continuous areas.
+For each interpolated dimension, the number of interpolation subareas is equal to the number of tie points minus the number of continuous areas.
 
 [[interpolation_subarea_generation, figure 1]]
 [.text-center]
@@ -199,8 +199,8 @@ the extent of the of the interpolation subarea.
 
 In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-sampling-tie-point-dimensions-attribute>>, <<compression-by-coordinate-sampling-tie-point-indices>> and <<compression-by-coordinate-sampling-interpolation-parameters>>.
 
-[[compression-by-coordinate-sampling-dimensions,Section 8.3.4, "Interpolation, Interpolated and Non-Interpolated Dimensions"]]
-==== Interpolation, Interpolated and Non-Interpolated Dimensions
+[[compression-by-coordinate-sampling-dimensions,Section 8.3.4, "Subsampled, Interpolated and Non-Interpolated Dimensions"]]
+==== Subsampled, Interpolated and Non-Interpolated Dimensions
 
 For each interpolation variable identified in the 
 **`coordinate_interpolation`** attribute, all of the associated tie point
@@ -211,23 +211,23 @@ of these dimensions must be either the uncompressed dimension itself, or
 a dimension that is to be interpolated to the uncompressed dimension.
 
 Dimensions of the tie point coordinate variable which are to be 
-interpolated are called __tie point interpolation dimensions__, and 
+interpolated are called __subsampled dimensions__, and 
 the corresponding data variable dimensions are called __interpolated 
 dimensions__, while those for which no interpolation is required, 
 being the same in the data variable and the tie point coordinate 
 variable, are called __non-interpolated dimensions__. The dimensions 
-of a tie point coordinate variable must contain at least one tie 
-point interpolation dimension, for each of which the corresponding 
+of a tie point coordinate variable must contain at least one  
+subsampled dimension, for each of which the corresponding 
 interpolated dimension cannot be included.
 
-The size of a tie point interpolation dimension will be less than the 
+The size of a subsampled dimension will be less than the 
 size of the corresponding interpolated dimension. For example, if the 
 interpolated dimensions are `xc = 30` and `yc = 10`,  interpolation 
 could be applied in both of these dimensions, based on tie point 
 variables of the dimensions `tp_xc = 4` and `tp_yc = 2`. Here, 
-`tp_xc` is the tie point interpolation dimension related to the 
-interpolated dimension `xc`, and `tp_yc` is the tie point 
-interpolation dimension related to the interpolated dimension `yc`.
+`tp_xc` is the subsampled dimension related to the 
+interpolated dimension `xc`, and `tp_yc` is the  
+subsampled dimension related to the interpolated dimension `yc`.
 
 The presence of non-interpolated dimensions in the tie point coordinate variable
 impacts the interpolation process in that there must be a separate
@@ -236,34 +236,34 @@ indices of the non-interpolated dimensions. For example, if
 `xc = 30` is an interpolated dimension and `yc = 10` 
 is a non-interpolated dimension, interpolation
 could be applied in the `xc` dimension only, based on tie point
-variables that have the interpolation dimension `tp_xc = 4` and the 
+variables that have the subsampled dimension `tp_xc = 4` and the 
 non-interpolated dimension `yc = 10`. The
 interpolation in the `xc` dimension would then be repeated for each of
-the 10 indices of the `yc` dimension.
+the 10 indices of the `yc` non-interpolated dimension.
 
 [[compression-by-coordinate-sampling-tie-point-dimensions-attribute, Section 8.3.5, "Tie Point Dimensions Attribute"]]
 ==== Tie Point Mapping Attribute
 
-Each interpolation dimension must be associated with its corresponding
-tie point interpolation dimension and, if required, its corresponding
+Each interpolated dimension must be associated with its corresponding
+subsampled dimension and, if required, its corresponding
 __interpolation subarea dimension__ that defines the number of
-interpolation subareas which partition the interpolation dimension. It is
+interpolation subareas which partition the interpolated dimension. It is
 only required to associate an interpolation subarea dimension to an
-interpolation dimension in the case that the interpolation subarea
+interpolated dimension in the case that the interpolation subarea
 dimension is spanned by an interpolation parameter variable, as
 described in
 <<compression-by-coordinate-sampling-interpolation-parameters>>. The
 association is stored in the interpolation variable's
 **`tie_point_mapping`** attribute that contains a blank-separated
-list of words of the form __"interpolation_dimension:
-tie_point_interpolation_dimension [interpolation_subarea_dimension]
-[interpolation_dimension: ...]"__. If an interpolation subarea dimension
+list of words of the form __"interpolated_dimension:
+subsampled_dimension [interpolation_subarea_dimension]
+[interpolated_dimension: ...]"__. If an interpolation subarea dimension
 is provided then it must be the second of the two named dimensions
-following the interpolation dimension.
+following the interpolated dimension.
 
 An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
 
-Note that an interpolation subarea dimension has, by definition, the same size as the corresponding tie point interpolation dimension, minus the number of continuous areas.
+Note that an interpolation subarea dimension has, by definition, the same size as the corresponding subsampled dimension, minus the number of continuous areas.
 
 
 [[ci_dimensions_overview, figure 2]]
@@ -272,10 +272,10 @@ Note that an interpolation subarea dimension has, by definition, the same size a
 image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
 
 
-A single interpolated dimension may be associated with multiple tie point
-interpolation dimensions by repeating the interpolated dimension in the
+A single interpolated dimension may be associated with multiple 
+subsampled dimensions by repeating the interpolated dimension in the
 **`tie_point_mapping`** attribute. For instance, interpolated dimension 
-`dimension1` could be mapped to two different tie point interpolation 
+`dimension1` could be mapped to two different subsampled 
 dimensions with `dimension1: tp_index_variable1  tp_dimension1 dimension1: 
 tp_index_variable2 tp_dimension2`. This is necessary when two or more tie 
 point coordinate variables have different tie point index variables 
@@ -284,14 +284,14 @@ corresponding to the same interpolated dimension.
 [[compression-by-coordinate-sampling-tie-point-indices, Section 8.3.6, "Tie Point Indices"]]
 ==== Tie Point Indices
 
-The relationship between a tie point interpolation dimension and its
-corresponding interpolation dimension is defined with a __tie point
+The relationship between a subsampled dimension and its
+corresponding interpolated dimension is defined with a __tie point
 index variable__. The tie point index variable is a one-dimensional
-integer variable that must span the tie point interpolation dimension
+integer variable that must span the subsampled dimension
 specified by the **`tie_point_mapping`** attribute. Each tie point
 index variable value is a zero-based index of the related
-interpolation dimension which maps an element of that interpolation
-dimension to the corresponding location in the tie point interpolation
+interpolated dimension which maps an element of that interpolated
+dimension to the corresponding location in the subsampled
 dimension. The tie point index values must be strictly monotonically
 increasing within continuous areas. An interpolation subarea must span
 at least two points in each of its corresponding interpolated
@@ -306,15 +306,15 @@ For instance, in example <<example-Two-dimensional-tie-point-interpolation>>
 the tie point coordinate variables represent a subset of the target domain and
 the tie point index variable `int x_indices(tp_xc)` contains the
 indices `x_indices = 0, 9, 19, 29` that identify the location in the
-interpolation dimension `xc` of size 30.
+interpolated dimension `xc` of size 30.
 
 To indicate which tie point index variable applies to each
-interpolation dimension, a **`tie_point_indices`** attribute must be
+interpolated dimension, a **`tie_point_indices`** attribute must be
 defined for the interpolation variable. This is a string attribute that maps
-the interpolation dimensions to the corresponding tie point index
+the interpolated dimensions to the corresponding tie point index
 variables. It is a blank-separated list of words of the form
-"__interpolation_dimension: tie_point_index_variable
-[interpolation_dimension: tie_point_index_variable ...]__".
+"__interpolated_dimension: tie_point_index_variable
+[interpolated_dimension: tie_point_index_variable ...]__".
 Continuing the above example, specifying that the target dimension
 `xc` and `yc` are associated with the tie point index variables
 `x_indices` and `y_indices` respectively, could be indicated with `xc:
@@ -426,13 +426,13 @@ allowed by the definition of the interpolation method. Interpolation
 parameters may always be provided to non-standardized interpolation
 methods.
 
-The interpolation parameter variable dimensions must include, for all of the interpolation dimensions, either the associated tie point interpolation dimension or the associated interpolation subarea dimension. Additionally, any subset of zero or more of the non-interpolation dimensions of the tie point coordinate variable are permitted as interpolation parameter variable dimensions.
+The interpolation parameter variable dimensions must include, for all of the interpolated dimensions, either the associated subsampled dimension or the associated interpolation subarea dimension. Additionally, any subset of zero or more of the non-interpolated dimensions of the tie point coordinate variable are permitted as interpolation parameter variable dimensions.
 
-The application of an interpolation parameter variable is independent of its non-interpolation dimensions, but depends on its set of tie point interpolation dimensions and interpolation subarea dimensions: 
+The application of an interpolation parameter variable is independent of its non-interpolated dimensions, but depends on its set of subsampled dimensions and interpolation subarea dimensions: 
 
-* If the set only contains tie point interpolation dimensions, then the variable provides values for every tie point and therefore equally applicable to the interpolation subareas that share that tie point, see example a) in figure 3;
+* If the set only contains subsampled dimensions, then the variable provides values for every tie point and therefore equally applicable to the interpolation subareas that share that tie point, see example a) in figure 3;
 * If the set only contains interpolation subarea dimensions, then the variable provides values for every interpolation subarea and therefore only applicable to that interpolation subarea, see example b) in figure 3;
-* If the set contains both tie point interpolation dimensions and interpolation subarea dimensions, then the variable’s values are to be shared by the interpolation subareas that are adjacent along each of the specified tie point interpolation dimensions. This case is akin to the values being defined at the interpolation subarea boundaries, and therefore equally applicable to the interpolation subareas that share that boundary, see example c) and d) in figure 3;
+* If the set contains both subsampled dimensions and interpolation subarea dimensions, then the variable’s values are to be shared by the interpolation subareas that are adjacent along each of the specified subsampled dimensions. This case is akin to the values being defined at the interpolation subarea boundaries, and therefore equally applicable to the interpolation subareas that share that boundary, see example c) and d) in figure 3;
 
 [[ci_interpolation_parameters, figure 3]]
 [.text-center]
@@ -538,7 +538,7 @@ attribute.
 
 [[example-grid-mapping-and-interpolation-with-time-not-interpolated]]
 [caption="Example 8.6. "]
-.Combining a grid mapping and coordinate interpolation, with time as a non-interpolation dimension.
+.Combining a grid mapping and coordinate interpolation, with time as a non-interpolated dimension.
 ====
 ----
 dimensions:
