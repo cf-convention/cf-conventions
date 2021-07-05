@@ -434,7 +434,22 @@ The application of an interpolation parameter variable is independent of its non
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
 
-[[compression-by-coordinate-sampling-bounds, Section 8.3.9, "Interpolation of Tie Point Bounds"]]
+[[compression-by-coordinate-sampling-computational_precision, Section 8.3.9, "Computational Precision"]]
+==== Computational Precision
+
+The accuracy of the reconstituted coordinates depends mainly on the degree of subsampling and the choice of interpolation method, both of which are set by the creator of the dataset. The accuracy will also depend, however, on how the interpolation method is implemented and on the computer platform carrying out the computations. There are no restrictions on the choice of interpolation method implementation, for neither the data creator nor the data user, but the floating-point arithmetic precision used by the data creator during the preparation and validation of the compressed coordinates must be specified by setting the interpolation variable’s  **`computational_precision**` attribute to one of the following values:
+
+[cols="3,10"]
+|===============
+| ** Value ** | ** Description** 
+| "32" | 32-bit floating-point arithmetic, comparable to the binary32 standard in [<<IEEE_754>>]
+| "64" | 64-bit floating-point arithmetic, comparable to the binary64 standard in [<<IEEE_754>>]
+|===============
+
+
+Using the given computational precision in the interpolation computations is a necessary, but not sufficient, condition for the data user to be able to reconstitute the coordinates to an accuracy comparable to that intended by the data creator. For instance, a **`computational_precision**` value of **`"64"**` would specify that, using the same software and hardware as the creator of the compressed dataset, sufficient accuracy could not be reached when using a floating-point precision lower than 64-bit floating-point arithmetic in the interpolation computations required to reconstitute the coordinates.
+
+[[compression-by-coordinate-sampling-bounds, Section 8.3.10, "Interpolation of Tie Point Bounds"]]
 ==== Interpolation of Tie Point Bounds
 
 If reconstituted coordinates have cell boundaries, then the corresponding tie point coordinate variable must also have cell boundaries, specified by the **`bounds`** attribute that names the variable that contains the vertices of the cell boundaries. 
