@@ -29,7 +29,8 @@ material required for completeness or clarity.
 
 *Requirements:*
 
-* CF attributes that take string values must be 1D character arrays.
+* CF attributes that take string values must be 1D character arrays or single
+atomic strings.
 
 [[section-1]]
 
@@ -296,8 +297,9 @@ which has a **`formula_terms`** attribute.
 with the **`standard_name`** of the coordinate variable it is attached to, and in some cases 
 also with the **`standard_name`** attributes of variables named by the **`formula_terms`** attribute, 
 according to the appropriate definition in Appendix D.
-
-
+* The units of a variable named by the **`formula_terms`** attribute
+  must be consistent with the units defined in Appendix D.
+  
 [[section-13]]
 
 [[time-coordinate]]
@@ -305,10 +307,12 @@ according to the appropriate definition in Appendix D.
 
 *Requirements:*
 
-* The time units of a time coordinate variable must contain a reference
-time.
-* The reference time of a time coordinate variable must be a legal time
+* The time **`units`** of a time coordinate variable must contain a reference
+date/time.
+* The reference date/time of a time coordinate variable must be a legal date/time
 in the specified calendar.
+* The reference date/time in time **`units`** is not allowed to contain seconds
+equal to or greater than 60.
 
 *Recommendations:*
 
@@ -348,7 +352,7 @@ default mixed Gregorian/Julian calendar is in use.
 [[section-15]]
 
 [[coordinate-systems]]
-=== 5 Coordinate Systems
+=== 5 Coordinate Systems and Domain
 
 *Requirements:*
 
@@ -363,10 +367,10 @@ blank separated list of variable names. All specified variable names
 must exist in the file.
 * The dimensions of each auxiliary coordinate must be a subset of the
 dimensions of the variable they are attached to, with two exceptions.
-First, a label variable which will have a trailing dimension for the
-maximum string length. Second a ragged array (Chapter 9, Discrete
-sampling geometries and Appendix H) uses special, more indirect, methods
-to connect the data and coordinates. +
+First, a label variable of type **`char`** will have a trailing dimension
+for the maximum string length.
+Second, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H)
+uses special, more indirect, methods to connect the data and coordinates.
 
 *Recommendations:*
 
@@ -383,7 +387,7 @@ an **`axis`** attribute.
 === 5.6 Grid Mappings and Projections
 
 [[requirements]]
-=== Requirements:
+*Requirements:*
 
 * The type of the **`grid_mapping`** attribute is a string whose value is of 
 the following form, in which brackets indicate optional text:
@@ -414,18 +418,57 @@ the CRS WKT specification described in reference [OGC_CTS].
 
 * The grid mapping variables should have 0 dimensions.
 
+
+[[section-17]]
+
+[[domain-variables]]
+=== 5.8 Domain Variables
+
+[[requirements]]
+*Requirements:*
+
+* Domain variables must have a **`dimensions`** attribute.
+
+* The type of the **`dimensions`** attribute is a string whose value
+  is a blank separated list of dimension names. All specified
+  dimensions must exist in the file. The string may be empty.
+
+* The dimensions of each variable named by the **`coordinates`**
+  attribute must be a subset of zero or more of the dimensions named
+  by the **`dimensions`** attribute, with two exceptions. First, a
+  label variable which will have a trailing dimension for the maximum
+  string length. Second a ragged array (Chapter 9, Discrete sampling
+  geometries and Appendix H) uses special, more indirect, methods to
+  connect the domain and coordinates.
+
+* The dimensions of each variable named by the **`cell_measures`**
+  attribute must be a subset of zero or more of the dimensions named
+  by the **`dimensions`** attribute.
+
+*Recommendations:*
+
+* Domain variables should have a **`long_name`** attribute.
+
+* Domain variables should not have any of the attributes marked in
+  <<attribute-appendix>> as applicable to data variables except those
+  which are also marked as applicable to domain variables.
+
+
 [[labels]]
 === 6.1 Labels
 
 *Requirements:*
 
-* A variable of character type that is named by a **`coordinates`** attribute
-is a label variable. This variable must have one or two dimensions. The
-trailing (CDL order) or sole dimension is for the maximum string length.
-If there are two dimensions, leading dimension (CDL order) must match
-one of those of the data variable.
+* A string variable that is named by a **`coordinates`** attribute is a label
+variable.
+If the variable is of type **`string`** it must have at most one dimension,
+which must match one of those of the data variable.
+If the variable is of type **`char`** it must have one or two dimensions, where
+the trailing (CDL order) or sole dimension is for the maximum string length.
+If there are two dimensions, the leading dimension (CDL order) must match one
+of those of the data variable.
 
-[[section-17]]
+[[section-18]]
 
 [[cell-boundaries]]
 === 7.1 Cell Boundaries
@@ -461,7 +504,7 @@ associated boundary variable.
 **`calendar`**, **`leap_month`**, **`leap_year`** or **`month_lengths`** attributes. 
 
 
-[[section-18]]
+[[section-19]]
 
 [[cell-measures]]
 === 7.2 Cell Measures
@@ -479,7 +522,7 @@ of the variable to which they are related.
 measure type, i.e., square meters for area measures and cubic meters for
 volume measures.
 
-[[section-19]]
+[[section-20]]
 
 [[cell-methods]]
 === 7.3 Cell Methods
@@ -492,17 +535,23 @@ or more blank separated word lists, each with the form
 ....
 dim1: [dim2: [dim3: ...]] method [where type1 [over type2]] [within|over days|years] [(comment)]
 ....
-where brackets indicate optional words. The valid values for **`dim1`** [**`dim2`**
-[**`dim3`** ...] ] are the names of dimensions of the data variable, names of
-scalar coordinate variables of the data variable, valid standard names,
-or the word **`area`**. The valid values of **`method`** are contained in Appendix E. The valid values
-for **`type1`** are the name of a string-valued auxiliary  
-or scalar coordinate variable with a **`standard_name`** of **`area_type`**, or any
-string value allowed for a variable of **`standard_name`** of **`area_type`**. If
-**`type2`** is a string-valued auxiliary coordinate variable, it is not
-allowed to have a leading dimension (the number of strings) of more than
-one. When the method refers to a climatological time axis, the suffixes
-for within and over may be appended.
+where brackets indicate optional words.
+The valid values for **`dim1`** [**`dim2`** [**`dim3`** ...] ] are the names of
+dimensions of the data variable, names of scalar coordinate variables of the
+data variable, valid standard names, or the word **`area`**.
+The valid values of **`method`** are contained in Appendix E.
+The valid values for **`type1`** are the name of a string-valued auxiliary  or
+scalar coordinate variable with a **`standard_name`** of **`area_type`**, or
+any string value allowed for a variable of **`standard_name`** of
+**`area_type`**.
+If **`type2`** is a string-valued auxiliary coordinate variable, it must be
+sized to contain a single string.
+If it is a variable of type **`string`**, it must be scalar or one-dimensional
+with a length of one.
+If it is a variable of type **`char`**, it must be one-dimensional or
+two-dimensional with a leading dimension (the number of strings) of length one.
+When the method refers to a climatological time axis, the suffixes for within
+and over may be appended.
 
 * A given dimension name may only occur once in a **`cell_methods`** string.
 An exception is a climatological time dimension.
@@ -597,7 +646,7 @@ polygon and 1 to indicate an interior ring polygon.
 * The single dimension of the interior ring variable must be the same dimension as
 that of the part node count variable.
 
-[[section-20]]
+[[section-21]]
 
 [[packed-data]]
 === 8.1 Packed Data
@@ -616,7 +665,7 @@ then the variable must be type byte, short or int.
 * If **`scale_factor`** and **`add_offset`** are type float, the variable should not
 be of type int.
 
-[[section-21]]
+[[section-22]]
 
 [[compression-by-gathering]]
 === 8.2 Compression by Gathering

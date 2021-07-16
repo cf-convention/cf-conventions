@@ -85,7 +85,7 @@ information about the dataset as a whole. NetCDF library software has
 functions to define dimensions, variables and attributes, and write
 and read data.
 
-[[img-netCDF, figure 1]]
+[[img-netCDF, figure 3]]
 [.text-center]
 .Key components of the netCDF classic data model. Files consist of global attributes, dimensions and variables. Variables contain attributes and data, and attributes also contain data. Variables, attributes and dimensions all contain properties, such as a "name" which identifies them in the file. A data array has a data type for all of its elements (e.g. "double" for 64-bit floating point numbers).
 image::images/cfdm_netcdf_classic_data_model.png[,50%,pdfwidth=50vw,align="center"]
@@ -99,7 +99,6 @@ relationships with the aims of removing aspects specific to the netCDF
 encoding, and reducing the number of elements, whilst retaining the
 ability to describe the CF conventions fully, in order to meet the
 design criteria.
-
 
 [[table-cf-concepts, table 1]]
 .The elements of the CF-netCDF conventions. The relationships to netCDF entities are shown in <<img-cf-concepts>>.
@@ -163,7 +162,6 @@ be programming language-neutral (i.e. as opposed to "object" or
 related to CF-netCDF entities (<<img-cf-concepts>>), which in turn
 relate to the components of netCDF file (<<img-netCDF>>).
 
-
 [[table-cf-constructs, table 2]]
 .The constructs of the CF data model. The relationships between the constructs and CF-netCDF entities are shown in in <<img-field>>, <<img-dim-aux>> and <<img-coordinate-reference>>.
 [options="header",cols="2",caption="Table 2. "]
@@ -174,6 +172,9 @@ CF construct
 
 | Field
 | Scientific data discretised within a domain
+
+| Domain
+| Describes a domain
 
 | Domain axis
 | Independent axes of the domain
@@ -200,30 +201,45 @@ CF construct
 | Describes how data represents variation within cells
 |===============
 
+The field construct and domain construct are central to the CF data
+model in that all the other constructs are included in one or other of
+them (<<img-field>>). The constructs contained by the field and domain
+constructs cannot exist independently, with the exception of the
+domain construct itself that may be part of a field construct or exist
+on its own, as is indicated by the nature of the class associations
+shown in <<img-field>>. All CF-netCDF elements are mapped to field
+constructs, domain constructs or their components; and the field and
+domain constructs completely contain all the data and metadata which
+can be extracted from the file using the CF conventions.
+
+[[img-field, figure 3]]
+[.text-center]
+.The constructs of the CF data model. The field construct corresponds to a CF-netCDF data variable (defined in <<img-cf-concepts>> and identified here with the "CN" prefix). Relationships between other constructs and CF-netCDF are given in <<img-dim-aux>> and <<img-coordinate-reference>>. The domain construct provides the linkage between the field construct and the constructs which describe measurement locations and cell properties. It is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.
+image::images/cfdm_field.png[,50%,pdfwidth=50vw,align="center"]
+
 === Field construct
 
-The field construct is central to the CF data model and includes all
-the other constructs (<<img-field>>). A field corresponds to a
-CF-netCDF data variable with all of its metadata. All CF-netCDF
-elements are mapped to some component of the CF field construct and
-the field constructs completely contain all the data and metadata
-which can be extracted from the file using the CF conventions. Note
-that the constructs contained by the field construct cannot exist
-independently, as is indicated by the nature of the class associations
-shown in <<img-field>>.
+A field construct (<<img-field>>) corresponds to a CF-netCDF data
+variable with all of its metadata. The field construct consists of
 
-The field construct consists of a data array and the definition of its
-domain, ancillary metadata defined over the same domain, metadata to
-describe how the cell values represent the variation of the physical
-quantity within the cells of the domain (<<img-field>>), and
-properties to describe aspects of the data that are independent of the
-domain. All of the constructs contained by the field construct are
-optional (as indicated by "0..*" in <<img-field>>). The only component
-of the field which is mandatory is the data array. Because the CF
-conventions do not mention the concept of the domain, it is not
-regarded as a construct of the data model. Instead, the domain is
-defined collectively by various other constructs included in the
-field.
+* A data array.
+
+* A domain construct containing metadata defining the domain that
+  provides measurement locations and cell properties for the data.
+
+* Field ancillary constructs containing ancillary metadata defined
+  over the same domain.
+
+* Cell method constructs containing metadata to describe how the cell
+  values represent the variation of the physical quantity within the
+  cells of the domain.
+
+* Properties to describe aspects of the data that are independent of
+  the domain.
+
+All of the constructs contained by the field construct are optional
+(as indicated by "0.." in <<img-field>>). The only component of the
+field which is mandatory is the data array.
 
 The properties of the field construct correspond to some netCDF
 attributes of variables (e.g. the **`units`**, **`long_name`**, and
@@ -243,25 +259,47 @@ file attributes is not stated in the CF conventions, but for the data
 model it is necessary because there is no notion of a file. Hence,
 metadata stored in attributes of the file as a whole have to be
 transferred to the field construct. If present, the global file
-attribute featureType applies to every data variable in the file with
-a discrete sampling geometry. Hence, the feature type is regarded as a
-property of the field construct.
+attribute **`featureType`** applies to every data variable in the file
+with a discrete sampling geometry. Hence, the feature type is regarded
+as a property of the field construct.
 
-The standard_name property constrains the units property (i.e. only
-certain units are consistent with each standard name) and in some
-cases also the dimensions that a data variable must have. These
-constraints, however, do not supply any further information--they are
-just for self consistency. Similarly the featureType property imposes
-some requirements on the axes the domain must have. Following the aim
-of constructing a minimal data model, the standard name and
-featureType are not regarded as separate constructs within the field,
-because they do not depend on any other construct for their
-interpretation.
+The **`standard_name`** property constrains the **`units`** property
+(i.e. only certain units are consistent with each standard name) and
+in some cases also the dimensions that a data variable must
+have. These constraints, however, do not supply any further
+information--they are just for self consistency. Similarly the
+**`featureType`** property imposes some requirements on the axes the
+domain must have. Following the aim of constructing a minimal data
+model, the standard name and feature type are not regarded as separate
+constructs within the field, because they do not depend on any other
+construct for their interpretation.
 
-[[img-field, figure 3]]
-[.text-center]
-.The constructs of the CF data model. The field construct corresponds to a CF-netCDF data variable (defined in <<img-cf-concepts>> and identified here with the "CN" prefix). Relationships between other constructs and CF-netCDF are given in <<img-dim-aux>> and <<img-coordinate-reference>>. The domain provides the linkage between the field construct and the constructs which describe measurement locations and cell properties. It is not a construct of the data model, but is an abstract concept that is useful for understanding it. Similarly, it is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.
-image::images/cfdm_field.png[,50%,pdfwidth=50vw,align="center"]
+=== Domain construct
+
+The domain construct (<<img-field>>) describes a domain comprising
+measurement locations and cell properties. The domain construct is the
+only metadata construct that may also exist independently of a field
+construct. The domain construct contains properties to describe the
+domain (in the same sense as for the field construct) and relates the
+following metadata constructs
+
+* Domain axis constructs.
+
+* Dimension coordinate and auxiliary coordinate constructs.
+
+* Coordinate reference constructs.
+
+* Domain ancillary constructs.
+
+* Cell measure constructs.
+
+All of the constructs contained by the domain construct are optional
+(as indicated by "0.." in <<img-field>>).
+
+In CF-netCDF, domain information is stored either implicitly via data
+variable attributes (such as `coordinates`), or explicitly in a domain
+variable. In the latter case, the domain exists without reference to a
+data array.
 
 === Domain axis construct and the data array
 
