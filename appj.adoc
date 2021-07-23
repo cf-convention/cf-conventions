@@ -103,17 +103,17 @@ The interpolation function fl() defined for linear interpolation above is first 
 | Name | **`interpolation_name = "quadratic"`** 
 | Description | General purpose one dimensional quadratic interpolation method for one coordinate. 
 
-| Interpolation Parameter terms | Optionally interpolation coefficient `c`, which must span the interpolation subarea dimension.
+| Interpolation Parameter terms | Optionally coefficient `w`, which must span the interpolation subarea dimension.
 
 | Coordinate Compression Calculations | 
 The expression +
-`c = fc(ua, ub, u(i), s(i)) = ((u - (1 - s) * ua - s * ub)/( 4 * (1 - s) * s)` +
-enables the creator of the dataset to calculate `c` from the coordinate values `ua` and `ub` at tie points `A` and `B` respectively, and the coordinate value `u(i)` at index `i` between the tie points `A` and `B`. If the size of the interpolation subarea `(ib - ia)` is an even number, then the data point at index `i = (ib + ia)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib + ia - 1)/2` shall be selected. 
+`w = fw(ua, ub, u(i), s(i)) = ((u - (1 - s) * ua - s * ub)/( 4 * (1 - s) * s)` +
+enables the creator of the dataset to calculate the coefficient `w` from the coordinate values `ua` and `ub` at tie points `A` and `B` respectively, and the coordinate value `u(i)` at index `i` between the tie points `A` and `B`. If the size of the interpolation subarea `(ib - ia)` is an even number, then the data point at index `i = (ib + ia)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib + ia - 1)/2` shall be selected. 
   
 | Coordinate Uncompression Calculations | 
 The coordinate value `u(i)` at index `i` between tie points `A` and `B` is calculated from:   +
- `u(i) = fq(ua, ub, c, s(i)) = ua + s * (ub - ua + 4 * c * (1 - s))`; + 
-where `ua` and `ub` are the coordinate values at tie points `A` and `B` respectively and the coefficient `c` is available as a term in the `interpolation_parameters`, or otherwise defaults to `0.0`. +
+ `u(i) = fq(ua, ub, w, s(i)) = ua + s * (ub - ua + 4 * w * (1 - s))`; + 
+where `ua` and `ub` are the coordinate values at tie points `A` and `B` respectively and the coefficient `w` is available as a term in the `interpolation_parameters`, or otherwise defaults to `0.0`. +
 |===============
 
 [[quadratic_geo]]
@@ -140,7 +140,7 @@ For interpolation in cartesian coordinates as the coefficients `cv = (cv.x, cv.y
 
 For interpolation in geographic coordinates latitude and longitude as the coefficients `cll = (cll.lat, cll.lon)`, expressing the offset components along the longitude and latitude directions respectively.
 
-The functions `fq()` and `fc()` referenced in the following are defined in <<quadratic>>. 
+The functions `fq()` and `fw()` referenced in the following are defined in <<quadratic>>. 
  
 | Interpolation Parameter terms | Any subset of interpolation coefficients `ce, ca`, which must each span the interpolation subarea dimension. +
 Optionally the flag variable `interpolation_subarea_flags`, which must span the interpolation subarea dimension and must include `location_use_cartesian` in the `flag_meanings` attribute. 
@@ -150,7 +150,7 @@ First calculate the tie point vector representations from the tie point latitude
 `va = fll2v(lla);  vb = fll2v(llb);` +
 Then calculate the cartesian representation of the interpolation coefficients from the tie points `va` and `vb` as well as the point `vp(i)` at index `i` between the tie points `A` and `B`. If the size of the interpolation subarea `(ib - ia)` is an even number, then the data point at index `i = (ib + ia)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib + ia - 1)/2` shall be selected. +
 The cartesian interpolation coefficients are found from +
-`cv = fcv(va, vb, vp(i), s(i)) = (fc(va.x, vb.x, vp(i).x, s(i)), fc(va.y, vb.y, vp(i).y, s(i)), fc(va.z, vb.z, vp(i).z, s(i))).` +
+`cv = fcv(va, vb, vp(i), s(i)) = (fw(va.x, vb.x, vp(i).x, s(i)), fw(va.y, vb.y, vp(i).y, s(i)), fw(va.z, vb.z, vp(i).z, s(i))).` +
 Finally, for storage in the dataset, convert the coefficients to the parametric representation + 
 `cea(is) = (ce(is), ca(is)) = fcv2cea(va, vb, cv) = (fdot(cv, fminus(va, vb))/ gsqr), fdot(cv, fcross(va, vb))/(rsqr*gsqr));` + 
 where `vr = fmultiply(0.5, fplus(va, vb))`, `rsqr = fdot(vr, vr)`, `vg = fminus(va, vb)` and `gsqr = fdot(vg, vg).` +  
@@ -168,7 +168,7 @@ If the flag `location_use_cartesian` of the interpolation parameter term `interp
 `vp(i) = fqv(va, vb, cv, s(i)) = (fq(va.x, vb.x, cv.x, s(i)), fq(va.y, vb.y, cv.y, s(i)), fq(va.z, vb.z, cv.z, s(i)));` +
 `llp(i) = fv2ll(vp(i)).` +
 Otherwise, first calculate latitude-longitude representation of the interpolation coefficients + 
-`cll = fcll(lla, llb, llab) = (fc(lla.lat, llb.lat, llab.lat, 0.5), fc(lla.lon, llb.lon, llab.lon, 0.5));` + 
+`cll = fcll(lla, llb, llab) = (fw(lla.lat, llb.lat, llab.lat, 0.5), fw(lla.lon, llb.lon, llab.lon, 0.5));` + 
 where `llab = fv2ll(fqv(va, vb, cv, 0.5))`. +
 Then use the following expression to reconstitute any point `llp(i)` between the tie points `A` and `B` using interpolation in latitude-longitude coordinates + 
 `llp(i) = (llp(i).lat, llp(i).lon) = fqll(lla, llb, cll, s(i)) = (fq(lla.lat, llb.lat, cll.lat, s(i)), fq(lla.lon, llb.lon, cll.lon, s(i)))`. + 
