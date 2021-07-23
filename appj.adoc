@@ -14,23 +14,6 @@ The appendix is organised in a sections on <<common-definitions-and-notation>>, 
 [[common-definitions-and-notation, Section J.1, "Common Definitions and Notation"]]
 === Common Definitions and Notation
 
-The target domain is segmented into smaller interpolation subareas as described in <<compression-by-coordinate-subsampling-tie-points-and-interpolation-subareas>>.
-
-For one-dimensional interpolation, an interpolation subarea is defined by two tie points, one at each end of the interpolation subarea. However, the tie points may be inside or outside the interpolation subareas as shown in <<interpolation_subareas_1d>>. When interpolation methods are applied for a given interpolation subarea, it must be ensured that reconstituted coordinate points are only generated inside the interpolation subarea being processed, even if some of the tie point coordinates lie outside of that interpolation subarea. See also description in <<compression-by-coordinate-subsampling-tie-points-and-interpolation-subareas>>. 
-
-[[interpolation_subareas_1d, Figure 1]]
-[.text-center]
-.One-dimensional interpolation subareas, one including and one excluding tie point A.
-image::images/ci_1d_interpolation_subarea.svg[,100%,pdfwidth=50vw,align="center"] 
-
-For two-dimensional interpolation, an interpolation subarea is defined by four tie points, one at each corner of a rectangular area aligned with the domain axes, see <<interpolation_subarea_2d>>.
-
-[[interpolation_subarea_2d, Figure 2]]
-[.text-center]
-.Two-dimensional interpolation subarea.
-image::images/ci_2d_interpolation_subarea.svg[,60%,pdfwidth=50vw,align="center"] 
-
-
 The coordinate interpolation methods are named to indicate the number of dimensions they interpolate as well as the type of interpolation provided. For example, the interpolation method named `linear` provides linear interpolation in one dimension and the method named `bi_linear` provides linear interpolation in two dimensions. Equivalently, the interpolation method named `quadratic` provides quadratic interpolation in one dimension and the interpolation method named `bi_quadratic` provides quadratic interpolation in two dimensions.
 
 When an interpolation method is referred to as linear or quadratic, it means that the method is linear or quadratic in the indices of the interpolated dimensions. 
@@ -49,6 +32,22 @@ In the case of two dimensional interpolation, the interpolation arguments are eq
 `s2 = s(ia2, ic2, i2) = (i2 - ia2)/(ic2 - ia2)`
 
 where `ia1` and `ib1` are the first dimension indices in the target domain of the tie points `A` and `B` respectively, `ia2` and `ic2` are the second dimension indices in the target domain of the tie points `A` and `C` respectively and the indices `i1` and `i2` are the first and second dimension indices respectively in the target domain of the coordinate value to be reconstituted. 
+
+The target domain is segmented into smaller interpolation subareas as described in <<compression-by-coordinate-subsampling-tie-points-and-interpolation-subareas>>.
+
+For one-dimensional interpolation, an interpolation subarea is defined by two tie points, one at each end of the interpolation subarea. However, the tie points may be inside or outside the interpolation subareas as shown in <<interpolation_subareas_1d>>. When interpolation methods are applied for a given interpolation subarea, it must be ensured that reconstituted coordinate points are only generated inside the interpolation subarea being processed, even if some of the tie point coordinates lie outside of that interpolation subarea. See also description in <<compression-by-coordinate-subsampling-tie-points-and-interpolation-subareas>>. 
+
+[[interpolation_subareas_1d, Figure 1]]
+[.text-center]
+.One-dimensional interpolation subareas, one including and one excluding tie point A.
+image::images/ci_1d_interpolation_subarea.svg[,100%,pdfwidth=50vw,align="center"] 
+
+For two-dimensional interpolation, an interpolation subarea is defined by four tie points, one at each corner of a rectangular area aligned with the domain axes, see <<interpolation_subarea_2d>>.
+
+[[interpolation_subarea_2d, Figure 2]]
+[.text-center]
+.Two-dimensional interpolation subarea.
+image::images/ci_2d_interpolation_subarea.svg[,60%,pdfwidth=50vw,align="center"] 
 
 For the reconstitution of the uncompressed coordinate and auxiliary coordinate variables the interpolation method can be applied independently for each interpolation subarea, making it possible to parallelize the computational process.
 
