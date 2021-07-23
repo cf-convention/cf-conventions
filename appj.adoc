@@ -9,7 +9,7 @@ The definitions and guidance given here allow an application to compress an exis
 Futhermore, the definitions given here allow an application to uncompress coordinate and auxiliary coordinate variables that have been compressed using coordinate subsampling. The key element of this process is the reconstitution of the full resolution coordinates in the domain of the data by interpolation between the subsampled coordinates, the tie points, stored in the compressed dataset.
 
 
-The appendix is organised in a sections on <<common-definitions-and-notation>>, <<interpolation-methods>>, <<common-conversions-and-formulas>>  and finally two sections with step procedures <<coordinate-compression-steps>> and <<coordinate-uncompression-steps>>.
+The appendix is organised in a sections on <<common-definitions-and-notation>>,  <<common-conversions-and-formulas>>, <<interpolation-methods>> and finally two sections with step procedures <<coordinate-compression-steps>> and <<coordinate-uncompression-steps>>.
 
 [[common-definitions-and-notation, Section J.1, "Common Definitions and Notation"]]
 === Common Definitions and Notation
@@ -60,7 +60,40 @@ For two dimensional interpolation, `i1` and `i2` are indices in the interpolated
 
 Note that, for simplicity of notation, the descriptions of the interpolation methods in most places leave out the indices of tie point related variables and refer to these with `a` and `b` in the one dimensional case and with `a`, `b`, `c` and `d` in the two dimensional case. In the two dimensional case, `a = tp(tpi2, tpi1)`, `b = tp(tpi2, tpi1+1)`, `c = tp(tpi2+1, tpi1)` and `d = tp(tpi2+1, tpi1+1)` would reflect the way the tie point data would be stored in the data set, see also <<interpolation>>.
 
-[[interpolation-methods, Section J.2, "Interpolation Methods"]]
+
+[[common-conversions-and-formulas, Section J.2, "Common Conversions and Formulas"]]
+==== Common Conversions and Formulas
+
+[cols="1, 8, 8"]  
+|=============== 
+| |Description | Formula 
+
+| fll2v | Conversion from geocentric `(latitude, longitude)` to cartesian vector `(x, y, z)` | `(x, y, z) = fll2v(ll) = (cos⁡(ll.lat)*cos⁡(ll.lon), cos⁡(ll.lat)*sin⁡(ll.lon), sin⁡(ll.lat))` +
+
+| fv2ll | Conversion from cartesian vector `(x, y, z)` to geocentric `(latitude, longitude)`| `(lat, lon) = fv2ll(v) = (atan2(v.y, v.x), atan2(z, sqrt(v.x * v.x + v.y * v.y))` +
+ 
+| faz2v | Conversion from `(azimuth, zenith)` angles to cartesian vector `(x, y, z)` | `(x, y, z) = faz2v(az) = (sin⁡(az.zenith) * sin⁡(az.azimuth), sin⁡(az.zenith) * cos⁡(az.azimuth), cos⁡(az.zenith))` +
+
+| fv2az | Conversion from cartesian vector `(x, y, z)` to `(azimuth, zenith)` angles | `(azimuth, zenith) = fv2az(v) = (atan2(y, x), atan2(sqrt(x * x + y * y), z)` +
+
+| fsqrt | Square Root | `s = fsqrt(t)`
+
+| fplus | Vector Sum | `(x, y, z) = fplus(va , vb) = (va.x + vb.x, va.y + vb.y, va.z + vb.z)` + 
+`(x, y, z) = fplus(va , vb, vc) = (va.x + vb.x + vc.x, va.y + vb.y + vc.y, va.z + vb.z + vc.z)` 
+
+| fminus | Vector Difference | `(x, y, z) = fminus(va, vb) = (va.x - vb.x, va.y - vb.y, va.z - vb.z)` + 
+
+| fmultiply | Vector multiplied by Scalar | `(x, y, z) = fmultiply(r, v) = (r * v.x, r * v.y, r * v.z)` + 
+ 
+| fcross | Vector Cross Product | `(x, y, z) = fcross(va, vb) = (va.y*vb.z - va.z*vb.y, va.z*vb.x - va.x*vb.z, va.x*vb.y - va.y*vb.x)` + 
+
+| norm | Normalised Vector | `(x, y, z) = norm(v) = (v.x, v.y, v.z) / sqrt (v.x*v.x + v.y*v.y + v.z*v.z)` + 
+
+| fdot | Vector Dot Product | `d = fdot(va, vb) = va.x*vb.x + va.y*vb.y + va.z*vb.z`
+
+|===============  
+
+[[interpolation-methods, Section J.3, "Interpolation Methods"]]
 === Interpolation Methods
 
 ==== Linear Interpolation
@@ -270,39 +303,6 @@ where +
 [.text-center]
 .The parametric representation of the interpolation coefficients `cea = (ce, ca)`, stored in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3`, is equivalent to five additional tie points for the interpolation subarea. Shown with parameter orientation and indices.  
 image::images/ci_quadratic3.svg[,50%,pdfwidth=50vw,align="center"] 
-
-
-[[common-conversions-and-formulas, Section J.3, "Common Conversions and Formulas"]]
-==== Common Conversions and Formulas
-
-[cols="1, 8, 8"]  
-|=============== 
-| |Description | Formula 
-
-| fll2v | Conversion from geocentric `(latitude, longitude)` to cartesian vector `(x, y, z)` | `(x, y, z) = fll2v(ll) = (cos⁡(ll.lat)*cos⁡(ll.lon), cos⁡(ll.lat)*sin⁡(ll.lon), sin⁡(ll.lat))` +
-
-| fv2ll | Conversion from cartesian vector `(x, y, z)` to geocentric `(latitude, longitude)`| `(lat, lon) = fv2ll(v) = (atan2(v.y, v.x), atan2(z, sqrt(v.x * v.x + v.y * v.y))` +
- 
-| faz2v | Conversion from `(azimuth, zenith)` angles to cartesian vector `(x, y, z)` | `(x, y, z) = faz2v(az) = (sin⁡(az.zenith) * sin⁡(az.azimuth), sin⁡(az.zenith) * cos⁡(az.azimuth), cos⁡(az.zenith))` +
-
-| fv2az | Conversion from cartesian vector `(x, y, z)` to `(azimuth, zenith)` angles | `(azimuth, zenith) = fv2az(v) = (atan2(y, x), atan2(sqrt(x * x + y * y), z)` +
-
-| fsqrt | Square Root | `s = fsqrt(t)`
-
-| fplus | Vector Sum | `(x, y, z) = fplus(va , vb) = (va.x + vb.x, va.y + vb.y, va.z + vb.z)` + 
-`(x, y, z) = fplus(va , vb, vc) = (va.x + vb.x + vc.x, va.y + vb.y + vc.y, va.z + vb.z + vc.z)` 
-
-| fminus | Vector Difference | `(x, y, z) = fminus(va, vb) = (va.x - vb.x, va.y - vb.y, va.z - vb.z)` + 
-
-| fmultiply | Vector multiplied by Scalar | `(x, y, z) = fmultiply(r, v) = (r * v.x, r * v.y, r * v.z)` + 
- 
-| fcross | Vector Cross Product | `(x, y, z) = fcross(va, vb) = (va.y*vb.z - va.z*vb.y, va.z*vb.x - va.x*vb.z, va.x*vb.y - va.y*vb.x)` + 
-
-| norm | Normalised Vector | `(x, y, z) = norm(v) = (v.x, v.y, v.z) / sqrt (v.x*v.x + v.y*v.y + v.z*v.z)` + 
-
-| fdot | Vector Dot Product | `d = fdot(va, vb) = va.x*vb.x + va.y*vb.y + va.z*vb.z`
-
-|===============  
 
 
 [[coordinate-compression-steps, Section J.4, "Coordinate Compression Steps"]]
