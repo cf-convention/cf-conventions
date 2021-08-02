@@ -197,7 +197,7 @@ interpolation subarea basis, for which the construction of the
 uncompressed coordinates may only access those tie points that define
 the extent of the of the interpolation subarea.
 
-In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-subsampling-coordinate-interpolation-attribute>> and <<compression-by-coordinate-subsampling-interpolation-parameters>>, <<compression-by-coordinate-subsampling-interpolation-of-cell-boundaries>> and <<compression-by-coordinate-subsampling-computational-precision>>.
+In addition to the **`interpolation_name`** and **`interpolation_description`** attributes described in this section, further attributes of the interpolation variable are described in <<compression-by-coordinate-subsampling-coordinate-interpolation-attribute>> and <<compression-by-coordinate-subsampling-interpolation-parameters>>, <<compression-by-coordinate-subsampling-interpolation-of-cell-boundaries>> and <<compression-by-coordinate-subsampling-interpolation-method-implementation>>.
 
 [[compression-by-coordinate-subsampling-dimensions,Section 8.3.4, "Subsampled, Interpolated and Non-Interpolated Dimensions"]]
 ==== Subsampled, Interpolated and Non-Interpolated Dimensions
@@ -329,6 +329,7 @@ variables:
   char bl_interpolation ;
     bl_interpolation:interpolation_name = "bi_linear" ;
     bl_interpolation:tie_point_mapping = "xc: x_indices tp_xc  yc: y_indices tp_yc"  ;
+    bl_interpolation:computational_precision = "64"
 
   // tie point coordinate variables
   double lat(tp_yc, tp_xc) ;
@@ -370,6 +371,7 @@ variables:
   char l_interpolation ;
     l_interpolation:interpolation_name = "linear" ;
     l_interpolation:tie_point_mapping = "xc: x_indices tp_xc"  ;
+    l_interpolation:computational_precision = "64"
 
   // tie point coordinate variables
   double lat(yc, tp_xc) ;
@@ -426,23 +428,6 @@ The application of an interpolation parameter variable is independent of its non
 .Through combination of dimensions, interpolation parameter variables may provide values for a) interpolation subareas sharing a tie point, b) each interpolation subarea,  c) and d) interpolation subareas sharing a boundary.
 image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="center"]
 
-
-[[compression-by-coordinate-subsampling-computational-precision, Section 8.3.9, "Computational Precision"]]
-==== Computational Precision
-
-The accuracy of the reconstituted coordinates depends mainly on the degree of subsampling and the choice of interpolation method, both of which are set by the creator of the dataset. The accuracy will also depend, however, on how the interpolation method is implemented and on the computer platform carrying out the computations. There are no restrictions on the choice of interpolation method implementation, for neither the data creator nor the data user, but the floating-point arithmetic precision used by the data creator during the preparation and validation of the compressed coordinates must be specified by setting the interpolation variable’s  **`computational_precision**` attribute to one of the following values:
-
-[cols="3,10"]
-|===============
-| ** Value ** | ** Description** 
-| "32" | 32-bit floating-point arithmetic, comparable to the binary32 standard in [<<IEEE_754>>]
-| "64" | 64-bit floating-point arithmetic, comparable to the binary64 standard in [<<IEEE_754>>]
-|===============
-
-
-Using the given computational precision in the interpolation computations is a necessary, but not sufficient, condition for the data user to be able to reconstitute the coordinates to an accuracy comparable to that intended by the data creator. For instance, a **`computational_precision**` value of **`"64"**` would specify that, using the same software and hardware as the creator of the compressed dataset, sufficient accuracy could not be reached when using a floating-point precision lower than 64-bit floating-point arithmetic in the interpolation computations required to reconstitute the coordinates.
-
-
 [[example-VIIRS]]
 [caption="Example 8.5. "]
 .Multiple interpolation variables with interpolation parameter attributes.
@@ -474,10 +459,9 @@ variables:
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_latitude_longitude" ;
-    tp_interpolation:tie_point_mapping = "track: track_indices tp_track subarea_track
-                                             scan: scan_indices tp_scan subarea_scan
-;;
+    tp_interpolation:tie_point_mapping = "track: track_indices tp_track subarea_track scan: scan_indices tp_scan subarea_scan" ;
     tp_interpolation:interpolation_parameters = "ce1: ce1  ca2: ca2  ce3: ce3 flags: interpolation_subarea_flags" ;
+    tp_interpolation:computational_precision = "32"
 
   // Interpolation parameters
   short ce1(tp_track , subarea_scan) ;
@@ -507,8 +491,8 @@ variables:
   // Time interpolation variable
   char time_interpolation ;
     time_interpolation:interpolation_name = "bi_linear" ;
-    time_interpolation:tie_point_mapping = "track: track_indices tp_track 
-                                            scan: time_scan_indices tp_time_scan"  ;
+    time_interpolation:tie_point_mapping = "track: track_indices tp_track scan: time_scan_indices tp_time_scan"  ;
+    time_interpolation:computational_precision = "64"
 
   // Time tie points
   double t(tp_track, tp_time_scan) ;
@@ -555,14 +539,17 @@ variables:
   char bi_linear ;
     bi_linear:interpolation_name = "bi_linear" ;
     bi_linear:tie_point_mapping = "y: y_indices tp_y  x: x_indices tp_x"  ;
+    bi_linear:computational_precision = "64"
 
   char linear_x ;
-    linear:interpolation_name = "linear" ;
-    linear:tie_point_mapping = "x: x_indices tp_x" ; 
+    linear_x:interpolation_name = "linear" ;
+    linear_x:tie_point_mapping = "x: x_indices tp_x" ; 
+    linear_x:computational_precision = "64"
 
   char linear_y ;
-    linear:interpolation_name = "linear" ;
-    linear:tie_point_mapping = "y: y_indices tp_y" ;
+    linear_y:interpolation_name = "linear" ;
+    linear_y:tie_point_mapping = "y: y_indices tp_y" ;
+    linear_y:computational_precision = "64"
 
   // tie point coordinate variables
   double time(time) ;
@@ -597,7 +584,7 @@ given by the **`tie_point_mapping`** attribute.
 ====
 
 
-[[compression-by-coordinate-subsampling-interpolation-of-cell-boundaries, Section 8.3.10, "Interpolation of Cell Boundaries"]]
+[[compression-by-coordinate-subsampling-interpolation-of-cell-boundaries, Section 8.3.9, "Interpolation of Cell Boundaries"]]
 ==== Interpolation of Cell Boundaries
 
 Coordinates may have cell bounds. Equivalently to the way coordinates can be stored as coordinate tie points and reconstituted through interpolation, contiguous cell bounds of interpolated dimensions can be stored as __bounds tie points__ and reconstituted through interpolation. In this process, the coordinate tie points are a prerequisite for the bounds tie points and the same interpolation method used for the coordinate interpolation is used for the bounds interpolation.
@@ -679,11 +666,11 @@ variables:
   char bl_interpolation ;
     bl_interpolation:interpolation_name = "bi_linear" ;
     bl_interpolation:tie_point_mapping = "ic: i_indices itp  jc: j_indices jtp"  ;
+    bl_interpolation:computational_precision = "64"
 
   // Tie point index variables
   int i_indices(itp) ;
   int j_indices(jtp) ;
-
 
   // Tie point coordinate variables
   double lat(jtp, itp) ;
@@ -702,3 +689,23 @@ variables:
 
 ----
 ====
+
+[[compression-by-coordinate-subsampling-interpolation-method-implementation, Section 8.3.10, "Interpolation Method Implementation"]]
+==== Interpolation Method Implementation
+
+The accuracy of the reconstituted coordinates depends mainly on the degree of subsampling and the choice of interpolation method, both of which are set by the creator of the dataset. The accuracy and reproducibility will also depend, however, on how the interpolation method is implemented and on the computer platform carrying out the computations. To facilitate a good level of reproducibility of the processes of compressing and uncompressing coordinates, requirements are placed on the specification of interpolation methods and on stating the computational precision. 
+ 
+**Interpolation Method Specification** +
+The interpolation method specifications provided in Appendix J are complete in their description of steps and formulas required for compressing and uncompressing coordinate data. Formulas are structured in a way that encourages an efficient implementation of the interpolation method in a high-level programming language. For instance, expressions that are constant within a computational loop should be externalised from that loop.
+
+**Computational Precision Attribute** +
+The data creator shall specify the floating-point arithmetic precision used during the preparation and validation of the compressed coordinates by setting the interpolation variable’s **`computational_precision**` attribute to one of the following values:
+
+[cols="3,10"]
+|===============
+| ** Value ** | ** Description** 
+| "32" | 32-bit floating-point arithmetic, comparable to the binary32 standard in [<<IEEE_754>>]
+| "64" | 64-bit floating-point arithmetic, comparable to the binary64 standard in [<<IEEE_754>>]
+|===============
+
+Using the given computational precision in the interpolation computations is a necessary, but not sufficient, condition for the data user to be able to reconstitute the coordinates to an accuracy comparable to that intended by the data creator. For instance, a **`computational_precision**` value of **`"64"**` would specify that, using the same implementation and hardware as the creator of the compressed dataset, sufficient accuracy could not be reached when using a floating-point precision lower than 64-bit floating-point arithmetic in the interpolation computations required to reconstitute the coordinates.
