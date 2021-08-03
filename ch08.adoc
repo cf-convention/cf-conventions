@@ -88,7 +88,7 @@ assumed that these errors will be small enough to not be of concern to
 users of the uncompressed dataset. The creator of the compressed
 dataset can control the accuracy of the reconstituted coordinates
 through the degree of subsampling and the choice of interpolation
-method, see <<Appendix J>>.
+method, see <<appendix-coordinate-subsampling>>.
 
 The subsampled coordinates are called __tie points__ and are stored in
 __tie point coordinate variables__.
@@ -129,11 +129,11 @@ continuous area is segmented into interpolation subareas. The
 processes of generating interpolation subareas for a domain without
 discontinuities and for a domain with discontinuities is illustrated
 in <<interpolation_subarea_generation>>, and described in more detail in
-<<Appendix J>>.
+<<appendix-coordinate-subsampling>>.
 
 For each __interpolated dimension__, i.e. a target domain dimension for which coordinate interpolation is required, the locations of the tie point coordinates are defined by a corresponding __tie point index variable__, which also indicates the locations of the continuous areas (<<compression-by-coordinate-subsampling-tie-point-index-mapping>>).
  
-The interpolation subareas within a continuous area do not overlap, ensuring that each coordinate of an interpolated dimension is computed from a unique interpolation subarea. These interpolation subareas, however, share the tie point coordinates that define their common boundaries. Such a shared tie point coordinate can only be located in one of a pair of adjacent interpolation subareas, which is always the first of the pair in index space. For instance, in <<interpolation_subarea_generation>>, the interpolation subarea labelled `(0,0)` contains all four of its tie point coordinates, and the interpolation subarea `(0,1)` only contains two of them. When applied for a given interpolation subarea, interpolation methods (such as those described in <<Appendix J>>) must ensure that reconstituted coordinate points are only generated inside the interpolation subarea being processed, even if some of the tie point coordinates lie outside of that interpolation subarea.
+The interpolation subareas within a continuous area do not overlap, ensuring that each coordinate of an interpolated dimension is computed from a unique interpolation subarea. These interpolation subareas, however, share the tie point coordinates that define their common boundaries. Such a shared tie point coordinate can only be located in one of a pair of adjacent interpolation subareas, which is always the first of the pair in index space. For instance, in <<interpolation_subarea_generation>>, the interpolation subarea labelled `(0,0)` contains all four of its tie point coordinates, and the interpolation subarea `(0,1)` only contains two of them. When applied for a given interpolation subarea, interpolation methods (such as those described in <<appendix-coordinate-subsampling>>) must ensure that reconstituted coordinate points are only generated inside the interpolation subarea being processed, even if some of the tie point coordinates lie outside of that interpolation subarea.
  
 Adjacent interpolation subareas that are in different continuous areas never share tie point coordinates, as consequence of the grid discontinuity between them. This results in a different number of tie point coordinates in the two cases shown in <<interpolation_subarea_generation>>.
 
@@ -167,8 +167,7 @@ that contains the method's name, or else by the
 that contains a non-standardized description of the method. These
 attributes must not be both set.
 
-The valid values of **`interpolation_name`** are given in <<Appendix
-J>>. This appendix describes the interpolation technique for each
+The valid values of **`interpolation_name`** are given in <<appendix-coordinate-subsampling>>. This appendix describes the interpolation technique for each
 method, and optional interpolation variable attributes for configuring
 the interpolation process.
 
@@ -402,7 +401,7 @@ process. The **`interpolation_parameters`** attribute takes a string
 value, the string comprising blank-separated elements of the form
 `"term: variable"`, where `term` is a case-insensitive keyword that
 defines one of the terms in the interpolation method's definition
-given in <<Appendix J>>, and `variable` is the name of the
+given in <<appendix-coordinate-subsampling>>, and `variable` is the name of the
 interpolation parameter variable that contains the values for that
 term. The order of elements is not significant. A numerical term that
 is omitted from the **`interpolation_parameters`** attribute should be
@@ -697,7 +696,7 @@ variables:
 The accuracy of the reconstituted coordinates depends mainly on the degree of subsampling and the choice of interpolation method, both of which are set by the creator of the dataset. The accuracy and reproducibility will also depend, however, on how the interpolation method is implemented and on the computer platform carrying out the computations. To facilitate a good level of reproducibility of the processes of compressing and uncompressing coordinates, requirements are placed on the specification of interpolation methods and on stating the computational precision. 
  
 **Interpolation Method Specification** +
-The interpolation method specifications provided in Appendix J are complete in their description of steps and formulas required for compressing and uncompressing coordinate data. Formulas are structured in a way that encourages an efficient implementation of the interpolation method in a high-level programming language. For instance, expressions that are constant within a computational loop should be externalised from that loop.
+The interpolation method specifications provided in <<appendix-coordinate-subsampling>> are complete in their description of steps and formulas required for compressing and uncompressing coordinate data. Formulas are structured in a way that encourages an efficient implementation of the interpolation method in a high-level programming language. For instance, expressions that are constant within a computational loop should be externalised from that loop.
 
 **Computational Precision Attribute** +
 The data creator shall specify the floating-point arithmetic precision used during the preparation and validation of the compressed coordinates by setting the interpolation variable’s **`computational_precision**` attribute to one of the following values:
