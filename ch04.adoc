@@ -197,32 +197,22 @@ The `computed_standard_name` attribute indicates that the values in variable
 [[time-coordinate]]
 === Time Coordinate
 
-Variables representing time must always explicitly include the **`units`** attribute; there is no default value. The **`units`** attribute takes a string value formatted as per the recommendations in the Udunits package <<UDUNITS>> . The following excerpt from the Udunits documentation explains the time unit encoding by example:
-----
+Variables representing time must always explicitly include the **`units`** attribute; there is no default value. The **`units`** attribute takes a string value formatted as per the recommendations in the <<UDUNITS>> package. The following excerpt from the UDUNITS documentation explains the time unit encoding by example:
 
-The specification:
-
-    seconds since 1992-10-8 15:15:42.5 -6:00
-
+"The specification `seconds since 1992-10-8 15:15:42.5 -6:00`
 indicates seconds since October 8th, 1992  at  3  hours,  15
 minutes  and  42.5 seconds in the afternoon in the time zone
 which is six hours to the west of Coordinated Universal Time
 (i.e.  Mountain Daylight Time).  The time zone specification
-can also be written without a colon using one or  two-digits
+can also be written without a colon using one or two digits
 (indicating hours) or three or four digits (indicating hours
-and minutes).
-      
-----
+and minutes)."
 
- 
+The acceptable units for time are listed in the UDUNITS database. The most commonly used of these strings (and their abbreviations) includes **`day`** (**`d`**), **`hour`** (**`hr`**, **`h`**), **`minute`** (**`min`**) and **`second`** (**`sec`**, **`s`**). Plural forms are also acceptable.
 
-The acceptable units for time are listed in the link:$$http://www.unidata.ucar.edu/software/udunits/$$[`udunits.dat`] file. The most commonly used of these strings (and their abbreviations) includes **`day (d)`**, **`hour (hr, h)`**, **`minute (min)`** and **`second (sec, s)`**. Plural forms are also acceptable. The reference time string (appearing after the identifier **`since`**) may include date alone; date and time; or date, time, and time zone. The reference time is required. A reference time in year 0 has a special meaning (see <<climatological-statistics>>).
+The reference date/time string (appearing after the identifier **`since`**) is required. It may include date alone, or date and time, or date, time and time zone. If the time zone is omitted the default is UTC, and if both time and time zone are omitted the default is 00:00:00 UTC.
 
-__Note: if the time zone is omitted the default is UTC, and if both time and time zone are omitted the default is 00:00:00 UTC.__ 
-
-We recommend that the unit **`year`** be used with caution. The Udunits package defines a **`year`** to be exactly 365.242198781 days (the interval between 2 successive passages of the sun through vernal equinox). __It is not a calendar year.__ Udunits includes the following definitions for years: a **`common_year`** is 365 days, a **`leap_year`** is 366 days, a **`Julian_year`** is 365.25 days, and a **`Gregorian_year`** is 365.2425 days.
-
-For similar reasons the unit **`month`**, which is defined in link:$$http://www.unidata.ucar.edu/software/udunits/$$[`udunits.dat`] to be exactly **`year/12`**, should also be used with caution.
+UDUNITS defines a **`year`** to be exactly 365.242198781 days (the interval between 2 successive passages of the sun through vernal equinox). __It is not a calendar year.__ UDUNITS defines a  **`month`** to be exactly **`year/12`**, which is __not a calendar month__. The CF standard follows UDUNITS in the definition of units, but we recommend that **`year`** and **`month`** should not be used, because of the potential for mistakes and confusion.
 
 [[time-axis-ex]]
 [caption="Example 4.4. "]
@@ -253,6 +243,7 @@ A date/time is the set of numbers which together identify an instant of time, na
 A time coordinate value represents a date/time.
 In order to calculate a time coordinate value from a date/time, or the reverse, one must know the **`units`** attribute of the time coordinate variable (containing the time unit of the coordinate values and the reference date/time) and the calendar.
 The choice of calendar defines the set of dates (year-month-day combinations) which are permitted, and therefore it specifies the number of days between the times of **`0:0:0`** (midnight) on any two dates.
+Date/times which are not permitted in a given calendar are prohibited in both the encoded time coordinate values, and in the reference date/time string. It is recommended that the calendar be specified by the **`calendar`** attribute of the time coordinate variable.
 
 When a time coordinate value is calculated from a date/time, or the reverse, it is assumed that the coordinate value increases by exactly 60 seconds from the start of any minute (identified by year, month, day, hour, minute, all being integers) to the start of the next minute, with no leap seconds, in all CF calendars.
 This assumption has various consequences when real-world date/times from calendars which do contain leap seconds (such as UTC) are stored in time coordinate variables:
@@ -263,26 +254,25 @@ This assumption has various consequences when real-world date/times from calenda
 * A date/time in the excluded range must not be used as a reference date/time e.g. **`seconds since 2016-12-31 23:59:60`** is not a permitted value for **`units`**.
 * It is important to realise that a time coordinate value does not necessarily exactly equal the actual length of the interval of time between the reference date/time and the date/time it represents.
 
-It is recommended that the calendar be specified by the **`calendar`** attribute of the time coordinate variable.
-The values currently defined for **`calendar`** are:
+The values currently defined for **`calendar`** are listed below. In all calendars except **`360_day`** and **`none`**, the lengths of the months are the same as in the Gregorian calendar for leap years and non-leap years. In the **`julian`** and the default **`standard`** mixed Gregorian/Julian calendar, dates in years before year 0 (i.e. before 0-1-1 0:0:0) are not allowed, and the year in the reference date/time of the units must not be negative. In these calendars, year zero has a special use to indicate a climatology (see <<climatological-statistics>>), but this use of year zero is deprecated. In other calendars, years before year 1 are allowed.
 
-**`gregorian`** or **`standard`**:: Mixed Gregorian/Julian calendar as defined by Udunits. __This is the default.__
+**`standard`**:: Mixed Gregorian/Julian calendar as defined by UDUNITS. This is the default. A deprecated alternative name for this calendar is **`gregorian`**. In this calendar, date/times after (and including) 1582-10-15 0:0:0 are in the Gregorian calendar, in which a year is a leap year if either (i) it is divisible by 4 but not by 100 or (ii) it is divisible by 400. Date/times before (and excluding) 1582-10-5 0:0:0 are in the Julian calendar. Year 1 AD or CE in the **`standard`** calendar is also year 1 of the **`julian`** calendar. In the **`standard`** calendar, 1582-10-15 0:0:0 is exactly 1 day later than 1582-10-4 0:0:0 and the intervening dates are undefined. Therefore it is recommended that date/times in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 should not be used as reference in **`units`**, and that a time coordinate variable should not include any date/times in this range, because their interpretation is unclear. It is also recommended that a reference date/time before the discontinuity should not be used for date/times after the discontinuity, and vice-versa.
 
-**`proleptic_gregorian`**:: A Gregorian calendar extended to dates before 1582-10-15. That is, a year is a leap year if either (i) it is divisible by 4 but not by 100 or (ii) it is divisible by 400.
+**`proleptic_gregorian`**:: A calendar with the Gregorian rules for leap-years extended to dates before 1582-10-15. All dates consistent with these rules are allowed, both before and after 1582-10-15 0:0:0.
 
-**`noleap`** or **`365_day`**:: Gregorian calendar without leap years, i.e., all years are 365 days long.
+**`julian`**:: Julian calendar, in which a year is a leap year if it is divisible by 4, even if it is also divisible by 100.
 
-**`all_leap`** or **`366_day`**:: Gregorian calendar with every year being a leap year, i.e., all years are 366 days long.
+**`noleap`** or **`365_day`**:: A calendar with no leap years, i.e., all years are 365 days long.
 
-**`360_day`**:: All years are 360 days divided into 30 day months.
+**`all_leap`** or **`366_day`**:: A calendar in which every year is a leap year, i.e., all years are 366 days long.
 
-**`julian`**:: Julian calendar.
+**`360_day`**:: A calendar in which all years are 360 days, and divided into 30 day months.
 
 **`none`**:: No calendar.
 
 
 
-The **`calendar`** attribute may be set to **`none`** in climate experiments that simulate a fixed time of year. The time of year is indicated by the date in the reference time of the **`units`** attribute. The time coordinate that might apply in a perpetual July experiment are given in the following example.
+The **`calendar`** attribute may be set to **`none`** in climate experiments that simulate a fixed time of year. The time of year is indicated by the date in the reference time of the **`units`** attribute. The time coordinates that might apply in a perpetual July experiment are given in the following example.
 
 [[perpetual-time-axis-ex]]
 [caption="Example 4.5. "]
@@ -337,30 +327,6 @@ double time(time) ;
 
 
 ====
-
-The mixed Gregorian/Julian calendar used by Udunits is explained in the following excerpt from the udunits(3) man page: 
-----
-
-The udunits(3) package uses a mixed Gregorian/Julian  calen-
-dar  system.   Dates  prior to 1582-10-15 are assumed to use
-the Julian calendar, which was introduced by  Julius  Caesar
-in 46 BCE and is based on a year that is exactly 365.25 days
-long.  Dates on and after 1582-10-15 are assumed to use  the
-Gregorian calendar, which was introduced on that date and is
-based on a year that is exactly 365.2425 days long.  (A year
-is  actually  approximately 365.242198781 days long.)  Seem-
-ingly strange behavior of the udunits(3) package can  result
-if  a user-given time interval includes the changeover date.
-For example, utCalendar() and utInvCalendar() can be used to
-show that 1582-10-15 *preceded* 1582-10-14 by 9 days.
-	
-----
-
- 
-
-Due to problems caused by the discontinuity in the default mixed Gregorian/Julian calendar, we strongly recommend that this calendar should only be used when the time coordinate does not cross the discontinuity. For time coordinates that do cross the discontinuity the **`proleptic_gregorian`** calendar should be used instead.
-
-
 
 
 [[discrete-axis, Section 4.5, "Discrete Axis"]]
