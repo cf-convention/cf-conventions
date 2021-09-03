@@ -29,7 +29,8 @@ material required for completeness or clarity.
 
 *Requirements:*
 
-* CF attributes that take string values must be 1D character arrays.
+* CF attributes that take string values must be 1D character arrays or single
+atomic strings.
 
 [[section-1]]
 
@@ -296,8 +297,9 @@ which has a **`formula_terms`** attribute.
 with the **`standard_name`** of the coordinate variable it is attached to, and in some cases 
 also with the **`standard_name`** attributes of variables named by the **`formula_terms`** attribute, 
 according to the appropriate definition in Appendix D.
-
-
+* The units of a variable named by the **`formula_terms`** attribute
+  must be consistent with the units defined in Appendix D.
+  
 [[section-13]]
 
 [[time-coordinate]]
@@ -305,18 +307,17 @@ according to the appropriate definition in Appendix D.
 
 *Requirements:*
 
-* The time units of a time coordinate variable must contain a reference
-time.
-* The reference time of a time coordinate variable must be a legal time
+* The time **`units`** of a time coordinate variable must contain a reference
+date/time.
+* The reference date/time of a time coordinate variable must be a legal date/time
 in the specified calendar.
+* The reference date/time in time **`units`** is not allowed to contain seconds
+equal to or greater than 60.
 
 *Recommendations:*
 
-* The use of a reference time in the year 0 to indicate climatological
-time is deprecated. This restriction only applies to the real-world
-calendar as used by the udunits package.
-* Units of **`year`** and **`month`** and any equivalent units should be used with
-caution.
+* The use of time coordinates in year 0 and reference date/times in year 0 to indicate climatological time is deprecated.
+* Units of **`year`** and **`month`** and any equivalent units should be used with caution.
 
 [[section-14]]
 
@@ -325,11 +326,9 @@ caution.
 
 *Requirements:*
 
-* The attributes **`calendar`**, **`month_lengths`**, **`leap_year`**, and **`leap_month`** may
-only be attached to time coordinate variables.
-* The standardized values of the calendar attribute are **`gregorian`**,
-**`standard`**, **`proleptic_gregorian`**, **`noleap`**, **`365_day`**, **`all_leap`**, **`366_day`**,
-**`360_day`**, **`julian`**, and **`none`** (case insensitive). If the **`calendar`** attribute
+* The attributes **`calendar`**, **`month_lengths`**, **`leap_year`**, and **`leap_month`** may only be attached to time coordinate variables.
+* The standardized values (case insensitive) of the **`calendar`** attribute are **`standard`**, **`gregorian`** (deprecated), **`proleptic_gregorian`**, **`noleap`**, **`365_day`**, **`all_leap`**, **`366_day`**,
+**`360_day`**, **`julian`**, and **`none`**. If the **`calendar`** attribute
 is given a non-standard value, then the attribute **`month_lengths`** is
 required, along with **`leap_year`** and **`leap_month`** as appropriate.
 * The type of the **`month_lengths`** attribute must be an integer array of
@@ -340,6 +339,8 @@ scalars.
 
 *Recommendations:*
 
+* A time coordinate variable should have a **`calendar`** attribute.
+* The value **`standard`** should be used instead of **`gregorian`** in the **`calendar`** attribute.
 * The attribute **`leap_month`** should not appear unless the attribute
 **`leap_year`** is present.
 * The time coordinate should not cross the date 1582-10-15 when the
@@ -363,10 +364,10 @@ blank separated list of variable names. All specified variable names
 must exist in the file.
 * The dimensions of each auxiliary coordinate must be a subset of the
 dimensions of the variable they are attached to, with two exceptions.
-First, a label variable which will have a trailing dimension for the
-maximum string length. Second a ragged array (Chapter 9, Discrete
-sampling geometries and Appendix H) uses special, more indirect, methods
-to connect the data and coordinates. +
+First, a label variable of type **`char`** will have a trailing dimension
+for the maximum string length.
+Second, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H)
+uses special, more indirect, methods to connect the data and coordinates.
 
 *Recommendations:*
 
@@ -455,11 +456,14 @@ the CRS WKT specification described in reference [OGC_CTS].
 
 *Requirements:*
 
-* A variable of character type that is named by a **`coordinates`** attribute
-is a label variable. This variable must have one or two dimensions. The
-trailing (CDL order) or sole dimension is for the maximum string length.
-If there are two dimensions, leading dimension (CDL order) must match
-one of those of the data variable.
+* A string variable that is named by a **`coordinates`** attribute is a label
+variable.
+If the variable is of type **`string`** it must have at most one dimension,
+which must match one of those of the data variable.
+If the variable is of type **`char`** it must have one or two dimensions, where
+the trailing (CDL order) or sole dimension is for the maximum string length.
+If there are two dimensions, the leading dimension (CDL order) must match one
+of those of the data variable.
 
 [[section-18]]
 
@@ -528,17 +532,23 @@ or more blank separated word lists, each with the form
 ....
 dim1: [dim2: [dim3: ...]] method [where type1 [over type2]] [within|over days|years] [(comment)]
 ....
-where brackets indicate optional words. The valid values for **`dim1`** [**`dim2`**
-[**`dim3`** ...] ] are the names of dimensions of the data variable, names of
-scalar coordinate variables of the data variable, valid standard names,
-or the word **`area`**. The valid values of **`method`** are contained in Appendix E. The valid values
-for **`type1`** are the name of a string-valued auxiliary  
-or scalar coordinate variable with a **`standard_name`** of **`area_type`**, or any
-string value allowed for a variable of **`standard_name`** of **`area_type`**. If
-**`type2`** is a string-valued auxiliary coordinate variable, it is not
-allowed to have a leading dimension (the number of strings) of more than
-one. When the method refers to a climatological time axis, the suffixes
-for within and over may be appended.
+where brackets indicate optional words.
+The valid values for **`dim1`** [**`dim2`** [**`dim3`** ...] ] are the names of
+dimensions of the data variable, names of scalar coordinate variables of the
+data variable, valid standard names, or the word **`area`**.
+The valid values of **`method`** are contained in Appendix E.
+The valid values for **`type1`** are the name of a string-valued auxiliary  or
+scalar coordinate variable with a **`standard_name`** of **`area_type`**, or
+any string value allowed for a variable of **`standard_name`** of
+**`area_type`**.
+If **`type2`** is a string-valued auxiliary coordinate variable, it must be
+sized to contain a single string.
+If it is a variable of type **`string`**, it must be scalar or one-dimensional
+with a length of one.
+If it is a variable of type **`char`**, it must be one-dimensional or
+two-dimensional with a leading dimension (the number of strings) of length one.
+When the method refers to a climatological time axis, the suffixes for within
+and over may be appended.
 
 * A given dimension name may only occur once in a **`cell_methods`** string.
 An exception is a climatological time dimension.
@@ -668,4 +678,142 @@ in the file.
 starting with 0 and going up to the product of the compressed dimension
 sizes minus 1 (CDL index conventions).
 
+[[compression-by-gathering]]
+=== 8.2 Lossless Compression by Gathering
+
+*Requirements:*
+
+* The **`compress`** attribute may only be attached to a coordinate variable
+with an integer data type.
+* The type of the **`compress`** attribute is a string whose value is a blank
+separated list of dimension names. The specified dimensions must exist
+in the file.
+* The values of the associated coordinate variable must be in the range
+starting with 0 and going up to the product of the compressed dimension
+sizes minus 1 (CDL index conventions).
+
+[[compression-by-coordinate-subsampling]]
+=== 8.3 Lossy Compression by Coordinate Subsampling
+
+*Requirements:*
+
+* When attached to a data variable, the type of the **`tie_points`**
+  attribute is a string whose value is a list of blank separated word
+  groups of the following form, in which brackets indicate optional
+  text: **`tie_point_variable: [tie_point_variable: ...]
+  interpolation_variable`**. Each **`tie_point_variable`** token
+  specifies a tie point variable that must exist in the file, and each
+  **`interpolation_variable`** token specifies a variable that must
+  exist in the file.
+
+* An interpolation variable must have one of the string-valued
+  attributes **`interpolation_name`** or
+  **`interpolation_description`**, but not both. The legal values for
+  the **`interpolation_name`** attribute are contained in the
+  Interpolation Methods section of http://cfconventions.org/cf-conventions/cf-conventions.html#appendix-coordinate-subsampling[Appendix J].
+
+* An interpolation variable must have the attribute **`computational_precision`**.
+  The legal values for the **`computational_precision`** attribute are contained in the Interpolation Method Implementation subsection of the Lossy Compression by Coordinate Subsampling section of chapter 8.
+
+* An interpolation variable must have a **`tie_point_dimensions`**
+  attribute that is a string whose value is a list of blank separated
+  word groups of the following form, in which brackets indicate
+  optional text: **`interpolation_dimension:
+  tie_point_interpolation_dimension [interpolation_zone_dimension]`**.
+  Each **`interpolation_dimension`** token specifies a unique
+  interpolation dimension of the parent data variable, each
+  **`tie_point_interpolation_dimension`** token specifies the tie
+  point interpolation dimension of a unique tie point index variable,
+  and each **`interpolation_zone_dimension`** token specifies a unique
+  interpolation zone dimension. The tie point interpolation dimensions
+  and interpolation zone dimensions must not be dimensions of the
+  parent data variable.
+  
+* The tie point variables associated with each
+  **`interpolation_variable`** token must all span the same dimensions,
+  which comprise a subset of zero or more dimensions of the parent
+  data variable with the addition of all of the tie point
+  interpolation dimensions identified by the **`tie_point_dimensions`**
+  attribute of the interpolation variable. A tie point variable must
+  not span both a tie point interpolation dimension and its
+  corresponding interpolation dimension, as defined by the
+  **`tie_point_dimensions`** mapping.
+
+* An interpolation variable must have a **`tie_point_indices`**
+  attribute that is a string whose value is a list of blank separated
+  word pairs of the following form: **`interpolation_dimension:
+  tie_point_index_variable`**. The **`interpolation_dimension`**
+  tokens specify the same interpolation dimensions as the
+  **`tie_point_dimensions`** attribute, and each
+  **`tie_point_index_variable`** token specifies a tie point index
+  variable that must exist in the file.
+
+* A tie point index variable must be a one-dimensional variable with
+  an integer data type.
+
+* The dimension of a tie point index variable must be a tie point
+  interpolation dimension identified by the **`tie_point_dimensions`**
+  attribute.
+
+* The values of a tie point index variable must be non-negative
+  integers. The first value must be zero, and each subsequent value
+  must be greater than or equal to the previous value. If a value
+  differs by zero or one from its previous value, then it must differ
+  by two or more from its subsequent value.
+
+* The size of an interpolation zone dimension must be equal to the
+  size of the corresponding tie point interpolation dimension minus
+  the number of interpolation areas for that tie point interpolation
+  dimension. The number of interpolation areas is equal one plus the
+  number of occurences of adjacent values differing by zero or one in
+  the corresponding tie point index variable.
+
+* When attached to an interpolation variable, the type of the
+  **`interpolation_parameters`** attribute is a string whose value is
+  list of blank separated word pairs in the form **`term: var`**. For
+  each valid **`interpolation_name`**, the legal values for **`term`**
+  are described by the "Interpolation Parameter terms" table entry in
+  the Interpolation Methods section of http://cfconventions.org/cf-conventions/cf-conventions.html#appendix-coordinate-subsampling[Appendix J].
+  The values of
+  **`var`** must be interpolation parameter variables that exist in
+  the file.
+
+* The dimensions of an interpolation parameter variable must be a
+  subset of zero or more of the dimensions of the corresponding tie
+  point variables, with the exception that a tie point interpolation
+  dimension may be replaced with its corresponding interpolation zone
+  dimension, as defined by the **`tie_point_dimensions`** mapping.
+
+* If a tie point variable has **`bounds_tie_points`** attribute then
+  it must be a string whose value is a single variable name. The
+  specified variable must exist in the file.
+
+* A bounds tie point variable must have the same dimensions as its
+  associated tie points coordinate variable.
+
+* A bounds tie point variable must be a numeric data type.
+
+* A bounds tie point variable must not have the **`_FillValue`** or
+  **`missing_value`** attributes. The requirements on all other bounds
+  tie point variable attributes are the same as for bounds variables
+  described in <<cell-boundaries>>.
+
+*Recommendations:*
+
+* An interpolation variable should have 0 dimensions.
+
+* The recommendations on bounds tie point variable attributes are the
+  same as for bounds variables described in <<cell-boundaries>>.
+
  
+[[parametric-vertical-coordinates]]
+=== Appendix D Parametric Vertical Coordinates
+
+*Requirements:*
+
+* For each element `k` of a vertical coordinate variable with `**standard_name = "ocean_sigma_z_coordinate"**`, one and only one of the formula terms `**sigma(k)**` and `**zlev(k)**` must be missing data. If the optional formula term `**nsigma**` is supplied, it must equal the number of elements of `**zlev**` which contain missing data.
+
+*Recommendations:*
+
+* For a vertical coordinate variable with `**standard_name = "ocean_sigma_z_coordinate"**`, the formula term `**nsigma**` should be omitted.
+* Versions of the standard before 1.9 should not be used for vertical coordinate variables with `**standard_name = "ocean_sigma_z_coordinate"**` because these versions are defective in their definition of this coordinate.

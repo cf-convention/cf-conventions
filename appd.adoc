@@ -306,6 +306,8 @@ is the dimensionless coordinate at vertical gridpoint `(k)`, and `depth(j,i)`
 is the distance (a positive value) from the datum to the sea floor at
 horizontal gridpoint `(j,i)`. The constants `a`, `b`, and `depth_c` control the
 stretching.
+The constants `a` and `b` are dimensionless, and `depth_c` must have
+units of length.
 
 The format for the **`formula_terms`** attribute is 
 ----
@@ -342,7 +344,12 @@ The format for the **`formula_terms`** attribute is
 ----
 formula_terms = "s: var1 C: var2 eta: var3 depth: var4 depth_c: var5"
 ----
-    
+
+The pass:q[`standard_name`]s for `eta` and `depth` and the
+`computed_standard_name` must be one of the consistent sets shown in
+<<table-computed-standard-names, Table D.1>>. No `standard_name` has
+been defined for `C` or `depth_c`.
+
 
 === Ocean s-coordinate, generic form 2
 ----
@@ -368,9 +375,14 @@ The format for the **`formula_terms`** attribute is
 formula_terms = "s: var1 C: var2 eta: var3 depth: var4 depth_c: var5"
 ----      
 
+The pass:q[`standard_name`]s for `eta` and `depth` and the
+`computed_standard_name` must be one of the consistent sets shown in
+<<table-computed-standard-names, Table D.1>>. No `standard_name` has
+been defined for `C` or `depth_c`.
 
 ===  Ocean sigma over z coordinate 
 
+**The description of this type of parametric vertical coordinate is defective in version 1.8 and earlier versions of the standard, in that it does not state what values the vertical coordinate variable should contain. Therefore, in accordance with the rules, all versions of the standard before 1.9 are deprecated for datasets that use the "ocean sigma over z" coordinate.**
 
 ----
 
@@ -384,26 +396,22 @@ Definition:::
 +
 ----
 
-for k <= nsigma:
+for levels k where sigma(k) has a defined value and zlev(k) is not defined:
 
   z(n,k,j,i) = eta(n,j,i) + sigma(k)*(min(depth_c,depth(j,i))+eta(n,j,i))
- 
-for k > nsigma:
+
+for levels k where zlev(k) has a defined value and sigma(k) is not defined:
 
   z(n,k,j,i) = zlev(k)
               
 ----
 
-where `z(n,k,j,i)` is height (positive upwards) relative to the datum (e.g.
-mean sea level) at gridpoint `(n,k,j,i)`, `eta(n,j,i)` is the height of the sea
-surface (positive upwards) relative to the datum at gridpoint `(n,j,i)`,
-`sigma(k)` is the dimensionless coordinate at vertical gridpoint `(k)` for `k
-&lt;= nsigma`, and `depth(j,i)` is the distance (a positive value) from the
-datum to the sea floor at horizontal gridpoint `(j,i)`. Above depth `depth_c`
-there are `nsigma` layers and below this depth the levels are surfaces of
-constant height `zlev` (positive upwards) relative to the datum.
+where `z(n,k,j,i)` is height, positive upwards, relative to ocean datum (e.g. mean sea level) at gridpoint `(n,k,j,i)`, `eta(n,j,i)` is the height of the ocean surface, positive upwards, relative to ocean datum at gridpoint `(n,j,i)`, and `depth(j,i)` is the distance from ocean datum to sea floor (positive value) at horizontal gridpoint `(j,i)`.
 
-The format for the **`formula_terms`** attribute is 
+The parameter `sigma(k)` is defined only for the `nsigma` layers nearest the ocean surface, while `zlev(k)` is defined for the `nlayer - nsigma` deeper layers, where `0 \<= nsigma \<= nlayer` and `nlayer` is the size of the dimension of the vertical coordinate variable. Both `sigma` and `zlev` must have this dimension. For any `k`, whichever of `sigma(k)` or `zlev(k)` is undefined must contain missing data, while the other must not.
+
+The format for the `formula_terms` attribute is 
+
 ----
 
 formula_terms = "sigma: var1 eta: var2 depth: var3 depth_c: var4 nsigma: var5
@@ -411,12 +419,10 @@ formula_terms = "sigma: var1 eta: var2 depth: var3 depth_c: var4 nsigma: var5
         
 ----
 
-The pass:q[`standard_name`]s for `eta`, `depth`, `zlev` and the
-`computed_standard_name` must be one of the consistent sets shown in
-<<table-computed-standard-names, Table D.1>>. No `standard_name` has been
-defined for `depth_c` or `nsigma`.
+The pass:q[`standard_name`]s for `eta`, `depth`, `zlev` and the `computed_standard_name` must be one of the consistent sets shown in <<table-computed-standard-names, Table D.1>>. The `standard_name` for `sigma` is `ocean_sigma_coordinate`. No `standard_name` has been defined for `depth_c` or `nsigma`. The `nsigma` parameter is deprecated and optional in `formula_terms`; if supplied, it must equal the number of elements of `zlev` which contain missing data. 
 
-  
+The `standard_name` for the vertical coordinate variable is `ocean_sigma_z_coordinate`. This variable should contain `sigma(k)*depth_c` for the layers where `sigma` is defined and `zlev(k)` for the other layers, with units of length. The layers must be arranged so that the vertical coordinate variable contains a monotonic set of indicative values for the heights of the levels relative to the datum, either increasing or decreasing, and the direction must be indicated by the `positive` attribute, in the usual way for a vertical coordinate variable.
+
 ===  Ocean double sigma coordinate 
 
 
@@ -448,7 +454,7 @@ where `z(k,j,i)` is height (positive upwards) relative to the datum (e.g. mean
 sea level) at gridpoint `(k,j,i)`, `sigma(k)` is the dimensionless coordinate
 at vertical gridpoint `(k)` for `k &lt;= k_c`, and `depth(j,i)` is the distance
 (a positive value) from the datum to sea floor at horizontal gridpoint `(j,i)`.
-`z1`, `z2`, `a`, and `href` are constants.
+`z1`, `z2`, `a`, and `href` are constants with units of length.
 
 The format for the **`formula_terms`** attribute is 
 ----
