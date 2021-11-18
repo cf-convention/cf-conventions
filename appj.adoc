@@ -174,13 +174,15 @@ For interpolation in geographic coordinates latitude and longitude as the coeffi
 
 The functions `fq()` and `fw()` referenced in the following are defined in <<quadratic>>. 
  
-| Interpolation Parameter terms | Any subset of interpolation coefficients `ce, ca`, which must each span the interpolation subarea dimension. +
-Optionally the flag variable `interpolation_subarea_flags`, which must span the interpolation subarea dimension and must include `location_use_3d_cartesian` in the `flag_meanings` attribute. 
+| Interpolation Parameter terms | Optionally, any subset of terms `ce, ca`, each specifying a numerical variable spanning the interpolation subarea dimension. +
+
+The mandatory term `interpolation_subarea_flags`, specifying a flag variable spanning the interpolation subarea dimension and including `location_use_3d_cartesian` in the `flag_meanings` attribute.
 
 | Coordinate Compression Calculations | 
 First calculate the tie point vector representations from the tie point latitude-longitude representations +
 `va = fll2v(lla);  vb = fll2v(llb);` +
-Then calculate the three-dimensional cartesian representation of the interpolation coefficients from the tie points `va` and `vb` as well as the point `vp(i)` at index `i` between the tie points `A` and `B`. If the size of the interpolation subarea `(ib - ia)` is an even number, then the data point at index `i = (ib + ia)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib + ia - 1)/2` shall be selected. +
+Then calculate the three-dimensional cartesian representation of the interpolation coefficients from the tie points `va` and `vb` as well as the point `vp(i)` at index `i` between the tie points `A` and `B`. If the number of points in an interpolation subarea `(ib + ia + 1)` is odd, then the data point at index `i = (ib + ia)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib + ia - 1)/2` shall be selected. +
+
 The three-dimensional cartesian interpolation coefficients are found from +
 `cv = fcv(va, vb, vp(i), s(i)) = (fw(va.x, vb.x, vp(i).x, s(i)), fw(va.y, vb.y, vp(i).y, s(i)), fw(va.z, vb.z, vp(i).z, s(i))).` +
 Finally, for storage in the dataset, convert the coefficients to the parametric representation + 
@@ -233,18 +235,18 @@ The functions `fcv()`, `fcv2cea()`, `fcea2cv()`, `fcll()`, `fqv()` and `fqll()` 
 The parametric representation of the interpolation coefficients, stored in the interpolation parameters `ce1, ca1, ce2, ca2, ce3` and `ca3`, is equivalent to five additional tie points for the interpolation subarea as shown in <<quadratic3>>, which also shows the orientation and indices of the parameters.  
 
 | Interpolation Parameter terms  | 
-Any subset of interpolation coefficients `ce1, ca1`, which must each span the subsampled dimension 2 and interpolation subarea dimension 1; +
-Any subset of interpolation coefficients `ce2, ca2`, which must each span the interpolation subarea dimension 2 and subsampled dimension 1; +
-Any subset of interpolation coefficients `ce3, ca3`, which must each span the interpolation subarea dimension 2 and interpolation subarea dimension 1; + 
 
-Optionally the flag variable `interpolation_subarea_flags`, which must span the interpolation subarea dimension 2 and interpolation subarea dimension 1 and must include `location_use_3d_cartesian` in the `flag_meanings` attribute.  
+Optionally, any subset of terms `ce1, ca1`, each specifying a numerical variable spanning the subsampled dimension 2 and the interpolation subarea dimension 1; +
+Optionally, any subset of terms `ce2, ca2`, each specifying a numerical variable spanning the interpolation subarea dimension 2 and the subsampled dimension 1; +
+Optionally, any subset of terms `ce3, ca3`, each specifying a numerical variable spanning the interpolation subarea dimension 2 and the interpolation subarea dimension 1; + 
+
+The mandatory term `interpolation_subarea_flags`, specifying a flag variable spanning the interpolation subarea dimension 2 and the interpolation subarea dimension 1 and including `location_use_3d_cartesian` in the `flag_meanings` attribute.
 
 | Coordinate Compression Calculations | 
 First calculate the tie point vector representations from the tie point latitude-longitude representations +
 `va = fll2v(lla);  vb = fll2v(llb); vc = fll2v(llc); vd = fll2v(lld).` +
-Then calculate the three-dimensional cartesian representation of the interpolation coefficients sets from the tie points as well as a point `vp(i2, i1)` between the tie points. If the size of the interpolation subarea in the first dimension `(ib1 - ia1)` is an even number, then the index 
-`i1 = (ib1 + ia1)/2` shall be selected for this calculation, otherwise the index 
-`i1 = (ib1 + ia1 - 1)/2` shall be selected. If the size of the interpolation subarea in the second dimension `(ib2 - ic2)` is an even number, then the index `i2 = (ib2 + ic2)/2` shall be selected for this calculation, otherwise the index `i2 = (ib2 + ic2 - 1)/2` shall be selected. +
+Then calculate the three-dimensional cartesian representation of the interpolation coefficients sets from the tie points as well as a point `vp(i2, i1)` between the tie points. If the number of points in the first dimension of the interpolation subarea `(ib1 - ia1 + 1)` is odd, then the data point at index i = `(ib1 + ia1)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib1 + ia1 - 1)/2` shall be selected. If the number of points in the second dimension of the interpolation subarea `(ib2 - ic2 + 1)` is odd, then the data point at index `i = (ib2 + ic2)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib2 + ic2 - 1)/2` shall be selected. +
+
 Using the selected `(i2, i1)`, the three-dimensional cartesian interpolation coefficients are found from + 
 `s1 = s(ia1, ib1, i1);`
 `s2 = s(ia2, ic2, i2);` +
