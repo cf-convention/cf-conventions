@@ -71,17 +71,17 @@ Note that, for simplicity of notation, the descriptions of the interpolation met
 |=============== 
 | |Description | Formula 
 
+| `sqrt` | Square Root | `s = sqrt(t)`
+
+| `atan2` | Inverse Tangent of y/x | `a = atan2(y, x)`
+
 | `fll2v` | Conversion from geocentric `(latitude, longitude)` to three-dimensional cartesian vector `(x, y, z)` | `(x, y, z) = fll2v(ll) = (cos(ll.lat)*cos(ll.lon), cos(ll.lat)*sin(ll.lon), sin(ll.lat))` +
 
-| `fv2ll` | Conversion from three-dimensional cartesian vector `(x, y, z)` to geocentric `(latitude, longitude)`| `(lat, lon) = fv2ll(v) = (fatan2(v.z, fsqrt(v.x * v.x + v.y * v.y)), fatan2(v.y, v.x))` +
+| `fv2ll` | Conversion from three-dimensional cartesian vector `(x, y, z)` to geocentric `(latitude, longitude)`| `(lat, lon) = fv2ll(v) = (atan2(v.z, sqrt(v.x * v.x + v.y * v.y)), atan2(v.y, v.x))` +
  
 | `faz2v` | Conversion from `(azimuth, zenith)` angles to three-dimensional cartesian vector `(x, y, z)` | `(x, y, z) = faz2v(az) = (sin(az.zenith) * sin(az.azimuth), sin(az.zenith) * cos(az.azimuth), cos(az.zenith))` +
 
-| `fv2az` | Conversion from three-dimensional cartesian vector `(x, y, z)` to `(azimuth, zenith)` angles | `(azimuth, zenith) = fv2az(v) = (fatan2(y, x), fatan2(fsqrt(x * x + y * y), z))` +
-
-| `fsqrt` | Square Root | `s = fsqrt(t)`
-
-| `fatan2` | Inverse Tangent of y/x | `a = fatan2(y, x)`
+| `fv2az` | Conversion from three-dimensional cartesian vector `(x, y, z)` to `(azimuth, zenith)` angles | `(azimuth, zenith) = fv2az(v) = (atan2(y, x), atan2(sqrt(x * x + y * y), z))` +
 
 | `fplus` | Vector Sum | `(x, y, z) = fplus(va , vb) = (va.x + vb.x, va.y + vb.y, va.z + vb.z)` + 
 `(x, y, z) = fplus(va , vb, vc) = (va.x + vb.x + vc.x, va.y + vb.y + vc.y, va.z + vb.z + vc.z)` 
@@ -202,7 +202,7 @@ Then calculate the three-dimensional cartesian representation of the interpolati
 where +
 `vr = fmultiply(0.5, fplus(va, vb))`; + 
 `rsqr = fdot(vr, vr);` +
-`cr = fsqrt(1 - ce(is)*ce(is) - ca(is)*ca(is)) - fsqrt(rsqr).` +
+`cr = sqrt(1 - ce(is)*ce(is) - ca(is)*ca(is)) - sqrt(rsqr).` +
 If the flag `location_use_3d_cartesian` of the interpolation parameter term `interpolation_subarea_flags(is2, is1)` is set, use the following expression to reconstitute any point `llp(i)` between the tie points `A` and `B` using interpolation in three-dimensional cartesian coordinates + 
 `vp(i) = fqv(va, vb, cv, s(i)) = (fq(va.x, vb.x, cv.x, s(i)), fq(va.y, vb.y, cv.y, s(i)), fq(va.z, vb.z, cv.z, s(i)));` +
 `llp(i) = fv2ll(vp(i)).` +
