@@ -251,7 +251,7 @@ The mandatory term `interpolation_subarea_flags`, specifying a flag variable spa
 | Coordinate Compression Calculations | 
 First calculate the tie point vector representations from the tie point latitude-longitude representations +
 `va = fll2v(lla);  vb = fll2v(llb); vc = fll2v(llc); vd = fll2v(lld).` +
-Then calculate the three-dimensional cartesian representation of the interpolation coefficients sets from the tie points as well as a point `vp(i2, i1)` between the tie points. If the number of points in the first dimension of the interpolation subarea `(ib1 - ia1 + 1)` is odd, then the data point at index i = `(ib1 + ia1)/2` shall be selected for this calculation, otherwise the data point at index `i = (ib1 + ia1 - 1)/2` shall be selected. If the number of points in the second dimension of the interpolation subarea `(ic2 - ia2 + 1)` is odd, then the data point at index `i = (ic2 + ica)/2` shall be selected for this calculation, otherwise the data point at index `i = (ic2 + ia2 - 1)/2` shall be selected. +
+Then calculate the three-dimensional cartesian representation of the interpolation coefficients sets from the tie points as well as a point `vp(i2, i1)` between the tie points. If the number of points in the first dimension of the interpolation subarea `(ib1 - ia1 + 1)` is odd, then the data point at index i1 = `(ib1 + ia1)/2` shall be selected for this calculation, otherwise the data point at index `i1 = (ib1 + ia1 - 1)/2` shall be selected. If the number of points in the second dimension of the interpolation subarea `(ic2 - ia2 + 1)` is odd, then the data point at index `i2 = (ic2 + ica)/2` shall be selected for this calculation, otherwise the data point at index `i2 = (ic2 + ia2 - 1)/2` shall be selected. +
 
 Using the selected `(i2, i1)`, the three-dimensional cartesian interpolation coefficients are found from + 
 `s1 = s(ia1, ib1, i1);`
@@ -294,11 +294,11 @@ where +
 `vz = fqv(vab, vcd, cv_z, s2);` +
 `cv_zz = fcv(vac, vbd, vz, 0.5);` +
 Otherwise, first calculate latitude-longitude representation of the interpolation coefficients + 
-`llc_ac = fcll(lla, llc, fv2ll(fqv(va, vc, cv_ac, 0.5)), 0.5);` +
-`llc_bd = fcll(llb, lld, fv2ll(fqv(vb, vd, cv_bd, 0.5)), 0.5);` +
+`llc_ac = fcll(lla, llc, fv2ll(fqv(va, vc, cv_ac, 0.5)));` +
+`llc_bd = fcll(llb, lld, fv2ll(fqv(vb, vd, cv_bd, 0.5)));` +
 `llab = fv2ll(vab);` +
 `llcd = fv2ll(vcd);` +
-`llc_z = fcll(llab, llcd, fv2ll(fqv(vab, vcd, cv_z, 0.5)), 0.5);` +
+`llc_z = fcll(llab, llcd, fv2ll(fqv(vab, vcd, cv_z, 0.5)));` +
 Then use the following expression to reconstitute any point `llp(i2, i1)` in the interpolation subarea using interpolation in latitude-longitude coordinates + 
 `llp(i2, i1) = fqll(llac, llbd, cl_zz, s(ia1, ib1, i1));` +
 where +
@@ -306,7 +306,7 @@ where +
 `llac = fqll(a, c, llc_ac, s2);` +
 `llbd = fqll(b, d, llc_bd, s2);` +
 `llz = fqll(llab, llcd, llc_z, s2);` +
-`cl_zz = fcll(llac, llbd, llz, 0.5);` +
+`cl_zz = fcll(llac, llbd, llz);` +
 |===============   
 
 [[quadratic3]]
