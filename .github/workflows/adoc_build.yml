@@ -14,14 +14,14 @@
 # on the gh-pages branch in a directory named after the release (e.g. v1.9.0/).
 #
 # For more information on the actions used in this workflow, please see:
-#   https://github.com/actions/checkout 
+#   https://github.com/actions/checkout
 #   https://github.com/Analog-inc/asciidoctor-action
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
 #
 name: Asciidoctor Build Workflow
 on:
-  # trigger on PR event against main (will not run publish job) 
+  # trigger on PR event against main (will not run publish job)
   pull_request:
     branches: [ main ]
   # Trigger on a push to main (a PR is merged), or when a release is
@@ -122,7 +122,7 @@ jobs:
           ref: 'gh-pages'
       # Will new docs go into root, or into a directory named after the
       # release?
-      - name: Determin where the new documents should live
+      - name: Determine where the new documents should live
         run: |
           if [[ ${{ github.event_name }} == 'release' ]]; then
             # ${GITHUB_REF##*/} -> turns refs/tags/vM.m.p into vM.m.p
@@ -135,7 +135,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           path: build/
-      # If we are doing a release, we need to create the release directory 
+      # If we are doing a release, we need to create the release directory
       - name: Make release directory
         if: github.event_name == 'release'
         run: mkdir -p ${{ env.TARGET_DIR }}
@@ -158,9 +158,9 @@ jobs:
         run: rm -rf build/
       # If we are doing a release, update the index.html file to reflect the new
       # latest release version.
-      - name: Update release index.html to point to new release 
+      - name: Update release index.html to point to new release
         if: github.event_name == 'release'
-        run: |        
+        run: |
           sed s/Latest/"${GITHUB_REF##*/}"/ index.html > ${{ env.TARGET_DIR }}/index.html;
       # Stage all changed files to git
       - name: Add all changes to git
@@ -173,4 +173,3 @@ jobs:
           git config user.email github-actions@github.com
           git commit -m "Auto-generated from ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
           git push
-
