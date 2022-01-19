@@ -3,7 +3,7 @@
 #
 # cfdm_field.gv created with:
 #
-# $ dot -T svg cfdm_field.gv cfdm_field.svg
+# $ dot -T svg cfdm_field.gv -o cfdm_field.svg
 # ====================================================================
 
 digraph {splines=ortho nodesep="+0.25"
@@ -34,9 +34,12 @@ DataVariable [
 # --------------------------------------------------------------------
 Domain [
        label="<<construct>>\nDomain"
+       width=2.5
+       height=1
        ]
 Field [				      
       label="<<construct>>\nField"
+      height=1
       ]
 CellMethod [
 	   label="<<construct>>\nCellMethod"
@@ -52,6 +55,7 @@ CellMeasure [
 	    ]
 CoordinateReference [
 		    label="<<construct>>\nCoordinateReference "
+		    width=2.75
 		    ]
 AuxiliaryCoordinate [
 		    label="<<construct>>\nAuxillaryCoordinate"
@@ -61,6 +65,9 @@ DimensionCoordinate [
 		    ]
 FieldAncillary [
 	       label="<<construct>>\nFieldAncillary"
+	       ]
+DomainTopology [
+	       label="<<construct>>\nDomainTopology"
 	       ]
 GenericCoordinate [
 		  label="<<abstract>>\nGeneric\nCoordinate\nConstruct"
@@ -86,6 +93,10 @@ route6
 route7
 route8
 route9
+route10
+route11
+route12
+route13
 
 DataVariable -> Field [dir=back arrowtail=vee weight=100]
 
@@ -104,7 +115,8 @@ edge [arrowtail=vee
       labelfontsize=11.0
       ]
 
-Domain -> GenericCoordinate [taillabel="0..*   " weight=100]
+Domain -> route11 [arrowtail=diamond arrowhead=none weight=100]
+route11 -> GenericCoordinate [arrowhead=vee arrowtail=none headlabel="0..*   " weight=100]
 route2 -> CellMethod [arrowhead=vee arrowtail=none headlabel="0..*   "
                       weight=100]
 route1 -> FieldAncillary [arrowhead=vee arrowtail=none headlabel="0..*  "
@@ -119,21 +131,24 @@ route6 -> CoordinateReference [arrowtail=none arrowhead=vee headlabel="0..*  "]
 Domain -> route7 [arrowtail=diamond arrowhead=none]
 route7-> CellMeasure [headlabel="0..*  " arrowhead=vee arrowtail=none]
 Domain -> DomainAncillary [headlabel="0..*  " arrowhead=vee arrowtail=diamond]
-FieldAncillary -> Domain [label="uses      \nparent        "
+FieldAncillary -> Domain [label="uses             \nparent               "
                           arrowhead=vee arrowtail=none labelfontsize=11.0] 
 
-DomainVariable -> route9 [dir=back arrowtail=vee]
-route9 -> Domain [arrowtail=none arrowhead=none]
 
 {rank=same; DomainVariable, DataVariable}
-{rank=same; route9, FieldAncillary}
 
+route9 -> Domain [dir=none]
+DomainVariable -> route9 [arrowtail=vee, arrowhead=none, weight=100]
+{rank=same; route1, route9}
+
+
+Domain -> DomainTopology [taillabel="0..*   " weight=100]
 
 GenericCoordinate -> route4 [arrowhead=none arrowtail=empty weight=100]
-route4 -> AuxiliaryCoordinate [dir=none]
+route4 -> AuxiliaryCoordinate [dir=none weight=100]
 {rank=same; route4, AuxiliaryCoordinate}
-route4 -> route5 [dir=none]
-route5 -> DimensionCoordinate [dir=none]
+route4 -> route5 [dir=none weight=100]
+route5 -> DimensionCoordinate [dir=none weight=100]
 {rank=same; route5, DimensionCoordinate}
 {rank=same;DomainAncillary, GenericCoordinate, route7, CellMeasure}
 
@@ -155,7 +170,8 @@ route3 -> CoordinateReference [dir=none]
 # --------------------------------------------------------------------
 DomainAxis -> AuxiliaryCoordinate [style=invis]
 DomainAxis -> CellMeasure [style=invis weight=100]
-CellMeasure -> AuxiliaryCoordinate [style=invis]
+CellMeasure -> AuxiliaryCoordinate [style=invis weight=100]
 AuxiliaryCoordinate -> DimensionCoordinate[style=invis weight=100]
-
+DomainVariable -> FieldAncillary [style=invis weight=100]
+route9 -> route1 [style=invis weight=100]
 }
