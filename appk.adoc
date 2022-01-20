@@ -4,13 +4,26 @@
 [appendix]
 == Mesh topologies
 
-link:$$https://ugrid-conventions.github.io/ugrid-conventions$$[UGRID conventions]
+A mesh topology is the interconnection of various geometrical elements
+of a domain on which data is defined. A __mesh topology variable__
+defines one or more domains, each of which has its own mesh topology,
+and the topological connections between the domains are also
+defined. For instance, <<cdl-mesh-topology-variable, Example K.1>>
+shows a mesh topology variable that defines a 2D triangular mesh
+topology comprising three domains: one at the triangular element
+nodes, one along the triangular element edges, and one on the
+triangular faces. The nodes that define each edge, and the edges that
+define each triangular face are also identified.
+
+A __location index set__ variable defines a subset of locations of another mesh topology, e.g. only boundary points or special locations like weirs and gates.
+It is provided as a space saving device to prevent the need to redefine parts of an existing mesh topology variable, and as such is logically equivalent to a mesh topology variable.
+
+The canonical definitions of mesh topology and location index set variables are described in the UGRID conventions <<UGRID>>, but the standardized attributes are listed here for convenience.
 
 The "Type" values are **S** for string, and **I** for integer.
 The "Use" values are **MT** for mesh topology variables, **LIS** for location index set variables, **D** for data variables, and **Do** for domain variables
 
-
-[[table-attributes]]
+[[table-mesh-topology-attributes]]
 .Mesh topology attributes
 [options="header",cols="6,2,4,12",caption="Table K.1. "]
 |===============
@@ -83,7 +96,7 @@ Attribute
 | **`location_index_set`**
 | S
 | D, Do
-| Specifies a variable that defines the subset of locations of a mesh topology at which the variable is defined, e.g. only at boundary points or at special locations like weirs and gates.
+| Specifies a variable that defines the subset of locations of a mesh topology at which the variable is defined.
 
 | **`mesh`**
 | S
@@ -135,3 +148,78 @@ Attribute
 | MT, LIS
 | Specifies an index variable identifying all volumes that share a face with each volume, i.e. are neighbours.
 |===============
+
+
+[[cdl-mesh-topology-variable]]
+[caption=""]
+.Example K.1 A 2D triangular mesh topology variable.
+====
+----
+dimensions:
+  nMesh2_node = 4 ; // nNodes
+  nMesh2_edge = 5 ; // nEdges
+  nMesh2_face = 2 ; // nFaces
+  
+variables:
+  // Mesh topology variable
+  integer Mesh2 ;
+    Mesh2:cf_role = "mesh_topology" ;
+    Mesh2:long_name = "Topology data of 2D unstructured mesh" ;
+    Mesh2:topology_dimension = 2 ;
+    Mesh2:node_coordinates = "Mesh2_node_x Mesh2_node_y" ;
+    Mesh2:face_node_connectivity = "Mesh2_face_nodes" ;
+    Mesh2:face_dimension = "nMesh2_face" ;
+    Mesh2:edge_node_connectivity = "Mesh2_edge_nodes" ;
+    Mesh2:edge_dimension = "nMesh2_edge" ;
+    Mesh2:edge_coordinates = "Mesh2_edge_x Mesh2_edge_y" ;
+    Mesh2:face_coordinates = "Mesh2_face_x Mesh2_face_y" ;
+    Mesh2:face_edge_connectivity = "Mesh2_face_edges" ;
+    Mesh2:face_face_connectivity = "Mesh2_face_links" ;
+    Mesh2:edge_face_connectivity = "Mesh2_edge_face_links" ;
+
+  // Connectivity variables
+  integer Mesh2_face_nodes(nMesh2_face, Three) ;
+    Mesh2_face_nodes:long_name = "Maps every triangular face to its three corner nodes." ;
+  integer Mesh2_edge_nodes(nMesh2_edge, Two) ;
+    Mesh2_edge_nodes:cf_role = "edge_node_connectivity" ;
+    Mesh2_edge_nodes:long_name = "Maps every edge to the two nodes that it connects." ;
+  integer Mesh2_face_edges(nMesh2_face, Three) ;
+    Mesh2_face_edges:cf_role = "face_edge_connectivity" ;
+    Mesh2_face_edges:long_name = "Maps every triangular face to its three edges." ;
+  integer Mesh2_face_links(nMesh2_face, Three) ;
+    Mesh2_face_links:cf_role = "face_face_connectivity" ;
+    Mesh2_face_links:long_name = "neighbor faces for faces" ;
+    Mesh2_face_links:_FillValue = -999 ;
+    Mesh2_face_links:comment = "missing neighbor faces are indicated using _FillValue" ;
+  integer Mesh2_edge_face_links(nMesh2_edge, Two) ;
+    Mesh2_edge_face_links:cf_role = "edge_face_connectivity" ;
+    Mesh2_edge_face_links:long_name = "neighbor faces for edges" ;
+    Mesh2_edge_face_links:_FillValue = -999 ;
+    Mesh2_edge_face_links:comment = "missing neighbor faces are indicated using _FillValue" ;
+
+  // Data at faces, edges, and nodes
+  double volume_at_faces(nMesh2_face) ;
+    volume_at_faces:long_name = "volumes" ;
+    volume_at_faces:units = "m3" ;
+    volume_at_faces:mesh = "Mesh2" ;
+    volume_at_faces:location = "face" ;
+    volume_at_faces:coordinates = "Mesh2_face_x Mesh2_face_y" ;
+  double flux_at_edges(nMesh2_edge) ;
+    fluxe_at_edges:long_name = "flux across edge" ;
+    fluxe_at_edges:units = "m3 s-1" ;
+    fluxe_at_edges:mesh = "Mesh2"
+    fluxe_at_edges:location = "edge" ;
+    fluxe_at_edges:coordinates = "Mesh2_edge_x Mesh2_edge_y" ;
+  double volume_at_nodes(nMesh2_node) ;
+    volume_at_facess:long_name = "volumes" ;
+    volume_at_facess:units = "m3" ;
+    volume_at_facess:mesh = "Mesh2" ;
+    volume_at_facess:location = "node" ;
+    volume_at_facess:coordinates = "Mesh2_node_x Mesh2_node_y" ;
+----
+
+A mesh topology variable that defines a 2D triangular mesh topology comprising three domains: one at the triangular element nodes, one along the triangular element edges, and one on the triangular faces.
+Each data variable selects exactly one of these for its domain.
+The auxiliary coordinate variables identified by the **`node_coordinates`**, **`edge_coordinates`**, and **`face_coordinates`** mesh topology variable attributes have been omitted from the CDL for clarity.
+
+====
