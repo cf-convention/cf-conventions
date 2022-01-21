@@ -116,7 +116,10 @@ CF-netCDF element
 | Metadata that depends on the domain
 
 | Mesh topology variable
-| Domain(s) with cell connectivity
+| One or more related domains with cell connectivity
+
+| Location index set variable
+| A domain with cell connectivity
 
 | Formula terms attribute
 | Vertical coordinate system
@@ -293,11 +296,18 @@ construct) and relates the following metadata constructs
 All of the constructs contained by the domain construct are optional
 (as indicated by "0.." in <<figure-field, Figure I.2>>).
 
-In CF-netCDF, domain information is stored either implicitly via data
-variable attributes (such as `coordinates`), or explicitly in a domain
-variable. In the latter case, the domain exists without reference to a
-data array.
+In CF-netCDF, domain information may be stored in a number of ways:
 
+* implicitly via data variable attributes (such as `coordinates`);
+
+* explicitly in a domain variable;
+
+* explicitly in a mesh topology variable, in which case the domain may be one of multiple domains defined by the same variable (for instance, a single mesh topology variable could contain different domains defined respectively at node, edge, and face elements);
+
+* explicitly in a location index set variable that references a subset of another domain defined by a mesh topology variable.
+
+For the explicit cases, the domain exists without reference to a data array.
+  
 [[data-model-domain-axis-construct-and-the-data-array]]
 ==== Domain axis construct and the data array
 
@@ -334,7 +344,7 @@ of the domain axis constructs, properties to describe the coordinates
 (in the same sense as for the field construct), an optional data array
 of cell bounds recording the extents of each cell, and any extra
 arrays needed to interpret the cell bounds values. The data array of
-the coordinate values is required, execpt for the special cases
+the coordinate values is required, except for the special cases
 described below.
 
 There are two distinct types of coordinate construct: dimension
@@ -636,13 +646,14 @@ that is external to CF.
 In CF-netCDF a domain topology can only be provided for a domain
 defined by a UGRID mesh topology variable. In this case, the
 connectivity array is supplied by a UGRID connectivity variable, such
-as a "face_face_connectivity" variable. The information represented by
-the symmetrical connectivity array of the domain topology construct in
-the CF data model is stored in a different but equivalent way in
-UGRID. The trailing dimension of a UGRID connectivity variable's data
-records, for each cell, the indices of the other cells to which it is
-connected (padded with missing data if a cell has fewer connections
-than some others).
+as a "face_face_connectivity" variable, that is referenced from a mesh
+topology variable. The information represented by the symmetrical
+connectivity array of the domain topology construct in the CF data
+model is stored in a different but equivalent way in UGRID. The
+trailing dimension of a UGRID connectivity variable's data records,
+for each cell, the indices of the other cells to which it is connected
+(padded with missing data if a cell has fewer connections than some
+others).
 
 [[data-model-field-ancillary]]
 ==== Field ancillary constructs
