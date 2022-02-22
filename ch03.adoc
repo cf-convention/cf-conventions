@@ -34,16 +34,21 @@ Udunits recognizes the following prefixes and their abbreviations.
 The Udunits syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard. The application of any scale factors or offsets to data should be indicated by the **`scale_factor`** and **`add_offset`** attributes. Use of these attributes for data packing, which is their most important application, is discussed in detail in <<packed-data>>.
 
 [[special-units, Section 3.1.1, "Special Units"]]
-=== Special Units
+=== Units and quantities that requires special considerations
+
+==== Degrees (angular units)
 
 The COARDS convention prohibits the unit `degrees` altogether, but this unit is not forbidden by the CF convention because it may in fact be appropriate for a variable containing, say, solar zenith angle. The unit `degrees` is also allowed on coordinate variables such as the latitude and longitude coordinates of a transformed grid. In this case the coordinate values are not true latitudes and longitudes which must always be identified using the more specific forms of `degrees` as described in <<latitude-coordinate>> and <<longitude-coordinate>>.
 
+==== Dimensionless vertical coordinates
+
 The units `level`, `layer`, and `sigma_level` are allowed for dimensionless vertical coordinates to maintain backwards compatibility with COARDS. These units are not compatible with Udunits and are deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are introduced (see <<dimensionless-vertical-coordinate>>).
 
-A temperature quantity (including a power of temperature) either refers to a "position-on-scale" quantity (i.e. how warm an object is in relation to the origin of the scale), or to a "difference" quantity (i.e. how much warmer one object is in relation to another object).
-The position-on-scale quantity is a difference between one temperature quantity and a fixed origin that is intrinsic to the definition of the temperature scale itself; and the difference quantity is the difference between two temperature quantities only depending on their relative position on a measurement scale.
-Discerning between these two types of temperature measurement is not possible from the **`units`** attribute alone, for which all valid Udunits temperature values (such as `K`, `degree_Celsius`, `K2`, etc.) could refer to either type, and may not be possible even when the **`standard_name`** (including any standard name modifiers, see <<standard-name>>), **`long_name`** (see <<long-name>>), or **`cell_methods`** (see <<cell-methods>>) attributes are also present.
-Temperature is special, compared with other quantities, in that it is a quantity that is most commonly stored using measurement scales with different offsets, and so cannot be analysed reliably without explicit knowledge of the measurement type.
+==== Temperature units
+
+Temperature is special, compared with other quantities, in that it is a quantity that is most commonly stored using measurement scales with different offsets. Consequently, it is important to distinguish when a temperature unit (including a power of temperature) either refers to a "position-on-scale" quantity (i.e. how warm an object is in relation to the origin of the scale), or to a "difference" quantity (i.e. how much warmer one object is in relation to another object).
+The position-on-scale quantity is a difference between one temperature quantity and a fixed origin that is intrinsic to the definition of the temperature scale itself (i.e. the offset is essential for interpreting the unit); and the difference quantity is the difference between two temperature quantities only depending on their relative position on a measurement scale (i.e. the offset is not important for interpreting the unit).
+Discerning between these two types of temperature measurement is not possible from the **`units`** attribute alone, for which all valid Udunits temperature values (such as `K`, `degree_Celsius`, `K2`, etc.) could refer to either type, and may not be possible even when the **`standard_name`** (including any standard name modifiers, see <<standard-name>>), **`long_name`** (see <<long-name>>), or **`cell_methods`** (see <<cell-methods>>) attributes are also present. That is, they cannot be analysed reliably without explicit knowledge of the measurement type.
 Therefore, whenever a (power of) temperature quantity is stored, it is a requirement to also include the **`temperature_context`** attribute which indicates which measurement type applies, with a string value of `position_on_scale` or `difference`.
 This attribute was introduced in CF-1.10, and for versions prior to CF-1.10 it may not be possible to ascertain the temperature measurement type from the available metadata.
 
