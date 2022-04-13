@@ -31,6 +31,7 @@ Practically all changes should be documented and discussed in an issue fixed in 
 1. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.**
 Currently this is achieved by using an appropriate issue template when creating a [new issue](https://github.com/cf-convention/cf-conventions/issues/new/choose).
 1. **Comments in pull requests.** These should be avoided, unless discussing changes to the wording of a proposal that do not impact on the agreed meaning. This is so that the scientific development of the proposal is easily found in one place, i.e. the GitHub issue.
+2. **Role of the issue moderator.** Each issue should have a moderator who guides the discussion through the change process and summarises it occasionally. This is described in greater detail in the [CF Conventions Rules](http://cfconventions.org/rules.html).
 
 ## Issues and pull requests
 Note that it takes a minimum of three weeks for a change to the content of the CF Conventions to be merged into the Convention's next version.
