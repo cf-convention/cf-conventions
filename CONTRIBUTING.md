@@ -41,6 +41,15 @@ All new pull requests should be submitted to the master branch of this repositor
 It is recommended that pull requests are created on a branch of a personal fork of this repository.
 Use of other branches is at the discretion of the repository administrators.
 
+## Moderating proposals
+The rules foresee a moderator for proposals.
+Moderators summarise the discussion in an issue by updating the issue's description occasionally.
+When they do so, they make a comment in the issue.
+This ensures that all watchers are notified, and records the moderator’s summary as part of the discussion for future reference.
+
+When discussions around an issue have concluded positively, the moderator announces the merge date.
+A maintainer (who might be the moderator!) merges the issue at earliest on the announced date.
+
 ## Merging of pull requests, and closing and reopening of issues
 
 When an issue and accompanying pull request concludes with an agreed change to the conventions, the pull request is merged into the master branch according to the [Rules for CF Convention Changes](http://cfconventions.org/rules.html).
