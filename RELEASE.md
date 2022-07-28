@@ -1,6 +1,7 @@
 # Release process for a new version of the CF conventions
+Complete the following steps in the order presented.
 
-### 1. Documents
+## Documents
 
 * Check that the version (e.g. `1.10`) in `cf-conventions.adoc` is correct.
 * Set the release date in `cf-conventions.adoc`.
@@ -12,8 +13,7 @@
   them.
 
 
-### 2. Repository
-
+## Repository
 When all Pull Requests have been merged:
 
 * Tag the `main` branch with the new version (e.g. `v1.10.0`).
@@ -29,28 +29,23 @@ When all Pull Requests have been merged:
   * `conformance.html`
   * `conformance.pdf`
 
-### 3. Set new draft version
-
+## Set new draft version
 * Set the new *next* version in `cf-conventions.adoc`, and change the
   release date to "draft"
 * Set the new *next* version in `conformance.adoc`.
 
-## Move to the cf-convention.github.io repository
-
-### 4. At cf-convention.github.io, add the release documents
-
-* Commit the new release documents into the `Data` folder as follows:
+## Add the release documents
+* Move to the cf-convention.github.io repository
+* Commit the new release documents into the `Data` folder as follows, where `<vn>` is replaced with the new version (e.g. `1.10`):
   * `Data/cf-conventions/cf-conventions-<vn>/cf-conventions.html`
   * `Data/cf-conventions/cf-conventions-<vn>/cf-conventions.pdf`
   * `Data/cf-conventions/cf-conventions-<vn>/images/*`
   * `Data/cf-documents/requirements-recommendations/conformance-<vn>.html`
-     
-   where `<vn>` is replaced with the new version (e.g. `1.10`). Ensure
-   that the PDF file is not stored with LFS. These documents are
+* Ensure that the PDF file is not stored with LFS. These documents are
    available as Artefacts from the latest GitHub Actions run in the
    cf-conventions repository.
 
-### 5. At cf-convention.github.io, update website links and headings for the new version
+## At cf-convention.github.io, update website links and headings for the new version
 
 * The following files need updating (although be aware that changes
   to the web site may introduce new links in other files, in which
