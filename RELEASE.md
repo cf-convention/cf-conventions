@@ -19,7 +19,7 @@
 
 When all Pull Requests have been merged:
 
-* Tag the master branch with the new version (e.g. `v1.10.0`).
+* Tag the `main` branch with the new version (e.g. `v1.10.0`).
 
 * Create a new "Latest release" that contains a link to the Pull
   Requests that contributed to the new version. Include a link to the
