@@ -8,23 +8,26 @@
 
 * Check that the version in `conformance.adoc` is correct.
 
-* Check that the history in `history.adoc` is up to date. Every Pull
-  Request merged to the convention document should be
-  referenced. Check that all merged Pull Requests that contributed to
-  the new version have the appropriate GitHub Milestone attached to
-  them.
+* Check that all merged Pull Requests that contributed to the new
+  version have the correct GitHub Milestone
+  (https://github.com/cf-convention/cf-conventions/milestones)
+  attached to them - the milestone has the same name as the new
+  version (e.g. `1.10`).
 
+* Check that the history in `history.adoc` is up to date. Every Pull
+  Request merged to the convention document should be referenced.
 
 ### 2. Repository
-
-When all Pull Requests have been merged:
 
 * Tag the master branch with the new version (e.g. `v1.10.0`).
 
 * Create a new "Latest release" that contains a link to the Pull
-  Requests that contributed to the new version. Include a link to the
-  contributing the Pull Requests labelled with the appropriate GitHub
-  milestone.
+  Requests that contributed to the new version:
+  https://github.com/cf-convention/cf-conventions/releases. Include a
+  link to the list of contributing the Pull Requests that are labelled
+  with the new version's GitHub milestone. This link is found via
+  https://github.com/cf-convention/cf-conventions/milestones, from
+  where you select the version, and then view the "Closed" items.
 
 (It is possible to combine these two items whilst setting up the new
 latest release in GitHub.)
@@ -44,7 +47,7 @@ latest release in GitHub.)
 
 * Set the new *next* version in `conformance.adoc`.
 
-## Move to the cf-convention.github.io repository
+## Move to the https://github.com/cf-convention/cf-convention.github.io repository
 
 ### 4. At cf-convention.github.io, add the release documents
 
@@ -75,5 +78,6 @@ latest release in GitHub.)
 ## Announce the release
 
 * Wait until all changes are visible via the web site, and then
-  announce the release on `cf-convention/discuss/issues`. There may
-  already be a open issue in which to do this.
+  announce the release on the `discuss` repo issue tracker:
+  https://github.com/cf-convention/discuss/issues/new. (Note: There
+  may already be a open issue in which to do this.)
