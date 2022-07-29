@@ -1,13 +1,11 @@
 # Release process for a new version of the CF conventions
+Complete the following steps in the order presented.
 
-### 1. Documents
+## Documents
 
 * Check that the version (e.g. `1.10`) in `cf-conventions.adoc` is correct.
-
 * Set the release date in `cf-conventions.adoc`.
-
 * Check that the version in `conformance.adoc` is correct.
-
 * Check that all merged Pull Requests that contributed to the new
   version have the correct GitHub Milestone
   (https://github.com/cf-convention/cf-conventions/milestones)
@@ -33,18 +31,15 @@
 latest release in GitHub.)
 
 * Get the new documents from the Artefacts of the latest GitHub Actions:
-
   * `cf-conventions.html`
   * `cf-conventions.pdf`
   * `images/*`
   * `conformance.html`
   * `conformance.pdf`
 
-### 3. Set new draft version
-
+## Set new draft version
 * Set the new *next* version in `cf-conventions.adoc`, and change the
   release date to "draft"
-
 * Set the new *next* version in `conformance.adoc`.
 
 ## Move to the https://github.com/cf-convention/cf-convention.github.io repository
@@ -57,18 +52,16 @@ latest release in GitHub.)
   * `Data/cf-conventions/cf-conventions-<vn>/cf-conventions.pdf`
   * `Data/cf-conventions/cf-conventions-<vn>/images/*`
   * `Data/cf-documents/requirements-recommendations/conformance-<vn>.html`
-     
-   where `<vn>` is replaced with the new version (e.g. `1.10`). Ensure
-   that the PDF file is not stored with LFS. These documents are
+
+* Ensure that the PDF file is not stored with LFS. These documents are
    available as Artefacts from the latest GitHub Actions run in the
    cf-conventions repository.
 
-### 5. At cf-convention.github.io, update website links and headings for the new version
+## At cf-convention.github.io, update website links and headings for the new version
 
 * The following files need updating (although be aware that changes
   to the web site may introduce new links in other files, in which
   case this list should be updated as part of the release):
-  
    * `documents.md`
    * `faq.md`
    * `latest.md`
