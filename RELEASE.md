@@ -30,7 +30,8 @@ Complete the following steps in the order presented.
 (It is possible to combine these two items whilst setting up the new
 latest release in GitHub.)
 
-* Get the new documents from the Artefacts of the latest GitHub Actions:
+* Get the new documents from the Artefacts of the latest GitHub Actions, found at https://github.com/cf-convention/cf-conventions/tree/gh-pages:
+
   * `cf-conventions.html`
   * `cf-conventions.pdf`
   * `images/*`
