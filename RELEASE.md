@@ -68,6 +68,11 @@ latest release in GitHub.)
    * `latest.md`
    * `requirements-and-recommendations.md`
    * `software.md`
+   
+## Update Conventions Contributors list
+Check the issues that have been closed since the last release.
+When closing an issue, the moderator will have mentioned any users whose contributions have been substantial enough to warrant addition to the [list of contributors](https://cfconventions.org/conventions_contributors.html).
+Add new users who need to be mentioned to `conventions_contributors.md`.
  
 ## Announce the release
 
