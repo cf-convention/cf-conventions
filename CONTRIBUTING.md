@@ -61,3 +61,5 @@ The person who merges the pull request also closes the issue.
 If subsequent discussion is required after the pull request has been merged then a new issue should be raised, rather than reopening the closed issue.
 An issue may be closed without the merging of a pull request if the change was not accepted by the community.
 In this case the issue may be reopened for further discussion at a later date.
+
+Whether or not a discussion concludes with a change of the Conventions, when closing an issue, the moderator should note in the final comment any users who have contributed significantly enough to warrant addition to the [CF Conventions Contributors List](https://cfconventions.org/conventions_contributors.html).
