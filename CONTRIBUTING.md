@@ -8,7 +8,7 @@ The netCDF Climate and Forecasting conventions are a product by and for a broad 
 This set of guidelines provides a brief overview of the practices and procedures that should be used in fixing, updating, or adding to the conventions.
 It builds on the [rules for CF Convention changes.](http://cfconventions.org/rules.html)
 
-As a prerequisite to this guide, please review the community's code of [conduct.](https://github.com/cf-convention/cf-conventions/blob/master/CODE_OF_CONDUCT.md)
+As a prerequisite to this guide, please review the community's code of [conduct.](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md)
 The CF community takes great pride in respectful and collegial discourse. Any disrespectful or otherwise derogatory communication will not be tolerated.
 
 These contribution guidelines are designed to make it easy to contribute to the
@@ -38,7 +38,7 @@ Note that it takes a minimum of three weeks for a change to the content of the C
 As the Conventions are published once a year, this means that the de facto "feature freeze" for a given version of the CF Conventions is three weeks before that year's annual meeting.
 
 Issues should attempt to follow the guidelines in the issue template as much as possible.
-All new pull requests should be submitted to the master branch of this repository.
+All new pull requests should be submitted to the main branch of this repository.
 It is recommended that pull requests are created on a branch of a personal fork of this repository.
 Use of other branches is at the discretion of the repository administrators.
 
@@ -53,7 +53,7 @@ A maintainer (who might be the moderator!) merges the issue at earliest on the a
 
 ## Merging of pull requests, and closing and reopening of issues
 
-When an issue and accompanying pull request concludes with an agreed change to the conventions, the pull request is merged into the master branch according to the [Rules for CF Convention Changes](http://cfconventions.org/rules.html).
+When an issue and accompanying pull request concludes with an agreed change to the conventions, the pull request is merged into the main branch according to the [Rules for CF Convention Changes](http://cfconventions.org/rules.html).
 
 The pull request is merged by a member of the Governance Panel or the CF Conventions and Standard Names Committee.
 The person who merges the pull request also closes the issue.
