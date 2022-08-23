@@ -48,11 +48,8 @@ When an issue and accompanying pull request concludes with an agreed change to t
 The pull request is merged by a member of the Governance Panel or the CF Conventions and Standard Names Committee. That person carries out these tasks:
 
 * Set a milestone of the next release on the pull request.
-
 * Merge the pull request.
-
 * Label the issue with `change agreed`.
-
 * Close the issue.
 
 If subsequent discussion is required after the pull request has been merged then a new issue should be raised, rather than reopening the closed issue.
