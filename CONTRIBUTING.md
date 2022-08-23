@@ -55,8 +55,12 @@ A maintainer (who might be the moderator!) merges the issue at earliest on the a
 
 When an issue and accompanying pull request concludes with an agreed change to the conventions, the pull request is merged into the master branch according to the [Rules for CF Convention Changes](http://cfconventions.org/rules.html).
 
-The pull request is merged by a member of the Governance Panel or the CF Conventions and Standard Names Committee.
-The person who merges the pull request also closes the issue.
+The pull request is merged by a member of the Governance Panel or the CF Conventions and Standard Names Committee. That person carries out these tasks:
+
+* Set a milestone of the next release on the pull request.
+* Merge the pull request.
+* Label the issue with `change agreed`.
+* Close the issue.
 
 If subsequent discussion is required after the pull request has been merged then a new issue should be raised, rather than reopening the closed issue.
 An issue may be closed without the merging of a pull request if the change was not accepted by the community.
