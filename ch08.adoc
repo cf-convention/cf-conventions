@@ -5,7 +5,7 @@
 
 There are three methods for reducing dataset size: packing, lossless compression, and lossy compression. By packing we mean altering the data in a way that reduces its precision (but has no other effect on accuracy). By lossless compression we mean techniques that store the data more efficiently and result in no loss of precision or accuracy. By lossy compression we mean techniques that store the data more efficiently and retain its precision but result in some loss in accuracy.
 
-Lossless compression only works in certain circumstances, e.g., when a variable contains a significant amount of missing or repeated data values. In this case it is possible to make use of standard utilities, e.g., UNIX **`compress`** or GNU **`gzip`** , to compress the entire file after it has been written. In this section we offer an alternative compression method that is applied on a variable by variable basis. This has the advantage that only one variable need be uncompressed at a given time. The disadvantage is that generic utilities that don't recognize the CF conventions will not be able to operate on compressed variables.
+Lossless compression only works in certain circumstances, e.g., when a variable contains a significant amount of missing or repeated data values. In this case it is possible to make use of standard utilities, e.g., UNIX **`compress`** or GNU **`gzip`**, to compress the entire file after it has been written. In this section we offer an alternative compression method that is applied on a variable by variable basis. This has the advantage that only one variable need be uncompressed at a given time. The disadvantage is that generic utilities that don't recognize the CF conventions will not be able to operate on compressed variables.
 
 
 
@@ -13,11 +13,11 @@ Lossless compression only works in certain circumstances, e.g., when a variable 
 [[packed-data, Section 8.1, "Packed Data"]]
 === Packed Data
 
-At the current time the netCDF interface does not provide for packing data. However a simple packing may be achieved through the use of the optional NUG defined attributes **`scale_factor`** and **`add_offset`** . After the data values of a variable have been read, they are to be multiplied by the **`scale_factor`** , and have **`add_offset`** added to them. If both attributes are present, the data are scaled before the offset is added. When scaled data are written, the application should first subtract the offset and then divide by the scale factor. The units of a variable should be representative of the unpacked data.
+At the current time the netCDF interface does not provide for packing data. However a simple packing may be achieved through the use of the optional NUG defined attributes **`scale_factor`** and **`add_offset`**. After the data values of a variable have been read, they are to be multiplied by the **`scale_factor`**, and have **`add_offset`** added to them. If both attributes are present, the data are scaled before the offset is added. When scaled data are written, the application should first subtract the offset and then divide by the scale factor. The units of a variable should be representative of the unpacked data.
 
-This standard is more restrictive than the NUG with respect to the use of the **`scale_factor`** and **`add_offset`** attributes; ambiguities and precision problems related to data type conversions are resolved by these restrictions. If the **`scale_factor`** and **`add_offset`** attributes are of the same data type as the associated variable, the unpacked data is assumed to be of the same data type as the packed data. However, if the **`scale_factor`** and **`add_offset`** attributes are of a different data type from the variable (containing the packed data) then the unpacked data should match the type of these attributes, which must both be of type **`float`** or both be of type **`double`** . An additional restriction in this case is that the variable containing the packed data must be of type **`byte`** , **`short`** or **`int`** . It is not advised to unpack an **`int`** into a **`float`** as there is a potential precision loss.
+This standard is more restrictive than the NUG with respect to the use of the **`scale_factor`** and **`add_offset`** attributes; ambiguities and precision problems related to data type conversions are resolved by these restrictions. If the **`scale_factor`** and **`add_offset`** attributes are of the same data type as the associated variable, the unpacked data is assumed to be of the same data type as the packed data. However, if the **`scale_factor`** and **`add_offset`** attributes are of a different data type from the variable (containing the packed data) then the unpacked data should match the type of these attributes, which must both be of type **`float`** or both be of type **`double`**. An additional restriction in this case is that the variable containing the packed data must be of type **`byte`**, **`short`** or **`int`**. It is not advised to unpack an **`int`** into a **`float`** as there is a potential precision loss.
 
-When data to be packed contains missing values the attributes that indicate missing values ( **`_FillValue`** , **`valid_min`** , **`valid_max`** , **`valid_range`** ) must be of the same data type as the packed data. See <<missing-data>> for a discussion of how applications should treat variables that have attributes indicating both missing values and transformations defined by a scale and/or offset.
+When data to be packed contains missing values the attributes that indicate missing values (**`_FillValue`**, **`valid_min`**, **`valid_max`**, **`valid_range`**) must be of the same data type as the packed data. See <<missing-data>> for a discussion of how applications should treat variables that have attributes indicating both missing values and transformations defined by a scale and/or offset.
 
 
 
@@ -27,7 +27,7 @@ When data to be packed contains missing values the attributes that indicate miss
 
 To save space in the netCDF file, it may be desirable to eliminate points from data arrays that are invariably missing. Such a compression can operate over one or more adjacent axes, and is accomplished with reference to a list of the points to be stored. The list is constructed by considering a mask array that only includes the axes to be compressed, and then mapping this array onto one dimension without reordering. The list is the set of indices in this one-dimensional mask of the required points. In the compressed array, the axes to be compressed are all replaced by a single axis, whose dimension is the number of wanted points. The wanted points appear along this dimension in the same order they appear in the uncompressed array, with the unwanted points skipped over. Compression and uncompression are executed by looping over the list.
 
-The list is stored as the coordinate variable for the compressed axis of the data array. Thus, the list variable and its dimension have the same name. The list variable has a string attribute **`compress`** , __containing a blank-separated list of the dimensions which were affected by the compression in the order of the CDL declaration of the uncompressed array__ . The presence of this attribute identifies the list variable as such. The list, the original dimensions and coordinate variables (including boundary variables), and the compressed variables with all the attributes of the uncompressed variables are written to the netCDF file. The uncompressed variables can be reconstituted exactly as they were using this information.
+The list is stored as the coordinate variable for the compressed axis of the data array. Thus, the list variable and its dimension have the same name. The list variable has a string attribute **`compress`**, __containing a blank-separated list of the dimensions which were affected by the compression in the order of the CDL declaration of the uncompressed array__. The presence of this attribute identifies the list variable as such. The list, the original dimensions and coordinate variables (including boundary variables), and the compressed variables with all the attributes of the uncompressed variables are written to the netCDF file. The uncompressed variables can be reconstituted exactly as they were using this information.
 
 [[horiz-compression-of-three-d-array-ex]]
 [caption="Example 8.1. "]
@@ -52,7 +52,7 @@ variables:
 data:
   landpoint=363, 364, 365, ...;
 ----
-Since `landpoint(0)=363` , for instance, we know that `landsoilt(*,0)` maps on to point 363 of the original data with dimensions `(lat,lon)` . This corresponds to indices `(3,75)` , i.e., `363 = 3*96 + 75` .
+Since `landpoint(0)=363`, for instance, we know that `landsoilt(*,0)` maps on to point 363 of the original data with dimensions `(lat,lon)`. This corresponds to indices `(3,75)`, i.e., `363 = 3*96 + 75`.
 ====
  
 [[compression-of-three-d-field-ex]]
@@ -70,7 +70,7 @@ variables:
   float lon(lon);
   double time(time);
 ----
-This information implies that the salinity field should be uncompressed to an array with dimensions `(depth,lat,lon)` .
+This information implies that the salinity field should be uncompressed to an array with dimensions `(depth,lat,lon)`.
 ====
 
 
@@ -594,8 +594,8 @@ given by the **`tie_point_mapping`** attribute.
 Coordinates may have cell bounds. For the case that the reconstituted cells are contiguous and have exactly two cell bounds along each interpolated dimension, cell bounds of interpolated dimensions can be stored as __bounds tie points__ and reconstituted through interpolation. In this process, the coordinate tie points are a prerequisite for the bounds tie points and the same interpolation method used for the coordinate interpolation is used for the bounds interpolation.  
 
 For the reconstituted coordinates, cell bounds are stored separately for each coordinate point, as shown in the left part of <<figure_interpolation_of_cell_boundaries>>
-for the example of 2D bounds. Since the cell bounds are contiguous, bounds points of adjacent cells will coincide and so the full set of bounds points may be represented as a grid, comparable to the coordinate points grid. In the middle part of <<figure_interpolation_of_cell_boundaries>>
-, both the reconstituted bounds points grid and the reconstituted coordinate points grid are shown for a continuous area, where each bounds point may be shared by up to four cells. 
+for the example of 2D bounds. Since the cell bounds are contiguous, bounds points of adjacent cells will coincide and so the full set of bounds points may be represented as a grid, comparable to the coordinate points grid. In the middle part of <<figure_interpolation_of_cell_boundaries>>, 
+both the reconstituted bounds points grid and the reconstituted coordinate points grid are shown for a continuous area, where each bounds point may be shared by up to four cells. 
 
 Bounds interpolation uses the same tie point index variables and therefore the same tie point cells as coordinate interpolation. One of the vertices of each coordinate tie point cell is chosen as the bounds tie point for the cell. It is selected as the vertex of the tie point cell that is the closest to the boundary of the interpolation subarea with respect to each interpolated dimension. For the example of 2D bounds, the resulting set of bounds tie points are marked in <<figure_interpolation_of_cell_boundaries>>, where the selected vertices are those closest to the corners of the interpolation subareas. 
 
@@ -645,7 +645,7 @@ The reconstitution of the full set of bounds from the bounds tie point is a two-
 For one-dimensional coordinate bounds, in the second step of the process, for each index `i` of the interpolated dimension, the two bounds of the boundary variable are set to the value of the interpolated bounds point grid at the indices `B0`  and `B1`, respectively, where the indices are defined above under <<compressing_one_dimensional>>.
 
 **Uncompression of two-dimensional coordinate bounds** +
-For two-dimensional coordinate bounds, in the second step of the process, for each index pair `(j, i)` of the interpolated dimension, the four bounds of the boundary variable is set to the value of the interpolated bounds point grid at index pairs `B0` , `B1`  , `B2`  and `B3`, respectively, where the index pairs are defined above under <<compressing_two_dimensional>>.
+For two-dimensional coordinate bounds, in the second step of the process, for each index pair `(j, i)` of the interpolated dimension, the four bounds of the boundary variable is set to the value of the interpolated bounds point grid at index pairs `B0`, `B1`, `B2` and `B3`, respectively, where the index pairs are defined above under <<compressing_two_dimensional>>.
 
 
 [[example_interpolation_of_cell_boundaries, Example 8.7]]
