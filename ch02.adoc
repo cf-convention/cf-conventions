@@ -13,38 +13,10 @@ NetCDF files should have the file name extension "**`.nc`**".
 
 === Data Types
 
-Data variables must be one of the following data types:
-**`string`**, **`char`**, **`byte`**, **`unsigned byte`**,
-**`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**,
-**`int64`**, **`unsigned int64`**, **`float`** or **`real`**, and **`double`**
-(which are all the [netCDF external data types](https://www.unidata.ucar.edu/software/netcdf/docs/data_type.html#external_types) supported by netCDF-4).
-The **`string`** type is only available in files using the netCDF version 4
-(netCDF-4) format.
-The **`char`** and **`string`** types are not intended for numeric data.
-One byte numeric data should be stored using the **`byte`** or **`unsigned byte`** data types.
-It is possible to treat the **`byte`** and **`short`** types as unsigned by using the NUG
-convention of indicating the unsigned range using the **`valid_min`**,
-**`valid_max`**, or **`valid_range`** attributes.
-In many situations, any integer type may be used.
-When the phrase "integer type" is used in this document,
-it should be understood to mean **`byte`**, **`unsigned byte`**,
-**`short`**, **`unsigned short`**,
-**`int`**, **`unsigned int`**, **`int64`**, or **`unsigned int64`**.
+// TODO: Check, should this be a bullet list?
+Data variables must be one of the following data types: **`string`**, **`char`**, **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**, **`int64`**, **`unsigned int64`**, **`float`** or **`real`**, and **`double`** (which are all the [netCDF external data types](https://www.unidata.ucar.edu/software/netcdf/docs/data_type.html#external_types) supported by netCDF-4).  The **`string`** type is only available in files using the netCDF version 4 (netCDF-4) format.  The **`char`** and **`string`** types are not intended for numeric data.  One byte numeric data should be stored using the **`byte`** or **`unsigned byte`** data types.  It is possible to treat the **`byte`** and **`short`** types as unsigned by using the NUG convention of indicating the unsigned range using the **`valid_min`**, **`valid_max`**, or **`valid_range`** attributes.  In many situations, any integer type may be used.  When the phrase "integer type" is used in this document, it should be understood to mean **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**, **`int64`**, or **`unsigned int64`**.
 
-Strings in variables may be represented one of two ways - as atomic strings or
-as character arrays.
-An n-dimensional array of strings may be implemented as a variable of type
-**`string`** with n dimensions, or as a variable of type **`char`** with n+1
-dimensions where the last (most rapidly varying) dimension is large enough to
-contain the longest string in the variable.
-For example, a character array variable of strings containing the names of the
-months would be dimensioned (12,9) in order to accommodate "September", the
-month with the longest name.
-The other strings, such as "May", should be padded with trailing NULL or space
-characters so that every array element is filled.
-If the atomic string option is chosen, each element of the variable can be
-assigned a string with a different length.
-The CDL example below shows one variable of each type.
+Strings in variables may be represented one of two ways - as atomic strings or as character arrays.  An n-dimensional array of strings may be implemented as a variable of type **`string`** with n dimensions, or as a variable of type **`char`** with n+1 dimensions where the last (most rapidly varying) dimension is large enough to contain the longest string in the variable.  For example, a character array variable of strings containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.  The other strings, such as "May", should be padded with trailing NULL or space characters so that every array element is filled.  If the atomic string option is chosen, each element of the variable can be assigned a string with a different length.  The CDL example below shows one variable of each type.
 
 [[char-and-string-variables-ex]]
 [caption="Example 1.1. "]
@@ -62,8 +34,7 @@ variables:
 ----
 ====
 
-The examples in this document that use string-valued variables alternate between
-these two forms.
+The examples in this document that use string-valued variables alternate between these two forms.
 
 
 
@@ -105,49 +76,15 @@ NetCDF variables that contain coordinate data are referred to as __coordinate va
 
 The NUG conventions
 (link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, Attribute Conventions])
-provide the **`_FillValue`**, **`missing_value`**,
-**`valid_min`**, **`valid_max`**, and **`valid_range`** attributes to indicate
-missing data. Missing data is allowed in data variables and auxiliary coordinate variables. 
-Generic applications should treat the data as missing where any auxiliary coordinate variables 
-have missing values; special-purpose applications might be able to make use of the data. 
-Missing data is not allowed in coordinate variables.
+provide the **`_FillValue`**, **`missing_value`**, **`valid_min`**, **`valid_max`**, and **`valid_range`** attributes to indicate missing data. Missing data is allowed in data variables and auxiliary coordinate variables.  Generic applications should treat the data as missing where any auxiliary coordinate variables have missing values; special-purpose applications might be able to make use of the data.  Missing data is not allowed in coordinate variables.
 
 The NUG conventions for missing data changed significantly between version 2.3 and version 2.4. Since version 2.4 the NUG defines missing data as all values outside of the **`valid_range`**, and specifies how the **`valid_range`** should be defined from the **`_FillValue`** (which has library specified default values) if it hasn't been explicitly specified. If only one missing value is needed for a variable then we recommend  that this value be specified using the **`_FillValue`** attribute. Doing this guarantees that the missing value will be recognized by generic applications that follow either the before or after version 2.4 conventions.
 
-The scalar attribute with the name **`_FillValue`** and of the same type as its
-variable is recognized by the netCDF library as the value used to pre-fill disk
-space allocated to the variable. This value is considered to be a special value
-that indicates undefined or missing data, and is returned when reading values
-that were not written. The **`_FillValue`** should be outside the range
-specified by **`valid_range`** (if used) for a variable. The netCDF library
-defines a default fill value for each data type
-(See the "Note on fill values" in link:$$http://www.unidata.ucar.edu/software/netcdf/docs/file_format_specifications.html#classic_format_spec$$[NUG Appendix B, File Format Specifications]).
+The scalar attribute with the name **`_FillValue`** and of the same type as its variable is recognized by the netCDF library as the value used to pre-fill disk space allocated to the variable. This value is considered to be a special value that indicates undefined or missing data, and is returned when reading values that were not written. The **`_FillValue`** should be outside the range specified by **`valid_range`** (if used) for a variable. The netCDF library defines a default fill value for each data type (See the "Note on fill values" in link:$$http://www.unidata.ucar.edu/software/netcdf/docs/file_format_specifications.html#classic_format_spec$$[NUG Appendix B, File Format Specifications]).
 
-The missing values of a variable with **`scale_factor`** and/or
-**`add_offset`** attributes (see <<packed-data>>) are
-interpreted relative to the variable's external values (a.k.a. the
-packed values, the raw values, the values stored in the netCDF file),
-not the values that result after the scale and offset are applied.
-Applications that process variables that have attributes to indicate
-both a transformation (via a scale and/or offset) and missing values
-should first check that a data value is valid, and then apply the
-transformation. Note that values that are identified as missing should
-not be transformed. Since the missing value is outside the valid range
-it is possible that applying a transformation to it could result in an
-invalid operation. For example, the default **`_FillValue`** is very
-close to the maximum representable value of IEEE single precision
-floats, and multiplying it by 100 produces an "Infinity" (using single
-precision arithmetic).
+The missing values of a variable with **`scale_factor`** and/or **`add_offset`** attributes (see <<packed-data>>) are interpreted relative to the variable's external values (a.k.a. the packed values, the raw values, the values stored in the netCDF file), not the values that result after the scale and offset are applied.  Applications that process variables that have attributes to indicate both a transformation (via a scale and/or offset) and missing values should first check that a data value is valid, and then apply the transformation. Note that values that are identified as missing should not be transformed. Since the missing value is outside the valid range it is possible that applying a transformation to it could result in an invalid operation. For example, the default **`_FillValue`** is very close to the maximum representable value of IEEE single precision floats, and multiplying it by 100 produces an "Infinity" (using single precision arithmetic).
 
-This convention defines a two-element vector attribute **`actual_range`** for
-variables containing numeric data. If the variable is packed using the
-**`scale_factor`** and **`add_offset`** attributes (see <<packed-data>>), the
-elements of the **`actual_range`** should have the type intended for the
-unpacked data. The elements of **`actual_range`** must be exactly equal to the
-minimum and the maximum data values which occur in the variable (when unpacked
-if packing is used), and both must be within the **`valid_range`** if
-specified. If the data is all missing or invalid, the **`actual_range`**
-attribute cannot be used.
+This convention defines a two-element vector attribute **`actual_range`** for variables containing numeric data. If the variable is packed using the **`scale_factor`** and **`add_offset`** attributes (see <<packed-data>>), the elements of the **`actual_range`** should have the type intended for the unpacked data. The elements of **`actual_range`** must be exactly equal to the minimum and the maximum data values which occur in the variable (when unpacked if packing is used), and both must be within the **`valid_range`** if specified. If the data is all missing or invalid, the **`actual_range`** attribute cannot be used.
 
 === Attributes
 
@@ -159,20 +96,11 @@ This standard describes many attributes (some mandatory, others optional), but a
 [[identification-of-conventions]]
 ==== Identification of Conventions
 
-Files that follow this version of the CF Conventions must indicate this by setting the NUG defined global attribute **`Conventions`** to a string value that contains "**`CF-{current-version-as-attribute}`**".
-The Conventions version number contained in that string can be used to find the web based versions of this document are from the link:$$http://cfconventions.org/$$[netCDF Conventions web page].
-Subsequent versions of the CF Conventions will not make invalid a compliant usage of this or earlier versions of the CF terms and forms.
+Files that follow this version of the CF Conventions must indicate this by setting the NUG defined global attribute **`Conventions`** to a string value that contains "**`CF-{current-version-as-attribute}`**".  The Conventions version number contained in that string can be used to find the web based versions of this document are from the link:$$http://cfconventions.org/$$[netCDF Conventions web page].  Subsequent versions of the CF Conventions will not make invalid a compliant usage of this or earlier versions of the CF terms and forms.
 
-It is possible for a netCDF file to adhere to more than one set of conventions, 
-even when there is no inheritance relationship among the conventions. In this case, 
-the value of the Conventions attribute may be a single text string containing a list 
-of the convention names separated by blank space (recommended) or commas (if a convention 
-name contains blanks). This is the Unidata recommended syntax from NetCDF Users Guide, 
-Appendix A. If the string contains any commas, it is assumed to be a comma-separated list.
+It is possible for a netCDF file to adhere to more than one set of conventions, even when there is no inheritance relationship among the conventions. In this case, the value of the Conventions attribute may be a single text string containing a list of the convention names separated by blank space (recommended) or commas (if a convention name contains blanks). This is the Unidata recommended syntax from NetCDF Users Guide, Appendix A. If the string contains any commas, it is assumed to be a comma-separated list.
 
-When CF is listed with other conventions, this asserts the same full compliance with CF 
-requirements and interpretations as if CF was the sole convention. It is the responsibility 
-of the data-writer to ensure that all common metadata is used with consistent meaning between conventions.
+When CF is listed with other conventions, this asserts the same full compliance with CF requirements and interpretations as if CF was the sole convention. It is the responsibility of the data-writer to ensure that all common metadata is used with consistent meaning between conventions.
 
 
 
@@ -198,9 +126,7 @@ The NUG defines **`title`** and **`history`** to be global attributes. We wish t
 
 [[external-variables, Section 2.6.3, "External variables"]]
 ==== External Variables
-The global **`external_variables`** attribute is a blank-separated list of the names of variables which are named by attributes in the file but which are not present in the file.
-These variables are to be found in other files (called "external files") but CF does not provide conventions for identifying the files concerned.
-The only attribute for which CF standardises the use of external variables is **`cell_measures`**.
+The global **`external_variables`** attribute is a blank-separated list of the names of variables which are named by attributes in the file but which are not present in the file.  These variables are to be found in other files (called "external files") but CF does not provide conventions for identifying the files concerned.  The only attribute for which CF standardises the use of external variables is **`cell_measures`**.
 
 [[groups, Section 2.7, "Groups"]]
 === Groups
