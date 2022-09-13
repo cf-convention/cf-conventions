@@ -11,7 +11,7 @@ We extend COARDS by providing explicit definitions of dimensionless vertical coo
 The definitions are associated with a coordinate variable via the **`standard_name`** and **`formula_terms`** attributes.
 For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.
 
-Because identification of a coordinate type by its units is complicated by requiring the use of an external software package <<UDUNITS>>, we provide two optional methods that yield a direct identification.
+Because identification of a coordinate type by its units is complicated by requiring the use of an external package <<UDUNITS>>, we provide two optional methods that yield a direct identification.
 The attribute **`axis`** may be attached to a coordinate variable and given one of the values **`X`**, **`Y`**, **`Z`** or **`T`** which stand for a longitude, latitude, vertical, or time axis respectively.
 Alternatively the **`standard_name`** attribute may be used for direct identification.
 But note that these optional attributes are in addition to the required COARDS metadata.
@@ -28,15 +28,11 @@ The locations of the boundaries between cells are indicated by bounds variables 
 If bounds are not provided, an application might reasonably assume the gridpoints to be at the centers of the cells, but we do not require that in this standard.
 
 
-
-
 [[latitude-coordinate, Section 4.1, "Latitude Coordinate"]]
 === Latitude Coordinate
 
 Variables representing latitude must always explicitly include the **`units`** attribute; there is no default value.
-The **`units`** attribute will be a string formatted as per the link:$$http://www.unidata.ucar.edu/software/udunits/$$[`udunits.dat`] file.
-The recommended unit of latitude is **`degrees_north`**.
-Also acceptable are **`degree_north`**, **`degree_N`**, **`degrees_N`**, **`degreeN`**, and **`degreesN`**.
+The recommended value of the **`units`** attribute is the string **`degrees_north`**. Also accepted are **`degree_north`**, **`degree_N`**, **`degrees_N`**, **`degreeN`**, and **`degreesN`**.
 
 [[latitude-axis-ex]]
 [caption="Example 4.1. "]
@@ -55,11 +51,11 @@ float lat(lat) ;
 
 ====
 
-Application writers should note that the Udunits package does not recognize the directionality implied by the "north" part of the unit specification.
+Application writers should note that the UDUNITS package does not recognize the directionality implied by the "north" part of the unit specification.
 It only recognizes its size, i.e., 1 degree is defined to be pi/180 radians.
 Hence, determination that a coordinate is a latitude type should be done via a string match between the given unit and one of the acceptable forms of **`degrees_north`**.
 
-Optionally, the latitude type may be indicated additionally by providing the **`standard_name`** attribute with the value **`latitude`**, and/or the **`axis`** attribute with the value **`Y`**.
+It is strongly recommended that the latitude type is also indicated by providing the **`standard_name`** attribute with the value **`latitude`**, and/or the **`axis`** attribute with the value **`Y`**.
 
 Coordinates of latitude with respect to a rotated pole should be given units of **`degrees`**, not **`degrees_north`** or equivalents, because applications which use the units to identify axes would have no means of distinguishing such an axis from real latitude, and might draw incorrect coastlines, for instance.
 
@@ -70,9 +66,9 @@ Coordinates of latitude with respect to a rotated pole should be given units of 
 === Longitude Coordinate
 
 Variables representing longitude must always explicitly include the **`units`** attribute; there is no default value.
-The units **`attribute`** will be a string formatted as per the link:$$http://www.unidata.ucar.edu/software/udunits/$$[`udunits.dat`] file.
-The recommended unit of longitude is **`degrees_east`**.
-Also acceptable are **`degree_east`**, **`degree_E`**, **`degrees_E`**, **`degreeE`**, and **`degreesE`**.
+The recommended value of the **`units`** attribute is the string **`degrees_east`**. Also accepted are **`degree_east`**, **`degree_E`**, **`degrees_E`**, **`degreeE`**, and **`degreesE`**.
+
+
 
 [[longitude-axis-ex]]
 [caption="Example 4.2. "]
@@ -91,11 +87,11 @@ float lon(lon) ;
 
 ====
 
-Application writers should note that the Udunits package has limited recognition of the directionality implied by the "east" part of the unit specification.
+Application writers should note that the UDUNITS package has limited recognition of the directionality implied by the "east" part of the unit specification.
 It defines **`degrees_east`** to be pi/180 radians, and hence equivalent to **`degrees_north`**.
 We recommend the determination that a coordinate is a longitude type should be done via a string match between the given unit and one of the acceptable forms of **`degrees_east`**.
 
-Optionally, the longitude type may be indicated additionally by providing the **`standard_name`** attribute with the value **`longitude`**, and/or the **`axis`** attribute with the value **`X`**.
+It is strongly recommended that the longitude type is also indicated by providing the **`standard_name`** attribute with the value **`longitude`**, and/or the **`axis`** attribute with the value **`X`**.
 
 Coordinates of longitude with respect to a rotated pole should be given units of **`degrees`**, not **`degrees_east`** or equivalents, because applications which use the units to identify axes would have no means of distinguishing such an axis from real longitude, and might draw incorrect coastlines, for instance.
 
@@ -109,7 +105,7 @@ Variables representing dimensional height or depth axes must always explicitly i
 
 The direction of positive (i.e., the direction in which the coordinate values are increasing), whether up or down, cannot in all cases be inferred from the units.
 The direction of positive is useful for applications displaying the data.
-For this reason the attribute **`positive`** as defined in the COARDS standard is required if the vertical axis units are not a valid unit of pressure (a determination which can be made using the udunits routine, utScan) -- otherwise its inclusion is optional.
+For this reason the attribute **`positive`** as defined in the COARDS standard is required if the vertical axis units are not a valid unit of pressure (as determined by the UDUNITS package <<UDUNITS>>) -- otherwise its inclusion is optional.
 The **`positive`** attribute may have the value **`up`** or **`down`** (case insensitive).
 This attribute may be applied to either coordinate variables or auxiliary coordinate variables that contain vertical coordinate data.
 
@@ -143,14 +139,15 @@ Recommendations:  The **`positive`** attribute should be consistent with the sig
 
 ==== Dimensional Vertical Coordinate
 
-The **`units`** attribute for dimensional coordinates will be a string formatted as per the link:$$http://www.unidata.ucar.edu/software/udunits/$$[`udunits.dat`] file.
-The acceptable units for vertical (depth or height) coordinate variables are:
 
-* units of pressure as listed in the file `udunits.dat`.
+Variables representing dimensional vertical coordinates for or height must always explicitly include the  **`units`** attribute.
+The acceptable units for a vertical (depth or height) coordinate variable must a UDUNITS (<<UDUNITS>>) representation of one of the following:
+
+* units of pressure.
 For vertical axes the most commonly used of these include **`bar`**, **`millibar`**, **`decibar`**, **`atmosphere (atm)`**, **`pascal (Pa)`**, and **`hPa`**.
-* units of length as listed in the file udunits.dat.
+* units of length.
 For vertical axes the most commonly used of these include **`meter (metre, m)`**, and **`kilometer (km)`**.
-* other units listed in the file udunits.dat that may under certain circumstances reference vertical position such as units of density or temperature.
+* other units that may under certain circumstances reference vertical position such as units of density or temperature.
 
 Plural forms are also acceptable.
 
@@ -162,7 +159,7 @@ Plural forms are also acceptable.
 
 The **`units`** attribute is not required for dimensionless coordinates.
 For backwards compatibility with COARDS we continue to allow the **`units`** attribute to take one of the values: **`level`**, **`layer`**, or **`sigma_level`**.
-These values are not recognized by the Udunits package, and are considered a deprecated feature in the CF standard.
+These values are not recognized by the UDUNITS package, and are considered a deprecated feature in the CF standard.
 
 
 [[parametric-vertical-coordinate, Section 4.3.3, "Parametric Vertical Coordinate"]]
@@ -221,14 +218,14 @@ The `computed_standard_name` attribute indicates that the values in variable
 [[time-coordinate]]
 === Time Coordinate
 
-Variables representing time must always explicitly include the **`units`** attribute; there is no default value.
+Variables representing reference time must always explicitly include the **`units`** attribute; there is no default value.
 The **`units`** attribute takes a string value formatted as per the recommendations in the <<UDUNITS>> package.
 The following excerpt from the UDUNITS documentation explains the time unit encoding by example:
 
 "The specification `seconds since 1992-10-8 15:15:42.5 -6:00` indicates seconds since October 8th, 1992  at  3  hours,  15 minutes  and  42.5 seconds in the afternoon in the time zone which is six hours to the west of Coordinated Universal Time (i.e.  Mountain Daylight Time).
 The time zone specification can also be written without a colon using one or two digits (indicating hours) or three or four digits (indicating hours and minutes)."
 
-The acceptable units for time are listed in the UDUNITS database.
+The acceptable units for time are given by the UDUNITS package <<UDUNITS>>.
 The most commonly used of these strings (and their abbreviations) includes **`day`** (**`d`**), **`hour`** (**`hr`**, **`h`**), **`minute`** (**`min`**) and **`second`** (**`sec`**, **`s`**).
 Plural forms are also acceptable.
 
@@ -256,8 +253,7 @@ double time(time) ;
 
 ====
 
-A time coordinate is identifiable from its units string alone.
-The Udunits routines **`utScan()`** and **`utIsTime()`** can be used to make this determination.
+A reference time coordinate is identifiable from its units string alone.
 
 Optionally, the time coordinate may be indicated additionally by providing the **`standard_name`** attribute with an appropriate value, and/or the **`axis`** attribute with the value **`T`**.
 
