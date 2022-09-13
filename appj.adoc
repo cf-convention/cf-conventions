@@ -55,14 +55,15 @@ image::images/ci_2d_interpolation_subarea.svg[,60%,pdfwidth=50vw,align="center"]
 
 For the reconstitution of the uncompressed coordinate and auxiliary coordinate variables the interpolation method can be applied independently for each interpolation subarea, making it possible to parallelize the computational process.
 
-The following notation is used: +  
-A variable staring with `v` denotes a vector and `v.x`, `v.y` and `v.z` refer to the three coordinates of that vector. +
+The following notation is used:
 
-A variable staring with `ll` denotes a latitude-longitude coordinate pair and `ll.lat` and `ll.lon` refer to the latitude and longitude coordinates. +
+A variable staring with `v` denotes a vector and `v.x`, `v.y` and `v.z` refer to the three coordinates of that vector.
 
-For one-dimensional interpolation, `i` is an index in the interpolated dimension, `tpi` is an index in the subsampled dimension and `is` is an index in the interpolation subarea dimensions. +
+A variable staring with `ll` denotes a latitude-longitude coordinate pair and `ll.lat` and `ll.lon` refer to the latitude and longitude coordinates.
 
-For two-dimensional interpolation, `i1` and `i2` are indices in the interpolated dimensions, `tpi1` and `tpi2` are indices in the subsampled dimensions and `is1` and `is2` are indices in the interpolation subarea dimensions. Dimension 1 is the dimension with index values increasing from tie point A to tie point B, dimension 2 is the dimension with index values increasing from tie point A to tie point C. +
+For one-dimensional interpolation, `i` is an index in the interpolated dimension, `tpi` is an index in the subsampled dimension and `is` is an index in the interpolation subarea dimensions.
+
+For two-dimensional interpolation, `i1` and `i2` are indices in the interpolated dimensions, `tpi1` and `tpi2` are indices in the subsampled dimensions and `is1` and `is2` are indices in the interpolation subarea dimensions. Dimension 1 is the dimension with index values increasing from tie point A to tie point B, dimension 2 is the dimension with index values increasing from tie point A to tie point C.
 
 Note that, for simplicity of notation, the descriptions of the interpolation methods in most places leave out the indices of tie point related variables and refer to these with `a` and `b` in the one-dimensional case and with `a`, `b`, `c` and `d` in the two-dimensional case. In the two-dimensional case, `a = tp(tpi2, tpi1)`, `b = tp(tpi2, tpi1+1)`, `c = tp(tpi2+1, tpi1)` and `d = tp(tpi2+1, tpi1+1)` would reflect the way the tie point data would be stored in the data set, see also <<interpolation_subarea_2d>>.
 
@@ -113,7 +114,7 @@ Note that, for simplicity of notation, the descriptions of the interpolation met
 | Coordinate Uncompression Calculations | 
  The coordinate value `u(i)` at index `i` between tie points `A` and `B` is calculated from:   +
  `u(i) = fl(ua, ub, s(i)) = ua + s*(ub-ua)`; + 
-where `ua` and `ub` are the coordinate values at tie points `A` and `B` respectively. +
+where `ua` and `ub` are the coordinate values at tie points `A` and `B` respectively.
 
 |===============
 
@@ -129,7 +130,7 @@ where `ua` and `ub` are the coordinate values at tie points `A` and `B` respecti
 The interpolation function fl() defined for linear interpolation above is first applied twice in the interpolated dimension 2, once between tie points `A` and `C` and once between tie points `B` and `D`. It is then applied once in the interpolated dimension 1, between the two resulting coordinate points, yielding the interpolated coordinate value `u(i2, i1)`:  +  
 `uac = fl(ua, uc, s(ia2, ic2, i2))`; +
 `ubd = fl(ub, ud, s(ia2, ic2, i2))`; +
-`u(i2, i1) = fl(uac, ubd, s(ia1, ib1, i1))`; +
+`u(i2, i1) = fl(uac, ubd, s(ia1, ib1, i1))`;
 
 
 |===============
@@ -195,8 +196,7 @@ The three-dimensional cartesian interpolation coefficients are found from +
 Finally, for storage in the dataset, convert the coefficients to the parametric representation + 
 `cea(is) = (ce(is), ca(is)) = fcv2cea(va, vb, cv) = (fdot(cv, fminus(va, vb))/gsqr, fdot(cv, fcross(va, vb))/(rsqr*gsqr));` + 
 where `vr = fmultiply(0.5, fplus(va, vb))`, `rsqr = fdot(vr, vr)`, `vg = fminus(va, vb)` and `gsqr = fdot(vg, vg).` +  
-The interpolation parameter term `interpolation_subarea_flags(is)` shall have the flag `location_use_3d_cartesian` set if the interpolation subarea intersects the `longitude = 180.0` or if the interpolation subarea extends into `latitude > latitude_limit` or `latitude < -latitude_limit`. 
-The value of `latitude_limit` is set by the data set creator and defines the high latitude areas where interpolation in three-dimensional cartesian coordinates is required for reasons of coordinate reconstitution accuracy. The `latitude_limit` is used solely for setting the flag `location_use_3d_cartesian`, and is not required in a compressed dataset.
+The interpolation parameter term `interpolation_subarea_flags(is)` shall have the flag `location_use_3d_cartesian` set if the interpolation subarea intersects the `longitude = 180.0` or if the interpolation subarea extends into `latitude > latitude_limit` or `latitude < -latitude_limit`.  The value of `latitude_limit` is set by the data set creator and defines the high latitude areas where interpolation in three-dimensional cartesian coordinates is required for reasons of coordinate reconstitution accuracy. The `latitude_limit` is used solely for setting the flag `location_use_3d_cartesian`, and is not required in a compressed dataset.
 | Coordinate Uncompression Calculations | 
 First calculate the tie point vector representations from the tie point latitude-longitude representations +
 `va = fll2v(lla);  vb = fll2v(llb);` +
@@ -276,8 +276,7 @@ Finally, before storing them in the dataset's interpolation parameters, convert 
 `cea2(is2, tpi1)  = fcv2cea(va, vc, cv_ac);` +
 `cea2(is2, tpi1+1)  = fcv2cea(vb, vd, cv_bd);` + 
 `cea3(is2, is1)  = fcv2cea(vab, vcd, cv_z).` +
-The interpolation parameter term `interpolation_subarea_flags(is2, is1)` shall have the flag `location_use_3d_cartesian` set if the interpolation subarea intersects the `longitude = 180.0` or if the interpolation subarea extends into `latitude > latitude_limit` or `latitude < -latitude_limit`.
-The value of `latitude_limit` is set by the data set creator and defines the high latitude areas where interpolation in three-dimensional cartesian coordinates is required for reasons of coordinate reconstitution accuracy. The `latitude_limit` is used solely for setting the flag `location_use_3d_cartesian`, and is not required in a compressed dataset.
+The interpolation parameter term `interpolation_subarea_flags(is2, is1)` shall have the flag `location_use_3d_cartesian` set if the interpolation subarea intersects the `longitude = 180.0` or if the interpolation subarea extends into `latitude > latitude_limit` or `latitude < -latitude_limit`.  The value of `latitude_limit` is set by the data set creator and defines the high latitude areas where interpolation in three-dimensional cartesian coordinates is required for reasons of coordinate reconstitution accuracy. The `latitude_limit` is used solely for setting the flag `location_use_3d_cartesian`, and is not required in a compressed dataset.
 
 | Coordinate Uncompression Calculations |
 First calculate the tie point vector representations from the tie point latitude-longitude representations +
