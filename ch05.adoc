@@ -12,7 +12,7 @@ This is the only method of associating dimensions with coordinates that is suppo
 
 Any longitude, latitude, vertical or time coordinate which depends on more than one spatiotemporal dimension must be identified by the **`coordinates`** attribute of the data variable.
 The value of the **`coordinates`** attribute is __a blank separated list of the names of auxiliary coordinate variables__.
-There is no restriction on the order in which the auxiliary coordinate variables appear in the **`coordinates`** attribute string.  
+There is no restriction on the order in which the auxiliary coordinate variables appear in the **`coordinates`** attribute string.
 The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated, with two exceptions.
 First, string-valued coordinates (<<labels>>) will have a dimension for maximum string length if the coordinate variable has a type of **`char`** rather than a type of **`string`**.
 Second, in the ragged array representations of data (<<discrete-sampling-geometries>>), special methods are needed to connect the data and coordinates.
@@ -35,8 +35,8 @@ Horizontal dimensions are those whose coordinate variables have an **`axis`** at
 
 To geo-reference data horizontally with respect to the Earth, a __grid mapping variable__ may be provided by the data variable, using the **`grid_mapping`** attribute.
 If the coordinate variables for a horizontal grid are not longitude and latitude, then a grid_mapping variable provides the information required to derive longitude and latitude values for each grid location.
-If no __grid mapping variable__ is referenced by a data variable, then longitude and latitude coordinate values shall be supplied __in addition__ to the required coordinates. 
-For example, the Cartesian coordinates of a map projection may be supplied as coordinate variables and, in addition, two-dimensional latitude and longitude variables may be supplied via the **`coordinates`** attribute on a data variable. 
+If no __grid mapping variable__ is referenced by a data variable, then longitude and latitude coordinate values shall be supplied __in addition__ to the required coordinates.
+For example, the Cartesian coordinates of a map projection may be supplied as coordinate variables and, in addition, two-dimensional latitude and longitude variables may be supplied via the **`coordinates`** attribute on a data variable.
 The use of the **`axis`** attribute with values **`X`** and **`Y`** is recommended for the coordinate variables (see <<coordinate-types>>).
 
 It is sometimes not practical to specify the latitude-longitude location of data which is representative of geographic regions with complex boundaries.
@@ -76,7 +76,7 @@ variables:
   double time(time) ;
     time:long_name = "time" ;
     time:units = "days since 1990-1-1 0:0:0" ;
-      
+
 ----
 
 
@@ -124,7 +124,7 @@ variables:
   float lat(yc,xc) ;
     lat:long_name = "latitude" ;
     lat:units = "degrees_north" ;
-      
+
 ----
 
 
@@ -172,22 +172,22 @@ variables:
     lat:units = "degrees_north" ;
   int rgrid(rgrid);
     rgrid:compress = "latdim londim";
-      
+
 ----
 
 
 ====
 
 **`PS(n)`** is associated with the coordinate values **`lon(n)`**, **`lat(n)`**.
-Compressed grid index **`(n)`** would be assigned to 2D index **`(j,i)`** (C index conventions) where 
+Compressed grid index **`(n)`** would be assigned to 2D index **`(j,i)`** (C index conventions) where
 ----
 
 j = rgrid(n) / 128
 i = rgrid(n) - 128*j
-      
+
 ----
 
- 
+
 
 Notice that even if an application does not recognize the **`compress`** attribute, the grids stored in this format can still be handled, by an application that recognizes the **`coordinates`** attribute.
 
@@ -208,10 +208,10 @@ A __grid mapping variable__ may be referenced by a data variable  in order to ex
 For example, if the horizontal spatial coordinates are latitude and longitude, the grid mapping variable can be used to declare the figure of the earth (WGS84 ellipsoid, sphere, etc.) they are based on.
 If the horizontal spatial coordinates are easting and northing in a map projection, the grid mapping variable declares the map projection CRS used and provides the information needed to calculate latitude and longitude from easting and northing.
 
-When the horizontal spatial coordinate variables are not longitude and latitude, it is required that further information is provided to geo-locate the horizontal position. 
+When the horizontal spatial coordinate variables are not longitude and latitude, it is required that further information is provided to geo-locate the horizontal position.
 A __grid mapping variable__ provides this information.
 
-If no __grid mapping variable__ is provided and the coordinate variables for a horizontal grid are not longitude and latitude, then it is required that the latitude and longitude coordinates are supplied via the **`coordinates`** attribute. 
+If no __grid mapping variable__ is provided and the coordinate variables for a horizontal grid are not longitude and latitude, then it is required that the latitude and longitude coordinates are supplied via the **`coordinates`** attribute.
 Such coordinates may be provided in addition to the provision of a __grid mapping variable__, but that is not required.
 
 A grid mapping variable provides the description of the mapping via a collection of attached attributes.
@@ -234,8 +234,8 @@ Explicit 'axis order' is important when the grid_mapping_variable contains an at
 
 Using the simple form, where the **`grid_mapping`** attribute is only the name of a grid mapping variable, 2D latitude and longitude coordinates for a projected coordinate reference system use the same geographic coordinate reference system (ellipsoid and prime meridian) as the projection is projected from.
 
-The `grid_mapping` variable may identify datums (such as the reference ellipsoid, the geoid or the prime meridian) for horizontal or vertical coordinates. 
-Therefore a grid mapping variable may be needed when the coordinate variables for a horizontal grid are longitude and latitude. 
+The `grid_mapping` variable may identify datums (such as the reference ellipsoid, the geoid or the prime meridian) for horizontal or vertical coordinates.
+Therefore a grid mapping variable may be needed when the coordinate variables for a horizontal grid are longitude and latitude.
 The `grid_mapping_name` of `latitude_longitude` should be used in this case.
 
 The expanded form of the **`grid_mapping attribute`** is required if one wants to store coordinate information for more than one coordinate reference system.
@@ -286,7 +286,7 @@ variables:
   float lat(rlat,rlon) ;
     lat:long_name = "latitude" ;
     lat:units = "degrees_north" ;
-      
+
 ----
 
 
@@ -368,7 +368,7 @@ variables:
     crs:grid_mapping_name = "latitude_longitude"
     crs:semi_major_axis = 6371000.0 ;
     crs:inverse_flattening = 0 ;
-      
+
 ----
 ====
 
@@ -393,7 +393,7 @@ variables:
     crs:longitude_of_prime_meridian = 0.0 ;
     crs:semi_major_axis = 6378137.0 ;
     crs:inverse_flattening = 298.257223563 ;
-      
+
 ----
 //    crs:crs_wkt = "GEODCRS[\"WGS 84\", DATUM[\"World Geodetic System 1984\", ELLIPSOID[\"WGS 84\",6378137,298.257223563, LENGTHUNIT[\"metre\",1.0]]], PRIMEM[\"Greenwich\",0], CS[ellipsoidal,3], AXIS[\"(lat)\",north,ANGLEUNIT[\"degree\",0.0174532925199433]], AXIS[\"(lon)\",east,ANGLEUNIT[\"degree\",0.0174532925199433]], AXIS[\"ellipsoidal height (h)\",up,LENGTHUNIT[\"metre\",1.0]]]"
 ====
@@ -454,7 +454,7 @@ dimensions:
       crsWGS84:longitude_of_prime_meridian = 0.0 ;
       crsWGS84:semi_major_axis = 6378137.0 ;
       crsWGS84:inverse_flattening = 298.257223563 ;
-      
+
 ----
 ====
 
@@ -466,7 +466,7 @@ dimensions:
 
 An optional grid mapping attribute called **`crs_wkt`** may be used to specify multiple coordinate system properties in so-called __well-known text__ format (usually abbreviated to CRS WKT or OGC WKT).
 The CRS WKT format is widely recognised and used within the geoscience software community.
-As such it represents a versatile mechanism for encoding information about a variety of coordinate reference system parameters in a highly compact notational form. 
+As such it represents a versatile mechanism for encoding information about a variety of coordinate reference system parameters in a highly compact notational form.
 The translation of CF coordinate variables to/from OGC Well-Known Text (WKT) format is shown in Examples 5.11 and 5.12 below and described in detail in
 https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements.
 
@@ -477,15 +477,15 @@ It is envisaged that the value of the **`crs_wkt`** attribute typically will be 
 Other than the requirement to be a valid WKT string, the CF convention does not prescribe the content of the **`crs_wkt`** attribute since it will necessarily be context-dependent.
 
 Where a **`crs_wkt`** attribute is added to a grid_mapping, the extended syntax for the grid_mapping attribute enables the list of variables containing coordinate values being referenced to be explicitly stated and the CRS WKT Axis order to be explicitly defined.
-The explicit definition of WKT CRS Axis order is expected by the OGC standards for referencing by coordinates. 
+The explicit definition of WKT CRS Axis order is expected by the OGC standards for referencing by coordinates.
 Software implementing these standards are likely to expect to receive coordinate value tuples, with the correct coordinate value order, along with the coordinate reference system definition that those coordinate values are defined with respect to.
 
 The order of the <coordinatesVariable> references within the grid_mapping attribute definition defines the order of elements within a derived coordinate value tuple.
-This enables an application reading the data from a file to construct an array of coordinate value tuples, where each tuple is ordered to match the specification of the coordinate reference system being used whilst the array of tuples is structured according to the netCDF definition. 
+This enables an application reading the data from a file to construct an array of coordinate value tuples, where each tuple is ordered to match the specification of the coordinate reference system being used whilst the array of tuples is structured according to the netCDF definition.
 It is the responsibility of the data producer to ensure that the <coordinatesVariable> list is consistent with the CRS WKT definition of CS AXIS, with the correct number of entries in the correct order (note: this is not a conformance requirement as CF conformance is not dependent on CRS WKT parsing).
 
 For example, a file has two coordinate variables, lon and lat, and a grid mapping variable crs with an associated crs_wkt attribute; the WKT definition defines the AXIS order as ["latitude", "longitude"].
-The grid_mapping attribute is thus given a value crs:lat lon to define that where coordinate pairs are required, these shall be ordered (lat, lon), to be consistent with the provided crs_wkt string (and not order inverted). 
+The grid_mapping attribute is thus given a value crs:lat lon to define that where coordinate pairs are required, these shall be ordered (lat, lon), to be consistent with the provided crs_wkt string (and not order inverted).
 A 2-D array of (lat, lon) tuples can then be explicitly derived from the combination of the lat and lon variables.
 
 The **`crs_wkt`** attribute is intended to act as a _supplement_ to other single-property CF grid mapping attributes (as described in Appendix F); it is not intended to replace those attributes.
@@ -502,9 +502,9 @@ Likewise, in those cases where the value of a CRS WKT element should be used con
 https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
 should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is considered to represent the definitive authority as regards CRS property names and values.
 
-Examples 5.11 illustrates how the coordinate system properties specified via the crs grid mapping variable in Example 5.9 might be expressed using a **`crs_wkt`** attribute. 
-Example 5.12 also illustrates the addition of the **`crs_wkt`** attribute, but here the attribute is added to the **`crs`** variable of a simplified variant of Example 5.10. 
-For brevity in Example 5.11, only the grid mapping variable and its grid_mapping_name and crs_wkt attributes are included; all other elements are as per the Example 5.9. 
+Examples 5.11 illustrates how the coordinate system properties specified via the crs grid mapping variable in Example 5.9 might be expressed using a **`crs_wkt`** attribute.
+Example 5.12 also illustrates the addition of the **`crs_wkt`** attribute, but here the attribute is added to the **`crs`** variable of a simplified variant of Example 5.10.
+For brevity in Example 5.11, only the grid mapping variable and its grid_mapping_name and crs_wkt attributes are included; all other elements are as per the Example 5.9.
 Names of projection PARAMETERs follow the spellings used in the EPSG geodetic parameter registry.
 
 Example 5.12 illustrates how certain WKT elements - all of which are optional - can be used to specify CRS properties not covered by existing CF grid mapping attributes, including:
@@ -542,13 +542,13 @@ Example 5.12 illustrates how certain WKT elements - all of which are optional - 
        AXIS["(lat)",north,ANGLEUNIT["degree",0.0174532925199433]],
        AXIS["(lon)",east,ANGLEUNIT["degree",0.0174532925199433]],
        AXIS["ellipsoidal height (h)",up,LENGTHUNIT["metre",1.0]]]
-  ...      
+  ...
 ----
 ====
 
-Note: To enhance readability of these examples, the WKT value has been split across multiple lines and embedded quotation marks (") left unescaped - in real netCDF files such characters would need to be escaped. 
-In CDL, within the CRS WKT definition string, newlines would need to be encoded within the string as `\n` and double quotes as `\"`. 
-Also for readability, we have dropped the quotation marks which would delimit the entire crs_wkt string. 
+Note: To enhance readability of these examples, the WKT value has been split across multiple lines and embedded quotation marks (") left unescaped - in real netCDF files such characters would need to be escaped.
+In CDL, within the CRS WKT definition string, newlines would need to be encoded within the string as `\n` and double quotes as `\"`.
+Also for readability, we have dropped the quotation marks which would delimit the entire crs_wkt string.
 This pseudo CDL will not parse directly.
 
 [[british-national-grid-newlyn-datum-in-crs-wkt-format]]
@@ -625,7 +625,7 @@ variables:
         AUTHORITY ["EPSG", "5701"]
         CS[vertical,1],
           AXIS["gravity-related height (H)",up],
-          LENGTHUNIT[“metre”,1.0]     
+          LENGTHUNIT[“metre”,1.0]
       ]
       ]" ;
   ...
@@ -633,10 +633,10 @@ variables:
 
 ====
 
-Note: There are unescaped double quotes and newlines and the quotation marks which would delimit the entire crs_wkt string are missing in this example.  
+Note: There are unescaped double quotes and newlines and the quotation marks which would delimit the entire crs_wkt string are missing in this example.
 This is to enhance readability, but it means that this pseudo CDL will not parse directly.
 
-The preceding two example (5.11 and 5.12) may be combined, if the data provider desires to provide explicit latitude and longitude coordinates as well as projection coordinates and to provide CRS WKT referencing for both sets of coordinates. 
+The preceding two example (5.11 and 5.12) may be combined, if the data provider desires to provide explicit latitude and longitude coordinates as well as projection coordinates and to provide CRS WKT referencing for both sets of coordinates.
 This is demonstrated in example 5.13
 
 [[british-national-grid-newlyn-datum-with-wgs84-in-crs-wkt-format]]
@@ -674,7 +674,7 @@ This is demonstrated in example 5.13
 
 ====
 
-Note: There are unescaped double quotes and newlines and the quotation marks which would delimit the entire crs_wkt string are missing in this example.  
+Note: There are unescaped double quotes and newlines and the quotation marks which would delimit the entire crs_wkt string are missing in this example.
 This is to enhance readability, but it means that this pseudo CDL will not parse directly.
 
 
@@ -687,7 +687,7 @@ Since there is no associated dimension these scalar coordinate variables should 
 
 The use of scalar coordinate variables is a convenience feature which avoids adding size one dimensions to variables.
 A numeric scalar coordinate variable has the same information content and can be used in the same contexts as a size one numeric coordinate variable.
-Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (<<labels>>). 
+Similarly, a string-valued scalar coordinate variable has the same meaning and purposes as a size one string-valued auxiliary coordinate variable (<<labels>>).
 Note however that use of this feature with a latitude, longitude, vertical, or time coordinate will inhibit COARDS conforming applications from recognizing them.
 
 Once a name is used for a scalar coordinate variable it can not be used for a 1D coordinate variable.
@@ -732,7 +732,7 @@ data:
   time = 6., 12., 18., 24. ;
   atime = 0. ;
   p500 = 500. ;
-      
+
 ----
 ====
 
@@ -790,7 +790,7 @@ dimensions:
 variables:
   char domain ;
     domain:dimensions = "time pres lat lon" ;
-    domain:long_name = "Domain with independent coordinate variables" ;	
+    domain:long_name = "Domain with independent coordinate variables" ;
   float lon(lon) ;
     lon:long_name = "longitude" ;
     lon:units = "degrees_east" ;
@@ -803,7 +803,7 @@ variables:
   double time(time) ;
     time:long_name = "time" ;
     time:units = "days since 1990-1-1 0:0:0" ;
-     
+
 ----
 
 In this example the data variable **`xwind`** from the <<independent-coordinate-variables-ex>> example has been replaced by the domain variable **`domain`**.
@@ -851,7 +851,7 @@ variables:
   float lat(rlat,rlon) ;
     lat:long_name = "latitude" ;
     lat:units = "degrees_north" ;
-     
+
 ----
 ====
 
@@ -910,9 +910,9 @@ variables:
     domain:coordinates = "t" ;
     domain:long_name = "Domain with no explicit dimensions" ;
   double t ;
-    t:standard_name = "time" ; 
+    t:standard_name = "time" ;
     t:units = "days since 2021-01-01" ;
-     
+
 ----
 ====
 
@@ -981,7 +981,7 @@ dimensions:
 
 variables:
   char domain ;
-    domain:dimensions = "obs" ; 
+    domain:dimensions = "obs" ;
     domain:coordinates = "time lat lon alt station_name" ;
     domain:long_name = "Domain with a discrete sampling geometry" ;
   float lon(station) ;

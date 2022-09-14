@@ -28,6 +28,6 @@ Whenever a [pull request](https://github.com/cf-convention/cf-conventions/pulls)
 - http://cfconventions.org/cf-conventions/cf-conventions.html
 - http://cfconventions.org/cf-conventions/cf-conventions.pdf
 - http://cfconventions.org/cf-conventions/conformance.html
-- http://cfconventions.org/cf-conventions/conformance.pdf 
+- http://cfconventions.org/cf-conventions/conformance.pdf
 
-These documents are linked in the cf-conventions web site. [source here](https://github.com/cf-convention/cf-convention.github.io) which is published to: http://cfconventions.org/. The latest spec documents are linked from those web pages here: http://cfconventions.org/latest.html. 
+These documents are linked in the cf-conventions web site. [source here](https://github.com/cf-convention/cf-convention.github.io) which is published to: http://cfconventions.org/. The latest spec documents are linked from those web pages here: http://cfconventions.org/latest.html.
