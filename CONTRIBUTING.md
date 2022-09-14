@@ -8,7 +8,7 @@ The netCDF Climate and Forecasting conventions are a product by and for a broad 
 This set of guidelines provides a brief overview of the practices and procedures that should be used in fixing, updating, or adding to the conventions.
 It builds on the [rules for CF Convention changes.](http://cfconventions.org/rules.html)
 
-As a prerequisite to this guide, please review the community's code of [conduct.](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md)
+As a prerequisite to this guide, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md).
 The CF community takes great pride in respectful and collegial discourse.
 Any disrespectful or otherwise derogatory communication will not be tolerated.
 
