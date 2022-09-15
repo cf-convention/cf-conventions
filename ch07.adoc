@@ -1,5 +1,4 @@
-﻿
-==  Data Representative of Cells 
+﻿==  Data Representative of Cells 
 :doc-part: 7
 :figure: 0
 
@@ -9,9 +8,6 @@ This is true for many types of climatological averages, for example, the mean Ja
 The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells.
 However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>. 
 For cases when data pertain to geospatial features with highly variable geometry node counts such as river lines or watershed boundaries, we provide <<geometries> as an alternative to bounds.
-
-
-
 
 [[cell-boundaries, Section 7.1, "Cell Boundaries"]]
 === Cell Boundaries
@@ -68,7 +64,6 @@ float eta(eta) ;
 ----
 ====
 
-
 Note that the boundary variable for a set of N contiguous intervals is an array of shape (N,2).
 Although in this case there will be a duplication of the boundary coordinates between adjacent intervals, this representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.
 
@@ -102,22 +97,19 @@ If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat su
 +
 The bounds can be used to decide whether cells are contiguous via the following relationships.
 In these equations the variable **`bnd`** is used generically to represent either the latitude or longitude boundary variable. 
-----
 
+----
 For 0 < j < n and 0 < i < m,
 	If cells (j,i) and (j,i+1) are contiguous, then
 		bnd(j,i,1)=bnd(j,i+1,0) 
 		bnd(j,i,2)=bnd(j,i+1,3)
 	If cells (j,i) and (j+1,i) are contiguous, then	
 		bnd(j,i,3)=bnd(j+1,i,0) and bnd(j,i,2)=bnd(j+1,i,1)
-							
 ----
- 
 
 Bounds for multi-dimensional coordinate variables with p-sided cells:: In all other cases, the bounds should be dimensioned **`(...,n,p)`**, where **`(...,n)`** are the dimensions of the auxiliary coordinate variables, and **`p`** the number of vertices of the cells.
 The vertices must be traversed anticlockwise in the lon-lat plane as viewed from above.
 The starting vertex is not specified.
-
 
 [[cells-on-a-latitude-axis-ex]]
 [caption="Example 7.2. "]
@@ -137,7 +129,6 @@ variables:
 The boundary variable `lat_bnds` associates a latitude gridpoint `i` with the interval whose boundaries are `lat_bnds(i,0)` and `lat_bnds(i,1)`.
 The gridpoint location, `lat(i)`, should be contained within this interval.
 ====
-
 
 For rectangular grids, two-dimensional cells can be expressed as Cartesian products of one-dimensional cells of the type in the preceding example.
 However for non-rectangular grids a "rectangular" cell will in general require specifying all four vertices for each cell.
@@ -166,11 +157,6 @@ variables:
 The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` with the cell determined by the vertices `(lat_bnds(j,i,n),lon_bnds(j,i,n))`, `n=0,..,3`.
 The gridpoint location, `(lat(j,i),lon(j,i))`, should be contained within this region.
 ====
-
- 
-
-
-
 
 [[cell-measures, Section 7.2, "Cell Measures"]]
 === Cell Measures
@@ -239,7 +225,6 @@ variables:
 ----
 ====
 
-
 [[cell-methods, Section 7.3, "Cell Methods"]]
 === Cell Methods
 
@@ -277,6 +262,7 @@ It is especially recommended that **`cell_methods`** be explicitly specified for
 ====
 Consider 12-hourly timeseries of pressure, temperature and precipitation from a number of stations, where pressure is measured instantaneously, maximum temperature for the preceding 12 hours is recorded, and precipitation is accumulated in a rain gauge.
 For a period of 48 hours from 6 a.m. on 19 April 1998, the data is structured as follows: 
+
 ----
 dimensions:
   time = UNLIMITED; // (5 currently)
@@ -309,11 +295,6 @@ It is sometimes desirable, however, to use the midpoint of intervals as coordina
 An application may simply obtain the midpoint values by making use of the boundary data in `time_bnds`.
 ====
 
- 
-
-
-
-
 [[statistics-more-than-one-axis]]
 ==== Statistics for more than one axis
 
@@ -332,7 +313,6 @@ This is not the same as **`cell_methods="lon: standard_deviation lat: standard_d
 To indicate variation over horizontal area, it is recommended that instead of specifying the combination of horizontal dimensions, the special string "**`area`**" be used. 
 The common case of an area-mean can thus be indicated by **`cell_methods="area: mean"`** (rather than, for example, "**`lon: lat: mean`**"). 
 The horizontal coordinate variables to which "**`area`**" refers are in this case not explicitly indicated in **`cell_methods`** but can be identified, if necessary, from attributes attached to the coordinate variables, scalar coordinate variables, or auxiliary coordinate variables, as described in <<coordinate-types>>.
-
 
 [[recording-spacing-original-data]]
 ==== Recording the spacing of the original data and other information
@@ -383,11 +363,6 @@ data:
 Notice that a parenthesized comment in the `cell_methods` attribute provides the nature of the samples used to calculate the variance.
 ====
 
- 
-
-
-
-
 [[statistics-applying-portions]]
 ==== Statistics applying to portions of cells
 
@@ -407,7 +382,6 @@ Here __typevar__ is a string-valued auxiliary coordinate variable or string-valu
 The variable __typevar__ contains the name(s) of the selected portion(s) of the grid cell to which the __method__ is applied.
 This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types).
 It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., **`vegetation`**, **`bare_ground`**, **`snow`**, etc.).
-
 
 [[mean-surface-temperature-sensible-heat-flux]]
 [caption="Example 7.7. "]
@@ -458,9 +432,6 @@ In the case of sea-ice thickness, the phrase "`where sea_ice`" could be replaced
 In the case of snow thickness, "`where sea_ice`" differs from "`where all_area_types`" because "`where sea_ice`" excludes snow on land from the average.
 ====
 
-
-
-
 [[cell-methods-no-coordinates, Section 7.3.4, "Cell methods when there are no coordinates"]]
 ==== Cell methods when there are no coordinates
 
@@ -486,9 +457,6 @@ That would indicate a mean over all longitudes.
 Note, however, that if in addition the data variable had a scalar coordinate variable with a **`standard_name`** of **`region`** and a value of **`atlantic_ocean`**, it would indicate a mean over longitudes that lie within the Atlantic Ocean, not all longitudes.
 
 We recommend that whenever possible, cell bounds should be supplied by giving the variable a dimension of size one and attaching bounds to the associated coordinate variable.
-
-
-
 
 [[climatological-statistics, Section 7.4, "Climatological Statistics"]]
 === Climatological Statistics
@@ -531,8 +499,6 @@ time: method1 **`within days`**   time: method2 **`over days`**:: __method1__ i
 
 time: method1 **`within days`**   time: method2 **`over days`**   time: method3 **`over years`**:: __method1__ is applied to the time intervals (HMS0-HMS1) within individual days and __method2__ is applied over the days in the interval (md0-md1), and __method3__ is applied over the range of years (y0-y1).
 
-
-
 The methods which can be specified are those listed in <<appendix-cell-methods>> and each entry in the **`cell_methods`** attribute may also, as usual, contain non-standardised information in parentheses after the method.
 For instance, a mean over ENSO years might be indicated by "**`time: mean over years (ENSO years)`**".
 
@@ -570,8 +536,6 @@ data:  // time coordinates translated to date/time format
                      "1960-12-1", "1991-3-1" ;
 ----
 ====
-
-
 [[decadal-averages-for-january-ex]]
 [caption="Example 7.10. "]
 .Decadal averages for January
@@ -597,7 +561,6 @@ data:  // time coordinates translated to date/time format
                      "1981-1-1", "1990-2-1" ;
 ----
 ====
-
 
 [[temperature-each-hour-of-average-day-ex]] 
 [caption="Example 7.11. "]
@@ -657,7 +620,6 @@ data: // time coordinates translated to date/time format
   threshold=0.; 
 ----
 ====
-
 
 [[temperature-each-hour-of-climatological-day-ex]]
 [caption="Example 7.13. "]
@@ -795,7 +757,6 @@ Client applications unaware of CF geometries can fall back to the lat and lon va
 In this example, lat and lon coordinates are identical to the first node in each line geometry, though any representative point could be used.
 ====
 
-
 A __geometry container__ variable acts as a container for attributes that describe a set of geometries. 
 The **`geometry`** attribute of the data variable contains the name of a geometry container variable. 
 The geometry container variable must hold **`geometry_type`** and **`node_coordinates`** attributes. 
@@ -914,3 +875,4 @@ data:
    1, 2, 3, 4 ;
 ----
 ====
+

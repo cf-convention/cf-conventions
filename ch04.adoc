@@ -1,6 +1,4 @@
-
 [[coordinate-types, Chapter 4, Coordinate Types]]
-
 ==  Coordinate Types 
 
 The commonest use of coordinate variables is to locate the data in space and time, but coordinates may be provided for any other continuous geophysical quantity (e.g. density, temperature, radiation wavelength, zenith angle of radiance, sea surface wave frequency) or discrete category (see <<discrete-axis>>, e.g. area type, model level number, ensemble member number) on which the data variable depends.
@@ -27,9 +25,6 @@ The values of a coordinate variable or auxiliary coordinate variable indicate th
 The locations of the boundaries between cells are indicated by bounds variables (see <<cell-boundaries>>).
 If bounds are not provided, an application might reasonably assume the gridpoints to be at the centers of the cells, but we do not require that in this standard.
 
-
-
-
 [[latitude-coordinate, Section 4.1, "Latitude Coordinate"]]
 === Latitude Coordinate
 
@@ -52,7 +47,6 @@ float lat(lat) ;
       
 ----
 
-
 ====
 
 Application writers should note that the Udunits package does not recognize the directionality implied by the "north" part of the unit specification.
@@ -62,9 +56,6 @@ Hence, determination that a coordinate is a latitude type should be done via a s
 Optionally, the latitude type may be indicated additionally by providing the **`standard_name`** attribute with the value **`latitude`**, and/or the **`axis`** attribute with the value **`Y`**.
 
 Coordinates of latitude with respect to a rotated pole should be given units of **`degrees`**, not **`degrees_north`** or equivalents, because applications which use the units to identify axes would have no means of distinguishing such an axis from real latitude, and might draw incorrect coastlines, for instance.
-
-
-
 
 [[longitude-coordinate, Section 4.2, "Longitude Coordinate"]]
 === Longitude Coordinate
@@ -88,7 +79,6 @@ float lon(lon) ;
       
 ----
 
-
 ====
 
 Application writers should note that the Udunits package has limited recognition of the directionality implied by the "east" part of the unit specification.
@@ -98,9 +88,6 @@ We recommend the determination that a coordinate is a longitude type should be d
 Optionally, the longitude type may be indicated additionally by providing the **`standard_name`** attribute with the value **`longitude`**, and/or the **`axis`** attribute with the value **`X`**.
 
 Coordinates of longitude with respect to a rotated pole should be given units of **`degrees`**, not **`degrees_east`** or equivalents, because applications which use the units to identify axes would have no means of distinguishing such an axis from real longitude, and might draw incorrect coastlines, for instance.
-
-
-
 
 [[vertical-coordinate]]
 === Vertical (Height or Depth) Coordinate
@@ -114,14 +101,11 @@ The **`positive`** attribute may have the value **`up`** or **`down`** (case ins
 This attribute may be applied to either coordinate variables or auxiliary coordinate variables that contain vertical coordinate data.
 
 For example, if an oceanographic netCDF file encodes the depth of the surface as 0 and the depth of 1000 meters as 1000 then the axis would use attributes as follows: 
-----
 
+----
 axis_name:units = "meters" ; 
 axis_name:positive = "down" ; 	
-      
 ----
-
- 
 
 If, on the other hand, the depth of 1000 meters were represented as -1000 then the value of the **`positive`** attribute would have been **`up`**.
 If the **`units`** attribute value is a valid pressure unit the default value of the **`positive`** attribute is **`down`**.
@@ -131,15 +115,12 @@ A vertical coordinate will be identifiable by:
 * units of pressure; or
 * the presence of the **`positive`** attribute with a value of **`up`** or **`down`** (case insensitive).
 
- 
-
 Optionally, the vertical type may be indicated additionally by providing the **`standard_name`** attribute with an appropriate value, and/or the **`axis`** attribute with the value **`Z`**. 
 If both **`positive`** and **`standard_name`** are provided, it is recommended that they should be consistent. 
 For instance, if a depth of 1000 metres is represented by -1000 and **`positive`** is **`up`**, it would be inconsistent to give the **`standard_name`** as **`depth`**, whose definition (vertical distance below the surface) implies positive down. 
 If an application detects such an inconsistency, the user should be warned, and the **`positive`** attribute should be used to determine the sign convention.
 
 Recommendations:  The **`positive`** attribute should be consistent with the sign convention implied by the definition of the **`standard_name`**, if both are provided.
-
 
 ==== Dimensional Vertical Coordinate
 
@@ -154,16 +135,12 @@ For vertical axes the most commonly used of these include **`meter (metre, m)`**
 
 Plural forms are also acceptable.
 
-
-
-
 [[dimensionless-vertical-coordinate, Section 4.3.2, "Dimensionless Vertical Coordinate"]]
 ==== Dimensionless Vertical Coordinate
 
 The **`units`** attribute is not required for dimensionless coordinates.
 For backwards compatibility with COARDS we continue to allow the **`units`** attribute to take one of the values: **`level`**, **`layer`**, or **`sigma_level`**.
 These values are not recognized by the Udunits package, and are considered a deprecated feature in the CF standard.
-
 
 [[parametric-vertical-coordinate, Section 4.3.3, "Parametric Vertical Coordinate"]]
 ==== Parametric Vertical Coordinate
@@ -175,48 +152,37 @@ The `formula_terms` attribute can be used to associate terms in the definitions 
 To maintain backwards compatibility with COARDS the use of these attributes is not required, but is strongly recommended.
 Some of the definitions may be supplemented with information stored in the `grid_mapping` variable about the datum used as a vertical reference (e.g. geoid, other geopotential datum or reference ellipsoid; see <<grid-mappings-and-projections>> and <<appendix-grid-mappings>>).
 
-
 [[atm-sigma-coord-ex]]
 [caption="Example 4.3. "]
 .Atmosphere sigma coordinate
 ====
 
 ----
-
 float lev(lev) ;
   lev:long_name = "sigma at layer midpoints" ;
   lev:positive = "down" ;
   lev:standard_name = "atmosphere_sigma_coordinate" ;
   lev:formula_terms = "sigma: lev ps: PS ptop: PTOP" ;
   lev:computed_standard_name = "air_pressure" ;
-	
 ----
-
 
 ====
 
 In this example the **`standard_name`** value **`atmosphere_sigma_coordinate`** identifies the following definition from <<parametric-v-coord>> which specifies how to compute pressure at gridpoint **`(n,k,j,i)`** where **`j`** and **`i`** are horizontal indices, **`k`** is a vertical index, and **`n`** is a time index:
-----
 
+----
 p(n,k,j,i) = ptop + sigma(k)*(ps(n,j,i)-ptop)
-	
 ----
-
- 
 
 The **`formula_terms`** attribute associates the variable **`lev`** with the term **`sigma`**, the variable **`PS`** with the term **`ps`**, and the variable **`PTOP`** with the term **`ptop`**.
 Thus the pressure at gridpoint **`(n,k,j,i)`** would be calculated by 
-----
 
+----
 p(n,k,j,i) = PTOP + lev(k)*(PS(n,j,i)-PTOP)
-	
 ----
 
 The `computed_standard_name` attribute indicates that the values in variable
 `p` would have a `standard_name` of `air_pressure`.
-
-
-
 
 [[time-coordinate]]
 === Time Coordinate
@@ -246,13 +212,10 @@ The CF standard follows UDUNITS in the definition of units, but we recommend tha
 ====
 
 ----
-
 double time(time) ;
   time:long_name = "time" ;
   time:units = "days since 1990-1-1 0:0:0" ;
-      
 ----
-
 
 ====
 
@@ -261,11 +224,9 @@ The Udunits routines **`utScan()`** and **`utIsTime()`** can be used to make thi
 
 Optionally, the time coordinate may be indicated additionally by providing the **`standard_name`** attribute with an appropriate value, and/or the **`axis`** attribute with the value **`T`**.
 
-
-
-
 [[calendar, Section 4.4.1, "Calendar"]]
 ==== Calendar
+
 A date/time is the set of numbers which together identify an instant of time, namely its year, month, day, hour, minute and second, where the second may have a fraction but the others are all integer.
 A time coordinate value represents a date/time.
 In order to calculate a time coordinate value from a date/time, or the reverse, one must know the **`units`** attribute of the time coordinate variable (containing the time unit of the coordinate values and the reference date/time) and the calendar.
@@ -311,8 +272,6 @@ All dates consistent with these rules are allowed, both before and after 1582-10
 
 **`none`**:: No calendar.
 
-
-
 The **`calendar`** attribute may be set to **`none`** in climate experiments that simulate a fixed time of year.
 The time of year is indicated by the date in the reference time of the **`units`** attribute.
 The time coordinates that might apply in a perpetual July experiment are given in the following example.
@@ -323,7 +282,6 @@ The time coordinates that might apply in a perpetual July experiment are given i
 ====
 
 ----
-
 variables:
   double time(time) ;
     time:long_name = "time" ;
@@ -331,9 +289,7 @@ variables:
     time:calendar = "none" ;
 data:
   time = 0., 1., 2., ...;
-      
 ----
-
 
 ====
 
@@ -355,8 +311,6 @@ If this attribute is absent, it is assumed there are no leap years.
 If this attribute is not present, February (2) is assumed.
 This attribute is ignored if **`leap_year`** is not specified.
 
-
-
 The **`calendar`** attribute is not required when a non-standard calendar is being used.
 It is sufficient to define the calendar using the **`month_lengths`** attribute, along with **`leap_year`**, and **`leap_month`** as appropriate.
 However, the **`calendar`** attribute is allowed to take non-standard values and in that case defining the non-standard calendar using the appropriate attributes is required.
@@ -367,18 +321,14 @@ However, the **`calendar`** attribute is allowed to take non-standard values and
 ====
 
 ----
-
 double time(time) ;
   time:long_name = "time" ;
   time:units = "days since 1-1-1 0:0:0" ;
   time:calendar = "126 kyr B.P." ;
   time:month_lengths = 34, 31, 32, 30, 29, 27, 28, 28, 28, 32, 32, 34 ;
-	
 ----
 
-
 ====
-
 
 [[discrete-axis, Section 4.5, "Discrete Axis"]]
 === Discrete Axis

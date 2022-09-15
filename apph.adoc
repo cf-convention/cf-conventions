@@ -1,5 +1,4 @@
-﻿
-[[appendix-examples-discrete-geometries, Appendix H, Annotated Examples of Discrete Geometries]]
+﻿[[appendix-examples-discrete-geometries, Appendix H, Annotated Examples of Discrete Geometries]]
 
 [appendix]
 == Annotated Examples of Discrete Geometries
@@ -55,7 +54,6 @@ In this example, the humidity(i) and temp(i) data are associated with the coordi
 The obs dimension may optionally be the netCDF unlimited dimension of the netCDF file.
 ====
 
-
 [[time-series-data, Section H.2, "Time Series Data"]]
 === Time Series Data
 
@@ -71,7 +69,6 @@ In addition,
 
 All the representations described in section 9.3 can be used for time series.
 The global attribute **`featureType={rdquo}timeSeries{rdquo}`** (case-insensitive) must be included.
-
 
 ==== Orthogonal multidimensional array representation of time series
 
@@ -120,7 +117,6 @@ In the former case, listing the time variable in the **`coordinates`** attribute
 In this example, **`humidity(i,o)`** is element o of time series i, and associated with the coordinate values **`time(o)`**, **`lat(i)`**, and **`lon(i)`**.
 Either the instance (station) or the element (time) dimension may optionally be the netCDF unlimited dimension.
 ====
-
 
 ==== Incomplete multidimensional array representation of time series
 
@@ -186,7 +182,6 @@ Either the instance (station) dimension or the element (obs) dimension could be 
 Any unused elements of the data and auxiliary coordinate variables must contain the missing data flag value(section 9.6).
 ====
 
-
 ==== Single time series, including deviations from a nominal fixed spatial location
 
 When the intention of a data variable is to contain only a single time series, the preferred encoding is a special case of the multidimensional array representation.
@@ -240,7 +235,6 @@ When the intention of a data variable is to contain only a single time series, t
 While an idealized time series is defined at a single, stable point location, there are examples of time series, such as cabled ocean surface mooring measurements, in which the precise position of the observations varies slightly from a nominal fixed point. 
 In the following example we show how the spatial positions of such a time series should be encoded in CF. 
 Note that although this example shows only a single time series, the technique is applicable to all of the representations.
-
 
 [[example-h.5]]
 [caption="Example H.5. "]
@@ -299,7 +293,6 @@ Note that although this example shows only a single time series, the technique i
 ----
 ====
 
-
 ==== Contiguous ragged array representation of time series
 
 When the time series have different lengths and the data values for entire time series are available to be written in a single operation,  the contiguous ragged array representation is efficient.
@@ -355,8 +348,6 @@ When the time series have different lengths and the data values for entire time 
           :featureType = "timeSeries";
 ----
 
-
-
 The data humidity(o) and temp(o) are associated with the coordinate values time(o), lat(i), lon(i), and alt(i), where i indicates which time series.
 Time series i comprises the data elements from
 
@@ -378,7 +369,6 @@ The variable bearing the `**sample_dimension**` attribute must have the instance
 This variable implicitly partitions into individual instances all variables that have the sample dimension. 
 The auxiliary coordinate variables **`lat`**, **`lon`**, **`alt`** and **`station_name`** are station variables.
 ====
-
 
 ==== Indexed ragged array representation of time series
 
@@ -444,7 +434,6 @@ This variable implicitly assigns the station to each value of any variable havin
 The sample dimension need not be the netCDF unlimited dimension, though it commonly is.
 ====
 
-
 [[profile-data, Section H.3, "Profile Data"]]
 === Profile Data
 
@@ -458,7 +447,6 @@ The profile variables may contain missing values.
 This allows one to reserve space for additional profiles that may be added at a later time, as discussed in section 9.6.
 All the representations described in section 9.1.3 can be used for profiles.
 The global attribute **`featureType={rdquo}profile{rdquo}`** (case-insensitive) should be included if all data variables in the file contain profiles.
-
 
 ==== Orthogonal multidimensional array representation of profiles
 
@@ -524,13 +512,11 @@ The vertical coordinate for element o in each profile is altitude z(o).
 Either the instance (profile) or the element (z) dimension could be the netCDF unlimited dimension.
 ====
 
-
 ==== Incomplete multidimensional array representation of profiles
 
 If there are the same number of levels in each profile, but they do not have the same set of vertical coordinates, one can use the incomplete multidimensional array representation, which the vertical coordinate variable is two-dimensional e.g. replacing z(z) in <<example-h.8>> with alt(profile,z). 
 This representation also allows one to have a variable number of elements in different profiles, at the cost of some wasted space.
 In that case, any unused elements of the data and auxiliary coordinate variables must contain missing data values (section 9.6).
-
 
 ==== Single profile
 
@@ -593,7 +579,6 @@ This is a special case of the orthogonal multidimensional array representation (
 The pressure(o), temperature(o), and humidity(o) data is associated with the coordinate values time, z(o), lat, and lon.
 The profile variables time, lat and lon, shown here as scalar, could alternatively be one-dimensional time(profile), lat(profile), lon(profile) if a size-one profile dimension were retained in the file.
 ====
-
 
 ==== Contiguous ragged array representation of profiles
 
@@ -666,7 +651,6 @@ It must have the profile dimension as its single dimension, and must have an int
 The elements are associated with the profile using the same algorithm as in H.2.4.
 ====
 
-
 ==== Indexed ragged array representation of profiles
 
 When the number of vertical levels for each profile varies, and one cannot write them contiguously, one can use the indexed ragged array representation.
@@ -738,7 +722,6 @@ Each value in the profile index variable is the zero-based profile index that th
 The elements are associated with the profiles using the same algorithm as in H.2.5.
 ====
 
-
 [[trajectory-data, Section H.4, "Trajectory Data"]]
 === Trajectory Data
 
@@ -751,7 +734,6 @@ The trajectory variables may contain missing values.
 This allows one to reserve space for additional trajectories that may be added at a later time, as discussed in section 9.6.
 All the representations described in section 9.3 can be used for trajectories.
 The global attribute **`featureType={rdquo}trajectory{rdquo}`** (case-insensitive) should be included if all data variables in the file contain trajectories.
-
 
 ==== Multidimensional array representation of trajectories
 
@@ -818,7 +800,6 @@ If the trajectories all have the same set of times, the time auxiliary coordinat
 In the latter case, listing the time coordinate variable in the coordinates attribute is optional.
 ====
 
-
 ==== Single trajectory
 
 When a single trajectory is stored in the data variable, there is no need for the trajectory dimension and the arrays are one-dimensional.
@@ -878,7 +859,6 @@ The time dimension may be unlimited or not.
 Note that structurally this looks like unconnected point data as in example 9.5.
 The presence of the featureType = "trajectory" global attribute indicates that in fact the points are connected along a trajectory.
 ====
-
 
 ==== Contiguous ragged array representation of trajectories
 
@@ -944,7 +924,6 @@ The count variable (row_size) contains the number of elements for each trajector
 It must have the trajectory dimension as its single dimension, and must have an integer type. 
 The elements are associated with the trajectories using the same algorithm as in H.2.4.
 ====
-
 
 ==== Indexed ragged array representation of trajectories
 
@@ -1013,7 +992,6 @@ Each value in the trajectory_index variable is the zero-based trajectory index t
 The elements are associated with the trajectories using the same algorithm as in H.2.5.
 ====
 
-
 [[time-series-profiles, Section H.5, "Time Series of Profiles"]]
 === Time Series of Profiles
 
@@ -1032,7 +1010,6 @@ In addition,
 TimeSeriesProfiles are more complicated than timeSeries because there are two element dimensions (profile and vertical).
 Each time series has a number of profiles from different times as its elements, and each profile has a number of data from various levels as its elements.
 It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the **`cf_role`** attribute " **`profile_id`** ", whose values uniquely identify the profiles.
-
 
 ==== Multidimensional array representations of time series profiles
 
@@ -1146,7 +1123,6 @@ The number of profiles equals the number of times.
 At the cost of some wasted space, the multidimensional array representation also allows one to have a variable number of profiles for different stations, and varying numbers of levels for different profiles.
 In these cases, any unused elements of the data and auxiliary coordinate variables must contain missing data values (section 9.6).
 
-
 ==== Time series of profiles at a single station
 
 If there is only one station in the data variable, there is no need for the station dimension:
@@ -1214,7 +1190,6 @@ The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of pro
 If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.
 ====
-
 
 ==== Ragged array representation of time series profiles
 
@@ -1305,7 +1280,6 @@ The number of elements in profile p is recorded in row_size(p), as in section H.
 The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====
 
-
 [[trajectory-profiles, Section H.6, "Trajectory of Profiles"]]
 === Trajectory of Profiles
 
@@ -1318,7 +1292,6 @@ This allows one to reserve space for additional trajectories that may be added a
 TrajectoryProfiles are more complicated than trajectories because there are two element dimensions.
 Each trajectory has a number of profiles as its elements, and each profile has a number of data from various levels as its elements.
 It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the **`cf_role`** attribute " **`profile_id`** ", whose values uniquely identify the profiles.
-
 
 ==== Multidimensional array representation of trajectory profiles
 
@@ -1394,7 +1367,6 @@ In the latter case, listing the time coordinate variable in the coordinates attr
 At the cost of some wasted space, the multidimensional array representation also allows one to have a variable number of profiles for different trajectories, and varying numbers of levels for different profiles.
 In these cases, any unused elements of the data and auxiliary coordinate variables must contain missing data values (section 9.6).
 
-
 ==== Profiles along a single trajectory
 
 If there is only one trajectory in the data variable, there is no need for the trajectory dimension:
@@ -1458,7 +1430,6 @@ The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of pro
 If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.
 ====
-
 
 ==== Ragged array representation of trajectory profiles
 
@@ -1540,3 +1511,4 @@ It must have the profile dimension as its sole dimension, and must have an integ
 The number of elements in profile p is recorded in row_size(p), as in section H.2.4.
 The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====
+
