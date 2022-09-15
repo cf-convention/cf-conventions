@@ -9,7 +9,7 @@
 To represent data at scattered locations and times with no implied relationship among of coordinate positions, both data and coordinates must share the same (sample) instance dimension.  
 Because each feature contains only a single data element, there is no need for a separate element dimension. 
 The representation of point features is a special, degenerate case of the standard four representations. 
-The **`coordinates`** attribute is used on the data variables to unambiguously identify the relevant space and time auxiliary coordinate variables.
+The `coordinates` attribute is used on the data variables to unambiguously identify the relevant space and time auxiliary coordinate variables.
 
 [[example-h.1, Example H.1, "Point data"]]
 [caption="Example H.1. "]
@@ -50,8 +50,8 @@ The **`coordinates`** attribute is used on the data variables to unambiguously i
    attributes:
       :featureType = "point";
 ----
-In this example, the humidity(i) and temp(i) data are associated with the coordinate values time(i), lat(i), lon(i), and alt(i).
-The obs dimension may optionally be the netCDF unlimited dimension of the netCDF file.
+In this example, the `humidity(i)` and `temp(i)` data are associated with the coordinate values `time(i)`, `lat(i)`, `lon(i)`, and `alt(i)`.
+The `obs` dimension may optionally be the netCDF unlimited dimension of the netCDF file.
 ====
 
 [[time-series-data, Section H.2, "Time Series Data"]]
@@ -64,17 +64,17 @@ The instance variables, which have just this dimension, including latitude and l
 The station variables may contain missing values, allowing one to reserve space for additional stations that may be added at a later time, as discussed in section 9.6.
 In addition,
 
-* It is strongly recommended that there should be a station variable (which may be of any type) with the attribute **`cf_role={rdquo}timeseries_id{rdquo}`**, whose values uniquely identify the stations.
-* It is recommended that there should be station variables with standard_name attributes " **`platform_name`** ", " **`surface_altitude`** " and {ldquo} **`platform_id`** {rdquo} when applicable.
+* It is strongly recommended that there should be a station variable (which may be of any type) with the attribute `cf_role={rdquo}timeseries_id{rdquo}`, whose values uniquely identify the stations.
+* It is recommended that there should be station variables with standard_name attributes " `platform_name` ", " `surface_altitude` " and `platform_id` when applicable.
 
 All the representations described in section 9.3 can be used for time series.
-The global attribute **`featureType={rdquo}timeSeries{rdquo}`** (case-insensitive) must be included.
+The global attribute `featureType={rdquo}timeSeries{rdquo}` (case-insensitive) must be included.
 
 ==== Orthogonal multidimensional array representation of time series
 
 If the time series instances have the same number of elements and the time values are identical for all instances, you may use the orthogonal multidimensional array representation.
-This has either a one-dimensional coordinate variable, time(time), provided the time values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, time(o), where o is the element dimension.
-In the former case, listing the time variable in the **`coordinates`** attributes of the data variables is optional.
+This has either a one-dimensional coordinate variable, `time(time)`, provided the time values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, `time(o)`, where `o` is the element dimension.
+In the former case, listing the time variable in the `coordinates` attributes of the data variables is optional.
 
 [[example-h.2]]
 [caption="Example H.2. "]
@@ -114,14 +114,14 @@ In the former case, listing the time variable in the **`coordinates`** attribute
    attributes:
        :featureType = "timeSeries";
 ----
-In this example, **`humidity(i,o)`** is element o of time series i, and associated with the coordinate values **`time(o)`**, **`lat(i)`**, and **`lon(i)`**.
-Either the instance (station) or the element (time) dimension may optionally be the netCDF unlimited dimension.
+In this example, `humidity(i,o)` is element `o` of time series `i`, and associated with the coordinate values `time(o)`, `lat(i)`, and `lon(i)`.
+Either the instance (`station`) or the element (`time`) dimension may optionally be the netCDF unlimited dimension.
 ====
 
 ==== Incomplete multidimensional array representation of time series
 
 Much of the simplicity of the orthogonal multidimensional representation can be preserved even in cases where individual time series have different time coordinate values. 
-All time series must be allocated the amount of staorage needed by the longest, so the use of this representation will trade off simplicity against storage space in some cases.  
+All time series must be allocated the amount of storage needed by the longest, so the use of this representation will trade off simplicity against storage space in some cases.  
 
 [[example-h.3]]
 [caption="Example H.3. "]
@@ -177,8 +177,8 @@ All time series must be allocated the amount of staorage needed by the longest, 
    attributes:
           :featureType = "timeSeries";
 ----
-In this example, the humidity(i,o) and temp(i,o) data for element o of time series i are associated with the coordinate values time(i,o), lat(i), lon(i) and alt(i).
-Either the instance (station) dimension or the element (obs) dimension could be the unlimited dimension of a netCDF file. 
+In this example, the `humidity(i,o)` and `temp(i,o)` data for element `o` of time series `i` are associated with the coordinate values `time(i,o)`, `lat(i)`, `lon(i)` and `alt(i)`.
+Either the instance (`station`) dimension or the element (`obs`) dimension could be the unlimited dimension of a netCDF file. 
 Any unused elements of the data and auxiliary coordinate variables must contain the missing data flag value(section 9.6).
 ====
 
@@ -295,7 +295,7 @@ Note that although this example shows only a single time series, the technique i
 
 ==== Contiguous ragged array representation of time series
 
-When the time series have different lengths and the data values for entire time series are available to be written in a single operation,  the contiguous ragged array representation is efficient.
+When the time series have different lengths and the data values for entire time series are available to be written in a single operation, the contiguous ragged array representation is efficient.
 
 [[example-h.6]]
 [caption="Example H.6. "]
@@ -348,8 +348,8 @@ When the time series have different lengths and the data values for entire time 
           :featureType = "timeSeries";
 ----
 
-The data humidity(o) and temp(o) are associated with the coordinate values time(o), lat(i), lon(i), and alt(i), where i indicates which time series.
-Time series i comprises the data elements from
+The data `humidity(o)` and `temp(o)` are associated with the coordinate values `time(o)`, `lat(i)`, `lon(i)`, and `alt(i)`, where `i` indicates which time series.
+Time series `i` comprises the data elements from
 
 ----
    rowStart(i) to rowStart(i) + row_size(i) - 1
@@ -362,12 +362,12 @@ where
       rowStart(i) = rowStart(i-1) + row_size(i-1) if i > 0
 ----
 
-The variable, **`row_size`**, is the count variable containing the length of each time series feature. 
-It is identified by having an attribute with name `**sample_dimension**` whose value is name of the sample dimension (**`obs`** in this example). 
+The variable, `row_size`, is the count variable containing the length of each time series feature. 
+It is identified by having an attribute with name `sample_dimension` whose value is name of the sample dimension (`obs` in this example). 
 The sample dimension could optionally be the netCDF unlimited dimension. 
-The variable bearing the `**sample_dimension**` attribute must have the instance dimension (**`station`** in this example) as its single dimension, and must have an integer type. 
+The variable bearing the `sample_dimension` attribute must have the instance dimension (`station` in this example) as its single dimension, and must have an integer type. 
 This variable implicitly partitions into individual instances all variables that have the sample dimension. 
-The auxiliary coordinate variables **`lat`**, **`lon`**, **`alt`** and **`station_name`** are station variables.
+The auxiliary coordinate variables `lat`, `lon`, `alt` and `station_name` are station variables.
 ====
 
 ==== Indexed ragged array representation of time series
@@ -425,11 +425,11 @@ When time series with different lengths are written incrementally, the indexed r
    attributes:
           :featureType = "timeSeries";
 ----
-The humidity(o) and temp(o) data are associated with the coordinate values time(o), lat(i), lon(i), and alt(i), where i = stationIndex(o) is a zero-based index indicating which time series.
-Thus, time(0), humidity(0) and temp(0) belong to the element of the **`station`** dimension that is indicated by **`stationIndex(0)`** ; time(1), humidity(1) and temp(1) belong to element **`stationIndex(1)`** of the **`station`** dimension, etc.
+The `humidity(o)` and `temp(o)` data are associated with the coordinate values `time(o)`, `lat(i)`, `lon(i)`, and `alt(i)`, where `i = stationIndex(o)` is a zero-based index indicating which time series.
+Thus, `time(0)`, `humidity(0)` and `temp(0)` belong to the element of the `station` dimension that is indicated by `stationIndex(0)` ; `time(1)`, `humidity(1)` and `temp(1)` belong to element `stationIndex(1)` of the `station` dimension, etc.
 
-The variable, **`stationIndex`**, is identified as the index variable by having an attribute with name of `**instance_dimension**` whose value is the instance dimension (**`station`** in this example). 
-The variable bearing the `**instance_dimension**` attribute must have the sample dimension (**`obs`** in this example) as its single dimension, and must have an integer type. 
+The variable, `stationIndex`, is identified as the index variable by having an attribute with name of `instance_dimension` whose value is the instance dimension (`station` in this example). 
+The variable bearing the `instance_dimension` attribute must have the sample dimension (`obs` in this example) as its single dimension, and must have an integer type. 
 This variable implicitly assigns the station to each value of any variable having the sample dimension. 
 The sample dimension need not be the netCDF unlimited dimension, though it commonly is.
 ====
@@ -442,16 +442,16 @@ For each profile, there is a single time, lat and lon.
 A data variable may contain a collection of profile features.
 The instance dimension in the case of profiles specifies the number of profiles in the collection and is also referred to as the **profile dimension**.
 The instance variables, which have just this dimension, including latitude and longitude for example, are also referred to as **profile variables** and are considered to be information about the profiles.
-It is strongly recommended that there always be a profile variable (of any data type) with **`cf_role`** attribute " **`profile_id`** ", whose values uniquely identify the profiles.
+It is strongly recommended that there always be a profile variable (of any data type) with `cf_role` attribute " `profile_id` ", whose values uniquely identify the profiles.
 The profile variables may contain missing values.
 This allows one to reserve space for additional profiles that may be added at a later time, as discussed in section 9.6.
 All the representations described in section 9.1.3 can be used for profiles.
-The global attribute **`featureType={rdquo}profile{rdquo}`** (case-insensitive) should be included if all data variables in the file contain profiles.
+The global attribute `featureType={rdquo}profile{rdquo}` (case-insensitive) should be included if all data variables in the file contain profiles.
 
 ==== Orthogonal multidimensional array representation of profiles
 
 If the profile instances have the same number of elements and the vertical coordinate values are identical for all instances, you may use the orthogonal multidimensional array representation.
-This has either a one-dimensional coordinate variable, z(z), provided the vertical coordinate values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, alt(o), where o is the element dimension.
+This has either a one-dimensional coordinate variable, `z(z)`, provided the vertical coordinate values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, `alt(o)`, where `o` is the element dimension.
 In the former case, listing the vertical coordinate variable in the **coordinates** attributes of the data variables is optional.
 
 [[example-h.8, Example H.8, "Atmospheric sounding profiles for a common set of vertical coordinates stored in the orthogonal multidimensional array representation."]]
@@ -507,14 +507,14 @@ In the former case, listing the vertical coordinate variable in the **coordinate
    attributes:
       :featureType = "profile";
 ----
-The pressure(i,o), temperature(i,o), and humidity(i,o) data for element o of profile i are associated with the coordinate values time(i), lat(i), and lon(i).
-The vertical coordinate for element o in each profile is altitude z(o).
-Either the instance (profile) or the element (z) dimension could be the netCDF unlimited dimension.
+The `pressure(i,o)`, `temperature(i,o)`, and `humidity(i,o)` data for element `o` of profile `i` are associated with the coordinate values `time(i)`, `lat(i)`, and `lon(i)`.
+The vertical coordinate for element `o` in each profile is altitude `z(o)`.
+Either the instance (`profile`) or the element (`z`) dimension could be the netCDF unlimited dimension.
 ====
 
 ==== Incomplete multidimensional array representation of profiles
 
-If there are the same number of levels in each profile, but they do not have the same set of vertical coordinates, one can use the incomplete multidimensional array representation, which the vertical coordinate variable is two-dimensional e.g. replacing z(z) in <<example-h.8>> with alt(profile,z). 
+If there are the same number of levels in each profile, but they do not have the same set of vertical coordinates, one can use the incomplete multidimensional array representation, which the vertical coordinate variable is two-dimensional e.g. replacing `z(z)` in <<example-h.8>> with `alt(profile,z)`.
 This representation also allows one to have a variable number of elements in different profiles, at the cost of some wasted space.
 In that case, any unused elements of the data and auxiliary coordinate variables must contain missing data values (section 9.6).
 
@@ -576,8 +576,8 @@ This is a special case of the orthogonal multidimensional array representation (
    attributes:
       :featureType = "profile";
 ----
-The pressure(o), temperature(o), and humidity(o) data is associated with the coordinate values time, z(o), lat, and lon.
-The profile variables time, lat and lon, shown here as scalar, could alternatively be one-dimensional time(profile), lat(profile), lon(profile) if a size-one profile dimension were retained in the file.
+The `pressure(o)`, `temperature(o)`, and `humidity(o)` data is associated with the coordinate values `time`, `z(o)`, `lat`, and `lon`.
+The profile variables `time`, `lat` and `lon`, shown here as scalar, could alternatively be one-dimensional `time(profile)`, `lat(profile)`, `lon(profile)` if a size-one profile dimension were retained in the file.
 ====
 
 ==== Contiguous ragged array representation of profiles
@@ -641,12 +641,12 @@ The canonical use case for this is when rewriting raw data, and you expect that 
    attributes:
       :featureType = "profile";
 ----
-The pressure(o), temperature(o), and humidity(o) data is associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile.
+The `pressure(o)`, `temperature(o)`, and `humidity(o)` data is associated with the coordinate values `time(i)`, `z(o)`, `lat(i)`, and `lon(i)`, where `i` indicates which profile.
 All elements for one profile are contiguous along the sample dimension.
-The sample dimension (obs) may be the unlimited dimension or not.
-All variables that have the instance dimension (profile) as their single dimension are considered to be information about the profiles.
+The sample dimension (`obs`) may be the unlimited dimension or not.
+All variables that have the instance dimension (`profile`) as their single dimension are considered to be information about the profiles.
 
-The count variable (row_size) contains the number of elements for each profile, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted. 
+The count variable (`row_size`) contains the number of elements for each profile, and is identified by having an attribute with name `sample_dimension` whose value is the sample dimension being counted. 
 It must have the profile dimension as its single dimension, and must have an integer type. 
 The elements are associated with the profile using the same algorithm as in H.2.4.
 ====
@@ -714,9 +714,9 @@ If the sample dimension is the unlimited dimension, this allows data to be appen
    attributes:
       :featureType = "profile";
 ----
-The pressure(o), temperature(o), and humidity(o) data are associated with the coordinate values time(i), z(o), lat(i), and lon(i), where i indicates which profile.
-The sample dimension (obs) may be the unlimited dimension or not.
-The profile index variable (parentIndex) is identified by having an attribute with name of "instance_dimension" whose value is the profile dimension name. 
+The `pressure(o)`, `temperature(o)`, and `humidity(o)` data are associated with the coordinate values `time(i)`, `z(o)`, `lat(i)`, and `lon(i)`, where `i` indicates which profile.
+The sample dimension (`obs`) may be the unlimited dimension or not.
+The profile index variable (`parentIndex`) is identified by having an attribute with name of `instance_dimension` whose value is the profile dimension name. 
 It must have the sample dimension as its single dimension, and must have an integer type. 
 Each value in the profile index variable is the zero-based profile index that the element belongs to.
 The elements are associated with the profiles using the same algorithm as in H.2.5.
@@ -729,11 +729,11 @@ Data may be taken along discrete paths through space, each path constituting a c
 A data variable may contain a collection of trajectory features.
 The instance dimension in the case of trajectories specifies the number of trajectories in the collection and is also referred to as the **trajectory dimension**.
 The instance variables, which have just this dimension, are also referred to as **trajectory variables** and are considered to be information about the trajectories.
-It is strongly recommended that there always be a trajectory variable (of any data type) with the attribute **`cf_role={rdquo}trajectory_id{rdquo}`** attribute, whose values uniquely identify the trajectories.
+It is strongly recommended that there always be a trajectory variable (of any data type) with the attribute `cf_role={rdquo}trajectory_id{rdquo}` attribute, whose values uniquely identify the trajectories.
 The trajectory variables may contain missing values.
 This allows one to reserve space for additional trajectories that may be added at a later time, as discussed in section 9.6.
 All the representations described in section 9.3 can be used for trajectories.
-The global attribute **`featureType={rdquo}trajectory{rdquo}`** (case-insensitive) should be included if all data variables in the file contain trajectories.
+The global attribute `featureType={rdquo}trajectory{rdquo}` (case-insensitive) should be included if all data variables in the file contain trajectories.
 
 ==== Multidimensional array representation of trajectories
 
@@ -792,11 +792,11 @@ In that case, any unused elements of the data and auxiliary coordinate variables
    attributes:
       :featureType = "trajectory";
 ----
-The NO3(i,o) and O3(i,o) data for element o of trajectory i are associated with the coordinate values time(i,o), lat(i,o), lon(i,o), and z(i,o).
-Either the instance (trajectory) or the element (obs) dimension could be the netCDF unlimited dimension.
+The `NO3(i,o)` and `O3(i,o)` data for element `o` of trajectory `i` are associated with the coordinate values `time(i,o)`, `lat(i,o)`, `lon(i,o)`, and `z(i,o)`.
+Either the instance (trajectory) or the element (`obs`) dimension could be the netCDF unlimited dimension.
 All variables that have trajectory as their only dimension are considered to be information about that trajectory.
 
-If the trajectories all have the same set of times, the time auxiliary coordinate variable could be one-dimensional time(obs), or replaced by a one-dimensional coordinate variable time(time), where the size of the time dimension is now equal to the number of elements of each trajectory.
+If the trajectories all have the same set of times, the time auxiliary coordinate variable could be one-dimensional `time(obs)`, or replaced by a one-dimensional coordinate variable `time(time)`, where the size of the time dimension is now equal to the number of elements of each trajectory.
 In the latter case, listing the time coordinate variable in the coordinates attribute is optional.
 ====
 
@@ -852,12 +852,12 @@ This is a special case of the multidimensional array representation.
    attributes:
       :featureType = "trajectory";
 ----
-The NO3(o) and O3(o) data are associated with the coordinate values time(o), z(o), lat(o), and lon(o).
-In this example, the time coordinate is ordered, so time values are contained in a coordinate variable i.e. time(time) and time is the element dimension.
-The time dimension may be unlimited or not.
+The `NO3(o)` and `O3(o)` data are associated with the coordinate values `time(o)`, `z(o)`, `lat(o)`, and `lon(o)`.
+In this example, the time coordinate is ordered, so time values are contained in a coordinate variable i.e. `time(time)` and `time` is the element dimension.
+The `time` dimension may be unlimited or not.
 
 Note that structurally this looks like unconnected point data as in example 9.5.
-The presence of the featureType = "trajectory" global attribute indicates that in fact the points are connected along a trajectory.
+The presence of the `featureType = "trajectory"` global attribute indicates that in fact the points are connected along a trajectory.
 ====
 
 ==== Contiguous ragged array representation of trajectories
@@ -915,12 +915,12 @@ The canonical use case for this is when rewriting raw data, and you expect that 
    attributes:
       :featureType = "trajectory";
 ----
-The O3(o) and NO3(o) data are associated with the coordinate values time(o), lat(o), lon(o), and alt(o).
+The `O3(o)` and `NO3(o)` data are associated with the coordinate values `time(o)`, `lat(o)`, `lon(o)`, and `alt(o)`.
 All elements for one trajectory are contiguous along the sample dimension.
-The sample dimension (obs) may be the unlimited dimension or not.
-All variables that have the instance dimension (trajectory) as their single dimension are considered to be information about that trajectory.
+The sample dimension (`obs`) may be the unlimited dimension or not.
+All variables that have the instance dimension (`trajectory`) as their single dimension are considered to be information about that trajectory.
 
-The count variable (row_size) contains the number of elements for each trajectory, and is identified by having an attribute with name "sample_dimension" whose value is the sample dimension being counted. 
+The count variable (`row_size`) contains the number of elements for each trajectory, and is identified by having an attribute with name `sample_dimension` whose value is the sample dimension being counted. 
 It must have the trajectory dimension as its single dimension, and must have an integer type. 
 The elements are associated with the trajectories using the same algorithm as in H.2.4.
 ====
@@ -982,13 +982,13 @@ The data can be written as it arrives; if the flatsample dimension is the unlimi
    attributes:
       :featureType = "trajectory";
 ----
-The O3(o) and NO3(o) data are associated with the coordinate values time(o), lat(o), lon(o), and alt(o).
+The `O3(o)` and `NO3(o)` data are associated with the coordinate values `time(o)`, `lat(o)`, `lon(o)`, and `alt(o)`.
 All elements for one trajectory will have the same trajectory index value.
-The sample dimension (obs) may be the unlimited dimension or not.
+The sample dimension (`obs`) may be the unlimited dimension or not.
 
-The index variable (trajectory_index) is identified by having an attribute with name of "instance_dimension" whose value is the trajectory dimension name. 
+The index variable (`trajectory_index`) is identified by having an attribute with name of `instance_dimension` whose value is the trajectory dimension name. 
 It must have the sample dimension as its single dimension, and must have an integer type. 
-Each value in the trajectory_index variable is the zero-based trajectory index that the element belongs to.
+Each value in the `trajectory_index` variable is the zero-based trajectory index that the element belongs to.
 The elements are associated with the trajectories using the same algorithm as in H.2.5.
 ====
 
@@ -1004,12 +1004,12 @@ The station variables may contain missing values.
 This allows one to reserve space for additional stations that may be added at a later time, as discussed in section 9.6.
 In addition,
 
-* It is strongly recommended that there should be a station variable (which may be of any type) with **`cf_role`** attribute "**`timeseries_id`**", whose values uniquely identify the stations.
-* It is recommended that there should be station variables with standard_name attributes "**`platform_name`**", "**`surface_altitude`**" and {ldquo}**`platform_id`**{rdquo} when applicable.
+* It is strongly recommended that there should be a station variable (which may be of any type) with `cf_role` attribute `timeseries_id`, whose values uniquely identify the stations.
+* It is recommended that there should be station variables with standard_name attributes `platform_name`, `surface_altitude` and `platform_id` when applicable.
       
 TimeSeriesProfiles are more complicated than timeSeries because there are two element dimensions (profile and vertical).
 Each time series has a number of profiles from different times as its elements, and each profile has a number of data from various levels as its elements.
-It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the **`cf_role`** attribute " **`profile_id`** ", whose values uniquely identify the profiles.
+It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the `cf_role` attribute `profile_id`, whose values uniquely identify the profiles.
 
 ==== Multidimensional array representations of time series profiles
 
@@ -1074,17 +1074,18 @@ When storing time series of profiles at multiple stations in the same data varia
    attributes:
     :featureType = "timeSeriesProfile";
 ----
-The pressure(i,p,o), temperature(i,p,o), and humidity(i,p,o) data for element o of profile p at station i are associated with the coordinate values time(i,p), z(i,p,o), lat(i), and lon(i).
+The `pressure(i,p,o)`, `temperature(i,p,o)`, and `humidity(i,p,o)` data for element `o` of profile `p` at station `i` are associated with the coordinate values `time(i,p)`, `z(i,p,o)`, `lat(i)`, and `lon(i)`.
 Any of the three dimensions could be the netCDF unlimited dimension, if it might be useful to be able enlarge it.
 
-If all of the profiles at any given station have the same set of vertical coordinates values, the vertical auxiliary coordinate variable could be dimensioned alt(station, z).
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+If all of the profiles at any given station have the same set of vertical coordinates values, the vertical auxiliary coordinate variable could be dimensioned `alt(station, z)`.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional `alt(z)`, or replaced by a one-dimensional coordinate variable `z(z)`, provided the values are ordered monotonically.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.
 
-If the profiles are taken at all stations at the same set of times, the time auxiliary coordinate variable could be one-dimensional time(profile), or replaced by a one-dimensional coordinate variable time(time), where the size of the time dimension is now equal to the number of profiles at each station.
+If the profiles are taken at all stations at the same set of times, the time auxiliary coordinate variable could be one-dimensional `time(profile)`, or replaced by a one-dimensional coordinate variable `time(time)`, where the size of the `time` dimension is now equal to the number of profiles at each station.
 In the latter case, listing the time coordinate variable in the coordinates attribute is optional.
 
 If there is only a single set of levels and a single set of times, the multidimensional array representation is formally orthogonal:
+
 ====
 
 [[example-h.17]]
@@ -1116,7 +1117,7 @@ If there is only a single set of levels and a single set of times, the multidime
        pressure:units = "hPa" ;
        pressure:axis = "Z" ;
 ----
-**`humidity(p,o,i)`** is associated with the coordinate values **`time(p)`**, **`pressure(o)`**, **`lat(i)`**, and **`lon(i)`**.
+`humidity(p,o,i)` is associated with the coordinate values `time(p)`, `pressure(o)`, `lat(i)`, and `lon(i)`.
 The number of profiles equals the number of times.
 ====
 
@@ -1186,8 +1187,8 @@ If there is only one station in the data variable, there is no need for the stat
    attributes:
     :featureType = "timeSeriesProfile";
 ----
-The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of profile p are associated with the coordinate values time(p), alt(p,o), lat, and lon.
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+The `pressure(p,o)`, `temperature(p,o)`, and `humidity(p,o)` data for element `o` of profile `p` are associated with the coordinate values `time(p)`, `alt(p,o)`, `lat`, and `lon`.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional `alt(z)`, or replaced by a one-dimensional coordinate variable `z(z)`, provided the values are ordered monotonically.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.
 ====
 
@@ -1267,16 +1268,16 @@ The canonical use case is when writing real-time data streams that contain profi
    attributes:
       :featureType = "timeSeriesProfile";
 ----
-The pressure(o), temperature(o), and humidity(o) data for element o of profile p at station i are associated with the coordinate values time(p), z(o), lat(i), and lon(i).
+The `pressure(o)`, `temperature(o)`, and `humidity(o)` data for element `o` of profile `p` at station `i` are associated with the coordinate values `time(p)`, `z(o)`, `lat(i)`, and `lon(i)`.
 
-The index variable (station_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (station in this example). 
+The index variable (`station_index`) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (`station` in this example). 
 The index variable must have the profile dimension as its sole dimension, and must have an integer type. 
-Each value in the index variable is the zero-based station index that the profile belongs to i.e. profile p belongs to station i=station_index(p), as in section H.2.5.
+Each value in the index variable is the zero-based station index that the profile belongs to i.e. profile `p` belongs to `station i=station_index(p)`, as in section H.2.5.
 
-The count variable (row_size) contains the number of elements for each profile, which must be written contiguously.
-The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted. 
+The count variable (`row_size`) contains the number of elements for each profile, which must be written contiguously.
+The count variable is identified by having an attribute with name `sample_dimension` whose value is the sample dimension (`obs` in this example) being counted. 
 It must have the profile dimension as its sole dimension, and must have an integer type. 
-The number of elements in profile p is recorded in row_size(p), as in section H.2.4.
+The number of elements in profile `p` is recorded in `row_size(p)`, as in section H.2.4.
 The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====
 
@@ -1291,7 +1292,7 @@ The trajectory variables may contain missing values.
 This allows one to reserve space for additional trajectories that may be added at a later time, as discussed in section 9.6.
 TrajectoryProfiles are more complicated than trajectories because there are two element dimensions.
 Each trajectory has a number of profiles as its elements, and each profile has a number of data from various levels as its elements.
-It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the **`cf_role`** attribute " **`profile_id`** ", whose values uniquely identify the profiles.
+It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the `cf_role` attribute `profile_id`, whose values uniquely identify the profiles.
 
 ==== Multidimensional array representation of trajectory profiles
 
@@ -1353,14 +1354,14 @@ If there are the same number of profiles for all trajectories, and the same numb
    attributes:
     :featureType = "trajectoryProfile";
 ----
-The pressure(i,p,o), temperature(i,p,o), and humidity(i,p,o) data for element o of profile p along trajectory i are associated with the coordinate values time(i,p), alt(i,p,o), lat(i,p), and lon(i,p).
+The `pressure(i,p,o)`, `temperature(i,p,o)`, and `humidity(i,p,o)` data for element `o` of profile `p` along trajectory `i` are associated with the coordinate values `time(i,p)`, `alt(i,p,o)`, `lat(i,p)`, and `lon(i,p)`.
 Any of the three dimensions could be the netCDF unlimited dimension, if it might be useful to be able enlarge it.
 
-If all of the profiles along any given trajectory have the same set of vertical coordinates values, the vertical auxiliary coordinate variable could be dimensioned alt(trajectory, z).
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+If all of the profiles along any given trajectory have the same set of vertical coordinates values, the vertical auxiliary coordinate variable could be dimensioned `alt(trajectory, z)`.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional `alt(z)`, or replaced by a one-dimensional coordinate variable `z(z)`, provided the values are ordered monotonically.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.
 
-If the profiles are taken along all the trajectories at the same set of times, the time auxiliary coordinate variable could be one-dimensional time(profile), or replaced by a one-dimensional coordinate variable time(time), where the size of the time dimension is now equal to the number of profiles along each trajectory.
+If the profiles are taken along all the trajectories at the same set of times, the time auxiliary coordinate variable could be one-dimensional `time(profile)`, or replaced by a one-dimensional coordinate variable `time(time)`, where the size of the time dimension is now equal to the number of profiles along each trajectory.
 In the latter case, listing the time coordinate variable in the coordinates attribute is optional.
 ====
 
@@ -1426,8 +1427,8 @@ If there is only one trajectory in the data variable, there is no need for the t
    attributes:
     :featureType = "trajectoryProfile";
 ----
-The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of profile p are associated with the coordinate values time(p), alt(p,o), lat(p), and lon(p).
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+The `pressure(p,o)`, `temperature(p,o)`, and `humidity(p,o)` data for element `o` of profile `p` are associated with the coordinate values `time(p)`, `alt(p,o)`, `lat(p)`, and `lon(p)`.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional `alt(z)`, or replaced by a one-dimensional coordinate variable `z(z)`, provided the values are ordered monotonically.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.
 ====
 
@@ -1499,16 +1500,16 @@ The canonical use case is when writing real-time data streams that contain profi
    attributes:
       :featureType = "trajectoryProfile";
 ----
-The pressure(o), temperature(o), and humidity(o) data for element o of profile p along trajectory i are associated with the coordinate values time(p), z(o), lat(p), and lon(p).
+The `pressure(o)`, `temperature(o)`, and `humidity(o)` data for element `o` of profile `p` along trajectory `i` are associated with the coordinate values `time(p)`, `z(o)`, `lat(p)`, and `lon(p)`.
 
-The index variable (trajectory_index) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (trajectory in this example). 
+The index variable (`trajectory_index`) is identified by having an attribute with name of `instance_dimension` whose value is the instance dimension name (trajectory in this example). 
 The index variable must have the profile dimension as its sole dimension, and must have an integer type. 
-Each value in the index variable is the zero-based trajectory index that the profile belongs to i.e. profile p belongs to trajectory i=trajectory_index(p), as in section H.2.5.
+Each value in the index variable is the zero-based trajectory index that the profile belongs to i.e. profile `p` belongs to trajectory `i=trajectory_index(p)`, as in section H.2.5.
 
-The count variable (row_size) contains the number of elements for each profile, which must be written contiguously.
-The count variable is identified by having an attribute with name sample_dimension whose value is the sample dimension (obs in this example) being counted. 
+The count variable (`row_size`) contains the number of elements for each profile, which must be written contiguously.
+The count variable is identified by having an attribute with name `sample_dimension` whose value is the sample dimension (`obs` in this example) being counted. 
 It must have the profile dimension as its sole dimension, and must have an integer type. 
-The number of elements in profile p is recorded in row_size(p), as in section H.2.4.
+The number of elements in profile `p` is recorded in `row_size(p)`, as in section H.2.4.
 The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====
 
