@@ -1,9 +1,14 @@
 ﻿
-==  Data Representative of Cells 
+==  Data Representative of Cells
 :doc-part: 7
 :figure: 0
 
-When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent. It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells. This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000. The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells. However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.  For cases when data pertain to geospatial features with highly variable geometry node counts such as river lines or watershed boundaries, we provide <<geometries> as an alternative to bounds.
+When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.
+It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells.
+This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000.
+The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells.
+However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.
+For cases when data pertain to geospatial features with highly variable geometry node counts such as river lines or watershed boundaries, we provide <<geometries> as an alternative to bounds.
 
 
 
@@ -11,13 +16,23 @@ When gridded data does not represent the point values of a field but instead rep
 [[cell-boundaries, Section 7.1, "Cell Boundaries"]]
 === Cell Boundaries
 
-To represent cells we add the attribute **`bounds`** to the appropriate coordinate variable(s). The value of **`bounds`** is the name of the variable that contains the vertices of the cell boundaries. We refer to this type of variable as a "boundary variable." __A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.__ The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices. Since a boundary variable is considered to be part of a coordinate variable's metadata, it is not necessary to provide it with attributes such as **`long_name`** and **`units`**.
+To represent cells we add the attribute **`bounds`** to the appropriate coordinate variable(s).
+The value of **`bounds`** is the name of the variable that contains the vertices of the cell boundaries.
+We refer to this type of variable as a "boundary variable."
+__A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.__ The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices.
+Since a boundary variable is considered to be part of a coordinate variable's metadata, it is not necessary to provide it with attributes such as **`long_name`** and **`units`**.
 
-Boundary variable attributes which determine the coordinate type (**`units`**, **`standard_name`**, **`axis`** and **`positive`**) or those which affect the interpretation of the array values (**`units`**, **`calendar`**, **`leap_month`**, **`leap_year`** and **`month_lengths`**) must always agree exactly with the same attributes of its associated coordinate, scalar coordinate or auxiliary coordinate variable. To avoid duplication, however, it is recommended that these are not provided to a boundary variable.
+Boundary variable attributes which determine the coordinate type (**`units`**, **`standard_name`**, **`axis`** and **`positive`**) or those which affect the interpretation of the array values (**`units`**, **`calendar`**, **`leap_month`**, **`leap_year`** and **`month_lengths`**) must always agree exactly with the same attributes of its associated coordinate, scalar coordinate or auxiliary coordinate variable.
+To avoid duplication, however, it is recommended that these are not provided to a boundary variable.
 
-If a parametric coordinate variable with a **`formula_terms`** attribute (section 4.3.2) also has a **`bounds`** attribute, its boundary variable must have a **`formula_terms`** attribute too. In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula. For any term that depends on the vertical dimension, however, the variable names appearing in the formula terms would differ from those found in the **`formula_terms`** attribute of the coordinate variable itself because the boundary variables for formula terms are two-dimensional while the formula terms themselves are one-dimensional.
+If a parametric coordinate variable with a **`formula_terms`** attribute (section 4.3.2) also has a **`bounds`** attribute, its boundary variable must have a **`formula_terms`** attribute too.
+In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula.
+For any term that depends on the vertical dimension, however, the variable names appearing in the formula terms would differ from those found in the **`formula_terms`** attribute of the coordinate variable itself because the boundary variables for formula terms are two-dimensional while the formula terms themselves are one-dimensional.
 
-Whenever a **`formula_terms`** attribute is attached to a boundary variable, the formula terms may additionally be identified using a second method: variables appearing in the vertical coordinates' **`formula_terms`** may be declared to be coordinate, scalar coordinate or auxiliary coordinate variables, and those coordinates may have **`bounds`** attributes that identify their boundary variables. In that case, the **`bounds`** attribute of a formula terms variable must be consistent with the **`formula_terms`** attribute of the boundary variable. Software digesting legacy datasets (constructed prior to version 1.7 of this standard) may have to rely in some cases on the first method of identifying the formula term variables and in other cases, on the second. Starting from version 1.7, however, the first method will be sufficient.
+Whenever a **`formula_terms`** attribute is attached to a boundary variable, the formula terms may additionally be identified using a second method: variables appearing in the vertical coordinates' **`formula_terms`** may be declared to be coordinate, scalar coordinate or auxiliary coordinate variables, and those coordinates may have **`bounds`** attributes that identify their boundary variables.
+In that case, the **`bounds`** attribute of a formula terms variable must be consistent with the **`formula_terms`** attribute of the boundary variable.
+Software digesting legacy datasets (constructed prior to version 1.7 of this standard) may have to rely in some cases on the first method of identifying the formula term variables and in other cases, on the second.
+Starting from version 1.7, however, the first method will be sufficient.
 
 [[specifying-formula_terms-ex]]
 [caption="Example 7.1. "]
@@ -54,13 +69,16 @@ float eta(eta) ;
 ====
 
 
-Note that the boundary variable for a set of N contiguous intervals is an array of shape (N,2). Although in this case there will be a duplication of the boundary coordinates between adjacent intervals, this representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.
+Note that the boundary variable for a set of N contiguous intervals is an array of shape (N,2).
+Although in this case there will be a duplication of the boundary coordinates between adjacent intervals, this representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.
 
-Applications that process cell boundary data often times need to determine whether or not adjacent cells share an edge. In order to facilitate this type of processing the following restrictions are placed on the data in boundary variables.
+Applications that process cell boundary data often times need to determine whether or not adjacent cells share an edge.
+In order to facilitate this type of processing the following restrictions are placed on the data in boundary variables.
 
 Bounds for 1-D coordinate variables:: For a coordinate variable such as **`lat(lat)`** with associated boundary variable **`latbnd(x,2)`**, the interval endpoints must be ordered consistently with the associated coordinate, e.g., for an increasing coordinate, **`lat(1)`** &gt; **`lat(0)`** implies **`latbnd(i,1)`** &gt;= **`latbnd(i,0)`** for all **`i`** (<<img-bnd_1d_coords>>).
 +
-If adjacent intervals are contiguous, the shared endpoint must be represented indentically in each instance where it occurs in the boundary variable. For example, if the intervals that contain grid points **`lat(i)`** and **`lat(i+1)`** are contiguous, then **`latbnd(i+1,0)`** = **`latbnd(i,1)`**.
+If adjacent intervals are contiguous, the shared endpoint must be represented indentically in each instance where it occurs in the boundary variable.
+For example, if the intervals that contain grid points **`lat(i)`** and **`lat(i+1)`** are contiguous, then **`latbnd(i+1,0)`** = **`latbnd(i,1)`**.
 +
 [[img-bnd_1d_coords, figure 1]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
@@ -68,7 +86,10 @@ If adjacent intervals are contiguous, the shared endpoint must be represented in
 .Order of **`lonbnd(i,0)`** and **`lonbnd(i,1)`** as well as of **`latbnd(i,0)`** and **`latbnd(i,1)`** in the case of one-dimensional horizontal coordinate axes. Tuples **`(lon(i),lat(j))`** represent grid cell centers. The four grid cell vertices are given by **`(lonbnd(i,0),latbnd(j,0))`**, **`(lonbnd(i,1),latbnd(j,0))`**, **`(lonbnd(i,1),latbnd(j,1))`** and **`(lonbnd(i,0),latbnd(j,1))`**.
 image::images/order_horizontal_bounds__1D_coord_variables.png[,50%,pdfwidth=50vw,align="center"]
 
-Bounds for 2-D coordinate variables with 4-sided cells:: In the case where the horizontal grid is described by two-dimensional auxiliary coordinate variables in latitude **`lat(n,m)`** and longitude **`lon(n,m)`**, and the associated cells are four-sided, then the boundary variables are given in the form **`latbnd(n,m,4)`** and **`lonbnd(n,m,4)`**, where the trailing index runs over the four vertices of the cells. Let us call the side of cell **`(j,i)`** facing cell **`(j,i-1)`** the "**`i-1`**" side, the side facing cell **`(j,i+1)`** the "**`i+1`**" side, and similarly for "**`j-1`**" and "**`j+1`**". Then we can refer to the vertex formed by sides **`i-1`** and **`j-1`** as **`(j-1,i-1)`**. With this notation, the four vertices are indexed as follows: **`0=(j-1,i-1)`**, **`1=(j-1,i+1)`**, **`2=(j+1,i+1)`**, **`3=(j+1,i-1)`**.
+Bounds for 2-D coordinate variables with 4-sided cells:: In the case where the horizontal grid is described by two-dimensional auxiliary coordinate variables in latitude **`lat(n,m)`** and longitude **`lon(n,m)`**, and the associated cells are four-sided, then the boundary variables are given in the form **`latbnd(n,m,4)`** and **`lonbnd(n,m,4)`**, where the trailing index runs over the four vertices of the cells.
+Let us call the side of cell **`(j,i)`** facing cell **`(j,i-1)`** the "**`i-1`**" side, the side facing cell **`(j,i+1)`** the "**`i+1`**" side, and similarly for "**`j-1`**" and "**`j+1`**".
+Then we can refer to the vertex formed by sides **`i-1`** and **`j-1`** as **`(j-1,i-1)`**.
+With this notation, the four vertices are indexed as follows: **`0=(j-1,i-1)`**, **`1=(j-1,i+1)`**, **`2=(j+1,i+1)`**, **`3=(j+1,i-1)`**.
 +
 [[img-bnd_2d_coords, figure 2]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
@@ -76,22 +97,26 @@ Bounds for 2-D coordinate variables with 4-sided cells:: In the case where the h
 .Order of **`lonbnd(j,i,0)`** to **`lonbnd(j,i,3)`** and of **`latbnd(j,i,0)`** and **`latbnd(j,i,3)`** in the case of two-dimensional horizontal coordinate axes. Tuples **`(lon(j,i),lat(j,i))`** represent grid cell centers and tuples **`(lonbnd(j,i,n),latbnd(j,i,n))`** represent the grid cell vertices.
 image::images/order_horizontal_bounds__2D_coord_variables.png[,50%,pdfwidth=50vw,align="center"]
 +
-If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this ordering means the vertices will be traversed anticlockwise on the lon-lat surface seen from above (<<img-bnd_2d_coords>>). If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat surface.
+If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this ordering means the vertices will be traversed anticlockwise on the lon-lat surface seen from above (<<img-bnd_2d_coords>>).
+If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat surface.
 +
-The bounds can be used to decide whether cells are contiguous via the following relationships. In these equations the variable **`bnd`** is used generically to represent either the latitude or longitude boundary variable. 
+The bounds can be used to decide whether cells are contiguous via the following relationships.
+In these equations the variable **`bnd`** is used generically to represent either the latitude or longitude boundary variable.
 ----
 
 For 0 < j < n and 0 < i < m,
-	If cells (j,i) and (j,i+1) are contiguous, then
-		bnd(j,i,1)=bnd(j,i+1,0) 
-		bnd(j,i,2)=bnd(j,i+1,3)
-	If cells (j,i) and (j+1,i) are contiguous, then	
-		bnd(j,i,3)=bnd(j+1,i,0) and bnd(j,i,2)=bnd(j+1,i,1)
-							
-----
- 
+  If cells (j,i) and (j,i+1) are contiguous, then
+    bnd(j,i,1)=bnd(j,i+1,0)
+    bnd(j,i,2)=bnd(j,i+1,3)
+  If cells (j,i) and (j+1,i) are contiguous, then
+    bnd(j,i,3)=bnd(j+1,i,0) and bnd(j,i,2)=bnd(j+1,i,1)
 
-Bounds for multi-dimensional coordinate variables with p-sided cells:: In all other cases, the bounds should be dimensioned **`(...,n,p)`**, where **`(...,n)`** are the dimensions of the auxiliary coordinate variables, and **`p`** the number of vertices of the cells. The vertices must be traversed anticlockwise in the lon-lat plane as viewed from above. The starting vertex is not specified.
+----
+
+
+Bounds for multi-dimensional coordinate variables with p-sided cells:: In all other cases, the bounds should be dimensioned **`(...,n,p)`**, where **`(...,n)`** are the dimensions of the auxiliary coordinate variables, and **`p`** the number of vertices of the cells.
+The vertices must be traversed anticlockwise in the lon-lat plane as viewed from above.
+The starting vertex is not specified.
 
 
 [[cells-on-a-latitude-axis-ex]]
@@ -109,11 +134,13 @@ variables:
     lat:bounds = "lat_bnds";
   float lat_bnds(lat,nv);
 ----
-The boundary variable `lat_bnds` associates a latitude gridpoint `i` with the interval whose boundaries are `lat_bnds(i,0)` and `lat_bnds(i,1)`. The gridpoint location, `lat(i)`, should be contained within this interval.
+The boundary variable `lat_bnds` associates a latitude gridpoint `i` with the interval whose boundaries are `lat_bnds(i,0)` and `lat_bnds(i,1)`.
+The gridpoint location, `lat(i)`, should be contained within this interval.
 ====
 
 
-For rectangular grids, two-dimensional cells can be expressed as Cartesian products of one-dimensional cells of the type in the preceding example. However for non-rectangular grids a "rectangular" cell will in general require specifying all four vertices for each cell.
+For rectangular grids, two-dimensional cells can be expressed as Cartesian products of one-dimensional cells of the type in the preceding example.
+However for non-rectangular grids a "rectangular" cell will in general require specifying all four vertices for each cell.
 
 [[cells-in-a-non-rectangular-grid-ex]]
 [caption="Example 7.3. "]
@@ -136,10 +163,11 @@ variables:
   float lat_bnds(jmax,imax,nv);
   float lon_bnds(jmax,imax,nv);
 ----
-The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` with the cell determined by the vertices `(lat_bnds(j,i,n),lon_bnds(j,i,n))`, `n=0,..,3`. The gridpoint location, `(lat(j,i),lon(j,i))`, should be contained within this region.
+The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` with the cell determined by the vertices `(lat_bnds(j,i,n),lon_bnds(j,i,n))`, `n=0,..,3`.
+The gridpoint location, `(lat(j,i),lon(j,i))`, should be contained within this region.
 ====
 
- 
+
 
 
 
@@ -147,17 +175,35 @@ The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` w
 [[cell-measures, Section 7.2, "Cell Measures"]]
 === Cell Measures
 
-For some calculations, information is needed about the size, shape or location of the cells that cannot be deduced from the coordinates and bounds without special knowledge that a generic application cannot be expected to have. For instance, in computing the mean of several cell values, it is often appropriate to "weight" the values by area. When computing an area-mean each grid cell value is multiplied by the grid-cell area before summing, and then the sum is divided by the sum of the grid-cell areas. Area weights may also be needed to map data from one grid to another in such a way as to preserve the area mean of the field. The preservation of area-mean values while regridding may be essential, for example, when calculating surface heat fluxes in an atmospheric model with a grid that differs from the ocean model grid to which it is coupled.
+For some calculations, information is needed about the size, shape or location of the cells that cannot be deduced from the coordinates and bounds without special knowledge that a generic application cannot be expected to have.
+For instance, in computing the mean of several cell values, it is often appropriate to "weight" the values by area.
+When computing an area-mean each grid cell value is multiplied by the grid-cell area before summing, and then the sum is divided by the sum of the grid-cell areas.
+Area weights may also be needed to map data from one grid to another in such a way as to preserve the area mean of the field.
+The preservation of area-mean values while regridding may be essential, for example, when calculating surface heat fluxes in an atmospheric model with a grid that differs from the ocean model grid to which it is coupled.
 
-In many cases the areas can be calculated from the cell bounds, but there are exceptions. Consider, for example, a spherical geodesic grid composed of contiguous, roughly hexagonal cells. The vertices of the cells can be stored in the variable identified by the **`bounds`** attribute, but the cell perimeter is not uniquely defined by its vertices (because the vertices could, for example, be connected by straight lines, or, on a sphere, by lines following a great circle, or, in general, in some other way). Thus, given the cell vertices alone, it is generally impossible to calculate the area of a grid cell. This is why it may be necessary to store the grid-cell areas in addition to the cell vertices.
+In many cases the areas can be calculated from the cell bounds, but there are exceptions.
+Consider, for example, a spherical geodesic grid composed of contiguous, roughly hexagonal cells.
+The vertices of the cells can be stored in the variable identified by the **`bounds`** attribute, but the cell perimeter is not uniquely defined by its vertices (because the vertices could, for example, be connected by straight lines, or, on a sphere, by lines following a great circle, or, in general, in some other way).
+Thus, given the cell vertices alone, it is generally impossible to calculate the area of a grid cell.
+This is why it may be necessary to store the grid-cell areas in addition to the cell vertices.
 
-In other cases, the grid cell-volume might be needed and might not be easily calculated from the coordinate information. In ocean models, for example, it is not uncommon to find "partial" grid cells at the bottom of the ocean. In this case, rather than (or in addition to) indicating grid cell area, it may be necessary to indicate volume.
+In other cases, the grid cell-volume might be needed and might not be easily calculated from the coordinate information.
+In ocean models, for example, it is not uncommon to find "partial" grid cells at the bottom of the ocean.
+In this case, rather than (or in addition to) indicating grid cell area, it may be necessary to indicate volume.
 
-To indicate extra information about the spatial properties of a variable's grid cells, a **`cell_measures`** attribute may be defined for a variable. This is a string attribute comprising a list of blank-separated pairs of words of the form "**`measure: name`**". For the moment, "**`area`**" and "**`volume`**" are the only defined measures, but others may be supported in future. The "name" is the name of the variable containing the measure values, which we refer to as a "measure variable". The dimensions of the measure variable should be the same as or a subset of the dimensions of the variable to which they are related, but their order is not restricted. In the case of area, for example, the field itself might be a function of longitude, latitude, and time, but the variable containing the area values would only include longitude and latitude dimensions (and the dimension order could be reversed, although this is not recommended). The variable must have a **`units`** attribute and may have other attributes such as a **`standard_name`**.
+To indicate extra information about the spatial properties of a variable's grid cells, a **`cell_measures`** attribute may be defined for a variable.
+This is a string attribute comprising a list of blank-separated pairs of words of the form "**`measure: name`**".
+For the moment, "**`area`**" and "**`volume`**" are the only defined measures, but others may be supported in future.
+The "name" is the name of the variable containing the measure values, which we refer to as a "measure variable".
+The dimensions of the measure variable should be the same as or a subset of the dimensions of the variable to which they are related, but their order is not restricted.
+In the case of area, for example, the field itself might be a function of longitude, latitude, and time, but the variable containing the area values would only include longitude and latitude dimensions (and the dimension order could be reversed, although this is not recommended).
+The variable must have a **`units`** attribute and may have other attributes such as a **`standard_name`**.
 
-For rectangular longitude-latitude grids, the area of grid cells can be calculated from the bounds: the area of a cell is proportional to the product of the difference in the longitude bounds of the cell and the difference between the sine of each latitude bound of the cell. In this case supplying grid-cell areas via the **`cell_measures`** attribute is unnecessary because it may be assumed that applications can perform this calculation, using their own value for the radius of the Earth.
+For rectangular longitude-latitude grids, the area of grid cells can be calculated from the bounds: the area of a cell is proportional to the product of the difference in the longitude bounds of the cell and the difference between the sine of each latitude bound of the cell.
+In this case supplying grid-cell areas via the **`cell_measures`** attribute is unnecessary because it may be assumed that applications can perform this calculation, using their own value for the radius of the Earth.
 
-A variable referenced by **`cell_measures`** is not required to be present in the file containing the data variable. If the **`cell_measures`** variable is located in another file (an "external file"), rather than in the file where it is referenced, it must be listed in the **`external_variables`** attribute of the referencing file (Section 2.6.3). 
+A variable referenced by **`cell_measures`** is not required to be present in the file containing the data variable.
+If the **`cell_measures`** variable is located in another file (an "external file"), rather than in the file where it is referenced, it must be listed in the **`external_variables`** attribute of the referencing file (Section 2.6.3).
 
 [[cell-areas-for-a-spherical-geodesic-grid]]
 [caption="Example 7.4. "]
@@ -167,7 +213,7 @@ A variable referenced by **`cell_measures`** is not required to be present in th
 dimensions:
   cell = 2562 ;  // number of grid cells
   time = 12 ;
-  nv = 6 ;       // maximum number of cell vertices 
+  nv = 6 ;       // maximum number of cell vertices
 variables:
   float PS(time,cell) ;
     PS:units = "Pa" ;
@@ -197,37 +243,40 @@ variables:
 [[cell-methods, Section 7.3, "Cell Methods"]]
 === Cell Methods
 
-To describe the characteristic of a field that is represented by cell values, we define the **`cell_methods`** attribute of the variable. This is a string attribute comprising a list of blank-separated words of the form "__name: method__". Each "__name: method__" pair indicates that for an axis identified by __name__, the cell values representing the field have been determined or derived by the specified __method__. For example, if data values have been generated by computing time means, then this could be indicated with **`cell_methods="t: mean"`**, assuming here that the name of the time dimension variable is "t".  
+To describe the characteristic of a field that is represented by cell values, we define the **`cell_methods`** attribute of the variable.
+This is a string attribute comprising a list of blank-separated words of the form "__name: method__".
+Each "__name: method__" pair indicates that for an axis identified by __name__, the cell values representing the field have been determined or derived by the specified __method__.
+For example, if data values have been generated by computing time means, then this could be indicated with **`cell_methods="t: mean"`**, assuming here that the name of the time dimension variable is "t".
 
-In the specification of this attribute, __name__ can be a dimension of
-the variable, a scalar coordinate variable, a valid standard name, or
-the word "**`area`**".  (See <<cell-methods-no-coordinates>> concerning
-the use of standard names in cell_methods.) The values of __method__
-should be selected from the list in <<appendix-cell-methods>>, which
-includes `point`, `sum`, `mean`, among others.  Case is not
-significant in the method name. Some methods (e.g., `variance` ) imply a
-change of units of the variable, as is indicated in
-<<appendix-cell-methods>>.
+In the specification of this attribute, __name__ can be a dimension of the variable, a scalar coordinate variable, a valid standard name, or the word "**`area`**".
+(See <<cell-methods-no-coordinates>> concerning the use of standard names in cell_methods.)
+The values of __method__ should be selected from the list in <<appendix-cell-methods>>, which includes `point`, `sum`, `mean`, among others.
+Case is not significant in the method name.
+Some methods (e.g., `variance`) imply a change of units of the variable, as is indicated in <<appendix-cell-methods>>.
 
-It must be remembered that the method applies only to the axis designated in **`cell_methods`** by __name__, and different methods may apply to other axes. If, for instance, a precipitation value in a longitude-latitude cell is given the method **`maximum`** for these axes, it means that it is the maximum within these spatial cells, and does not imply that it is also the maximum in time. Furthermore, it should be noted that if any __method__ other than "**`point`**" is specified for a given axis, then **`bounds`** should also be provided for that axis (except for the relatively rare exceptions described in <<cell-methods-no-coordinates>>).
+It must be remembered that the method applies only to the axis designated in **`cell_methods`** by __name__, and different methods may apply to other axes.
+If, for instance, a precipitation value in a longitude-latitude cell is given the method **`maximum`** for these axes, it means that it is the maximum within these spatial cells, and does not imply that it is also the maximum in time.
+Furthermore, it should be noted that if any __method__ other than "**`point`**" is specified for a given axis, then **`bounds`** should also be provided for that axis (except for the relatively rare exceptions described in <<cell-methods-no-coordinates>>).
 
-The default interpretation for variables that do not have the **`cell_methods`** attribute specified depends on whether the quantity is extensive (which depends on the size of the cell) or intensive (which does not). Suppose, for example, the quantities "accumulated precipitation" and "precipitation rate" each have a time axis. A variable representing accumulated precipitation is extensive in time because it depends on the length of the time interval over which it is accumulated. For correct interpretation, it therefore requires a time interval to be completely specified via a boundary variable (i.e., via a **`bounds`** attribute for the time axis). In this case the default interpretation is that the cell method is a sum over the specified time interval. This can be (optionally) indicated explicitly by setting the cell method to **`sum`**. A precipitation rate on the other hand is intensive in time and could equally well represent either an instantaneous value or a mean value over the time interval specified by the cell. In this case the default interpretation for the quantity would be "instantaneous" (which, optionally, can be indicated explicitly by setting the cell method to **`point`**). More often, however, cell values for intensive quantities are means, and this should be indicated explicitly by setting the cell method to **`mean`** and specifying the cell bounds.
+The default interpretation for variables that do not have the **`cell_methods`** attribute specified depends on whether the quantity is extensive (which depends on the size of the cell) or intensive (which does not).
+Suppose, for example, the quantities "accumulated precipitation" and "precipitation rate" each have a time axis.
+A variable representing accumulated precipitation is extensive in time because it depends on the length of the time interval over which it is accumulated.
+For correct interpretation, it therefore requires a time interval to be completely specified via a boundary variable (i.e., via a **`bounds`** attribute for the time axis).
+In this case the default interpretation is that the cell method is a sum over the specified time interval.
+This can be (optionally) indicated explicitly by setting the cell method to **`sum`**.
+A precipitation rate on the other hand is intensive in time and could equally well represent either an instantaneous value or a mean value over the time interval specified by the cell.
+In this case the default interpretation for the quantity would be "instantaneous" (which, optionally, can be indicated explicitly by setting the cell method to **`point`**).
+More often, however, cell values for intensive quantities are means, and this should be indicated explicitly by setting the cell method to **`mean`** and specifying the cell bounds.
 
-Because the default interpretation for an intensive quantity differs
-from that of an extensive quantity and because this distinction may not
-be understood by some users of the data, it is recommended that every
-data variable include for each of its dimensions and each of its scalar
-coordinate variables the **`cell_methods`** information of interest
-(unless this information would not be meaningful). It is especially
-recommended that **`cell_methods`** be explicitly specified for each
-spatio-temporal dimension and each spatio-temporal scalar coordinate
-variable.
+Because the default interpretation for an intensive quantity differs from that of an extensive quantity and because this distinction may not be understood by some users of the data, it is recommended that every data variable include for each of its dimensions and each of its scalar coordinate variables the **`cell_methods`** information of interest (unless this information would not be meaningful).
+It is especially recommended that **`cell_methods`** be explicitly specified for each spatio-temporal dimension and each spatio-temporal scalar coordinate variable.
 
 [[methods-applied-to-a-timeseries-ex]]
 [caption="Example 7.5. "]
-.Methods applied to a timeseries 
+.Methods applied to a timeseries
 ====
-Consider 12-hourly timeseries of pressure, temperature and precipitation from a number of stations, where pressure is measured instantaneously, maximum temperature for the preceding 12 hours is recorded, and precipitation is accumulated in a rain gauge. For a period of 48 hours from 6 a.m. on 19 April 1998, the data is structured as follows: 
+Consider 12-hourly timeseries of pressure, temperature and precipitation from a number of stations, where pressure is measured instantaneously, maximum temperature for the preceding 12 hours is recorded, and precipitation is accumulated in a rain gauge.
+For a period of 48 hours from 6 a.m. on 19 April 1998, the data is structured as follows:
 ----
 dimensions:
   time = UNLIMITED; // (5 currently)
@@ -253,12 +302,14 @@ variables:
   double time_bnds(time,nv);
 data:
   time = 0., 12., 24., 36., 48.;
-  time_bnds = -12.,0., 0.,12., 12.,24., 24.,36., 36.,48.; 
+  time_bnds = -12.,0., 0.,12., 12.,24., 24.,36., 36.,48.;
 ----
-Note that in this example the time axis values coincide with the end of each interval. It is sometimes desirable, however, to use the midpoint of intervals as coordinate values for variables that are representative of an interval. An application may simply obtain the midpoint values by making use of the boundary data in `time_bnds`.
+Note that in this example the time axis values coincide with the end of each interval.
+It is sometimes desirable, however, to use the midpoint of intervals as coordinate values for variables that are representative of an interval.
+An application may simply obtain the midpoint values by making use of the boundary data in `time_bnds`.
 ====
 
- 
+
 
 
 
@@ -266,38 +317,50 @@ Note that in this example the time axis values coincide with the end of each int
 [[statistics-more-than-one-axis]]
 ==== Statistics for more than one axis
 
-If more than one cell method is to be indicated, they should be arranged in the order they were applied. The left-most operation is assumed to have been applied first. Suppose, for example, that within each grid cell a quantity varies in both longitude and time and that these dimensions are named "lon" and "time", respectively. Then values representing the time-average of the zonal maximum are labeled **`cell_methods="lon: maximum time: mean"`** (i.e. find the largest value at each instant of time over all longitudes, then average these maxima over time); values of the zonal maximum of time-averages are labeled **`cell_methods="time: mean lon: maximum"`**. If the methods could have been applied in any order without affecting the outcome, they may be put in any order in the **`cell_methods`** attribute.
+If more than one cell method is to be indicated, they should be arranged in the order they were applied.
+The left-most operation is assumed to have been applied first.
+Suppose, for example, that within each grid cell a quantity varies in both longitude and time and that these dimensions are named "lon" and "time", respectively.
+Then values representing the time-average of the zonal maximum are labeled **`cell_methods="lon: maximum time: mean"`** (i.e. find the largest value at each instant of time over all longitudes, then average these maxima over time); values of the zonal maximum of time-averages are labeled **`cell_methods="time: mean lon: maximum"`**.
+If the methods could have been applied in any order without affecting the outcome, they may be put in any order in the **`cell_methods`** attribute.
 
-If a data value is representative of variation over a combination of axes, a single method should be prefixed by the names of all the dimensions involved (listed in any order, since in this case the order must be immaterial). Dimensions should be grouped in this way only if there is an essential difference from treating the dimensions individually. For instance, the standard deviation of topographic height within a longitude-latitude gridbox could   have **`cell_methods="lat: lon: standard_deviation"`**. (Note also, that in accordance with the recommendation of the following paragraph, this could be equivalently and preferably indicated by **`cell_methods="area: standard_deviation"`**.) This is not the same as **`cell_methods="lon: standard_deviation lat: standard_deviation"`**, which would mean finding the standard deviation along each parallel of latitude within the zonal extent of the gridbox, and then the standard deviation of these values over latitude.
+If a data value is representative of variation over a combination of axes, a single method should be prefixed by the names of all the dimensions involved (listed in any order, since in this case the order must be immaterial).
+Dimensions should be grouped in this way only if there is an essential difference from treating the dimensions individually.
+For instance, the standard deviation of topographic height within a longitude-latitude gridbox could   have **`cell_methods="lat: lon: standard_deviation"`**.
+(Note also, that in accordance with the recommendation of the following paragraph, this could be equivalently and preferably indicated by **`cell_methods="area: standard_deviation"`**.)
+This is not the same as **`cell_methods="lon: standard_deviation lat: standard_deviation"`**, which would mean finding the standard deviation along each parallel of latitude within the zonal extent of the gridbox, and then the standard deviation of these values over latitude.
 
-To indicate variation over horizontal area, it is recommended that
-instead of specifying the combination of horizontal dimensions, the
-special string "**`area`**" be used.  The common case of an area-mean
-can thus be indicated by **`cell_methods="area: mean"`** (rather than,
-for example, "**`lon: lat: mean`**").  The horizontal coordinate
-variables to which "**`area`**" refers are in this case not explicitly
-indicated in **`cell_methods`** but can be identified, if necessary,
-from attributes attached to the coordinate variables, scalar coordinate
-variables, or auxiliary coordinate variables, as described in
-<<coordinate-types>>.
+To indicate variation over horizontal area, it is recommended that instead of specifying the combination of horizontal dimensions, the special string "**`area`**" be used.
+The common case of an area-mean can thus be indicated by **`cell_methods="area: mean"`** (rather than, for example, "**`lon: lat: mean`**").
+The horizontal coordinate variables to which "**`area`**" refers are in this case not explicitly indicated in **`cell_methods`** but can be identified, if necessary, from attributes attached to the coordinate variables, scalar coordinate variables, or auxiliary coordinate variables, as described in <<coordinate-types>>.
 
 
 [[recording-spacing-original-data]]
 ==== Recording the spacing of the original data and other information
 
-To indicate more precisely how the cell method was applied, extra information may be included in parentheses () after the identification of the method. This information includes standardized and non-standardized parts. Currently the only standardized information is to provide the typical interval between the original data values to which the method was applied, in the situation where the present data values are statistically representative of original data values which had a finer spacing. The syntax is (**`interval`**: __value unit__), where __value__ is a numerical value and __unit__ is a string that can be recognized by UNIDATA's Udunits package <<UDUNITS>>. The __unit__ will usually be dimensionally equivalent to the unit of the corresponding dimension, but this is not required (which allows, for example, the interval for a standard deviation calculated from points evenly spaced in distance along a parallel to be reported in units of length even if the zonal coordinate of the cells is given in degrees). Recording the original interval is particularly important for standard deviations. For example, the standard deviation of daily values could be indicated by **`cell_methods="time: standard_deviation (interval: 1 day)"`** and of annual values by **`cell_methods="time: standard_deviation (interval: 1 year)"`**.
+To indicate more precisely how the cell method was applied, extra information may be included in parentheses () after the identification of the method.
+This information includes standardized and non-standardized parts.
+Currently the only standardized information is to provide the typical interval between the original data values to which the method was applied, in the situation where the present data values are statistically representative of original data values which had a finer spacing.
+The syntax is (**`interval`**: __value unit__), where __value__ is a numerical value and __unit__ is a string that can be recognized by UNIDATA's Udunits package <<UDUNITS>>.
+The __unit__ will usually be dimensionally equivalent to the unit of the corresponding dimension, but this is not required (which allows, for example, the interval for a standard deviation calculated from points evenly spaced in distance along a parallel to be reported in units of length even if the zonal coordinate of the cells is given in degrees).
+Recording the original interval is particularly important for standard deviations.
+For example, the standard deviation of daily values could be indicated by **`cell_methods="time: standard_deviation (interval: 1 day)"`** and of annual values by **`cell_methods="time: standard_deviation (interval: 1 year)"`**.
 
-If the cell method applies to a combination of axes, they may have a common original interval e.g. **`cell_methods="lat: lon: standard_deviation (interval: 10 km)"`**. Alternatively, they may have separate intervals, which are matched to the names of axes by position e.g. **`cell_methods="lat: lon: standard_deviation (interval: 0.1 degree_N interval: 0.2 degree_E)"`**, in which 0.1 degree applies to latitude and 0.2 degree to longitude.
+If the cell method applies to a combination of axes, they may have a common original interval e.g. **`cell_methods="lat: lon: standard_deviation (interval: 10 km)"`**.
+Alternatively, they may have separate intervals, which are matched to the names of axes by position e.g. **`cell_methods="lat: lon: standard_deviation (interval: 0.1 degree_N interval: 0.2 degree_E)"`**, in which 0.1 degree applies to latitude and 0.2 degree to longitude.
 
-If there is both standardized and non-standardized information, the non-standardized follows the standardized information and the keyword **`comment:`**. If there is no standardized information, the keyword **`comment:`** should be omitted. For instance, an area-weighted mean over latitude could be indicated as **`lat: mean (area-weighted)`** or **`lat: mean (interval: 1 degree_north comment: area-weighted)`**.
+If there is both standardized and non-standardized information, the non-standardized follows the standardized information and the keyword **`comment:`**.
+If there is no standardized information, the keyword **`comment:`** should be omitted.
+For instance, an area-weighted mean over latitude could be indicated as **`lat: mean (area-weighted)`** or **`lat: mean (interval: 1 degree_north comment: area-weighted)`**.
 
-A dimension of size one may be the result of "collapsing" an axis by some statistical operation, for instance by calculating a variance from time series data. We strongly recommend that dimensions of size one be retained (or scalar coordinate variables be defined) to enable documentation of the method (through the **`cell_methods`** attribute) and its domain (through the **`bounds`** attribute).
+A dimension of size one may be the result of "collapsing" an axis by some statistical operation, for instance by calculating a variance from time series data.
+We strongly recommend that dimensions of size one be retained (or scalar coordinate variables be defined) to enable documentation of the method (through the **`cell_methods`** attribute) and its domain (through the **`bounds`** attribute).
 
 [[surface-air-temperature-variance-ex]]
 [caption="Example 7.6. "]
 .Surface air temperature variance
 ====
-The variance of the diurnal cycle on 1 January 1990 has been calculated from hourly instantaneous surface air temperature measurements. The time dimension of size one has been retained. 
+The variance of the diurnal cycle on 1 January 1990 has been calculated from hourly instantaneous surface air temperature measurements.
+The time dimension of size one has been retained.
 ----
 dimensions:
   lat=90;
@@ -320,7 +383,7 @@ data:
 Notice that a parenthesized comment in the `cell_methods` attribute provides the nature of the samples used to calculate the variance.
 ====
 
- 
+
 
 
 
@@ -328,16 +391,27 @@ Notice that a parenthesized comment in the `cell_methods` attribute provides the
 [[statistics-applying-portions]]
 ==== Statistics applying to portions of cells
 
-By default, the statistical method indicated by **`cell_methods`** is assumed to have been evaluated over the entire horizontal area of the cell. Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area). To indicate this, one of two conventions may be used.
+By default, the statistical method indicated by **`cell_methods`** is assumed to have been evaluated over the entire horizontal area of the cell.
+Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area).
+To indicate this, one of two conventions may be used.
 
-The first convention is a method that can be used for the common case of a single area-type. In this case, the **`cell_methods`** attribute may include a string of the form "__name: method__  **`where`**  __type__". Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** of **`area_type`**. As an example, if the method were **`mean`** and the **`area_type`** were **`sea_ice`**, then the data would represent a mean over only the sea ice portion of the grid cell. If the data writer expects __type__ to be interpreted as one of the standard **`area_type`** strings, then none of the variables in the netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, takes precedence).
+The first convention is a method that can be used for the common case of a single area-type.
+In this case, the **`cell_methods`** attribute may include a string of the form "__name: method__  **`where`**  __type__".
+Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** of **`area_type`**.
+As an example, if the method were **`mean`** and the **`area_type`** were **`sea_ice`**, then the data would represent a mean over only the sea ice portion of the grid cell.
+If the data writer expects __type__ to be interpreted as one of the standard **`area_type`** strings, then none of the variables in the netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, takes precedence).
 
-The second convention is the more general. In this case, the **`cell_methods`** entry is of the form "__name: method__  **`where`**  __typevar__". Here __typevar__ is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see <<labels>>) with a **`standard_name`** of **`area_type`**. The variable __typevar__ contains the name(s) of the selected portion(s) of the grid cell to which the __method__ is applied. This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types). It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., **`vegetation`**, **`bare_ground`**, **`snow`**, etc.).
+The second convention is the more general.
+In this case, the **`cell_methods`** entry is of the form "__name: method__  **`where`**  __typevar__".
+Here __typevar__ is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see <<labels>>) with a **`standard_name`** of **`area_type`**.
+The variable __typevar__ contains the name(s) of the selected portion(s) of the grid cell to which the __method__ is applied.
+This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types).
+It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., **`vegetation`**, **`bare_ground`**, **`snow`**, etc.).
 
 
 [[mean-surface-temperature-sensible-heat-flux]]
 [caption="Example 7.7. "]
-.Mean surface temperature over land and sensible heat flux averaged separately over land and sea. 
+.Mean surface temperature over land and sensible heat flux averaged separately over land and sea.
 ====
 ----
 dimensions:
@@ -356,24 +430,13 @@ variables:
 data:
   land_sea="land","sea";
 ----
-If the _method_ is `mean`, various ways of calculating the mean can be
-distinguished in the `cell_methods` attribute with a string of the form "mean
-where  _type1_ [over _type2_]".
-Here, _type1_ can be any of the possibilities allowed for _typevar_ or _type_
-(as specified in the two paragraphs preceding above Example).
-The same options apply to _type2_, except it is not allowed to be the name of
-an auxiliary coordinate variable with a dimension greater than one (ignoring
-the possible dimension accommodating the maximum string length).
-A `cell_methods` attribute with a string of the form "mean where _type1_
-over _type2_" indicates the mean is calculated by summing over the _type1_
-portion of the cell and dividing by the area of the _type2_ portion.
-In particular, a `cell_methods` string of the form "mean where all_area_types
-over _type2_" indicates the mean is calculated by summing over all types of
-area within the cell and dividing by the area of the _type2_ portion.
-(Note that `all_area_types` is one of the valid strings permitted for a
-variable with the `standard_name` `area_type`.)
-If "over _type2_" is omitted, the mean is calculated by summing over the
-_type1_ portion of the cell and dividing by the area of this portion.
+If the _method_ is `mean`, various ways of calculating the mean can be distinguished in the `cell_methods` attribute with a string of the form "mean where  _type1_ [over _type2_]".
+Here, _type1_ can be any of the possibilities allowed for _typevar_ or _type_ (as specified in the two paragraphs preceding above Example).
+The same options apply to _type2_, except it is not allowed to be the name of an auxiliary coordinate variable with a dimension greater than one (ignoring the possible dimension accommodating the maximum string length).
+A `cell_methods` attribute with a string of the form "mean where _type1_ over _type2_" indicates the mean is calculated by summing over the _type1_ portion of the cell and dividing by the area of the _type2_ portion.
+In particular, a `cell_methods` string of the form "mean where all_area_types over _type2_" indicates the mean is calculated by summing over all types of area within the cell and dividing by the area of the _type2_ portion.
+(Note that `all_area_types` is one of the valid strings permitted for a variable with the `standard_name` `area_type`.)
+If "over _type2_" is omitted, the mean is calculated by summing over the _type1_ portion of the cell and dividing by the area of this portion.
 ====
 
 [[thickness-over-sea-area-ex]]
@@ -391,7 +454,8 @@ variables:
    snow_thickness:standard_name="lwe_thickness_of_surface_snow_amount";
     snow_thickness:units="m";
 ----
-In the case of sea-ice thickness, the phrase "`where sea_ice`" could be replaced by "`where all_area_types`" without changing the meaning since the integral of sea-ice thickness over all area types is obviously the same as the integral over the sea-ice area only. In the case of snow thickness, "`where sea_ice`" differs from "`where all_area_types`" because "`where sea_ice`" excludes snow on land from the average.
+In the case of sea-ice thickness, the phrase "`where sea_ice`" could be replaced by "`where all_area_types`" without changing the meaning since the integral of sea-ice thickness over all area types is obviously the same as the integral over the sea-ice area only.
+In the case of snow thickness, "`where sea_ice`" differs from "`where all_area_types`" because "`where sea_ice`" excludes snow on land from the average.
 ====
 
 
@@ -400,15 +464,26 @@ In the case of sea-ice thickness, the phrase "`where sea_ice`" could be replaced
 [[cell-methods-no-coordinates, Section 7.3.4, "Cell methods when there are no coordinates"]]
 ==== Cell methods when there are no coordinates
 
-To provide an indication that a particular cell method is relevant to the data without having to provide a precise description of the corresponding cell, the "__name__" that appears in a "__name__: __method__" pair may be an appropriate **`standard_name`** (which identifies the dimension) or the string, 
-"__area__" (rather than the name of a scalar coordinate variable or a dimension with a coordinate variable). This convention cannot be used, however, if the name of a dimension or scalar coordinate variable is identical to __name__. There are two situations where this convention is useful.
+To provide an indication that a particular cell method is relevant to the data without having to provide a precise description of the corresponding cell, the "__name__" that appears in a "__name__: __method__" pair may be an appropriate **`standard_name`** (which identifies the dimension) or the string, "__area__" (rather than the name of a scalar coordinate variable or a dimension with a coordinate variable).
+This convention cannot be used, however, if the name of a dimension or scalar coordinate variable is identical to __name__.
+There are two situations where this convention is useful.
 
-First, it allows one to provide some indication of the method when the cell coordinate range cannot be precisely defined. For example, a climatological mean might be based on any data that exists, and, in general, the data might not be available over the same time periods everywhere. In this case, the time range would not be well defined (because it would vary, depending on location), and it could not be precisely specified through a time dimension's bounds. Nevertheless, useful information can be conveyed by a **`cell_methods`** entry of "**`time: mean`**" (where **`time`**, it should be noted, is a valid **`standard_name`**). (As required by this convention, it is assumed here that for the data referred to by this **`cell_methods`** attribute, "time" is not a dimension or coordinate variable.)
+First, it allows one to provide some indication of the method when the cell coordinate range cannot be precisely defined.
+For example, a climatological mean might be based on any data that exists, and, in general, the data might not be available over the same time periods everywhere.
+In this case, the time range would not be well defined (because it would vary, depending on location), and it could not be precisely specified through a time dimension's bounds.
+Nevertheless, useful information can be conveyed by a **`cell_methods`** entry of "**`time: mean`**" (where **`time`**, it should be noted, is a valid **`standard_name`**).
+(As required by this convention, it is assumed here that for the data referred to by this **`cell_methods`** attribute, "time" is not a dimension or coordinate variable.)
 
-Second, for a few special dimensions, this convention allows one to indicate (without explicitly defining the coordinates) that the method applies to the domain covering the entire permitted range of those dimensions. This is allowed only for longitude, latitude, and area (indicating a combination of horizontal coordinates). For longitude, the domain is indicated according to this provision by the string "longitude" (rather than the name of a longitude coordinate variable), and this implies that the method applies to all possible longitudes (i.e., from 0E to 360E). For latitude, the string "latitude" is used and implies the method applies to all possible latitudes (i.e., from 90S to 90N). For area, the string "area" is used and implies the method applies to the whole world.
+Second, for a few special dimensions, this convention allows one to indicate (without explicitly defining the coordinates) that the method applies to the domain covering the entire permitted range of those dimensions.
+This is allowed only for longitude, latitude, and area (indicating a combination of horizontal coordinates).
+For longitude, the domain is indicated according to this provision by the string "longitude" (rather than the name of a longitude coordinate variable), and this implies that the method applies to all possible longitudes (i.e., from 0E to 360E).
+For latitude, the string "latitude" is used and implies the method applies to all possible latitudes (i.e., from 90S to 90N).
+For area, the string "area" is used and implies the method applies to the whole world.
 
-In the second case if, in addition, the data variable has a dimension with a corresponding labeled axis that specifies a geographic region (<<geographic-regions>>), the implied range of longitude and latitude is the valid range for each specified region, or in the case of 
-**`area`** the domain is the geographic region. For example, there could be a **`cell_methods`** entry of "**`longitude: mean`**", where **`longitude`** is __not__ the name of a dimension or coordinate variable (but is one of the special cases given above). That would indicate a mean over all longitudes. Note, however, that if in addition the data variable had a scalar coordinate variable with a **`standard_name`** of **`region`** and a value of **`atlantic_ocean`**, it would indicate a mean over longitudes that lie within the Atlantic Ocean, not all longitudes.
+In the second case if, in addition, the data variable has a dimension with a corresponding labeled axis that specifies a geographic region (<<geographic-regions>>), the implied range of longitude and latitude is the valid range for each specified region, or in the case of **`area`** the domain is the geographic region.
+For example, there could be a **`cell_methods`** entry of "**`longitude: mean`**", where **`longitude`** is __not__ the name of a dimension or coordinate variable (but is one of the special cases given above).
+That would indicate a mean over all longitudes.
+Note, however, that if in addition the data variable had a scalar coordinate variable with a **`standard_name`** of **`region`** and a value of **`atlantic_ocean`**, it would indicate a mean over longitudes that lie within the Atlantic Ocean, not all longitudes.
 
 We recommend that whenever possible, cell bounds should be supplied by giving the variable a dimension of size one and attaching bounds to the associated coordinate variable.
 
@@ -418,15 +493,37 @@ We recommend that whenever possible, cell bounds should be supplied by giving th
 [[climatological-statistics, Section 7.4, "Climatological Statistics"]]
 === Climatological Statistics
 
-Climatological statistics may be derived from corresponding portions of the annual cycle in a set of years, e.g., the average January temperatures in the climatology of 1961-1990, where the values are derived by averaging the 30 Januarys from the separate years. Portions of the climatological cycle are specified by references to dates within the calendar year. However, a calendar year is not a well-defined unit of time, because it differs between leap years and other years, and among calendars. Nonetheless for practical purposes we wish to compare statistics for months or seasons from different calendars, and to make climatologies from a mixture of leap years and other years. Hence we provide special conventions for indicating dates within the climatological year. Climatological statistics may also be derived from corresponding portions of a range of days, for instance the average temperature for each hour of the average day in April 1997. In addition the two concepts may be used at once, for instance to indicate not April 1997, but the average April of the five years 1995-1999.
+Climatological statistics may be derived from corresponding portions of the annual cycle in a set of years, e.g., the average January temperatures in the climatology of 1961-1990, where the values are derived by averaging the 30 Januarys from the separate years.
+Portions of the climatological cycle are specified by references to dates within the calendar year.
+However, a calendar year is not a well-defined unit of time, because it differs between leap years and other years, and among calendars.
+Nonetheless for practical purposes we wish to compare statistics for months or seasons from different calendars, and to make climatologies from a mixture of leap years and other years.
+Hence we provide special conventions for indicating dates within the climatological year.
+Climatological statistics may also be derived from corresponding portions of a range of days, for instance the average temperature for each hour of the average day in April 1997.
+In addition the two concepts may be used at once, for instance to indicate not April 1997, but the average April of the five years 1995-1999.
 
-Climatological variables have a climatological time axis. Like an ordinary time axis, a climatological time axis may have a dimension of unity (for example, a variable containing the January average temperatures for 1961-1990), but often it will have several elements (for example, a climatological time axis with a dimension of 12 for the climatological average temperatures in each month for 1961-1990, a dimension of 3 for the January mean temperatures for the three decades 1961-1970, 1971-1980, 1981-1990, or a dimension of 24 for the hours of an average day). Intervals of climatological time are conceptually different from ordinary time intervals; a given interval of climatological time represents a set of subintervals which are not necessarily contiguous. To indicate this difference, a climatological time coordinate variable does not have a **`bounds`** attribute. Instead, it has a **`climatology`** attribute, which names a variable with dimensions (n,2), n being the dimension of the climatological time axis. Using the units and calendar of the time coordinate variable, element (i,0) of the climatology variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension. The time coordinates should be values that are representative of the climatological time intervals, such that an application which does not recognise climatological time will nonetheless be able to make a reasonable interpretation.
+Climatological variables have a climatological time axis.
+Like an ordinary time axis, a climatological time axis may have a dimension of unity (for example, a variable containing the January average temperatures for 1961-1990), but often it will have several elements (for example, a climatological time axis with a dimension of 12 for the climatological average temperatures in each month for 1961-1990, a dimension of 3 for the January mean temperatures for the three decades 1961-1970, 1971-1980, 1981-1990, or a dimension of 24 for the hours of an average day).
+Intervals of climatological time are conceptually different from ordinary time intervals; a given interval of climatological time represents a set of subintervals which are not necessarily contiguous.
+To indicate this difference, a climatological time coordinate variable does not have a **`bounds`** attribute.
+Instead, it has a **`climatology`** attribute, which names a variable with dimensions (n,2), n being the dimension of the climatological time axis.
+Using the units and calendar of the time coordinate variable, element (i,0) of the climatology variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension.
+The time coordinates should be values that are representative of the climatological time intervals, such that an application which does not recognise climatological time will nonetheless be able to make a reasonable interpretation.
 
-For compatibility with the COARDS standard, a climatological time coordinate in the default **`standard`** and **`julian`** calendars may be indicated by setting the date/time reference string in the time coordinate's **`units`** attribute to midnight on 1 January in year 0 (i.e., **`since 0-1-1`**). This convention is deprecated because it does not provide any information about the intervals used to compute the climatology, and there may be inconsistencies among software packages in the interpretation of the time coordinates with a reference time of year 0. Use of year 0 for this purpose is impossible in all other calendars, because year 0 is a valid year.
+For compatibility with the COARDS standard, a climatological time coordinate in the default **`standard`** and **`julian`** calendars may be indicated by setting the date/time reference string in the time coordinate's **`units`** attribute to midnight on 1 January in year 0 (i.e., **`since 0-1-1`**).
+This convention is deprecated because it does not provide any information about the intervals used to compute the climatology, and there may be inconsistencies among software packages in the interpretation of the time coordinates with a reference time of year 0.
+Use of year 0 for this purpose is impossible in all other calendars, because year 0 is a valid year.
 
-A climatological axis may use different statistical methods to represent variation among years, within years and within days. For example, the average January temperature in a climatology is obtained by averaging both within years and over years. This is different from the average January-maximum temperature and the maximum January-average temperature. For the former, we first calculate the maximum temperature in each January, then average these maxima; for the latter, we first calculate the average temperature in each January, then find the largest one. As usual, the statistical operations are recorded in the **`cell_methods`** attribute, which may have two or three entries for the climatological time dimension.
+A climatological axis may use different statistical methods to represent variation among years, within years and within days.
+For example, the average January temperature in a climatology is obtained by averaging both within years and over years.
+This is different from the average January-maximum temperature and the maximum January-average temperature.
+For the former, we first calculate the maximum temperature in each January, then average these maxima; for the latter, we first calculate the average temperature in each January, then find the largest one.
+As usual, the statistical operations are recorded in the **`cell_methods`** attribute, which may have two or three entries for the climatological time dimension.
 
-Valid values of the **`cell_methods`** attribute must be in one of the forms from the following list. The intervals over which various statistical methods are applied are determined by decomposing the date and time specifications of the climatological time bounds of a cell, as recorded in the variable named by the **`climatology`** attribute. (The date and time specifications must be calculated from the time coordinates expressed in units of "time interval since reference date and time".) In the descriptions that follow we use the abbreviations __y__, __m__, __d__, __H__, __M__, and __S__ for year, month, day, hour, minute, and second respectively. The suffix __0__ indicates the earlier bound and __1__ the latter.
+Valid values of the **`cell_methods`** attribute must be in one of the forms from the following list.
+The intervals over which various statistical methods are applied are determined by decomposing the date and time specifications of the climatological time bounds of a cell, as recorded in the variable named by the **`climatology`** attribute.
+(The date and time specifications must be calculated from the time coordinates expressed in units of "time interval since reference date and time".)
+In the descriptions that follow we use the abbreviations __y__, __m__, __d__, __H__, __M__, and __S__ for year, month, day, hour, minute, and second respectively.
+The suffix __0__ indicates the earlier bound and __1__ the latter.
 
 time: method1 **`within years`**   time: method2 **`over years`**:: __method1__ is applied to the time intervals (mdHMS0-mdHMS1) within individual years and __method2__ is applied over the range of years (y0-y1).
 
@@ -436,19 +533,22 @@ time: method1 **`within days`**   time: method2 **`over days`**   time: method
 
 
 
-The methods which can be specified are those listed in <<appendix-cell-methods>> and each entry in the **`cell_methods`** attribute may also, as usual, contain non-standardised information in parentheses after the method. For instance, a mean over ENSO years might be indicated by "**`time: mean over years (ENSO years)`**".
+The methods which can be specified are those listed in <<appendix-cell-methods>> and each entry in the **`cell_methods`** attribute may also, as usual, contain non-standardised information in parentheses after the method.
+For instance, a mean over ENSO years might be indicated by "**`time: mean over years (ENSO years)`**".
 
-When considering intervals within years, if the earlier climatological time bound is later in the year than the later climatological time bound, it implies that the time intervals for the individual years run from each year across January 1 into the next year e.g. DJF intervals run from December 1 0:00 to March 1 0:00. Analogous situations arise for daily intervals running across midnight from one day to the next.
+When considering intervals within years, if the earlier climatological time bound is later in the year than the later climatological time bound, it implies that the time intervals for the individual years run from each year across January 1 into the next year e.g. DJF intervals run from December 1 0:00 to March 1 0:00.
+Analogous situations arise for daily intervals running across midnight from one day to the next.
 
 When considering intervals within days, if the earlier time of day is equal to the later time of day, then the method is applied to a full 24 hour day.
 
-__We have tried to make the examples in this section easier to understand by translating all time coordinate values to date and time formats. This is not currently valid CDL syntax.__ 
+__We have tried to make the examples in this section easier to understand by translating all time coordinate values to date and time formats.
+This is not currently valid CDL syntax.__
 
 [[climatological-seasons-ex]]
 [caption="Example 7.9. "]
 .Climatological seasons
 ====
-This example shows the metadata for the average seasonal-minimum temperature for the four standard climatological seasons MAM JJA SON DJF, made from data for March 1960 to February 1991. 
+This example shows the metadata for the average seasonal-minimum temperature for the four standard climatological seasons MAM JJA SON DJF, made from data for March 1960 to February 1991.
 ----
 dimensions:
   time=4;
@@ -476,7 +576,7 @@ data:  // time coordinates translated to date/time format
 [caption="Example 7.10. "]
 .Decadal averages for January
 ====
-Average January precipitation totals are given for each of the decades 1961-1970, 1971-1980, 1981-1990. 
+Average January precipitation totals are given for each of the decades 1961-1970, 1971-1980, 1981-1990.
 ----
 dimensions:
   time=3;
@@ -499,11 +599,11 @@ data:  // time coordinates translated to date/time format
 ====
 
 
-[[temperature-each-hour-of-average-day-ex]] 
+[[temperature-each-hour-of-average-day-ex]]
 [caption="Example 7.11. "]
 .Temperature for each hour of the average day
 ====
-Hourly average temperatures are given for April 1997. 
+Hourly average temperatures are given for April 1997.
 ----
 dimensions:
   time=24;
@@ -528,22 +628,16 @@ data:  // time coordinates translated to date/time format
 
 [[extreme-statistics-and-spell-lengths-ex]]
 [caption="Example 7.12. "]
-.Extreme statistics and spell-lengths 
+.Extreme statistics and spell-lengths
 ====
-Number of frost days during NH winter 2007-2008, and
-					maximum length of spells of consecutive frost days. A
-					"frost day" is defined as one during which the minimum
-					temperature falls below freezing point (0 degC). This
-					is described as a climatological statistic, in which
-					the minimum temperature is first calculated within each
-					day, and then the number of days or spell lengths
-					meeting the specified condition are evaluated. In this
-					operation, the standard name is also changed; the
-					original data are `air_temperature`. 
+Number of frost days during NH winter 2007-2008, and maximum length of spells of consecutive frost days.
+A "frost day" is defined as one during which the minimum temperature falls below freezing point (0 degC).
+This is described as a climatological statistic, in which the minimum temperature is first calculated within each day, and then the number of days or spell lengths meeting the specified condition are evaluated.
+In this operation, the standard name is also changed; the original data are `air_temperature`.
 ----
 variables:
   float n1(lat,lon);
-    n1:standard_name="number_of_days_with_air_temperature_below_threshold"; 
+    n1:standard_name="number_of_days_with_air_temperature_below_threshold";
     n1:coordinates="threshold time";
     n1:cell_methods="time: minimum within days time: sum over days";
   float n2(lat,lon);
@@ -560,7 +654,7 @@ variables:
 data: // time coordinates translated to date/time format
   time="2008-1-16 6:00";
   climatology_bounds="2007-12-1 6:00", "2000-8-2 6:00";
-  threshold=0.; 
+  threshold=0.;
 ----
 ====
 
@@ -569,8 +663,8 @@ data: // time coordinates translated to date/time format
 [caption="Example 7.13. "]
 .Temperature for each hour of the typical climatological day
 ====
-This is a modified version of the previous example, "Temperature
-					for each hour of the average day". It now applies to April from a 1961-1990 climatology. 
+This is a modified version of the previous example, "Temperature for each hour of the average day".
+It now applies to April from a 1961-1990 climatology.
 ----
 variables:
   float temperature(time,lat,lon);
@@ -595,7 +689,9 @@ data:  // time coordinates translated to date/time format
 [caption="Example 7.14. "]
 .Monthly-maximum daily precipitation totals
 ====
-Maximum of daily precipitation amounts for each of the three months June, July and August 2000 are given. The first daily total applies to 6 a.m. on 1 June to 6 a.m. on 2 June, the 30th from 6 a.m. on 30 June to 6 a.m. on 1 July. The maximum of these 30 values is stored under time index 0 in the precipitation array. 
+Maximum of daily precipitation amounts for each of the three months June, July and August 2000 are given.
+The first daily total applies to 6 a.m. on 1 June to 6 a.m. on 2 June, the 30th from 6 a.m. on 30 June to 6 a.m. on 1 July.
+The maximum of these 30 values is stored under time index 0 in the precipitation array.
 ----
 dimensions:
   time=3;
@@ -603,7 +699,7 @@ dimensions:
 variables:
   float precipitation(time,lat,lon);
     precipitation:long_name="Accumulated precipitation";
-    precipitation:cell_methods="time: sum within days time: maximum over days"; 
+    precipitation:cell_methods="time: sum within days time: maximum over days";
     precipitation:units="kg";
   double time(time);
     time:climatology="climatology_bounds";
@@ -620,22 +716,22 @@ data:  // time coordinates translated to date/time format
 [[geometries, Section 7.5, "Geometries"]]
 === Geometries
 
-For many geospatial applications, data values are associated with a geometry, which is a spatial representation of a real-world feature, for instance a time-series of areal average precipitation over a watershed. 
-Polygonal cells with an arbitrary number of vertices can be described using <<cell-boundaries>>, but in that case every cell must have the same number of vertices and must be a single polygon ring. 
-In contrast, each geometry may have a different number of nodes, the geometries may be lines (as alternatives to points and polygons), and they may be __multipart__, i.e., include several disjoint parts. 
-While line and point geometries don't describe an interval along a dimension as the traditional cell bounds described above do, they do describe the extent of a geometry or real-world feature so are included in this section. 
+For many geospatial applications, data values are associated with a geometry, which is a spatial representation of a real-world feature, for instance a time-series of areal average precipitation over a watershed.
+Polygonal cells with an arbitrary number of vertices can be described using <<cell-boundaries>>, but in that case every cell must have the same number of vertices and must be a single polygon ring.
+In contrast, each geometry may have a different number of nodes, the geometries may be lines (as alternatives to points and polygons), and they may be __multipart__, i.e., include several disjoint parts.
+While line and point geometries don't describe an interval along a dimension as the traditional cell bounds described above do, they do describe the extent of a geometry or real-world feature so are included in this section.
 The approach described here specifies how to encode such geometries following the pattern in **9.3.3 Contiguous ragged array representation** and attach them to variables in a way that is consistent with the cell bounds approach.
 
-All geometries are made up of one or more nodes. 
-The geometry type specifies the set of topological assumptions to be applied to relate the nodes (see Table 7.1). 
-For example, multipoint and line geometries are nearly the same except nodes are interpreted as being connected for lines. 
-Lines and polygons are also nearly the same except that the first and last nodes are assumed to be connected for polygons. 
-Note that CF does not require the first and last node to be identical but allows them to be coincident if desired. 
-Polygons that have holes, such as waterbodies in a land unit, are encoded as a collection of polygon ring parts, each identified as __exterior__ or __interior__ polygons. 
+All geometries are made up of one or more nodes.
+The geometry type specifies the set of topological assumptions to be applied to relate the nodes (see Table 7.1).
+For example, multipoint and line geometries are nearly the same except nodes are interpreted as being connected for lines.
+Lines and polygons are also nearly the same except that the first and last nodes are assumed to be connected for polygons.
+Note that CF does not require the first and last node to be identical but allows them to be coincident if desired.
+Polygons that have holes, such as waterbodies in a land unit, are encoded as a collection of polygon ring parts, each identified as __exterior__ or __interior__ polygons.
 Multipart geometries, such as multiple lines representing the same river or multiple islands representing the same jurisdiction, are encoded as collections of unconnected points, lines, or polygons that are logically grouped into a single geometry.
 
-Any data variable can be given a **`geometry`** attribute that indicates the geometry for the quantity held in the variable. 
-One of the dimensions of the data variable must be the number of geometries to which the data applies. 
+Any data variable can be given a **`geometry`** attribute that indicates the geometry for the quantity held in the variable.
+One of the dimensions of the data variable must be the number of geometries to which the data applies.
 As shown in Example 7.15, if the data variable has a discrete sampling geometry, the number of geometries is the length of the instance dimension (Section 9.2).
 
 [[timeseries-with-geometry]]
@@ -693,56 +789,49 @@ data:
   x = 30, 10, 40, 50, 50 ;
   y = 10, 30, 40, 60, 50 ;
 ----
-The time series variable, someData, is associated with line geometries via the geometry attribute. The first line geometry is comprised of three nodes, while the second has two nodes. Client applications unaware of CF geometries can fall back to the lat and lon variables to locate feature instances in space. In this example, lat and lon coordinates are identical to the first node in each line geometry, though any representative point could be used.
+The time series variable, someData, is associated with line geometries via the geometry attribute.
+The first line geometry is comprised of three nodes, while the second has two nodes.
+Client applications unaware of CF geometries can fall back to the lat and lon variables to locate feature instances in space.
+In this example, lat and lon coordinates are identical to the first node in each line geometry, though any representative point could be used.
 ====
 
 
-A __geometry container__ variable acts as a container for attributes that describe a set of geometries. 
-The **`geometry`** attribute of the data variable contains the name of a geometry container variable. 
-The geometry container variable must hold **`geometry_type`** and **`node_coordinates`** attributes. 
+A __geometry container__ variable acts as a container for attributes that describe a set of geometries.
+The **`geometry`** attribute of the data variable contains the name of a geometry container variable.
+The geometry container variable must hold **`geometry_type`** and **`node_coordinates`** attributes.
 The **`grid_mapping`** and **`coordinates`** attributes can be carried by the geometry container variable provided they are also carried by the data variables associated with the container.
 
-The **`geometry_type`** attribute indicates the type of geometry present. 
-Its allowable values are: __point__, __line__, __polygon__. 
-Multipart geometries are allowed for all three geometry types. 
-For example, polygon geometries could include single part geometries like the State of Colorado and multipart geometries like the State of Hawaii. 
+The **`geometry_type`** attribute indicates the type of geometry present.
+Its allowable values are: __point__, __line__, __polygon__.
+Multipart geometries are allowed for all three geometry types.
+For example, polygon geometries could include single part geometries like the State of Colorado and multipart geometries like the State of Hawaii.
 
-The **`node_coordinates`** attribute contains the blank-separated names of the variables that contain geometry node coordinates (one variable for each spatial dimension). 
-The geometry node coordinate variables must each have an **`axis`** attribute whose allowable values are __X__, __Y__, and __Z__. 
+The **`node_coordinates`** attribute contains the blank-separated names of the variables that contain geometry node coordinates (one variable for each spatial dimension).
+The geometry node coordinate variables must each have an **`axis`** attribute whose allowable values are __X__, __Y__, and __Z__.
 
-If a **`coordinates`** attribute is carried by the geometry container variable
-or its parent data variable, then those coordinate variables that have a
-meaningful correspondence with node coordinates are indicated as such by a
-**`nodes`** attribute that names the corresponding node coordinates, but only if
-the **`grid_mapping`** associated with the geometry node variables is the same as that of
-the coordinate variables. If a different grid mapping is used, then the provided
-coordinates must not have the **`nodes`** attribute. 
+If a **`coordinates`** attribute is carried by the geometry container variable or its parent data variable, then those coordinate variables that have a meaningful correspondence with node coordinates are indicated as such by a **`nodes`** attribute that names the corresponding node coordinates, but only if the **`grid_mapping`** associated with the geometry node variables is the same as that of the coordinate variables.
+If a different grid mapping is used, then the provided coordinates must not have the **`nodes`** attribute.
 
-Whether linked to normal CF space-time coordinates with a **`nodes`** attribute
-or not, inclusion of such coordinates is recommended to maintain backward
-compatibility with software that has not implemented geometry capabilities. 
+Whether linked to normal CF space-time coordinates with a **`nodes`** attribute or not, inclusion of such coordinates is recommended to maintain backward compatibility with software that has not implemented geometry capabilities.
 
-The geometry node coordinate variables must all have the same single dimension, which is the total number of nodes in all the geometries. 
-The nodes must be stored consecutively for each geometry and in the order of the geometries, and within each multipart geometry the nodes must be stored consecutively for each part and in the order of the parts. 
-Polygon exterior rings must be stored before any interior rings they may contain. 
-Nodes for polygon exterior rings must be ordered using the right-hand rule, e.g., anticlockwise in the lon-lat plane as viewed from above. 
-Polygon interior rings must be in clockwise order. 
-They are put in opposite orders to facilitate calculation of area and consistency with the typical implementation pattern. 
+The geometry node coordinate variables must all have the same single dimension, which is the total number of nodes in all the geometries.
+The nodes must be stored consecutively for each geometry and in the order of the geometries, and within each multipart geometry the nodes must be stored consecutively for each part and in the order of the parts.
+Polygon exterior rings must be stored before any interior rings they may contain.
+Nodes for polygon exterior rings must be ordered using the right-hand rule, e.g., anticlockwise in the lon-lat plane as viewed from above.
+Polygon interior rings must be in clockwise order.
+They are put in opposite orders to facilitate calculation of area and consistency with the typical implementation pattern.
 
-When more than one geometry instance is present, the geometry container variable must have a **`node_count`** attribute that contains the name of a variable indicating the count of nodes per geometry. 
-The node count is the total number of nodes in all the parts. 
-The exception is when all geometries are single part point geometries, in which
-case a node count is not needed since each geometry contains a single node.
-However in that case, the dimension of the node coordinate variables must be one
-of the dimensions of the data variable (because it serves also as the instance
-dimension for geometries).
+When more than one geometry instance is present, the geometry container variable must have a **`node_count`** attribute that contains the name of a variable indicating the count of nodes per geometry.
+The node count is the total number of nodes in all the parts.
+The exception is when all geometries are single part point geometries, in which case a node count is not needed since each geometry contains a single node.
+However in that case, the dimension of the node coordinate variables must be one of the dimensions of the data variable (because it serves also as the instance dimension for geometries).
 
-For multipart __lines__, multipart __polygons__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute that indicates a variable of the count of nodes per geometry part. 
-Note that because multipoint geometries always have a single node per part, the **`part_node_count`** is not required for __point__ geometry types. 
+For multipart __lines__, multipart __polygons__, and __polygons__ with holes, the geometry container variable must have a **`part_node_count`** attribute that indicates a variable of the count of nodes per geometry part.
+Note that because multipoint geometries always have a single node per part, the **`part_node_count`** is not required for __point__ geometry types.
 The single dimension of the part node count variable must equal the total number of parts in all the geometries.
 
-For __polygon__ geometries with holes, the geometry container variable must have an **`interior_ring`** attribute that contains the name of a variable that indicates if the polygon parts are interior rings (i.e., holes) or not. 
-This interior ring variable must contain the value 0 to indicate an exterior ring polygon and 1 to indicate an interior ring polygon. 
+For __polygon__ geometries with holes, the geometry container variable must have an **`interior_ring`** attribute that contains the name of a variable that indicates if the polygon parts are interior rings (i.e., holes) or not.
+This interior ring variable must contain the value 0 to indicate an exterior ring polygon and 1 to indicate an interior ring polygon.
 The single dimension of the interior ring variable must be the same dimension as that of the part node count variable.
 The geometry types included in this convention are listed in Table 7.1.
 

@@ -8,13 +8,12 @@ The netCDF Climate and Forecasting conventions are a product by and for a broad 
 This set of guidelines provides a brief overview of the practices and procedures that should be used in fixing, updating, or adding to the conventions.
 It builds on the [rules for CF Convention changes.](http://cfconventions.org/rules.html)
 
-As a prerequisite to this guide, please review the community's code of [conduct.](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md)
-The CF community takes great pride in respectful and collegial discourse. Any disrespectful or otherwise derogatory communication will not be tolerated.
+As a prerequisite to this guide, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md).
+The CF community takes great pride in respectful and collegial discourse.
+Any disrespectful or otherwise derogatory communication will not be tolerated.
 
-These contribution guidelines are designed to make it easy to contribute to the
-CF Conventions and are tailored to the platform where they are hosted, GitHub.
-They are intended to support your work and not to constrict you; if at any time
-you find them difficult to follow, ask for help.
+These contribution guidelines are designed to make it easy to contribute to the CF Conventions and are tailored to the platform where they are hosted, GitHub.
+They are intended to support your work and not to constrict you; if at any time you find them difficult to follow, ask for help.
 Your contribution is valuable and the community will be happy to give a hand.
 
 ## General guidelines for using GitHub to change the CF Conventions
@@ -30,8 +29,10 @@ If the proposal is non-controversial (such as a typo correction) or has been agr
 Practically all changes should be documented and discussed in an issue fixed in a related pull request.
 1. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.**
 Currently this is achieved by using an appropriate issue template when creating a [new issue](https://github.com/cf-convention/cf-conventions/issues/new/choose).
-1. **Comments in pull requests.** These should be avoided, unless discussing changes to the wording of a proposal that do not impact on the agreed meaning. This is so that the scientific development of the proposal is easily found in one place, i.e. the GitHub issue.
-2. **Role of the issue moderator.** Each issue should have a moderator who guides the discussion through the change process and summarises it occasionally. This is described in greater detail in the [CF Conventions Rules](http://cfconventions.org/rules.html).
+1. **Comments in pull requests.** These should be avoided, unless discussing changes to the wording of a proposal that do not impact on the agreed meaning.
+This is so that the scientific development of the proposal is easily found in one place, i.e. the GitHub issue.
+2. **Role of the issue moderator.** Each issue should have a moderator who guides the discussion through the change process and summarises it occasionally.
+This is described in greater detail in the [CF Conventions Rules](http://cfconventions.org/rules.html).
 
 ## Issues and pull requests
 Note that it takes a minimum of three weeks for a change to the content of the CF Conventions to be merged into the Convention's next version.
@@ -61,3 +62,11 @@ The person who merges the pull request also closes the issue.
 If subsequent discussion is required after the pull request has been merged then a new issue should be raised, rather than reopening the closed issue.
 An issue may be closed without the merging of a pull request if the change was not accepted by the community.
 In this case the issue may be reopened for further discussion at a later date.
+
+## Text styling
+
+The CF Conventions documents and website are generated from a mix of AsciiDoc and Markdown files.
+The files should be formatted in line with the
+[AsciiDoc Recommended Practices](https://asciidoctor.org/docs/asciidoc-recommended-practices/)
+and
+[Google Markdown style guide](https://google.github.io/styleguide/docguide/style.html).
