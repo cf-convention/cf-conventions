@@ -79,7 +79,7 @@ data:
 Since `landpoint(0)=363`, for instance, we know that `landsoilt(*,0)` maps on to point 363 of the original data with dimensions `(lat,lon)`.
 This corresponds to indices `(3,75)`, i.e., `363 = 3*96 + 75`.
 ====
- 
+
 [[compression-of-three-d-field-ex]]
 [caption="Example 8.2. "]
 .Compression of a three-dimensional field
@@ -134,13 +134,13 @@ Following this step, each continuous area is segmented into interpolation subare
 The processes of generating interpolation subareas for a domain without discontinuities and for a domain with discontinuities is illustrated in <<interpolation_subarea_generation>>, and described in more detail in <<appendix-coordinate-subsampling>>.
 
 For each __interpolated dimension__, i.e. a target domain dimension for which coordinate interpolation is required, the locations of the tie point coordinates are defined by a corresponding __tie point index variable__, which also indicates the locations of the continuous areas (<<compression-by-coordinate-subsampling-tie-point-index-mapping>>).
- 
+
 The interpolation subareas within a continuous area do not overlap, ensuring that each coordinate of an interpolated dimension is computed from a unique interpolation subarea.
 These interpolation subareas, however, share the tie point coordinates that define their common boundaries.
 Such a shared tie point coordinate can only be located in one of a pair of adjacent interpolation subareas, which is always the first of the pair in index space.
 For instance, in <<interpolation_subarea_generation>>, the interpolation subarea labelled `(0,0)` contains all four of its tie point coordinates, and the interpolation subarea `(0,1)` only contains two of them.
 When applied for a given interpolation subarea, interpolation methods (such as those described in <<appendix-coordinate-subsampling>>) must ensure that reconstituted coordinate points are only generated inside the interpolation subarea being processed, even if some of the tie point coordinates lie outside of that interpolation subarea.
- 
+
 Adjacent interpolation subareas that are in different continuous areas never share tie point coordinates, as consequence of the grid discontinuity between them.
 This results in a different number of tie point coordinates in the two cases shown in <<interpolation_subarea_generation>>.
 
@@ -152,7 +152,7 @@ Tie point coordinate variables for both coordinate and auxiliary coordinate vari
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
 [.text-center]
 .Process for generating the interpolation subareas for a grid without discontinuities and for a grid with discontinuities.
-image::images/ci_interpolation_subarea_generation_process.svg[,100%,pdfwidth=50vw,align="center"] 
+image::images/ci_interpolation_subarea_generation_process.svg[,100%,pdfwidth=50vw,align="center"]
 
 [[compression-by-coordinate-subsampling-coordinate-interpolation-attribute, Section 8.3.2, "Coordinate Interpolation Attribute"]]
 ==== Coordinate Interpolation Attribute
@@ -190,7 +190,7 @@ In addition to the **`interpolation_name`** and **`interpolation_description`** 
 [[compression-by-coordinate-subsampling-dimensions,Section 8.3.4, "Subsampled, Interpolated and Non-Interpolated Dimensions"]]
 ==== Subsampled, Interpolated and Non-Interpolated Dimensions
 
-For each interpolation variable identified in the **`coordinate_interpolation`** attribute, all of the associated tie point coordinate variables must share the same set of one or more dimensions. 
+For each interpolation variable identified in the **`coordinate_interpolation`** attribute, all of the associated tie point coordinate variables must share the same set of one or more dimensions.
 This set of dimensions must correspond to the set of dimensions of the uncompressed coordinate or auxiliary coordinate variables, such that each of these dimensions must be either the uncompressed dimension itself, or a dimension that is to be interpolated to the uncompressed dimension.
 
 Dimensions of the tie point coordinate variable which are to be interpolated are called __subsampled dimensions__, and the corresponding data variable dimensions are called __interpolated dimensions__, while those for which no interpolation is required, being the same in the data variable and the tie point coordinate variable, are called __non-interpolated dimensions__.
@@ -215,13 +215,13 @@ The mappings are stored in the interpolation variable's **`tie_point_mapping`** 
 [[compression-by-coordinate-subsampling-tie-point-dimension-mapping, Section 8.3.6, "Tie Point Dimension Mapping"]]
 ==== Tie Point Dimension Mapping
 
-The **`tie_point_mapping`** attribute defined above associates each interpolated dimension with its corresponding subsampled dimension and, if required, its corresponding __interpolation subarea dimension__ that defines the number of interpolation subareas which partition the interpolated dimension. 
-It is only required to associate an interpolated dimension  to an interpolation subarea dimension in the case that the interpolation subarea dimension is spanned by an interpolation parameter variable, as described in <<compression-by-coordinate-subsampling-interpolation-parameters>>. 
+The **`tie_point_mapping`** attribute defined above associates each interpolated dimension with its corresponding subsampled dimension and, if required, its corresponding __interpolation subarea dimension__ that defines the number of interpolation subareas which partition the interpolated dimension.
+It is only required to associate an interpolated dimension  to an interpolation subarea dimension in the case that the interpolation subarea dimension is spanned by an interpolation parameter variable, as described in <<compression-by-coordinate-subsampling-interpolation-parameters>>.
 If an interpolation subarea dimension is provided, then it must be the second of the two named dimensions following the tie point index variable.
 
 Note that the size of an interpolation subarea dimension is, by definition, the size of the corresponding subsampled dimension minus the number of continuous areas.
 
-An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>. 
+An overview of the different dimensions for coordinate interpolation is shown in <<ci_dimensions_overview>>.
 
 [[ci_dimensions_overview]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
@@ -233,10 +233,10 @@ image::images/ci_dimensions_overview.svg[,80%,pdfwidth=50vw,align="center"]
 ==== Tie Point Index Mapping
 
 The **`tie_point_mapping`** attribute defined in <<compression-by-coordinate-subsampling-tie-point-mapping-attribute>> identifies for each subsampled dimension a tie point index variable.
-The tie point index variable defines the relationship between the indices of the subsampled dimension and the indices of its corresponding interpolated dimension. 
+The tie point index variable defines the relationship between the indices of the subsampled dimension and the indices of its corresponding interpolated dimension.
 
 A tie point index variable is a one-dimensional integer variable that must span the subsampled dimension.
-Each tie point index variable value is a zero-based index of the related interpolated dimension which maps an element of that interpolated dimension to the corresponding location in the subsampled dimension. 
+Each tie point index variable value is a zero-based index of the related interpolated dimension which maps an element of that interpolated dimension to the corresponding location in the subsampled dimension.
 
 The tie point index values must be strictly monotonically increasing.
 The location in index space of a continuous area boundary that relates to a grid discontinuity (<<compression-by-coordinate-subsampling-tie-points-and-interpolation-subareas>>) is indicated by a pair of adjacent tie point index values differing by one.
@@ -245,8 +245,8 @@ As a consequence, any pair of tie point index values that defines an extent of a
 Interpolation subareas that are the first in index space of a continuous area, in one or more of the subsampled dimensions are, however, special.
 These interpolation subareas contain tie points at both of the subarea boundaries with respect to those subsampled dimensions and so must span at least three points in the corresponding interpolated dimensions (see <<interpolation_subarea_generation>>).
 
-For instance, in example <<example-Two-dimensional-tie-point-interpolation>> the tie point coordinate variables represent a subset of the target domain and the tie point index variable `int x_indices(tp_xc)` contains the indices `x_indices = 0, 9, 19, 29` that identify the location in the interpolated dimension `xc` of size 30. 
-The corresponding **`tie_point_mapping`** attribute of the interpolation variable is `xc: x_indices tp_xc  yc: y_indices tp_yc`. 
+For instance, in example <<example-Two-dimensional-tie-point-interpolation>> the tie point coordinate variables represent a subset of the target domain and the tie point index variable `int x_indices(tp_xc)` contains the indices `x_indices = 0, 9, 19, 29` that identify the location in the interpolated dimension `xc` of size 30.
+The corresponding **`tie_point_mapping`** attribute of the interpolation variable is `xc: x_indices tp_xc  yc: y_indices tp_yc`.
 
 [[example-Two-dimensional-tie-point-interpolation]]
 [caption="Example 8.3. "]
@@ -256,11 +256,11 @@ The corresponding **`tie_point_mapping`** attribute of the interpolation variabl
 dimensions:
   xc = 30;
   yc = 10;
-  tp_xc = 4 ; 
+  tp_xc = 4 ;
   tp_yc = 2 ;
 
 variables:
-  // Data variable    	       
+  // Data variable
   float Temperature(yc, xc) ;
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
@@ -279,7 +279,7 @@ variables:
   double lon(tp_yc, tp_xc) ;
     lon:units = "degrees_east" ;
     lon:standard_name = "longitude" ;
- 
+
   // Tie point index variables
   int y_indices(tp_yc) ;
   int x_indices(tp_xc) ;
@@ -299,10 +299,10 @@ data:
 dimensions:
   xc = 30;
   yc = 10;
-  tp_xc = 4 ; 
+  tp_xc = 4 ;
 
 variables:
-  // Data variable    	       
+  // Data variable
   float Temperature(yc, xc) ;
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
@@ -321,7 +321,7 @@ variables:
   double lon(yc, tp_xc) ;
     lon:units = "degrees_east" ;
     lon:standard_name = "longitude" ;
- 
+
   // Tie point index variables
   int x_indices(tp_xc) ;
 
@@ -338,18 +338,18 @@ The interpolation variable attribute **`interpolation_parameters`** may be used 
 This attribute names __interpolation parameter variables__ that provide values for coefficient terms in the interpolation equation, or for any other terms that configure the interpolation process.
 The **`interpolation_parameters`** attribute takes a string value, the string comprising blank-separated elements of the form `"term: variable"`, where `term` is a case-insensitive keyword that defines one of the terms in the interpolation method's definition given in <<appendix-coordinate-subsampling>>, and `variable` is the name of the interpolation parameter variable that contains the values for that term.
 The order of elements is not significant.
-Any numerical term that is specified as optional in <<appendix-coordinate-subsampling>> and is omitted from the **`interpolation_parameters`** attribute should be assumed to be zero. 
+Any numerical term that is specified as optional in <<appendix-coordinate-subsampling>> and is omitted from the **`interpolation_parameters`** attribute should be assumed to be zero.
 
 The **`interpolation_parameters`** attribute may only be provided if allowed by the definition of the interpolation method.
-Interpolation parameters may always be provided to non-standardized interpolation methods. 
+Interpolation parameters may always be provided to non-standardized interpolation methods.
 
 The interpolation parameters are not permitted to contain absolute coordinate information, such as additional tie points, but may contain relative coordinate information, for example an offset with respect to a tie point or with respect to a combination of tie points.
-This is to ensure that interpolation methods are equally applicable to both coordinate and bounds interpolation. 
+This is to ensure that interpolation methods are equally applicable to both coordinate and bounds interpolation.
 
 The interpolation parameter variable dimensions must include, for all of the interpolated dimensions, either the associated subsampled dimension or the associated interpolation subarea dimension.
 Additionally, any subset of zero or more of the non-interpolated dimensions of the tie point coordinate variable are permitted as interpolation parameter variable dimensions.
 
-The application of an interpolation parameter variable is independent of its non-interpolated dimensions, but depends on its set of subsampled dimensions and interpolation subarea dimensions: 
+The application of an interpolation parameter variable is independent of its non-interpolated dimensions, but depends on its set of subsampled dimensions and interpolation subarea dimensions:
 
 * If the set only contains subsampled dimensions, then the variable provides values for every tie point and therefore equally applicable to the interpolation subareas that share that tie point, see example a) in <<ci_interpolation_parameters>>;
 * If the set only contains interpolation subarea dimensions, then the variable provides values for every interpolation subarea and therefore only applicable to that interpolation subarea, see example b) in <<ci_interpolation_parameters>>;
@@ -370,12 +370,12 @@ image::images/ci_interpolation_coefficients.svg[,100%,pdfwidth=50vw,align="cente
 dimensions :
   // VIIRS I-Band (375 m resolution imaging)
   track = 1536 ;
-  scan = 6400 ; 
+  scan = 6400 ;
   // Tie points and interpolation subareas
   tp_track = 96 ;  // 48 VIIRS scans
   tp_scan = 205 ;
-  subarea_track = 48 ;   // track interpolation subarea 
-  subarea_scan= 200 ;    // scan interpolation subarea 
+  subarea_track = 48 ;   // track interpolation subarea
+  subarea_scan= 200 ;    // scan interpolation subarea
   // Time, stored at scan-start and scan-end of each scan
   tp_time_scan = 2;
 
@@ -393,9 +393,9 @@ variables:
   // Interpolation variable
   char tp_interpolation ;
     tp_interpolation:interpolation_name = "bi_quadratic_latitude_longitude" ;
-    tp_interpolation:tie_point_mapping = "track: track_indices tp_track subarea_track 
+    tp_interpolation:tie_point_mapping = "track: track_indices tp_track subarea_track
                                           scan: scan_indices tp_scan subarea_scan" ;
-    tp_interpolation:interpolation_parameters = 
+    tp_interpolation:interpolation_parameters =
          "ce1: ce1  ca2: ca2  ce3: ce3 interpolation_subarea_flags: interpolation_subarea_flags" ;
     tp_interpolation:computational_precision = "32" ;
 
@@ -412,9 +412,9 @@ variables:
           solar_direction_use_3d_cartesian" ;
 
   // Tie point index variables
-  int track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation 
-  int scan_indices(tp_scan) ;     
-  int time_scan_indices(tp_time_scan) 
+  int track_indices(tp_track) ;   // shared by tp_interpolation and time_interpolation
+  int scan_indices(tp_scan) ;
+  int time_scan_indices(tp_time_scan)
 
   // Tie points
   float lat(tp_track, tp_scan) ;
@@ -454,8 +454,8 @@ dimensions:
   tp_y = 58;
   tp_x = 52;
 
-variables:	       
-  // Data variable    
+variables:
+  // Data variable
   float Temperature(time, y, x) ;
     Temperature:standard_name = "air_temperature" ;
     Temperature:units = "K" ;
@@ -476,7 +476,7 @@ variables:
 
   char linear_x ;
     linear_x:interpolation_name = "linear" ;
-    linear_x:tie_point_mapping = "x: x_indices tp_x" ; 
+    linear_x:tie_point_mapping = "x: x_indices tp_x" ;
     linear_x:computational_precision = "64" ;
 
   char linear_y ;
@@ -500,10 +500,10 @@ variables:
   double lon(time, tp_y, tp_x) ;
     lon:units = "degrees_east" ;
     lon:standard_name = "longitude" ;
- 
+
   // Tie point index variables
   int y_indices(tp_y) ;
-    y_indices:long_name	= "Mapping of y dimension to its ",
+    y_indices:long_name = "Mapping of y dimension to its ",
                           "corresponding tie point dimension" ;
   int x_indices(tp_x) ;
     x_indices:long_name = "Mapping of x dimension to its ",
@@ -519,16 +519,16 @@ In this the projection coordinates are two-dimensional, but are only linearly in
 
 Coordinates may have cell bounds.
 For the case that the reconstituted cells are contiguous and have exactly two cell bounds along each interpolated dimension, cell bounds of interpolated dimensions can be stored as __bounds tie points__ and reconstituted through interpolation.
-In this process, the coordinate tie points are a prerequisite for the bounds tie points and the same interpolation method used for the coordinate interpolation is used for the bounds interpolation.  
+In this process, the coordinate tie points are a prerequisite for the bounds tie points and the same interpolation method used for the coordinate interpolation is used for the bounds interpolation.
 
 For the reconstituted coordinates, cell bounds are stored separately for each coordinate point, as shown in the left part of <<figure_interpolation_of_cell_boundaries>> for the example of 2D bounds.
 Since the cell bounds are contiguous, bounds points of adjacent cells will coincide and so the full set of bounds points may be represented as a grid, comparable to the coordinate points grid.
-In the middle part of <<figure_interpolation_of_cell_boundaries>>, both the reconstituted bounds points grid and the reconstituted coordinate points grid are shown for a continuous area, where each bounds point may be shared by up to four cells. 
+In the middle part of <<figure_interpolation_of_cell_boundaries>>, both the reconstituted bounds points grid and the reconstituted coordinate points grid are shown for a continuous area, where each bounds point may be shared by up to four cells.
 
 Bounds interpolation uses the same tie point index variables and therefore the same tie point cells as coordinate interpolation.
 One of the vertices of each coordinate tie point cell is chosen as the bounds tie point for the cell.
 It is selected as the vertex of the tie point cell that is the closest to the boundary of the interpolation subarea with respect to each interpolated dimension.
-For the example of 2D bounds, the resulting set of bounds tie points are marked in <<figure_interpolation_of_cell_boundaries>>, where the selected vertices are those closest to the corners of the interpolation subareas. 
+For the example of 2D bounds, the resulting set of bounds tie points are marked in <<figure_interpolation_of_cell_boundaries>>, where the selected vertices are those closest to the corners of the interpolation subareas.
 
 Note that within a continuous area, there is one more reconstituted bounds point than there are reconstituted coordinate points in each dimension.
 For this reason, a  virtual __interpolated bounds dimension__ is introduced for each dimension, having a size equal to the size of the interpolated dimension plus one.
@@ -538,7 +538,7 @@ This dimension is used for solely descriptive purposes, and is not required in a
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
 [.text-center]
 .Example of 2D bounds interpolation showing the bounds tie points and reconstituted bound points within a continuous area consisting of four interpolation subareas. The dimensions are shown for one of the two axes only. The index relationship between coordinate point indices and the related bound points indices is indicated.
-image::images/ci_bounds_interpolation.svg[,100%,pdfwidth=50vw,align="center"] 
+image::images/ci_bounds_interpolation.svg[,100%,pdfwidth=50vw,align="center"]
 
 Both the process of compressing bounds and the process of uncompressing bounds requires the steps to be carried out for a full continuous area, however, individual continuous areas can be processed independently.
 In the following description of these processes, indices relative to the origin of each continuous area are used for the interpolated dimension and the interpolated bounds dimension.
@@ -550,13 +550,13 @@ A bounds tie point is located in the same interpolation subarea  as its correspo
 The interpolation subareas do not overlap, ensuring that each bound point is computed from a unique interpolation subarea, see also the description of interpolation subareas in <<compression-by-coordinate-subsampling-tie-points-and-interpolation-subareas>>.
 That bounds are computed only once ensures that the reconstituted bounds are contiguous.
 
-For the generation of bounds tie points as part of the process of compressing bounds, the indices of the corresponding coordinate tie points are available in the tie point index variables, see <<compression-by-coordinate-subsampling-tie-point-index-mapping>>. 
+For the generation of bounds tie points as part of the process of compressing bounds, the indices of the corresponding coordinate tie points are available in the tie point index variables, see <<compression-by-coordinate-subsampling-tie-point-index-mapping>>.
 
 [[compressing_one_dimensional, "Compressing one-dimensional coordinate bounds"]]
 **Compressing one-dimensional coordinate bounds** +
 In the one-dimensional case, a coordinate point at index `i` in the interpolated dimension will be bounded by the two bounds +
-`B0 = (n0) = (i); 			B1 = (n1) = (i+1)` +
-where `n` is the bound index in the interpolated bound dimension. 
+`B0 = (n0) = (i); B1 = (n1) = (i+1)` +
+where `n` is the bound index in the interpolated bound dimension.
 
 For one-dimensional bound interpolation, an interpolation subarea is defined by two bounds tie points.
 The full set of bounds tie points is formed by appending, for each continuous area of the domain, the bound point `B0` of the first coordinate tie points of the continuous area, followed by the bound points `B1` of all subsequent coordinate tie point of the continuous area.
@@ -566,7 +566,7 @@ The full set of bounds tie points is formed by appending, for each continuous ar
 In the two-dimensional case, a coordinate point at indices `(j, i)` in the interpolated dimension will be bounded by the four bounds +
 `B0 = (n0, m0) = (j, i); B1 = (n1, m1) = (j, i+1)` +
 `B3 = (n3, m3) = (j+1, i); B2 = (n2, m2) = (j+1, i+1)` +
-where `(n, m)` are the bounds point indices in the interpolated bound dimensions. 
+where `(n, m)` are the bounds point indices in the interpolated bound dimensions.
 
 For two-dimensional bound interpolation, an interpolation subarea is defined by four bounds tie points.
 The full set of bounds tie points is formed by appending, for each continuous area of the domain, the bound point `B0` of the coordinate tie point at origin the of the continuous area `(0, 0)`, followed by the bound points `B1` of all remaining coordinate tie point of the continuous area with index `j = 0`, followed by the bound points `B3` of all remaining coordinate tie point of the continuous area with index `i = 0`, followed by the bound points `B2` of all remaining coordinate tie point of the continuous area.
@@ -575,13 +575,13 @@ The full set of bounds tie points is formed by appending, for each continuous ar
 A **`bounds_tie_points`** attribute must be defined for each tie point coordinate variable corresponding to reconstituted coordinates with cell boundaries.
 It is a single word of the form __“bounds_tie_point_variable”__ that identifies a bounds tie point variable, containing a bounds tie point coordinate value for each tie point stored in its tie point coordinate variable, and therefore the bounds tie point variable has the same set of dimensions as its tie point coordinate variable.
 An example of the usage of the **`bounds_tie_points`** is shown in <<example_interpolation_of_cell_boundaries>>.
-Since a bounds tie point variable is considered to be part of a tie point coordinate variable’s metadata, it is not necessary to provide it with attributes such as long_name and units, following the same rules as for the bounds of an uncompressed coordinate variable, see <<cell-boundaries>>. 
+Since a bounds tie point variable is considered to be part of a tie point coordinate variable’s metadata, it is not necessary to provide it with attributes such as long_name and units, following the same rules as for the bounds of an uncompressed coordinate variable, see <<cell-boundaries>>.
 
 **Uncompressing coordinate bounds** +
 The reconstitution of the full set of bounds from the bounds tie point is a two-step process.
 In a first step, which must be carried out for a full continuous area at a time, each bound point is reconstituted by interpolation between the bounds tie points within each interpolation subarea, using the same interpolation method as defined for the ordinary tie points.
 This step results in a grid of bound points spanning the interpolated bound dimensions.
-In a second step the reconstituted bounds vertices are replicated to the boundary variables of the reconstituted coordinates. 
+In a second step the reconstituted bounds vertices are replicated to the boundary variables of the reconstituted coordinates.
 
 **Uncompressing one-dimensional coordinate bounds** +
 For one-dimensional coordinate bounds, in the second step of the process, for each index `i` of the interpolated dimension, the two bounds of the boundary variable are set to the value of the interpolated bounds point grid at the indices `B0`  and `B1`, respectively, where the indices are defined above under <<compressing_one_dimensional>>.
@@ -600,7 +600,7 @@ dimensions:
 
   jc = 10;
   jtp = 3;
-  
+
 variables:
   // Data variable
   float Temperature(jc, ic) ;
@@ -641,8 +641,8 @@ variables:
 
 The accuracy of the reconstituted coordinates depends mainly on the degree of subsampling and the choice of interpolation method, both of which are set by the creator of the dataset.
 The accuracy and reproducibility will also depend, however, on how the interpolation method is implemented and on the computer platform carrying out the computations.
-To facilitate a good level of reproducibility of the processes of compressing and uncompressing coordinates, requirements are placed on the specification of interpolation methods and on stating the computational precision. 
- 
+To facilitate a good level of reproducibility of the processes of compressing and uncompressing coordinates, requirements are placed on the specification of interpolation methods and on stating the computational precision.
+
 **Interpolation Method Specification** +
 The interpolation method specifications provided in <<appendix-coordinate-subsampling>> are complete in their description of steps and formulas required for compressing and uncompressing coordinate data. Formulas are structured in a way that encourages an efficient implementation of the interpolation method in a high-level programming language.
 For instance, expressions that are constant within a computational loop should be externalised from that loop.
@@ -652,7 +652,7 @@ The data creator shall specify the floating-point arithmetic precision used duri
 
 [cols="3,10"]
 |===============
-| ** Value ** | ** Description** 
+| ** Value ** | ** Description**
 | "32" | 32-bit floating-point arithmetic, comparable to the binary32 standard in [<<IEEE_754>>]
 | "64" | 64-bit floating-point arithmetic, comparable to the binary64 standard in [<<IEEE_754>>]
 |===============
