@@ -1218,7 +1218,7 @@ The <strong><code>units</code></strong>, and <strong><code>long_name</code></str
 </div>
 <div class="paragraph">
 <p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>.
-The values of the <strong><code>units</code></strong> attributes are character strings that are recognized by UNIDATA&#8217;s Udunits package <a href="#UDUNITS">[UDUNITS]</a>, (with exceptions allowed as discussed in <a href="#units">Section 3.1, "Units"</a>).</p>
+The values of the <strong><code>units</code></strong> attributes are character strings that are recognized by UNIDATA&#8217;s UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>, (with exceptions allowed as discussed in <a href="#units">Section 3.1, "Units"</a>).</p>
 </div>
 <div class="paragraph">
 <p>The <strong><code>long_name</code></strong> and <strong><code>standard_name</code></strong> attributes are used to describe the content of each variable.
@@ -1242,7 +1242,7 @@ In cases where coordinate variables are not applicable, the variables containing
 Latitude, longitude, and time coordinates are identified solely by the value of their <strong><code>units</code></strong> attribute.
 Vertical coordinates with units of pressure may also be identified by the <strong><code>units</code></strong> attribute.
 Other vertical coordinates must use the attribute <strong><code>positive</code></strong> which determines whether the direction of increasing coordinate value is up or down.
-Because identification of a coordinate type by its units involves the use of an external software package <a href="#UDUNITS">[UDUNITS]</a>, we provide the optional attribute <strong><code>axis</code></strong> for a direct identification of coordinates that correspond to latitude, longitude, vertical, or time axes.</p>
+Because identification of a coordinate type by its units involves the use of an external package <a href="#UDUNITS">[UDUNITS]</a>, we provide the optional attribute <strong><code>axis</code></strong> for a direct identification of coordinates that correspond to latitude, longitude, vertical, or time axes.</p>
 </div>
 <div class="paragraph">
 <p>Latitude, longitude, and time are defined by internationally recognized standards, and hence, identifying the coordinates of these types is sufficient to locate data values uniquely with respect to time and a point on the earth&#8217;s surface.
@@ -1716,8 +1716,7 @@ But since it is an optional attribute, applications that implement these standar
 <h3 id="units"><a class="anchor" href="#units"></a>3.1. Units</h3>
 <div class="paragraph">
 <p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> and climatology variables defined in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>).
-The value of the <strong><code>units</code></strong> attribute is a string that can be recognized by UNIDATA&#8217;s Udunits package <a href="#UDUNITS">[UDUNITS]</a>, with a few exceptions that are given below.
-The <a href="http://www.unidata.ucar.edu/software/udunits/">Udunits package</a> includes a file <code>udunits.dat</code>, which lists its supported unit names.
+The value of the <strong><code>units</code></strong> attribute is a string that can be recognized by the UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>, with a few exceptions that are given below.
 Note that case is significant in the <strong><code>units</code></strong> strings.</p>
 </div>
 <div class="paragraph">
@@ -1729,23 +1728,23 @@ In this case the coordinate values are not true latitudes and longitudes which m
 <p>Units are not required for dimensionless quantities.
 A variable with no units attribute is assumed to be dimensionless.
 However, a units attribute specifying a dimensionless unit may optionally be included.
-The Udunits package defines a few dimensionless units, such as <code>percent</code>, but is lacking commonly used units such as ppm (parts per million).
-This convention does not support the addition of new dimensionless units that are not udunits compatible.
+The UDUNITS package defines a few dimensionless units, such as <code>percent</code>, <code>ppm</code> (parts per million), and others.
+This convention does not support the addition of new dimensionless units that are not UDUNITS compatible.
 The conforming unit for quantities that represent fractions, or parts of a whole, is "1".
 The conforming unit for parts per million is "1e-6".
 Descriptive information about dimensionless quantities, such as sea-ice concentration, cloud fraction, probability, etc., should be given in the <strong><code>long_name</code></strong> or <strong><code>standard_name</code></strong> attributes (see below) rather than the <strong><code>units</code></strong>.</p>
 </div>
 <div class="paragraph">
 <p>The units <code>level</code>, <code>layer</code>, and <code>sigma_level</code> are allowed for dimensionless vertical coordinates to maintain backwards compatibility with COARDS.
-These units are not compatible with Udunits and are deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are introduced (see <a href="#dimensionless-vertical-coordinate">Section 4.3.2, "Dimensionless Vertical Coordinate"</a>).</p>
+These units are not compatible with UDUNITS and are deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are introduced (see <a href="#dimensionless-vertical-coordinate">Section 4.3.2, "Dimensionless Vertical Coordinate"</a>).</p>
 </div>
 <div class="paragraph">
-<p>The Udunits syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard.
+<p>The UDUNITS syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard, except for case of specifying reference time, see section <a href="#time-coordinate">Time Coordinate</a>.
 The application of any scale factors or offsets to data should be indicated by the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes.
 Use of these attributes for data packing, which is their most important application, is discussed in detail in <a href="#packed-data">Section 8.1, "Packed Data"</a>.</p>
 </div>
 <div class="paragraph">
-<p>Udunits recognizes the following prefixes and their abbreviations.</p>
+<p>UDUNITS recognizes the following prefixes and their abbreviations.</p>
 </div>
 <table id="table-supported-units" class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 3.1. Supported Units</caption>
@@ -2237,7 +2236,7 @@ The definitions are associated with a coordinate variable via the <strong><code>
 For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.</p>
 </div>
 <div class="paragraph">
-<p>Because identification of a coordinate type by its units is complicated by requiring the use of an external software package <a href="#UDUNITS">[UDUNITS]</a>, we provide two optional methods that yield a direct identification.
+<p>Because identification of a coordinate type by its units is complicated by requiring the use of an external package <a href="#UDUNITS">[UDUNITS]</a>, we provide two optional methods that yield a direct identification.
 The attribute <strong><code>axis</code></strong> may be attached to a coordinate variable and given one of the values <strong><code>X</code></strong>, <strong><code>Y</code></strong>, <strong><code>Z</code></strong> or <strong><code>T</code></strong> which stand for a longitude, latitude, vertical, or time axis respectively.
 Alternatively the <strong><code>standard_name</code></strong> attribute may be used for direct identification.
 But note that these optional attributes are in addition to the required COARDS metadata.</p>
@@ -2260,9 +2259,7 @@ If bounds are not provided, an application might reasonably assume the gridpoint
 <h3 id="latitude-coordinate"><a class="anchor" href="#latitude-coordinate"></a>4.1. Latitude Coordinate</h3>
 <div class="paragraph">
 <p>Variables representing latitude must always explicitly include the <strong><code>units</code></strong> attribute; there is no default value.
-The <strong><code>units</code></strong> attribute will be a string formatted as per the <a href="http://www.unidata.ucar.edu/software/udunits/"><code>udunits.dat</code></a> file.
-The recommended unit of latitude is <strong><code>degrees_north</code></strong>.
-Also acceptable are <strong><code>degree_north</code></strong>, <strong><code>degree_N</code></strong>, <strong><code>degrees_N</code></strong>, <strong><code>degreeN</code></strong>, and <strong><code>degreesN</code></strong>.</p>
+The recommended value of the <strong><code>units</code></strong> attribute is the string <strong><code>degrees_north</code></strong>. Also accepted are <strong><code>degree_north</code></strong>, <strong><code>degree_N</code></strong>, <strong><code>degrees_N</code></strong>, <strong><code>degreeN</code></strong>, and <strong><code>degreesN</code></strong>.</p>
 </div>
 <div id="latitude-axis-ex" class="exampleblock">
 <div class="title">Example 4.1. Latitude axis</div>
@@ -2278,7 +2275,7 @@ Also acceptable are <strong><code>degree_north</code></strong>, <strong><code>de
 </div>
 </div>
 <div class="paragraph">
-<p>Application writers should note that the Udunits package does not recognize the directionality implied by the "north" part of the unit specification.
+<p>Application writers should note that the UDUNITS package does not recognize the directionality implied by the "north" part of the unit specification.
 It only recognizes its size, i.e., 1 degree is defined to be pi/180 radians.
 Hence, determination that a coordinate is a latitude type should be done via a string match between the given unit and one of the acceptable forms of <strong><code>degrees_north</code></strong>.</p>
 </div>
@@ -2293,9 +2290,7 @@ Hence, determination that a coordinate is a latitude type should be done via a s
 <h3 id="longitude-coordinate"><a class="anchor" href="#longitude-coordinate"></a>4.2. Longitude Coordinate</h3>
 <div class="paragraph">
 <p>Variables representing longitude must always explicitly include the <strong><code>units</code></strong> attribute; there is no default value.
-The units <strong><code>attribute</code></strong> will be a string formatted as per the <a href="http://www.unidata.ucar.edu/software/udunits/"><code>udunits.dat</code></a> file.
-The recommended unit of longitude is <strong><code>degrees_east</code></strong>.
-Also acceptable are <strong><code>degree_east</code></strong>, <strong><code>degree_E</code></strong>, <strong><code>degrees_E</code></strong>, <strong><code>degreeE</code></strong>, and <strong><code>degreesE</code></strong>.</p>
+The recommended value of the <strong><code>units</code></strong> attribute is the string <strong><code>degrees_east</code></strong>. Also accepted are <strong><code>degree_east</code></strong>, <strong><code>degree_E</code></strong>, <strong><code>degrees_E</code></strong>, <strong><code>degreeE</code></strong>, and <strong><code>degreesE</code></strong>.</p>
 </div>
 <div id="longitude-axis-ex" class="exampleblock">
 <div class="title">Example 4.2. Longitude axis</div>
@@ -2311,7 +2306,7 @@ Also acceptable are <strong><code>degree_east</code></strong>, <strong><code>deg
 </div>
 </div>
 <div class="paragraph">
-<p>Application writers should note that the Udunits package has limited recognition of the directionality implied by the "east" part of the unit specification.
+<p>Application writers should note that the UDUNITS package has limited recognition of the directionality implied by the "east" part of the unit specification.
 It defines <strong><code>degrees_east</code></strong> to be pi/180 radians, and hence equivalent to <strong><code>degrees_north</code></strong>.
 We recommend the determination that a coordinate is a longitude type should be done via a string match between the given unit and one of the acceptable forms of <strong><code>degrees_east</code></strong>.</p>
 </div>
@@ -2330,7 +2325,7 @@ We recommend the determination that a coordinate is a longitude type should be d
 <div class="paragraph">
 <p>The direction of positive (i.e., the direction in which the coordinate values are increasing), whether up or down, cannot in all cases be inferred from the units.
 The direction of positive is useful for applications displaying the data.
-For this reason the attribute <strong><code>positive</code></strong> as defined in the COARDS standard is required if the vertical axis units are not a valid unit of pressure (a determination which can be made using the udunits routine, utScan)&#8201;&#8212;&#8201;otherwise its inclusion is optional.
+For this reason the attribute <strong><code>positive</code></strong> as defined in the COARDS standard is required if the vertical axis units are not a valid unit of pressure (as determined by the UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>)&#8201;&#8212;&#8201;otherwise its inclusion is optional.
 The <strong><code>positive</code></strong> attribute may have the value <strong><code>up</code></strong> or <strong><code>down</code></strong> (case insensitive).
 This attribute may be applied to either coordinate variables or auxiliary coordinate variables that contain vertical coordinate data.</p>
 </div>
@@ -2372,21 +2367,21 @@ If an application detects such an inconsistency, the user should be warned, and 
 <div class="sect3">
 <h4 id="_dimensional_vertical_coordinate"><a class="anchor" href="#_dimensional_vertical_coordinate"></a>4.3.1. Dimensional Vertical Coordinate</h4>
 <div class="paragraph">
-<p>The <strong><code>units</code></strong> attribute for dimensional coordinates will be a string formatted as per the <a href="http://www.unidata.ucar.edu/software/udunits/"><code>udunits.dat</code></a> file.
-The acceptable units for vertical (depth or height) coordinate variables are:</p>
+<p>Variables representing dimensional vertical coordinates for or height must always explicitly include the  <strong><code>units</code></strong> attribute.
+The acceptable units for a vertical (depth or height) coordinate variable must a UDUNITS <a href="#UDUNITS">[UDUNITS]</a> representation of one of the following:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>units of pressure as listed in the file <code>udunits.dat</code>.
+<p>units of pressure.
 For vertical axes the most commonly used of these include <strong><code>bar</code></strong>, <strong><code>millibar</code></strong>, <strong><code>decibar</code></strong>, <strong><code>atmosphere (atm)</code></strong>, <strong><code>pascal (Pa)</code></strong>, and <strong><code>hPa</code></strong>.</p>
 </li>
 <li>
-<p>units of length as listed in the file udunits.dat.
+<p>units of length.
 For vertical axes the most commonly used of these include <strong><code>meter (metre, m)</code></strong>, and <strong><code>kilometer (km)</code></strong>.</p>
 </li>
 <li>
-<p>other units listed in the file udunits.dat that may under certain circumstances reference vertical position such as units of density or temperature.</p>
+<p>other units that may under certain circumstances reference vertical position such as units of density or temperature.</p>
 </li>
 </ul>
 </div>
@@ -2399,7 +2394,7 @@ For vertical axes the most commonly used of these include <strong><code>meter (m
 <div class="paragraph">
 <p>The <strong><code>units</code></strong> attribute is not required for dimensionless coordinates.
 For backwards compatibility with COARDS we continue to allow the <strong><code>units</code></strong> attribute to take one of the values: <strong><code>level</code></strong>, <strong><code>layer</code></strong>, or <strong><code>sigma_level</code></strong>.
-These values are not recognized by the Udunits package, and are considered a deprecated feature in the CF standard.</p>
+These values are not recognized by the UDUNITS package, and are considered a deprecated feature in the CF standard.</p>
 </div>
 </div>
 <div class="sect3">
@@ -2453,7 +2448,7 @@ Thus the pressure at gridpoint <strong><code>(n,k,j,i)</code></strong> would be 
 <div class="sect2">
 <h3 id="time-coordinate"><a class="anchor" href="#time-coordinate"></a>4.4. Time Coordinate</h3>
 <div class="paragraph">
-<p>Variables representing time must always explicitly include the <strong><code>units</code></strong> attribute; there is no default value.
+<p>Variables representing reference time must always explicitly include the <strong><code>units</code></strong> attribute; there is no default value.
 The <strong><code>units</code></strong> attribute takes a string value formatted as per the recommendations in the <a href="#UDUNITS">[UDUNITS]</a> package.
 The following excerpt from the UDUNITS documentation explains the time unit encoding by example:</p>
 </div>
@@ -2462,7 +2457,7 @@ The following excerpt from the UDUNITS documentation explains the time unit enco
 The time zone specification can also be written without a colon using one or two digits (indicating hours) or three or four digits (indicating hours and minutes)."</p>
 </div>
 <div class="paragraph">
-<p>The acceptable units for time are listed in the UDUNITS database.
+<p>The acceptable units for time are given by the UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>.
 The most commonly used of these strings (and their abbreviations) includes <strong><code>day</code></strong> (<strong><code>d</code></strong>), <strong><code>hour</code></strong> (<strong><code>hr</code></strong>, <strong><code>h</code></strong>), <strong><code>minute</code></strong> (<strong><code>min</code></strong>) and <strong><code>second</code></strong> (<strong><code>sec</code></strong>, <strong><code>s</code></strong>).
 Plural forms are also acceptable.</p>
 </div>
@@ -2489,8 +2484,7 @@ The CF standard follows UDUNITS in the definition of units, but we recommend tha
 </div>
 </div>
 <div class="paragraph">
-<p>A time coordinate is identifiable from its units string alone.
-The Udunits routines <strong><code>utScan()</code></strong> and <strong><code>utIsTime()</code></strong> can be used to make this determination.</p>
+<p>A reference time coordinate is identifiable from its units string alone.</p>
 </div>
 <div class="paragraph">
 <p>Optionally, the time coordinate may be indicated additionally by providing the <strong><code>standard_name</code></strong> attribute with an appropriate value, and/or the <strong><code>axis</code></strong> attribute with the value <strong><code>T</code></strong>.</p>
@@ -4227,7 +4221,7 @@ The horizontal coordinate variables to which "<strong><code>area</code></strong>
 <p>To indicate more precisely how the cell method was applied, extra information may be included in parentheses () after the identification of the method.
 This information includes standardized and non-standardized parts.
 Currently the only standardized information is to provide the typical interval between the original data values to which the method was applied, in the situation where the present data values are statistically representative of original data values which had a finer spacing.
-The syntax is (<strong><code>interval</code></strong>: <em>value unit</em>), where <em>value</em> is a numerical value and <em>unit</em> is a string that can be recognized by UNIDATA&#8217;s Udunits package <a href="#UDUNITS">[UDUNITS]</a>.
+The syntax is (<strong><code>interval</code></strong>: <em>value unit</em>), where <em>value</em> is a numerical value and <em>unit</em> is a string that can be recognized by UNIDATA&#8217;s UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>.
 The <em>unit</em> will usually be dimensionally equivalent to the unit of the corresponding dimension, but this is not required (which allows, for example, the interval for a standard deviation calculated from points evenly spaced in distance along a parallel to be reported in units of length even if the zonal coordinate of the cells is given in degrees).
 Recording the original interval is particularly important for standard deviations.
 For example, the standard deviation of daily values could be indicated by <strong><code>cell_methods="time: standard_deviation (interval: 1 day)"</code></strong> and of annual values by <strong><code>cell_methods="time: standard_deviation (interval: 1 year)"</code></strong>.</p>
@@ -11564,7 +11558,7 @@ Repeat this step for each combination of indices of the non-interpolated dimensi
 <p>Updated use of WKT-CRS syntax.</p>
 </li>
 <li>
-<p>Trivial updates to links for COARDS and Udunits in the bibliography.</p>
+<p>Trivial updates to links for COARDS and UDUNITS in the bibliography.</p>
 </li>
 <li>
 <p>Updated the links and references to NUG (The NetCDF User Guide), to refer to the current version.</p>
@@ -11888,7 +11882,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.11 draft<br>
-Last updated 2022-09-15 14:17:03 UTC
+Last updated 2022-10-06 07:52:06 UTC
 </div>
 </div>
 </body>
