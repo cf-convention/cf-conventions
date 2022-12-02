@@ -261,11 +261,10 @@ associated with each sample. For example, an annual mean could be computed from 
 of days in the month.  The exception to this default treatment is that for a vertical coordinate, the weights should be proportional to 
 the mass of the medium per unit area.  For a pressure coordinate, this is just the pressure spanned by the layer, but for a height coordinate, 
 the thickness would need to be weighted by density.  If the weighting applied is different from the default defined here, this can be 
-indicated by providing supplemental information in the cell_methods (see  Section 7.3.3. “Recording the spacing of the original data and 
-other information”).
+indicated by providing supplemental information in the **`cell_methods`** (see  <<recording-spacing-original-data>>).
 
 It must be remembered that the method applies only to the axis designated in **`cell_methods`** by __name__, and different methods may apply to other axes.
-If, for instance, a precipitation value in a longitude-latitude cell is given the method **`maximum`** for these axes, it means that it is the maximum within these spatial cells, and does not imply that it is also the maximum in time.
+If, for instance, a precipitation value in a longitude-latitude cell is given the method **`maximum`** for these axes, it means that it is the maximum within these spatial cells and does not imply that it is also the maximum in time.
 Furthermore, it should be noted that if any __method__ other than "**`point`**" is specified for a given axis, then **`bounds`** should also be provided for that axis (except for the relatively rare exceptions described in <<cell-methods-no-coordinates>>).
 
 [[methods-applied-to-a-timeseries-ex]]
@@ -350,7 +349,7 @@ To indicate this, one of two conventions may be used.
 The first convention is a method that can be used for the common case of a single area-type.
 In this case, the **`cell_methods`** attribute may include a string of the form "__name: method__  **`where`**  __type__".
 Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** 
-of **`area_type`**. Note that when a time dimension is named, the “where” in the cell_methods would be interpreted as meaning “when”, 
+of **`area_type`**. Note that when a time dimension is named, the “where” in the **`cell_methods`** would be interpreted as meaning “when”, 
 rather than “where”;  there are other cases for which “where and when” would be the appropriate interpretation.   
 As an example, for **`cell_methods=“area: mean where sea_ice”`**, the data would represent a mean over only the sea ice portion of the 
 grid cell.  As another example, consider surface temperature with a **`cell_methods=“time: mean where sea_ice”`**.  In this case there would 
@@ -397,7 +396,7 @@ The same options apply to _type2_, except it is not allowed to be the name of an
 A `cell_methods` attribute with a string of the form "mean where _type1_ over _type2_" indicates the mean is calculated by integrating over the _type1_ portion of the cell and dividing by the area of the _type2_ portion.
 In particular, a `cell_methods` string of the form "mean where _type1_ over all_area_types" indicates the mean is calculated by integrating over the _type1_ portion of the cell and dividing by the entire area of the cell.
 (Note that `all_area_types` is one of the valid strings permitted for a variable with the `standard_name` `area_type`.)
-If "over _type2_" is omitted, the mean is calculated by integrating over the _type1_ portion of the cell and dividing by the area of this portion.  Note that in practice when computing the mean from grid-cell values within a region, the integrals referred to above will in practice be sums with samples, by default, weighted by the cell areas.
+If "over _type2_" is omitted, the mean is calculated by integrating over the _type1_ portion of the cell and dividing by the area of this portion.  Note that when computing the mean from grid-cell values within a region, the integrals referred to above will in practice be sums with samples, by default, weighted by the cell areas.
 
 [[thickness-over-sea-area-ex]]
 [caption="Example 7.8. "]
@@ -420,7 +419,7 @@ In the case of snow thickness, "`where sea_ice`" differs from "`where all_area_t
 
 
 
-[[recording-spacing-original-data]]
+[[recording-spacing-original-data, Section 7.3.3, "Recording the spacing of the original data and other information"]]
 ==== Recording the spacing of the original data and other information
 
 To indicate more precisely how the cell method was applied, extra information may be included in parentheses () after the identification of the method.
@@ -436,7 +435,7 @@ Alternatively, they may have separate intervals, which are matched to the names 
 
 If there is both standardized and non-standardized information, the non-standardized follows the standardized information and the keyword **`comment:`**.
 If there is no standardized information, the keyword **`comment:`** should be omitted.
-For instance, an area-weighted mean over latitude could be indicated as **`lat: mean (area-weighted)`** or **`lat: mean (interval: 1 degree_north comment: area-weighted)`**.
+For instance, the time mean of a variable quantifying the “age of surface snow” might be computed with each sample weighted by the mass of surface snow rather than the default (which, for regularly spaced samples, would be to equally weight them). This alternative to the default could be indicated as **`time: mean (weighted by mass of surface snow)`** or **`time: mean (interval: 1 day comment: weighted by mass of surface snow)`**.
 
 A dimension of size one may be the result of "collapsing" an axis by some statistical operation, for instance by calculating a variance from time series data.
 We strongly recommend that dimensions of size one be retained (or scalar coordinate variables be defined) to enable documentation of the method (through the **`cell_methods`** attribute) and its domain (through the **`bounds`** attribute).
