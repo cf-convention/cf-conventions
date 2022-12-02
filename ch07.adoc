@@ -340,15 +340,22 @@ the original data and other information”).
 [[statistics-applying-portions]]
 ==== Statistics applying to portions of cells
 
-By default, the statistical method indicated by **`cell_methods`** is assumed to have been evaluated over the entire horizontal area of the cell.
-Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area).
+By default, the statistical method indicated by **`cell_methods`** is assumed to have been evaluated over the entire spatio-temporal extent of the cell.
+Sometimes, however, it is useful to limit consideration to only a portion of a cell or subset of cells (e.g. a mean surface temperature over the sea-ice portion of a cell or the surface snow depth, but only considering times when sea ice exists in the cell). 
 To indicate this, one of two conventions may be used.
 
 The first convention is a method that can be used for the common case of a single area-type.
 In this case, the **`cell_methods`** attribute may include a string of the form "__name: method__  **`where`**  __type__".
-Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** of **`area_type`**.
-As an example, if the method were **`mean`** and the **`area_type`** were **`sea_ice`**, then the data would represent a mean over only the sea ice portion of the grid cell.
-If the data writer expects __type__ to be interpreted as one of the standard **`area_type`** strings, then none of the variables in the netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, takes precedence).
+Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** 
+of **`area_type`**. Note that when a time dimension is named, the “where” in the cell_methods would be interpreted as meaning “when”, 
+rather than “where”;  there are other cases for which “where and when” would be the appropriate interpretation.   
+As an example, for cell_methods=“area: mean where sea_ice”, then the data would represent a mean over only the sea ice portion of the 
+grid cell.  As another example, consider surface temperature with a cell_methods=“time: mean where sea_ice”.  In this case there would 
+be no contribution to the mean from ice-free cells.  One limitation on application of this first convention for identifying the cell 
+portion of interest should be noted:
+if the data writer expects __type__ to be interpreted as one of the standard **`area_type`** strings, then none of the variables in the 
+netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, 
+takes precedence).
 
 The second convention is the more general.
 In this case, the **`cell_methods`** entry is of the form "__name: method__  **`where`**  __typevar__".
@@ -379,14 +386,15 @@ variables:
 data:
   land_sea="land","sea";
 ----
-If the _method_ is `mean`, various ways of calculating the mean can be distinguished in the `cell_methods` attribute with a string of the form "mean where  _type1_ [over _type2_]".
-Here, _type1_ can be any of the possibilities allowed for _typevar_ or _type_ (as specified in the two paragraphs preceding above Example).
-The same options apply to _type2_, except it is not allowed to be the name of an auxiliary coordinate variable with a dimension greater than one (ignoring the possible dimension accommodating the maximum string length).
-A `cell_methods` attribute with a string of the form "mean where _type1_ over _type2_" indicates the mean is calculated by summing over the _type1_ portion of the cell and dividing by the area of the _type2_ portion.
-In particular, a `cell_methods` string of the form "mean where all_area_types over _type2_" indicates the mean is calculated by summing over all types of area within the cell and dividing by the area of the _type2_ portion.
-(Note that `all_area_types` is one of the valid strings permitted for a variable with the `standard_name` `area_type`.)
-If "over _type2_" is omitted, the mean is calculated by summing over the _type1_ portion of the cell and dividing by the area of this portion.
 ====
+
+If the _method_ is `mean`, various ways of calculating the mean can be distinguished in the `cell_methods` attribute with a string of the form "mean where  _type1_ [over _type2_]".
+Here, _type1_ can be any of the possibilities allowed for _typevar_ or _type_ (as specified in the two paragraphs of the last Example above).
+The same options apply to _type2_, except it is not allowed to be the name of an auxiliary coordinate variable with a dimension greater than one (ignoring the possible dimension accommodating the maximum string length).
+A `cell_methods` attribute with a string of the form "mean where _type1_ over _type2_" indicates the mean is calculated by integrating over the _type1_ portion of the cell and dividing by the area of the _type2_ portion.
+In particular, a `cell_methods` string of the form "mean where _type1_ over all_area_types" indicates the mean is calculated by integrating over the _type1_ portion of the cell and dividing by the entire area of the cell.
+(Note that `all_area_types` is one of the valid strings permitted for a variable with the `standard_name` `area_type`.)
+If "over _type2_" is omitted, the mean is calculated by integrating over the _type1_ portion of the cell and dividing by the area of this portion.  Note that in practice when computing the mean from grid-cell values within a region, the integrals referred to above will in practice be sums with samples, by default, weighted by the cell areas.
 
 [[thickness-over-sea-area-ex]]
 [caption="Example 7.8. "]
@@ -458,80 +466,6 @@ data:
 Notice that a parenthesized comment in the `cell_methods` attribute provides the nature of the samples used to calculate the variance.
 ====
 
-
-
-
-
-
-[[statistics-applying-portions]]
-==== Statistics applying to portions of cells
-
-By default, the statistical method indicated by **`cell_methods`** is assumed to have been evaluated over the entire horizontal area of the cell.
-Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area).
-To indicate this, one of two conventions may be used.
-
-The first convention is a method that can be used for the common case of a single area-type.
-In this case, the **`cell_methods`** attribute may include a string of the form "__name: method__  **`where`**  __type__".
-Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** of **`area_type`**.
-As an example, if the method were **`mean`** and the **`area_type`** were **`sea_ice`**, then the data would represent a mean over only the sea ice portion of the grid cell.
-If the data writer expects __type__ to be interpreted as one of the standard **`area_type`** strings, then none of the variables in the netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, takes precedence).
-
-The second convention is the more general.
-In this case, the **`cell_methods`** entry is of the form "__name: method__  **`where`**  __typevar__".
-Here __typevar__ is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see <<labels>>) with a **`standard_name`** of **`area_type`**.
-The variable __typevar__ contains the name(s) of the selected portion(s) of the grid cell to which the __method__ is applied.
-This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types).
-It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., **`vegetation`**, **`bare_ground`**, **`snow`**, etc.).
-
-
-[[mean-surface-temperature-sensible-heat-flux]]
-[caption="Example 7.7. "]
-.Mean surface temperature over land and sensible heat flux averaged separately over land and sea.
-====
-----
-dimensions:
-  lat=73;
-  lon=96;
-  maxlen=20;
-  ls=2;
-variables:
-  float surface_temperature(lat,lon);
-    surface_temperature:cell_methods="area: mean where land";
-  float surface_upward_sensible_heat_flux(ls,lat,lon);
-    surface_upward_sensible_heat_flux:coordinates="land_sea";
-    surface_upward_sensible_heat_flux:cell_methods="area: mean where land_sea";
-  char land_sea(ls,maxlen);
-    land_sea:standard_name="area_type";
-data:
-  land_sea="land","sea";
-----
-If the _method_ is `mean`, various ways of calculating the mean can be distinguished in the `cell_methods` attribute with a string of the form "mean where  _type1_ [over _type2_]".
-Here, _type1_ can be any of the possibilities allowed for _typevar_ or _type_ (as specified in the two paragraphs preceding above Example).
-The same options apply to _type2_, except it is not allowed to be the name of an auxiliary coordinate variable with a dimension greater than one (ignoring the possible dimension accommodating the maximum string length).
-A `cell_methods` attribute with a string of the form "mean where _type1_ over _type2_" indicates the mean is calculated by summing over the _type1_ portion of the cell and dividing by the area of the _type2_ portion.
-In particular, a `cell_methods` string of the form "mean where all_area_types over _type2_" indicates the mean is calculated by summing over all types of area within the cell and dividing by the area of the _type2_ portion.
-(Note that `all_area_types` is one of the valid strings permitted for a variable with the `standard_name` `area_type`.)
-If "over _type2_" is omitted, the mean is calculated by summing over the _type1_ portion of the cell and dividing by the area of this portion.
-====
-
-[[thickness-over-sea-area-ex]]
-[caption="Example 7.8. "]
-.Thickness of sea-ice and snow on sea-ice averaged over sea area.
-====
-----
-variables:
-  float sea_ice_thickness(lat,lon);
-    sea_ice_thickness:cell_methods="area: mean where sea_ice over sea";
-    sea_ice_thickness:standard_name="sea_ice_thickness";
-    sea_ice_thickness:units="m";
-  float snow_thickness(lat,lon);
-    snow_thickness:cell_methods="area: mean where sea_ice over sea";
-   snow_thickness:standard_name="lwe_thickness_of_surface_snow_amount";
-    snow_thickness:units="m";
-----
-In the case of sea-ice thickness, the phrase "`where sea_ice`" could be replaced by "`where all_area_types`" without changing the meaning since the integral of sea-ice thickness over all area types is obviously the same as the integral over the sea-ice area only.
-In the case of snow thickness, "`where sea_ice`" differs from "`where all_area_types`" because "`where sea_ice`" excludes snow on land from the average.
-====
 
 
 
