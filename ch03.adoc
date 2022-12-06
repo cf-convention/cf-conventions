@@ -22,16 +22,20 @@ The unit `degrees` is also allowed on coordinate variables such as the latitude 
 In this case the coordinate values are not true latitudes and longitudes which must always be identified using the more specific forms of `degrees` as described in <<latitude-coordinate>> and <<longitude-coordinate>>.
 
 Units are not required for dimensionless quantities.
-A variable with no units attribute is assumed to be dimensionless.
-However, a units attribute specifying a dimensionless unit may optionally be included.
-The UDUNITS package defines a few dimensionless units, such as `percent`, `ppm` (parts per million), and others.
-This convention does not support the addition of new dimensionless units that are not UDUNITS compatible.
-The conforming unit for quantities that represent fractions, or parts of a whole, is "1".
-The conforming unit for parts per million is "1e-6".
-Descriptive information about dimensionless quantities, such as sea-ice concentration, cloud fraction, probability, etc., should be given in the **`long_name`** or **`standard_name`** attributes (see below) rather than the **`units`**.
-
-The units `level`, `layer`, and `sigma_level` are allowed for dimensionless vertical coordinates to maintain backwards compatibility with COARDS.
-These units are not compatible with UDUNITS and are deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are introduced (see <<dimensionless-vertical-coordinate>>).
+A variable with no **`units`** attribute is assumed to be dimensionless.
+However, a **`units`** attribute specifying a dimensionless unit may optionally be included.
+The canonical unit (see also <<standard-name>>) for dimensionless quantities that represent fractions, or parts of a whole, is `1`.
+When a dimensionless quantity is a ratio of dimensional quantities, CF suggests that it may be informative to users of data if the **`units`** are given as ratio of dimensional units, for instance `mg kg-1` for a mass ratio of 1e-6, or `microlitre litre-1` for a volume ratio of 1e-6.
+ 
+The UDUNITS package defines a few dimensionless units, such as `percent`, `ppm` (parts per million, 1e-6), and `ppb` (parts per billion, 1e-9).
+The CF convention supports dimensionless units that are UDUNITS compatible, with one exception, concerning the dimensionless units defined by UDUNITS for volume ratios, such as `ppmv` and `ppbv`.
+These units are allowed in the **`units`** attribute by CF only if the data variable has no **`standard_name`**.
+These units are prohibited by CF if there is a **`standard_name`**, because the **`standard_name`** defines whether the quantity is a volume ratio, so the **`units`** are needed only to indicate a dimensionless number.
+ 
+Information describing a dimensionless physical quantity itself (e.g.
+"area fraction" or "probability") does not belong in the **`units`** attribute, but should be given in the **`long_name`** or **`standard_name`** attributes (see <<long-name>> and <<standard-name>>), in the same way as for physical quantities with dimensional units.
+As an exception, to maintain backwards compatibility with COARDS, the text strings `level`, `layer`, and `sigma_level` are allowed in the **`units`** attribute, in order to indicate dimensionless vertical coordinates.
+This use of **`units`** is not compatible with UDUNITS, and is deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are available (see <<dimensionless-vertical-coordinate>>).
 
 The UDUNITS syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard, except for case of specifying reference time, see section <<time-coordinate>>.
 The application of any scale factors or offsets to data should be indicated by the **`scale_factor`** and **`add_offset`** attributes.
