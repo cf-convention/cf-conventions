@@ -1726,17 +1726,22 @@ In this case the coordinate values are not true latitudes and longitudes which m
 </div>
 <div class="paragraph">
 <p>Units are not required for dimensionless quantities.
-A variable with no units attribute is assumed to be dimensionless.
-However, a units attribute specifying a dimensionless unit may optionally be included.
-The UDUNITS package defines a few dimensionless units, such as <code>percent</code>, <code>ppm</code> (parts per million), and others.
-This convention does not support the addition of new dimensionless units that are not UDUNITS compatible.
-The conforming unit for quantities that represent fractions, or parts of a whole, is "1".
-The conforming unit for parts per million is "1e-6".
-Descriptive information about dimensionless quantities, such as sea-ice concentration, cloud fraction, probability, etc., should be given in the <strong><code>long_name</code></strong> or <strong><code>standard_name</code></strong> attributes (see below) rather than the <strong><code>units</code></strong>.</p>
+A variable with no <strong><code>units</code></strong> attribute is assumed to be dimensionless.
+However, a <strong><code>units</code></strong> attribute specifying a dimensionless unit may optionally be included.
+The canonical unit (see also <a href="#standard-name">Section 3.3, "Standard Name"</a>) for dimensionless quantities that represent fractions, or parts of a whole, is <code>1</code>.
+When a dimensionless quantity is a ratio of dimensional quantities, CF suggests that it may be informative to users of data if the <strong><code>units</code></strong> are given as ratio of dimensional units, for instance <code>mg kg-1</code> for a mass ratio of 1e-6, or <code>microlitre litre-1</code> for a volume ratio of 1e-6.</p>
 </div>
 <div class="paragraph">
-<p>The units <code>level</code>, <code>layer</code>, and <code>sigma_level</code> are allowed for dimensionless vertical coordinates to maintain backwards compatibility with COARDS.
-These units are not compatible with UDUNITS and are deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are introduced (see <a href="#dimensionless-vertical-coordinate">Section 4.3.2, "Dimensionless Vertical Coordinate"</a>).</p>
+<p>The UDUNITS package defines a few dimensionless units, such as <code>percent</code>, <code>ppm</code> (parts per million, 1e-6), and <code>ppb</code> (parts per billion, 1e-9).
+The CF convention supports dimensionless units that are UDUNITS compatible, with one exception, concerning the dimensionless units defined by UDUNITS for volume ratios, such as <code>ppmv</code> and <code>ppbv</code>.
+These units are allowed in the <strong><code>units</code></strong> attribute by CF only if the data variable has no <strong><code>standard_name</code></strong>.
+These units are prohibited by CF if there is a <strong><code>standard_name</code></strong>, because the <strong><code>standard_name</code></strong> defines whether the quantity is a volume ratio, so the <strong><code>units</code></strong> are needed only to indicate a dimensionless number.</p>
+</div>
+<div class="paragraph">
+<p>Information describing a dimensionless physical quantity itself (e.g.
+"area fraction" or "probability") does not belong in the <strong><code>units</code></strong> attribute, but should be given in the <strong><code>long_name</code></strong> or <strong><code>standard_name</code></strong> attributes (see <a href="#long-name">Section 3.2, "Long Name"</a> and <a href="#standard-name">Section 3.3, "Standard Name"</a>), in the same way as for physical quantities with dimensional units.
+As an exception, to maintain backwards compatibility with COARDS, the text strings <code>level</code>, <code>layer</code>, and <code>sigma_level</code> are allowed in the <strong><code>units</code></strong> attribute, in order to indicate dimensionless vertical coordinates.
+This use of <strong><code>units</code></strong> is not compatible with UDUNITS, and is deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are available (see <a href="#dimensionless-vertical-coordinate">Section 4.3.2, "Dimensionless Vertical Coordinate"</a>).</p>
 </div>
 <div class="paragraph">
 <p>The UDUNITS syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard, except for case of specifying reference time, see section <a href="#time-coordinate">Time Coordinate</a>.
@@ -11367,6 +11372,9 @@ Repeat this step for each combination of indices of the non-interpolated dimensi
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/260">Issue #260</a>: Clarify use of dimensionless units</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/410">Issue #410</a>: Delete "on a spherical Earth" from the definition of the <code>latitude_longitude</code> grid mapping in Appendix F</p>
 </li>
 </ul>
@@ -11889,7 +11897,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.11 draft<br>
-Last updated 2022-11-10 22:45:19 UTC
+Last updated 2022-12-06 09:48:30 UTC
 </div>
 </div>
 </body>
