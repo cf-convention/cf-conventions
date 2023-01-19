@@ -8,4 +8,4 @@ See issue #XXX for discussion of these changes.
 
 # For maintainers
 After the merge remember to delete the source branch.
-Tags are set at the conclusion of the annual meeting; until then `master` always is a draft for the next version.
+Tags are set at the conclusion of the annual meeting; until then, `main` always is a draft for the next version.
