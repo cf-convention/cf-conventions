@@ -958,6 +958,9 @@ I.1. <a href="#cdl-domain-anc-coordinate">Example I.1 A single CF-netCDF variabl
 <li>
 <p>Sylvain Herlédan, OceanDataLab</p>
 </li>
+<li>
+<p>Fernando Manzano, Puertos del Estado</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -2679,9 +2682,10 @@ This is the only method of associating dimensions with coordinates that is suppo
 <p>Any longitude, latitude, vertical or time coordinate which depends on more than one spatiotemporal dimension must be identified by the <strong><code>coordinates</code></strong> attribute of the data variable.
 The value of the <strong><code>coordinates</code></strong> attribute is <em>a blank separated list of the names of auxiliary coordinate variables</em>.
 There is no restriction on the order in which the auxiliary coordinate variables appear in the <strong><code>coordinates</code></strong> attribute string.
-The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated, with two exceptions.
+The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated, with three exceptions.
 First, string-valued coordinates (<a href="#labels">Section 6.1, "Labels"</a>) will have a dimension for maximum string length if the coordinate variable has a type of <strong><code>char</code></strong> rather than a type of <strong><code>string</code></strong>.
-Second, in the ragged array representations of data (<a href="#discrete-sampling-geometries">Chapter 9, Discrete Sampling Geometries</a>), special methods are needed to connect the data and coordinates.</p>
+Second, if the data variable has a list dimension resulting from lossless compression by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>), its auxiliary coordinate variables may have any of the dimensions named by the compress attribute of the list variable.
+Third, in the ragged array representations of data (<a href="#discrete-sampling-geometries">Chapter 9, Discrete Sampling Geometries</a>), special methods are needed to connect the data and coordinates.</p>
 </div>
 <div class="paragraph">
 <p>We recommend that the name of a multidimensional coordinate variable should not match the name of any of its dimensions because that precludes supplying a coordinate variable for the dimension.
@@ -4940,8 +4944,9 @@ The wanted points appear along this dimension in the same order they appear in t
 Compression and uncompression are executed by looping over the list.</p>
 </div>
 <div class="paragraph">
-<p>The list is stored as the coordinate variable for the compressed axis of the data array.
+<p>The list is stored as the coordinate variable for the compressed axis of the data variable.
 Thus, the list variable and its dimension have the same name.
+If any auxiliary coordinate variable has all the dimensions to be compressed, adjacent and in the same order as in the data variable, and if the auxiliary coordinate variable has missing data at all the points which are to be eliminated from the data variable, then the affected dimensions can optionally be replaced by the list dimension for the auxiliary coordinate variable just as for the data variable.
 The list variable has a string attribute <strong><code>compress</code></strong>, <em>containing a blank-separated list of the dimensions which were affected by the compression in the order of the CDL declaration of the uncompressed array</em>.
 The presence of this attribute identifies the list variable as such.
 The list, the original dimensions and coordinate variables (including boundary variables), and the compressed variables with all the attributes of the uncompressed variables are written to the netCDF file.
@@ -5004,6 +5009,9 @@ In this case, all three dimensions are affected by the compression, since there 
 <p>This information implies that the salinity field should be uncompressed to an array with dimensions <code>(depth,lat,lon)</code>.</p>
 </div>
 </div>
+</div>
+<div class="paragraph">
+<p>In <a href="#example-h.5">A single timeseries with time-varying deviations from a nominal point spatial location</a>, two auxiliary coordinate variables are compressed as described in this section, although their data variable is not.</p>
 </div>
 </div>
 <div class="sect2">
@@ -6231,7 +6239,7 @@ Similarly, although an idealized time series exists at a fixed lat-long position
 <div class="paragraph">
 <p>CF Discrete Geometries provides a mechanism to encode both the nominal and the precise positions, while retaining the semantics of the idealized feature type.
 Only the set of coordinates which are regarded as the nominal (default or preferred) positions should be indicated by the attribute <strong><code>axis</code></strong>, which should be assigned string values to indicate the orientations of the axes (<strong><code>X</code></strong>, <strong><code>Y</code></strong>, <strong><code>Z</code></strong>, or <strong><code>T</code></strong>).
-See example A9.2.3.2.
+See <a href="#example-h.5">A single timeseries with time-varying deviations from a nominal point spatial location</a> (a single timeseries with time-varying deviations from a nominal point spatial location):
 Auxiliary coordinate variables containing the nominal and the precise positions should be listed in the relevant <strong><code>coordinates</code></strong> attributes of data variables.
 In orthogonal representations the nominal positions could be  coordinate variables, which do not need to be listed in the <strong><code>coordinates</code></strong> attribute, rather than auxiliary coordinate variables.</p>
 </div>
@@ -8841,8 +8849,8 @@ Any unused elements of the data and auxiliary coordinate variables must contain 
 </div>
 </div>
 <div class="paragraph">
-<p>While an idealized time series is defined at a single, stable point location, there are examples of time series, such as cabled ocean surface mooring measurements, in which the precise position of the observations varies slightly from a nominal fixed point.
-In the following example we show how the spatial positions of such a time series should be encoded in CF.
+<p>While an idealized time series is defined at a single, stable point location, there are examples of time series, such as cabled ocean surface mooring measurements, in which the precise position of the observations varies slightly from a nominal fixed point. It is quite common that the deployment position of a station changes after maintenance or repositioning after it drifts.
+In the following example we show how the spatial positions of such a time series should be encoded in CF. In addition, this example shows how lossless compression by gathering <a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a> has been applied to the deployment coordinate variables, which otherwise would contain a lot of missing or repetitive data.
 Note that although this example shows only a single time series, the technique is applicable to all of the representations.</p>
 </div>
 <div id="example-h.5" class="exampleblock">
@@ -8851,54 +8859,65 @@ Note that although this example shows only a single time series, the technique i
 <div class="listingblock">
 <div class="content">
 <pre>   dimensions:
-      time = 100233 ;
-      name_strlen = 23 ;
+      time = 100233 ;
+      name_strlen = 23 ;
+      deployment = 5 ;
 
    variables:
-      float lon ;
-          lon:standard_name = "longitude";
-          lon:long_name = "station longitude";
-          lon:units = "degrees_east";
-          lon:axis = “X”;
-      float lat ;
-          lat:standard_name = "latitude";
-          lat:long_name = "station latitude" ;
-          lat:units = "degrees_north" ;
-          lat: axis = “Y” ;
-      float precise_lon (time);
-          precise_lon:standard_name = "longitude";
-          precise_lon:long_name = "station longitude";
-          precise_lon:units = "degrees_east";
-      float precise_lat (time);
-          precise_lat:standard_name = "latitude";
-          precise_lat:long_name = "station latitude" ;
-          precise_lat:units = "degrees_north" ;
-      float alt ;
-          alt:long_name = "vertical distance above the surface" ;
-          alt:standard_name = "height" ;
-          alt:units = "m";
-          alt:positive = "up";
-          alt:axis = "Z";
-      char station_name(name_strlen) ;
-          station_name:long_name = "station name" ;
-          station_name:cf_role = "timeseries_id";
-
-      double time(time) ;
-          time:standard_name = "time";
-          time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-      float humidity(time) ;
-          humidity:standard_name = “specific_humidity” ;
-          humidity:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
-          humidity:_FillValue = -999.9f;
-      float temp(time) ;
-          temp:standard_name = “air_temperature” ;
-          temp:units = "Celsius" ;
-          temp:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
-          temp:_FillValue = -999.9f;
+      float lon ;
+          lon:standard_name = "longitude";
+          lon:long_name = "station longitude";
+          lon:units = "degrees_east";
+          lon:axis = “X”;
+      float lat ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+          lat: axis = “Y” ;
+      float precise_lon (time);
+          precise_lon:standard_name = "longitude";
+          precise_lon:long_name = "station longitude";
+          precise_lon:units = "degrees_east";
+      float precise_lat (time);
+          precise_lat:standard_name = "latitude";
+          precise_lat:long_name = "station latitude" ;
+          precise_lat:units = "degrees_north" ;
+      float deploy_lon (deployment);
+          deploy_lon:standard_name = "deployment_longitude";
+          deploy_lon:long_name = station longitude";
+          deploy_lon:units = "degrees_east";
+      float deploy_lat (deployment);
+          deploy_lat:standard_name = "deployment_latitude";
+          deploy_lat:long_name = station latitude";
+          deploy_lat:units = "degrees_north";
+      int deployment (deployment) ;
+          deployment:long_name = "index of the first time after (re)deployment" ;
+          deployment:compress="time";
+      float alt ;
+          alt:long_name = "vertical distance above the surface" ;
+          alt:standard_name = "height" ;
+          alt:units = "m";
+          alt:positive = "up";
+          alt:axis = "Z";
+      char station_name(name_strlen) ;
+          station_name:long_name = "station name" ;
+          station_name:cf_role = "timeseries_id";
+      double time(time) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float humidity(time) ;
+          humidity:standard_name = “specific_humidity” ;
+          humidity:coordinates = "time lat lon alt precise_lon precise_lat deploy_lon deploy_lat station_name" ;
+          humidity:_FillValue = -999.9f;
+      float temp(time) ;
+          temp:standard_name = “air_temperature” ;
+          temp:units = "Celsius" ;
+          temp:coordinates = "time lat lon alt precise_lon precise_lat deploy_lon deploy_lat station_name" ;
+          temp:_FillValue = -999.9f;
 
    attributes:
-          :featureType = "timeSeries";</pre>
+          :featureType = "timeSeries";</pre>
 </div>
 </div>
 </div>
@@ -11371,6 +11390,9 @@ Repeat this step for each combination of indices of the non-interpolated dimensi
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/428">Issue #428</a>: Recording deployment positions</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/430">Issue #430</a>: Clarify the function of the <code>cf_role</code> attribute</p>
 </li>
 <li>
@@ -11902,7 +11924,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.11 draft<br>
-Last updated 2023-03-31 13:57:49 UTC
+Last updated 2023-04-05 08:21:49 UTC
 </div>
 </div>
 </body>
