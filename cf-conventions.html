@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.20">
-<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, Jon&#160;Blower, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano">
+<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, Jon&#160;Blower, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring">
 <title>NetCDF Climate and Forecast (CF) Metadata Conventions</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -466,6 +466,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author26" class="author">Lucile&#160;Gaultier</span><br>
 <span id="author27" class="author">Sylvain&#160;Herlédan</span><br>
 <span id="author28" class="author">Fernando&#160;Manzano</span><br>
+<span id="author29" class="author">Lars&#160;Bärring</span><br>
 <span id="revnumber">version 1.11 draft,</span>
 <span id="revdate">31 August, 2022</span>
 </div>
@@ -958,6 +959,9 @@ I.1. <a href="#cdl-domain-anc-coordinate">Example I.1 A single CF-netCDF variabl
 </li>
 <li>
 <p>Fernando Manzano, Puertos del Estado</p>
+</li>
+<li>
+<p>Lars Bärring, SMHI</p>
 </li>
 </ul>
 </div>
@@ -2455,17 +2459,19 @@ Thus the pressure at gridpoint <strong><code>(n,k,j,i)</code></strong> would be 
 <h3 id="time-coordinate"><a class="anchor" href="#time-coordinate"></a>4.4. Time Coordinate</h3>
 <div class="paragraph">
 <p>Variables representing reference time must always explicitly include the <strong><code>units</code></strong> attribute; there is no default value.
-The <strong><code>units</code></strong> attribute takes a string value formatted as per the recommendations in the <a href="#UDUNITS">[UDUNITS]</a> package.
-The following excerpt from the UDUNITS documentation explains the time unit encoding by example:</p>
+The <strong><code>units</code></strong> attribute takes a string value that follows the formatting requirements of the <a href="#UDUNITS">[UDUNITS]</a> package. These requirements can best be described by an example with explanatory comments:</p>
 </div>
 <div class="paragraph">
-<p>"The specification <code>seconds since 1992-10-8 15:15:42.5 -6:00</code> indicates seconds since October 8th, 1992  at  3  hours,  15 minutes  and  42.5 seconds in the afternoon in the time zone which is six hours to the west of Coordinated Universal Time (i.e.  Mountain Daylight Time).
-The time zone specification can also be written without a colon using one or two digits (indicating hours) or three or four digits (indicating hours and minutes)."</p>
+<p>The time unit specification <strong><code>seconds since 1992-10-8 15:15:42.5 -6:00</code></strong> indicates seconds since October 8th, 1992  at  3 hours,  15 minutes  and  42.5 seconds in the afternoon in the time zone which is six hours to the west of Coordinated Universal Time (i.e.  Mountain Daylight Time).
+The time zone specification can also be written without a colon using one or two digits (indicating hours) or three or four digits (indicating hours and minutes).</p>
 </div>
 <div class="paragraph">
-<p>The acceptable units for time are given by the UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>.
+<p>The acceptable units for time are given by the UDUNITS package.
 The most commonly used of these strings (and their abbreviations) includes <strong><code>day</code></strong> (<strong><code>d</code></strong>), <strong><code>hour</code></strong> (<strong><code>hr</code></strong>, <strong><code>h</code></strong>), <strong><code>minute</code></strong> (<strong><code>min</code></strong>) and <strong><code>second</code></strong> (<strong><code>sec</code></strong>, <strong><code>s</code></strong>).
 Plural forms are also acceptable.</p>
+</div>
+<div class="paragraph">
+<p>UDUNITS permits a number of alternatives to the word <strong><code>since</code></strong> in the units of time coordinates. All the alternatives have exactly the same meaning in UDUNITS. For compatibility with other software, CF strongly recommends that <code>since</code> should be used.</p>
 </div>
 <div class="paragraph">
 <p>The reference date/time string (appearing after the identifier <strong><code>since</code></strong>) is required.
@@ -11388,6 +11394,9 @@ Repeat this step for each combination of indices of the non-interpolated dimensi
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/405">Issue #405</a>: Update ch. 4.4 text on reference time vs. UDUNIT</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/406">Issue #406</a>: Remove duplicate section 8.2 in the conformance document</p>
 </li>
 <li>
@@ -11931,7 +11940,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.11 draft<br>
-Last updated 2023-07-14 13:05:10 UTC
+Last updated 2023-08-21 15:06:32 UTC
 </div>
 </div>
 </body>
