@@ -184,6 +184,9 @@ CF construct
 | Cell size or shape
 
 | Domain topology
+| Geospatial topology of domain cells
+
+| Cell connectivity
 | Connectivity of domain cells
 
 | Field ancillary
@@ -293,6 +296,8 @@ construct) and relates the following metadata constructs
 
 * Domain topology constructs.
 
+* Cell connectivity constructs.
+
 All of the constructs contained by the domain construct are optional
 (as indicated by "0.." in <<figure-field, Figure I.2>>).
 
@@ -302,7 +307,7 @@ In CF-netCDF, domain information may be stored in a number of ways:
 
 * explicitly in a domain variable;
 
-* explicitly in a mesh topology variable, in which case the domain may be one of multiple domains defined by the same variable (for instance, a single mesh topology variable could contain different domains defined respectively at node, edge, and face elements);
+* explicitly in a mesh topology variable, in which case the domain may be one of multiple domains defined by the same variable (for instance, a single mesh topology variable could contain different domains defined respectively at node, edge, and face mesh elements);
 
 * explicitly in a location index set variable that references a subset of another domain defined by a mesh topology variable.
 
@@ -614,46 +619,68 @@ domain which are not spanned by the array, along which the values are
 implicitly propagated. CF-netCDF cell measure variables correspond to
 cell measure constructs.
 
-[[data-model-domain_topology]]
+[[data-model-domain-topology]]
 ==== Domain topology construct
 
-A domain topology describes the connectivity of domain cells indexed
-by a subset of the domain axis constructs. When two cells are
-connected, operations on the data stored on them may be assumed to be
-continuous across their common boundary. A domain topology construct
-(<<figure-field, Figure I.2>>) describes logically and explicitly the
-domain topology of cells indexed by a single domain axis construct.
+A domain topology construct defines the geospatial topology of cells arranged in two or three dimensions in real space but indexed by a single (discrete) domain axis construct, and at most one domain topology construct may be associated with any such domain axis.
+The topology describes topological relationships between the cells - spatial relationships which do not depend on the cell locations - and is represented by an undirected graph, i.e. a mesh in which pairs of nodes are connected by links.
+Each node has a unique arbitrary identity that is independent of its spatial location, and different nodes may be spatially co-located.
 
-A domain topology construct contains a connectivity array that spans a
-single domain axis construct with the addition of an extra dimension
-of the same size, such that each dimension indexes the cells. The
-array is symmetrical, and each element indicates whether the pair of
-cells to which its indices refer are connected. The connectivity of a
-cell to itself is undefined, so the diagonal elements of this array
-are ignored. A domain construct may contain at most one domain
-topology construct.
+The topology may only describe cells that have a common spatial dimensionality, one of:
 
-For any subset of the domain axis constructs, excluding a domain axis
-construct for which there is a domain topology construct, there is an
-implicit domain topology that is defined by a function of the physical
-contiguousness of the cells, and/or the nature of the real world or
-simulated processes that produced the data. For example, in a field
-which contains both land and ocean cells, connections between land and
-ocean cells might be excluded for some physical processes. The
-description of such an implicit network topology may require metadata
-that is external to CF.
+* Point: A point is zero-dimensional and has no boundary vertices.
+* Edge: An edge is one-dimensional and corresponds to a line connecting two boundary vertices.
+* Face: A face is two-dimensional and corresponds to a surface enclosed by a set of edges.
 
-In CF-netCDF a domain topology can only be provided for a domain
-defined by a UGRID mesh topology variable. In this case, the
-connectivity array is supplied by a UGRID connectivity variable, such
-as a "face_face_connectivity" variable, that is referenced from a mesh
-topology variable. The information represented by the symmetrical
-connectivity array of the domain topology construct in the CF data
-model is stored in a different but equivalent way in UGRID. The
-trailing dimension of a UGRID connectivity variable's data records,
-for each cell, the indices of the other cells to which it is connected
-(padded with missing data if a cell has fewer connections than some
-others).
+Each type of cell implies a restricted topology for which only some kinds of mesh are allowed.
+For point cells, every node corresponds to exactly one cell; and two cells have a topological relationship if and only if their nodes are connected by a mesh link.
+For edge and face cells, every node corresponds to a boundary vertex of a cell; the same node can represent vertices in multiple cells; every link in the mesh connects two cell boundary vertices; and two cells have a topological relationship if and only if they share at least one node.
+
+[[figure-mesh-example]]
+[caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
+[.text-center]
+.A topology defined by a mesh with five nodes and six links.
+image::images/cfdm_mixed_mesh.png[,100%,pdfwidth=50vw,align="center"]
+
+For example, the mesh depicted in <<figure-mesh-example>> may be used with any of three domain topology constructs for domains comprising two face cells (one triangle and one quadrilateral), six edge cells, and five point cells respectively.
+
+A domain topology construct contains an array defining the mesh, and properties to describe it.
+There must be a property indicating the spatial dimensionality of the cells.
+The array values comprise the node identities, and all array elements that refer to the same node must contain the same value, which must differ from any other value in the array.
+The array spans the domain axis construct and also has a ragged dimension, whose function depends on the spatial dimensionality of the cells.
+
+For point cells, the array's ragged dimension values are composed of the node identity of each cell in the first element, followed in arbitrary order by the identity of each node to which it is connected by a mesh link.
+
+For edge and face cells, the array's ragged dimension values are the node identities of the boundary vertices of each cell, in the same order that the boundary vertices are stored by the auxiliary coordinate constructs.
+Each boundary vertex except the last is connected by a mesh link to the next vertex along the ragged dimension, and the last vertex is connected to the first.
+
+When a domain topology construct is present it is considered to be definitive and must be used in preference to the topology implied by inspection of any other constructs, which is not guaranteed to be the same.
+
+In CF-netCDF a domain topology construct can only be provided for a UGRID mesh topology variable.
+The information in the construct array is supplied by the UGRID "edge_nodes_connectivity" variable (for edge cells) or "face_nodes_connectivity" variable (for face cells).
+The topology for node cells may be provided by any of these three UGRID variables.
+The integer indices contained in the UGRID variable may be used as the mesh node identities, although the CF data model attaches no significance to the values other than the fact that some values are the same as others.
+The spatial dimensionality property is provided by the "location" attribute of a variable that references the UGRID mesh topology variable, i.e. a data variable or a UGRID location index set variable.
+
+A single UGRID mesh topology defines multiple domain constructs and defines how they relate to each other.
+For instance, when "face_node_connectivity" and "edge_node_connectivity" variables are both present there are three implied domain constructs - one each for face, edge and point cells - all of which have the same mesh and so are explicitly linked (e.g. it is known which edge cells define each face cell).
+The CF data model has no mechanism for explicitly recording such relationships between multiple domain constructs, however whether or not two domains have the same mesh may be reliably deternined by inspection, thereby allowing the creation of netCDF datasets containing UGRID mesh topology variables.
+
+The restrictions on the type of mesh that may be used with a given cell spatial dimensionality excludes some meshes which can be described by an undirected graph, but is consistent with UGRID encoding within CF-netCDF.
+UGRID also describes meshes for three-dimensional volume cells that correspond to a volume enclosed by a set of faces, but how the nodes relate to volume boundary vertices is undefined and so volume cells are currently omitted from the CF data model.
+
+[[data-model-cell-connectivity]]
+==== Cell connectivity construct
+
+A cell connectivity construct defines explicitly how cells arranged in two or three dimensions in real space but indexed by a single domain (discrete) axis are connected. Connectivity can only be provided when the domain axis construct also has a domain topology construct, and two cells can only be connected if they also have a topological relationship. For instance, the connectivity of two-dimensional face cells could be characterised by whether or not they have shared edges, where the edges are defined by connected nodes of the domain topology construct.
+
+The cell connectivity construct consists of an array recording the connectivity, and properties to describe the data. There must be a property indicating the condition by which the connectivity is derived from the domain topology. The array spans the domain axis construct with the addition of a ragged dimension that indexes a unique identity for the cell as well as the identities of all other cells to which it is connected. The cell identity must be recorded in the first element of the ragged dimension, otherwise the order is arbitrary. Note that the connectivity array for point cells is, by definition, equivalent to the array of the domain topology construct.
+
+When cell connectivity constructs are present they are considered to be definitive and must be used in preference to the connectivities implied by inspection of any other constructs, apart from the domain topology construct, which are not guaranteed to be the same.
+
+In CF-netCDF a cell topology construct can only be provided by a UGRID mesh topology variable. The construct array is supplied either indirectly by any of the UGRID variables that are used to define a domain topology construct, or directly by the UGRID "edge_edge_connectivity" variable (for edge cells) or "face_face_connectivity" variable (for face cells). In the direct case, the integer indices contained in the UGRID variable may be used as the cell identities, although the CF data model attaches no significance to the values other than the fact that some values are the same as others.
+
+Restricting the types of connectivity to those implied by the geospatial topology of the cells precludes connectivity derived from any other sources, but is consistent with UGRID encoding within CF-netCDF.
 
 [[data-model-field-ancillary]]
 ==== Field ancillary constructs
