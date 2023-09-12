@@ -402,9 +402,9 @@ There must be a property indicating the spatial dimensionality of the cells.
 The array values comprise the node identities, and all array elements that refer to the same node must contain the same value, which must differ from any other value in the array.
 The array spans the domain axis construct and also has a ragged dimension, whose function depends on the spatial dimensionality of the cells.
 
-For point cells, the array's ragged dimension values are composed of the node identity of each cell in the first element, followed in arbitrary order by the identity of each node to which it is connected by a mesh link.
+For each point cell, the first element along the ragged dimension contains the node identity of the cell, and the following elements contain in arbitrary order the identities of all the cells to which it is connected by a mesh link.
 
-For edge and face cells, the array's ragged dimension values are the node identities of the boundary vertices of each cell, in the same order that the boundary vertices are stored by the auxiliary coordinate constructs.
+For each edge or face cell, the elements along the ragged dimension contain the node identities of the boundary vertices of the cell, in the same order that the boundary vertices are stored by the auxiliary coordinate constructs.
 Each boundary vertex except the last is connected by a mesh link to the next vertex along the ragged dimension, and the last vertex is connected to the first.
 
 When a domain topology construct is present it is considered to be definitive and must be used in preference to the topology implied by inspection of any other constructs, which is not guaranteed to be the same.
@@ -425,13 +425,21 @@ UGRID also describes meshes for three-dimensional volume cells that correspond t
 [[data-model-cell-connectivity]]
 ==== Cell connectivity construct
 
-A cell connectivity construct defines explicitly how cells arranged in two or three dimensions in real space but indexed by a single domain (discrete) axis are connected. Connectivity can only be provided when the domain axis construct also has a domain topology construct, and two cells can only be connected if they also have a topological relationship. For instance, the connectivity of two-dimensional face cells could be characterised by whether or not they have shared edges, where the edges are defined by connected nodes of the domain topology construct.
+A cell connectivity construct defines explicitly how cells arranged in two or three dimensions in real space but indexed by a single domain (discrete) axis are connected.
+Connectivity can only be provided when the domain axis construct also has a domain topology construct, and two cells can only be connected if they also have a topological relationship.
+For instance, the connectivity of two-dimensional face cells could be characterised by whether or not they have shared edges, where the edges are defined by connected nodes of the domain topology construct.
 
-The cell connectivity construct consists of an array recording the connectivity, and properties to describe the data. There must be a property indicating the condition by which the connectivity is derived from the domain topology. The array spans the domain axis construct with the addition of a ragged dimension that indexes a unique identity for the cell as well as the identities of all other cells to which it is connected. The cell identity must be recorded in the first element of the ragged dimension, otherwise the order is arbitrary. Note that the connectivity array for point cells is, by definition, equivalent to the array of the domain topology construct.
+The cell connectivity construct consists of an array recording the connectivity, and properties to describe the data.
+There must be a property indicating the condition by which the connectivity is derived from the domain topology.
+The array spans the domain axis construct with the addition of a ragged dimension.
+For each cell, the first element along the ragged dimension contains the unique identity of the cell, and the following elements contain in arbitrary order the identities of all the other cells to which the cell is connected.
+Note that the connectivity array for point cells is, by definition, equivalent to the array of the domain topology construct.
 
 When cell connectivity constructs are present they are considered to be definitive and must be used in preference to the connectivities implied by inspection of any other constructs, apart from the domain topology construct, which are not guaranteed to be the same.
 
-In CF-netCDF a cell topology construct can only be provided by a UGRID mesh topology variable. The construct array is supplied either indirectly by any of the UGRID variables that are used to define a domain topology construct, or directly by the UGRID "edge_edge_connectivity" variable (for edge cells) or "face_face_connectivity" variable (for face cells). In the direct case, the integer indices contained in the UGRID variable may be used as the cell identities, although the CF data model attaches no significance to the values other than the fact that some values are the same as others.
+In CF-netCDF a cell topology construct can only be provided by a UGRID mesh topology variable.
+The construct array is supplied either indirectly by any of the UGRID variables that are used to define a domain topology construct, or directly by the UGRID "edge_edge_connectivity" variable (for edge cells) or "face_face_connectivity" variable (for face cells).
+In the direct case, the integer indices contained in the UGRID variable may be used as the cell identities, although the CF data model attaches no significance to the values other than the fact that some values are the same as others.
 
 Restricting the types of connectivity to those implied by the geospatial topology of the cells precludes connectivity derived from any other sources, but is consistent with UGRID encoding within CF-netCDF.
 

@@ -1024,117 +1024,83 @@ In this example the data variables **`humidity`** and **`temp`** from the <<exam
 [[mesh-topology-variables, Section 5.9, "Mesh Topology Variables"]]
 === Mesh Topology Variables
 
-A mesh topology is the intra- and inter-connections of the various geometrical elements of a number of related domains.
-A __mesh topology variable__ defines a mesh topology for one or more domains, i.e. domain cells are defined with auxiliary coordinate variables and topological connections within each domain are specified, as well as the topological connections between the domains.
-A data variable may use one of a mesh topology variable's domains by referencing the mesh topology variable along with the identity of required domain, typically specified as being the domain defined by one of the nodes, edges, faces or volumes of the mesh topology (see example <<example-mesh-topology-variable>>).
+A __mesh topology variable__ defines the geospatial topology of cells arranged in two or three dimensions in real space but indexed by a single dimension.
+It explicitly describes the topological relationships between cells, i.e. spatial relationships which do not depend on the cell locations. 
+The cells and their connectivity are defined by a mesh of connected nodes.
+A mesh topology variable may provide the topology for one or more domains, defined at the nodes, edges, or faces of the mesh. See the CF data model <<data-model-domain-topology>> and <<data-model-cell-connectivity>> descriptions for more details.
 
-A __location index set variable__ defines a subset of locations of a mesh topology variable, e.g. only boundary points or special locations like weirs and gates.
-It is provided as a space saving device to prevent the need to redefine parts of an existing mesh topology variable, and as such is logically equivalent to a mesh topology variable (see example <<example-location-index-set-variable>>).
+The canonical definitions of mesh topology variables and location index set variables are given externally by the UGRID conventions <<UGRID>>, but their standardized attributes, many of which are optional, are listed in <<appendix-mesh-topology-attributes>> and <<attribute-appendix>>.
+Some features of by the UGRID conventions <<UGRID>> are not currently allowed in the CF conventions: mesh topology volume cells (that are used to describe fully three-dimensional unstructured mesh topologies); and the "boundary node connectivity" variable (that specifies an index variable identifying the nodes that define where boundary condtions have been provided). 
 
-When a data variable's domain is defined by a mesh topology variable it is possible to provide, at selected domain locations, the boundary conditions which constrain the data.
+A data or domain variable may use one of a mesh topology variable's domains by referencing the mesh topology variable with the **`mesh`** attribute; along with the identity of required domain provided by the **`location`** attribute (see example <<example-mesh-topology-variable>>).
 
-The canonical definitions of mesh topology variables, location index set variables and boundary condition variables are given by the UGRID conventions <<UGRID>>, but their standardized attributes, many of which are optional, are listed in <<appendix-mesh-topology-attributes>> and <<attribute-appendix>>.
+The coordinate and bounds values for cells indexed by the mesh topology are defined by the mesh topology variable, but may also be provided by the data or domain variable's **`coordinates`** attribute.
+Note that the mesh topology variable allows cell bounds to be provided indpendently of any cell coordinate values because the mesh's __node coordinate variables__, that provide the location of each unique node, can always be mapped to cell vertices.
+
+A __location index set variable__ defines a subset of locations of a mesh topology variable, e.g. only special locations like weirs and gates.
+It is provided as a space saving device to prevent the need to redefine parts of an existing mesh topology variable, and as such is logically equivalent to a mesh topology variable.
 
 [[example-mesh-topology-variable]]
 [caption="Example 5.21. "]
-.Triangular mesh topology variable
+.A two-dimensional mesh topology for data stored at trianglur faces, edges and nodes, and with all optional mesh topology varable attributes omitted.  
 ====
 ----
 dimensions:
-  nMesh2_node = 4 ; // nNodes
-  nMesh2_edge = 5 ; // nEdges
-  nMesh2_face = 2 ; // nFaces
-  
+  node = 4 ;  // Number of mesh nodes
+  edge = 5 ;  // Number of mesh edges
+  face = 2 ;  // Number of mesh faces  
+  two = 2 ;   // Number of nodes per edge
+  three = 3 ; // Maximum number of nodes per face  
+  time = 12 ;
+
 variables:
   // Mesh topology variable
-  integer Mesh2 ;
-    Mesh2:cf_role = "mesh_topology" ;
-    Mesh2:long_name = "Topology data of 2D unstructured mesh" ;
-    Mesh2:topology_dimension = 2 ;
-    Mesh2:node_coordinates = "Mesh2_node_x Mesh2_node_y" ;
-    Mesh2:face_node_connectivity = "Mesh2_face_nodes" ;
-    Mesh2:face_dimension = "nMesh2_face" ;
-    Mesh2:edge_node_connectivity = "Mesh2_edge_nodes" ;
-    Mesh2:edge_dimension = "nMesh2_edge" ;
-    Mesh2:edge_coordinates = "Mesh2_edge_x Mesh2_edge_y" ;
-    Mesh2:face_coordinates = "Mesh2_face_x Mesh2_face_y" ;
-    Mesh2:face_edge_connectivity = "Mesh2_face_edges" ;
-    Mesh2:face_face_connectivity = "Mesh2_face_links" ;
-    Mesh2:edge_face_connectivity = "Mesh2_edge_face_links" ;
+  integer Mesh ;
+    Mesh:cf_role = "mesh_topology" ;
+    Mesh:long_name = "Topology of a 2D triangular unstructured mesh" ;
+    Mesh:topology_dimension = 2 ;
+    Mesh:node_coordinates = "Mesh_node_x Mesh_node_y" ;
+    Mesh:edge_node_connectivity = "Mesh_face_nodes" ;
+    Mesh:face_node_connectivity = "Mesh_edge_nodes" ;
 
-  // Connectivity variables
-  integer Mesh2_face_nodes(nMesh2_face, Three) ;
-    Mesh2_face_nodes:long_name = "Maps every triangular face to its three corner nodes." ;
-  integer Mesh2_edge_nodes(nMesh2_edge, Two) ;
-    Mesh2_edge_nodes:cf_role = "edge_node_connectivity" ;
-    Mesh2_edge_nodes:long_name = "Maps every edge to the two nodes that it connects." ;
-  integer Mesh2_face_edges(nMesh2_face, Three) ;
-    Mesh2_face_edges:cf_role = "face_edge_connectivity" ;
-    Mesh2_face_edges:long_name = "Maps every triangular face to its three edges." ;
-  integer Mesh2_face_links(nMesh2_face, Three) ;
-    Mesh2_face_links:cf_role = "face_face_connectivity" ;
-    Mesh2_face_links:long_name = "neighbor faces for faces" ;
-    Mesh2_face_links:_FillValue = -999 ;
-    Mesh2_face_links:comment = "missing neighbor faces are indicated using _FillValue" ;
-  integer Mesh2_edge_face_links(nMesh2_edge, Two) ;
-    Mesh2_edge_face_links:cf_role = "edge_face_connectivity" ;
-    Mesh2_edge_face_links:long_name = "neighbor faces for edges" ;
-    Mesh2_edge_face_links:_FillValue = -999 ;
-    Mesh2_edge_face_links:comment = "missing neighbor faces are indicated using _FillValue" ;
+  // Mesh node coordinates
+  double Mesh2_node_x(node) ;
+    Mesh_node_x:standard_name = "longitude" ;
+    Mesh_node_x:units = "degrees_east" ;
+  double Mesh2_node_y(node) ;
+    Mesh_node_y:standard_name = "latitude" ;
+    Mesh_node_y:units = "degrees_north" ;
 
-  // Data at faces, edges, and nodes
-  double volume_at_faces(nMesh2_face) ;
-    volume_at_faces:long_name = "volumes" ;
-    volume_at_faces:units = "m3" ;
-    volume_at_faces:mesh = "Mesh2" ;
+  // Mesh connectivity variables
+  integer Mesh_face_nodes(face, three) ;
+    Mesh_face_nodes:long_name = "Maps each face to its 3 corner nodes" ;
+  integer Mesh_edge_nodes(edge, two) ;
+    Mesh_edge_nodes:long_name = "Maps each edge to the 2 nodes it connects" ;
+
+  // Coordinate variables
+  float time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2000-01-01" ;     			      	
+
+  // Data at mesh faces
+  double volume_at_faces(time, face) ;
+    volume_at_faces:standard_name = "air_density" ;
+    volume_at_faces:units = "kg m-3" ;
+    volume_at_faces:mesh = "Mesh" ;
     volume_at_faces:location = "face" ;
-    volume_at_faces:coordinates = "Mesh2_face_x Mesh2_face_y" ;
-  double flux_at_edges(nMesh2_edge) ;
-    fluxe_at_edges:long_name = "flux across edge" ;
-    fluxe_at_edges:units = "m3 s-1" ;
-    fluxe_at_edges:mesh = "Mesh2"
+  // Data at mesh edges
+  double flux_at_edges(time, edge) ;
+    fluxe_at_edges:standard_name = "northward_wind" ;
+    fluxe_at_edges:units = "m s-1" ;
+    fluxe_at_edges:mesh = "Mesh"
     fluxe_at_edges:location = "edge" ;
-    fluxe_at_edges:coordinates = "Mesh2_edge_x Mesh2_edge_y" ;
-  double height_at_nodes(nMesh2_node) ;
+  // Data at mesh nodes
+  double height_at_nodes(time, node) ;
     height_at_nodes:standard_name = "sea_surface_height_above_geoid" ;
     height_at_nodes:units = "m" ;
-    height_at_nodes:mesh = "Mesh2" ;
+    height_at_nodes:mesh = "Mesh" ;
     height_at_nodes:location = "node" ;
-    height_at_nodes:coordinates = "Mesh2_node_x Mesh2_node_y" ;
 
 ----
-
-This example shows a mesh topology variable that defines a 2D triangular mesh topology comprising three domains: one at the triangular element nodes, one along the triangular element edges, and one on the triangular faces.
-Each data variable selects exactly one of these for its domain.
-The auxiliary coordinate variables identified by the **`node_coordinates`**, **`edge_coordinates`**, and **`face_coordinates`** mesh topology variable attributes have been omitted from the CDL for clarity.
-
-====
-
-[[example-location-index-set-variable]]
-[caption="Example 5.22. "]
-.Location index set variable
-====
-----
-dimensions:
-  time = 12 ;	 
-  nMesh2_set = 2 ;
-
-variables:
-  // Location index set variable
-  integer Mesh2_set(nMesh2_set) ;
-    Mesh2_set:cf_role = "location_index_set" ;
-    Mesh2_set:long_name = "Defines Mesh2_set as subset of the nodes of Mesh2.";
-    Mesh2_set:mesh = "Mesh2" ;
-    Mesh2_set:location = "node" ;
-
-  // Data at a subset of the nodes of Mesh2
-  double Mesh2_waterlevel(time, nMesh2_set) ;
-    Mesh2_waterlevel:standard_name = "sea_surface_height_above_geoid" ;
-    Mesh2_waterlevel:units = "m" ;
-    Mesh2_waterlevel:location_index_set = "Mesh2_set" ;
-----
-
-This example shows a domain defined by a location index set variable. 
-The mesh topology variable `Mesh2`, not shown but as defined in example <<example-mesh-topology-variable>>, has four nodes, two of which are used here to define the new domain in `Mesh2_set`.
 
 ====
