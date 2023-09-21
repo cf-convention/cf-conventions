@@ -1025,81 +1025,85 @@ In this example the data variables **`humidity`** and **`temp`** from the <<exam
 === Mesh Topology Variables
 
 A __mesh topology variable__ defines the geospatial topology of cells arranged in two or three dimensions in real space but indexed by a single dimension.
-It explicitly describes the topological relationships between cells, i.e. spatial relationships which do not depend on the cell locations, via a mesh of connected nodes.
-A mesh topology variable may provide the topology for one or more domains, defined at the nodes, edges, or faces of the mesh. See the CF data model <<data-model-domain-topology>> and <<data-model-cell-connectivity>> descriptions for more details.
+It explicitly describes the topological relationships between cells, i.e. spatial relationships which do not depend on the cell locations, via a mesh of connected nodes. 
+A mesh topology variable may provide the topology for one or more domains, defined at the nodes, edges, or faces of the mesh.
+See the <<data-model-domain-topology>> and <<data-model-cell-connectivity>> descriptions in the CF data model for more details, including on how the mesh relates to the cells of the domain.
 
 The canonical definitions of mesh topology variables and location index set variables are given externally by the UGRID conventions <<UGRID>>, but their standardized attributes, many of which are optional, are listed in <<appendix-mesh-topology-attributes>> and <<attribute-appendix>>.
-Some features of by the UGRID conventions <<UGRID>> are not currently allowed in the CF conventions: mesh topology volume cells (that are used to describe fully three-dimensional unstructured mesh topologies); and the "boundary node connectivity" variable (that specifies an index variable identifying the nodes that define where boundary condtions have been provided). 
+Some features of the UGRID conventions <<UGRID>> are not currently recognized by the CF conventions: mesh topology volume cells (that are used to describe fully three-dimensional unstructured mesh topologies); and the "boundary node connectivity" variable (that specifies an index variable identifying the nodes that define where boundary condtions have been provided). 
 
 A data or domain variable may use one of a mesh topology variable's domains by referencing the mesh topology variable with the **`mesh`** attribute; along with the identity of required domain provided by the **`location`** attribute (see example <<example-mesh-topology-variable>>).
 
-The coordinate and bounds values for cells indexed by the mesh topology are defined by the mesh topology variable, but may also be provided by the data or domain variable's **`coordinates`** attribute.
-Note that the mesh topology variable allows cell bounds to be provided indpendently of any cell coordinate values because the mesh's __node coordinate variables__, that provide the location of each unique node, can always be mapped to cell vertices.
+The variables containing the coordinate values for cells indexed by the mesh topology are defined by the mesh topology variable but are equivalent to one-dimensional auxiliary coordinate variables, and so may also be provided by the data or domain variable's **`coordinates`** attribute.
+Note that the mesh topology variable allows cell bounds to be provided without any cell coordinate values, via its __**`node_coordinates`**__ attribute.
 
 A __location index set variable__ defines a subset of locations of a mesh topology variable, e.g. only special locations like weirs and gates.
 It is provided as a space saving device to prevent the need to redefine parts of an existing mesh topology variable, and as such is logically equivalent to a mesh topology variable.
+A data or domain variable references a location index set variable via its **`location_index_set`** attribute.
 
 [[example-mesh-topology-variable]]
 [caption="Example 5.21. "]
-.A two-dimensional mesh topology for data stored at trianglur faces, edges and nodes, and with all optional mesh topology varable attributes omitted.  
+.A two-dimensional UGRID mesh topology variable
 ====
 ----
 dimensions:
-  node = 4 ;  // Number of mesh nodes
-  edge = 5 ;  // Number of mesh edges
+  node = 5 ;  // Number of mesh nodes
+  edge = 6 ;  // Number of mesh edges
   face = 2 ;  // Number of mesh faces  
   two = 2 ;   // Number of nodes per edge
-  three = 3 ; // Maximum number of nodes per face  
+  four = 4 ;  // Maximum number of nodes per face  
   time = 12 ;
 
 variables:
   // Mesh topology variable
-  integer Mesh ;
-    Mesh:cf_role = "mesh_topology" ;
-    Mesh:long_name = "Topology of a 2D triangular unstructured mesh" ;
-    Mesh:topology_dimension = 2 ;
-    Mesh:node_coordinates = "Mesh_node_x Mesh_node_y" ;
-    Mesh:edge_node_connectivity = "Mesh_face_nodes" ;
-    Mesh:face_node_connectivity = "Mesh_edge_nodes" ;
+  integer mesh ;
+    mesh:cf_role = "mesh_topology" ;
+    mesh:long_name = "Topology of a 2-d unstructured mesh" ;
+    mesh:topology_dimension = 2 ;
+    mesh:node_coordinates = "mesh_node_x mesh_node_y" ;
+    mesh:edge_node_connectivity = "mesh_edge_nodes" ;
+    mesh:face_node_connectivity = "mesh_face_nodes" ;
 
   // Mesh node coordinates
-  double Mesh2_node_x(node) ;
-    Mesh_node_x:standard_name = "longitude" ;
-    Mesh_node_x:units = "degrees_east" ;
-  double Mesh2_node_y(node) ;
-    Mesh_node_y:standard_name = "latitude" ;
-    Mesh_node_y:units = "degrees_north" ;
+  double mesh2_node_x(node) ;
+    mesh_node_x:standard_name = "longitude" ;
+    mesh_node_x:units = "degrees_east" ;
+  double mesh2_node_y(node) ;
+    mesh_node_y:standard_name = "latitude" ;
+    mesh_node_y:units = "degrees_north" ;
 
   // Mesh connectivity variables
-  integer Mesh_face_nodes(face, three) ;
-    Mesh_face_nodes:long_name = "Maps each face to its 3 corner nodes" ;
-  integer Mesh_edge_nodes(edge, two) ;
-    Mesh_edge_nodes:long_name = "Maps each edge to the 2 nodes it connects" ;
+  integer mesh_face_nodes(face, four) ;
+    mesh_face_nodes:long_name = "Maps each face to its 3 or 4 corner nodes" ;
+  integer mesh_edge_nodes(edge, two) ;
+    mesh_edge_nodes:long_name = "Maps each edge to the 2 nodes it connects" ;
 
   // Coordinate variables
   float time(time) ;
     time:standard_name = "time" ;
-    time:units = "days since 2000-01-01" ;     			      	
+    time:units = "days since 2004-06-01" ;     			      	
 
   // Data at mesh faces
   double volume_at_faces(time, face) ;
     volume_at_faces:standard_name = "air_density" ;
     volume_at_faces:units = "kg m-3" ;
-    volume_at_faces:mesh = "Mesh" ;
+    volume_at_faces:mesh = "mesh" ;
     volume_at_faces:location = "face" ;
   // Data at mesh edges
   double flux_at_edges(time, edge) ;
     fluxe_at_edges:standard_name = "northward_wind" ;
     fluxe_at_edges:units = "m s-1" ;
-    fluxe_at_edges:mesh = "Mesh"
+    fluxe_at_edges:mesh = "mesh"
     fluxe_at_edges:location = "edge" ;
   // Data at mesh nodes
   double height_at_nodes(time, node) ;
     height_at_nodes:standard_name = "sea_surface_height_above_geoid" ;
     height_at_nodes:units = "m" ;
-    height_at_nodes:mesh = "Mesh" ;
+    height_at_nodes:mesh = "mesh" ;
     height_at_nodes:location = "node" ;
 
 ----
+
+A two-dimensional UGRID mesh topology variable for the mesh depicted in <<figure-mesh-example>>, with data variables defined at face, edge and node elements of the mesh. All optional attributes have been omitted.
 
 ====
