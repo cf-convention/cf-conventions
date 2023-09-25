@@ -18,61 +18,61 @@ node [
      ]
 
 # --------------------------------------------------------------------
-# CF-netCDF variables
-# --------------------------------------------------------------------
-DomainVariable [
-       fillcolor="#C3FFFF"
-       label="CN::Domain\nVariable"
-       ]
-DataVariable [
-       fillcolor="#C3FFFF"
-       label="CN::Data\nVariable"
-       ]
-
-# --------------------------------------------------------------------
 # CF data model constructs
 # --------------------------------------------------------------------
 Domain [
        label="<<construct>>\nDomain"
-       width=2.5
+       width=2
        height=1
        ]
 Field [
       label="<<construct>>\nField"
+      width=2.5
       height=1
       ]
 CellMethod [
      label="<<construct>>\nCellMethod"
+		    width=2
      ]
 DomainAxis [
      label="<<construct>>\nDomainAxis"
+		    width=2
      ]
 DomainAncillary [
       label="<<construct>>\nDomainAncillary"
+		    width=2
       ]
 CellMeasure [
       label="<<construct>>\nCellMeasure"
+		    width=2
       ]
 CoordinateReference [
 		    label="<<construct>>\nCoordinateReference "
-		    width=2.75
+		    width=2
 		    ]
-        label="<<construct>>\nCoordinateReference "
-        ]
 AuxiliaryCoordinate [
         label="<<construct>>\nAuxillaryCoordinate"
+		    width=2
         ]
 DimensionCoordinate [
         label="<<construct>>\nDimensionCoordinate"
+		    width=2
         ]
 FieldAncillary [
 	       label="<<construct>>\nFieldAncillary"
+		    width=2
 	       ]
 DomainTopology [
 	       label="<<construct>>\nDomainTopology"
+		    width=2
+	       ]
+CellConnectivity [
+	       label="<<construct>>\nCellConnectivity"
+		    width=2
 	       ]
 GenericCoordinate [
       label="<<abstract>>\nGeneric\nCoordinate\nConstruct"
+		    width=2
       fillcolor=white
       ]
 
@@ -100,79 +100,87 @@ route11
 route12
 route13
 
-DataVariable -> Field [dir=back arrowtail=vee weight=100]
-
-Field -> route8 [arrowtail=odiamond arrowhead=none dir=both weight=100]
-route8 -> Domain [arrowtail=none arrowhead=vee dir=bothhead
-                  headlabel="0..1  " weight=100 labelfontsize=11.0 weight=100]
-route1 -> Field [arrowhead=diamond]
-Field -> route2 [arrowtail=diamond arrowhead=none dir=both]
-{rank=same; route1, Field, route2}
-
-edge [arrowtail=vee
-      arrowhead=diamond
-      dir=both
+edge [dir=both
       arrowsize=1.0
       fontname="Arial"
       labelfontsize=11.0
       ]
 
-Domain -> route11 [arrowtail=diamond arrowhead=none weight=100]
-route11 -> GenericCoordinate [arrowhead=vee arrowtail=none headlabel="0..*   " weight=100]
-route2 -> CellMethod [arrowhead=vee arrowtail=none headlabel="0..*   "
-                      weight=100]
-route1 -> FieldAncillary [arrowhead=vee arrowtail=none headlabel="0..*  "
-                           weight=100]
-Domain -> DomainAxis [arrowtail=vee arrowhead=diamond taillabel="0..*  "]
-{rank=same; Domain, DomainAxis}
-
-route6 -> Domain [arrowtail=none]
-{rank=same;route6, Domain}
-route6 -> CoordinateReference [arrowtail=none arrowhead=vee headlabel="0..*  "]
-
-Domain -> route7 [arrowtail=diamond arrowhead=none]
-route7-> CellMeasure [headlabel="0..*  " arrowhead=vee arrowtail=none]
-Domain -> DomainAncillary [headlabel="0..*  " arrowhead=vee arrowtail=diamond]
-FieldAncillary -> Domain [label="uses             \nparent               "
-                          arrowhead=vee arrowtail=none labelfontsize=11.0] 
-
-{rank=same; DomainVariable, DataVariable}
-
-route9 -> Domain [dir=none]
-DomainVariable -> route9 [arrowtail=vee, arrowhead=none, weight=100]
-{rank=same; route1, route9}
-
-
-Domain -> DomainTopology [taillabel="0..*   " weight=100]
-
-GenericCoordinate -> route4 [arrowhead=none arrowtail=empty weight=100]
-route4 -> AuxiliaryCoordinate [dir=none weight=100]
-{rank=same; route4, AuxiliaryCoordinate}
-route4 -> route5 [dir=none weight=100]
-route5 -> DimensionCoordinate [dir=none weight=100]
-{rank=same; route5, DimensionCoordinate}
-{rank=same;DomainAncillary, GenericCoordinate, route7, CellMeasure}
-
-DomainAncillary -> CoordinateReference [arrowhead=none, arrowtail=vee
-                                        taillabel="0..*      "
-          labeldistance=1.1
-                weight=100]
-
-CellMethod -> DomainAxis [taillabel="1..*  " weight=100]
-GenericCoordinate -> route3 [arrowhead=none arrowtail=vee
-                             taillabel="0..*      "
-           labeldistance=1.1
-           weight=100]
-route3 -> CoordinateReference [dir=none]
-{rank=same; CoordinateReference, DimensionCoordinate}
+Field -> route1 [arrowtail=odiamond arrowhead=none weight=100]
+Field -> route2 [arrowtail=diamond arrowhead=none weight=100]
+route2 -> FieldAncillary [arrowhead=vee arrowtail=none
+                          headlabel="0..*    "
+                          weight=100 minlen=7]
+{rank=same; route1, route2, FieldAncillary}
+#-----------------------------
+route1 -> route3 [arrowtail=none arrowhead=none weight=100]
+route2 -> route4 [arrowtail=none arrowhead=none weight=100]
+route4 -> CellMethod [arrowhead=vee arrowtail=none
+                      headlabel="0..*    "
+                      weight=100 minlen=7]
+{rank=same; route3, route4, CellMethod}
+#-----------------------------
+route3 -> Domain  [arrowtail=none arrowhead=vee
+                   headlabel="0..1   " weight=100]
+Domain -> route5  [arrowtail=diamond arrowhead=none 
+                   weight=100 labelfontsize=11.0 minlen=2]
+route5 -> DomainAxis [arrowtail=none arrowhead=vee
+                      headlabel="0..*    " weight=100 minlen=3]
+route6 -> DimensionCoordinate [arrowtail=none arrowhead=none
+                               weight=100 minlen=2]
+CellMethod -> DomainAxis  [arrowtail=none arrowhead=vee
+                           headlabel="0..*   " weight=100]
+{rank=same; Domain, route5, DomainAxis, route6, DimensionCoordinate} 
+#-----------------------------
+route5 -> route7 [arrowhead=none arrowtail=none weight=100]
+route6 -> route8 [arrowtail=none arrowhead=none weight=100]
+route7 -> GenericCoordinate [arrowtail=none arrowhead=vee
+                             headlabel="0..*    " weight=100 minlen=3]
+GenericCoordinate -> route8 [arrowtail=empty arrowhead=none
+                             weight=100 minlen=2]
+route8 -> AuxiliaryCoordinate [arrowtail=none arrowhead=none minlen=2]
+{rank=same; route7, GenericCoordinate, route8, AuxiliaryCoordinate}
+#-----------------------------
+route7 -> route9 [arrowtail=none arrowhead=none weight=100]
+route9 -> CoordinateReference[arrowtail=none arrowhead=vee
+                              headlabel="0..*    " weight=100 minlen=3]
+GenericCoordinate -> CoordinateReference [arrowtail=vee arrowhead=none
+                                          taillabel="0..*   " weight=100]
+{rank=same; route9, CoordinateReference}
+#-----------------------------
+route9 -> route10 [arrowtail=none arrowhead=none weight=100]
+route10 -> DomainAncillary [arrowtail=none arrowhead=vee
+                            weight=100 headlabel="0..*    "  minlen=3]
+CoordinateReference -> DomainAncillary [arrowtail=none arrowhead=vee 
+                                        headlabel="0..*   " weight=100] 
+{rank=same; route10, DomainAncillary}
+#-----------------------------
+route10 -> route11 [arrowtail=none arrowhead=none weight=100]
+route11 -> CellMeasure [arrowtail=none arrowhead=vee
+                        weight=100 headlabel="0..*    "  minlen=3]
+{rank=same; route11, CellMeasure}
+#-----------------------------
+route11 -> route12 [arrowtail=none arrowhead=none weight=100]
+route12 -> DomainTopology [arrowtail=none arrowhead=vee weight=100
+	                   headlabel="0..*    "  minlen=3]
+{rank=same; route12, DomainTopology}
+#-----------------------------
+route12 -> route13 [arrowtail=none arrowhead=none weight=100]
+route13 -> CellConnectivity [arrowtail=none arrowhead=vee weight=100
+      	                     headlabel="0..*    "  minlen=3]
+{rank=same; route13, CellConnectivity}
+#-----------------------------
 
 # --------------------------------------------------------------------
 # Invisible edges used to aid in layout
 # --------------------------------------------------------------------
-DomainAxis -> AuxiliaryCoordinate [style=invis]
-DomainAxis -> CellMeasure [style=invis weight=100]
-CellMeasure -> AuxiliaryCoordinate [style=invis weight=100]
-AuxiliaryCoordinate -> DimensionCoordinate[style=invis weight=100]
-DomainVariable -> FieldAncillary [style=invis weight=100]
-route9 -> route1 [style=invis weight=100]
+route1 -> route2 [style=invis weight=100 minlen=3]
+route3 -> route4 [style=invis weight=100 minlen=3]
+FieldAncillary -> CellMethod [style=invis weight=100]
+DomainAxis -> route6 [style=invis weight=100 minlen=2]
+DomainAxis -> GenericCoordinate [style=invis weight=100]
+DimensionCoordinate -> AuxiliaryCoordinate  [style=invis weight=100]
+DomainAncillary -> CellMeasure [style=invis weight=100]
+CellMeasure -> DomainTopology [style=invis weight=100]
+DomainTopology -> CellConnectivity [style=invis weight=100]
 }
