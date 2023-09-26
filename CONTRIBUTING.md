@@ -26,7 +26,7 @@ Depending on the length and nature of the proposal, this may require different a
 1. **In general, issues should be used for discussion of proposed changes and pull requests should be used for review of agreed upon changes.**
 In other words, if the content or concept of what is being proposed needs to be vetted by the community it should be vetted in an issue.
 If the proposal is non-controversial (such as a typo correction) or has been agreed to in concept in an issue, then detailed review of the text may take place in a pull request.
-Practically all changes should be documented and discussed in an issue fixed in a related pull request.
+Practically all changes should be documented and discussed in an issue and fixed in a related pull request.
 1. **Use [labels](https://github.com/cf-convention/cf-conventions/labels) on issues and pull requests.**
 Currently this is achieved by using an appropriate issue template when creating a [new issue](https://github.com/cf-convention/cf-conventions/issues/new/choose).
 1. **Comments in pull requests.** These should be avoided, unless discussing changes to the wording of a proposal that do not impact on the agreed meaning.
