@@ -28,10 +28,10 @@ When scaled data are written, the application should first subtract the offset a
 The units of a variable should be representative of the unpacked data.
 
 This standard is more restrictive than the NUG with respect to the use of the **`scale_factor`** and **`add_offset`** attributes; ambiguities and precision problems related to data type conversions are resolved by these restrictions.
-If the **`scale_factor`** and **`add_offset`** attributes are of the same data type as the associated variable, the unpacked data is assumed to be of the same data type as the packed data.
-However, if the **`scale_factor`** and **`add_offset`** attributes are of a different data type from the variable (containing the packed data) then the unpacked data should match the type of these attributes, which must both be of type **`float`** or both be of type **`double`**.
-An additional restriction in this case is that the variable containing the packed data must be of type **`byte`**, **`short`** or **`int`**.
-It is not advised to unpack an **`int`** into a **`float`** as there is a potential precision loss.
+
+When packed data is written, the **`scale_factor`** and **`add_offset`** attributes must be of the same type as the unpacked data, which must be either **`float`** or **`double`**. Data of type **`float`** must be packed into one of these types: **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**. Data of type **`double`** must be packed into one of these types: **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**.
+
+When packed data is read, it should be unpacked to the type of the **`scale_factor`** and **`add_offset`** attributes, which must have the same type if both are present. For guidance only, we suggest that packed data which does not conform to the rules of this section regarding the types of the data variable and attributes should be unpacked to **`double`** type, in order to minimise the risk of loss of precision.
 
 When data to be packed contains missing values the attributes that indicate missing values (**`_FillValue`**, **`valid_min`**, **`valid_max`**, **`valid_range`**) must be of the same data type as the packed data.
 See <<missing-data>> for a discussion of how applications should treat variables that have attributes indicating both missing values and transformations defined by a scale and/or offset.
@@ -50,8 +50,9 @@ In the compressed array, the axes to be compressed are all replaced by a single 
 The wanted points appear along this dimension in the same order they appear in the uncompressed array, with the unwanted points skipped over.
 Compression and uncompression are executed by looping over the list.
 
-The list is stored as the coordinate variable for the compressed axis of the data array.
+The list is stored as the coordinate variable for the compressed axis of the data variable.
 Thus, the list variable and its dimension have the same name.
+If any auxiliary coordinate variable has all the dimensions to be compressed, adjacent and in the same order as in the data variable, and if the auxiliary coordinate variable has missing data at all the points which are to be eliminated from the data variable, then the affected dimensions can optionally be replaced by the list dimension for the auxiliary coordinate variable just as for the data variable.
 The list variable has a string attribute **`compress`**, __containing a blank-separated list of the dimensions which were affected by the compression in the order of the CDL declaration of the uncompressed array__.
 The presence of this attribute identifies the list variable as such.
 The list, the original dimensions and coordinate variables (including boundary variables), and the compressed variables with all the attributes of the uncompressed variables are written to the netCDF file.
@@ -105,6 +106,7 @@ variables:
 This information implies that the salinity field should be uncompressed to an array with dimensions `(depth,lat,lon)`.
 ====
 
+In <<example-h.5>>, two auxiliary coordinate variables are compressed as described in this section, although their data variable is not.
 
 [[compression-by-coordinate-subsampling, Section 8.3, "Lossy Compression by Coordinate Subsampling"]]
 === Lossy Compression by Coordinate Subsampling
@@ -600,8 +602,8 @@ For one-dimensional coordinate bounds, in the second step of the process, for ea
 For two-dimensional coordinate bounds, in the second step of the process, for each index pair `(j, i)` of the interpolated dimension, the four bounds of the boundary variable is set to the value of the interpolated bounds point grid at index pairs `B0`, `B1`, `B2` and `B3`, respectively, where the index pairs are defined above under <<compressing_two_dimensional>>.
 
 
-[[example_interpolation_of_cell_boundaries, Example 8.7]]
-[caption="Example 8.7 "]
+[[example-interpolation-of-cell-boundaries]]
+[caption="Example 8.7. "]
 .Interpolation of 2D Cell Boundaries corresponding to <<figure_interpolation_of_cell_boundaries>>
 ====
 ----

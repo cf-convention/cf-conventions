@@ -242,6 +242,7 @@ The values of **`var`** must be variables that exist in the file.
 
 * The use of time coordinates in year 0 and reference date/times in year 0 to indicate climatological time is deprecated.
 * Units of **`year`** and **`month`** and any equivalent units should be used with caution.
+* UDUNITS permits a number of alternatives to the word **`since`** in the units of time coordinates. All the alternatives have exactly the same meaning in UDUNITS. For compatibility with other software, CF strongly recommends that **`since`** should be used.
 
 [[section-14]]
 
@@ -276,9 +277,10 @@ If the **`calendar`** attribute is given a non-standard value, then the attribut
 * A coordinate variable must not have the **`_FillValue`** or **`missing_value`** attributes.
 * The type of the **`coordinates`** attribute is a string whose value is a blank separated list of variable names.
 All specified variable names must exist in the file.
-* The dimensions of each auxiliary coordinate must be a subset of the dimensions of the variable they are attached to, with two exceptions.
+* The dimensions of each auxiliary coordinate must be a subset of the dimensions of the variable they are attached to, with three exceptions.
 First, a label variable of type **`char`** will have a trailing dimension for the maximum string length.
-Second, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) uses special, more indirect, methods to connect the data and coordinates.
+Second, if the data variable to which the auxiliary coordinate variable is attached has a dimension whose coordinate variable has a **`compress`** attribute, the auxiliary coordinate variable may have any of the dimensions named by that attribute.
+Third, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) uses special, more indirect, methods to connect the data and coordinates.
 
 *Recommendations:*
 
@@ -481,25 +483,11 @@ The specified variable must be a node coordinate variable that exists in the fil
 
 *Requirements:*
 
-* The **`scale_factor`** and **`add_offset`** attributes must be the same numeric data type.
-* If **`scale_factor`** and **`add_offset`** are a different type than the variable, then they must be either type float or type double.
-* If **`scale_factor`** and **`add_offset`** are a different type than the variable, then the variable must be type byte, short or int.
-
-*Recommendations:*
-
-* If **`scale_factor`** and **`add_offset`** are type float, the variable should not be of type int.
+* The **`scale_factor`** and **`add_offset`** attributes must be either type **`float`** or type **`double`**, and if both are present they must be the same type.
+* If the **`scale_factor`** and **`add_offset`** are type **`float`**, the data variable must be one of these types: **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**.
+* If the **`scale_factor`** and **`add_offset`** are type **`double`**, the data variable must be one of these types: **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**.
 
 [[section-22]]
-
-[[compression-by-gathering]]
-=== 8.2 Compression by Gathering
-
-*Requirements:*
-
-* The **`compress`** attribute may only be attached to a coordinate variable with an integer data type.
-* The type of the **`compress`** attribute is a string whose value is a blank separated list of dimension names.
-The specified dimensions must exist in the file.
-* The values of the associated coordinate variable must be in the range starting with 0 and going up to the product of the compressed dimension sizes minus 1 (CDL index conventions).
 
 [[compression-by-gathering]]
 === 8.2 Lossless Compression by Gathering
