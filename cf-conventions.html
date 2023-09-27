@@ -1149,8 +1149,8 @@ The term <em>interval</em> is sometimes used for one-dimensional cells.</p>
 <dt class="hdlist1">coordinate variable</dt>
 <dd>
 <p>We use this term precisely as it is defined in the
-<a href="http://www.unidata.ucar.edu/software/netcdf/docs/netcdf_data_set_components.html#coordinate_variables">NUG section on coordinate variables</a>.
-It is a one-dimensional variable with the same name as its dimension [e.g., <strong><code>time(time)</code></strong>], and it is defined as a numeric data type with values that are ordered monotonically.
+<a href="https://docs.unidata.ucar.edu/nug/current/best_practices.html#bp_Coordinate-Systems">NUG section on coordinate variables</a>.
+It is a one-dimensional variable with the same name as its dimension [e.g., <strong><code>time(time)</code></strong>], and it is defined as a numeric data type with values in strict monotonic order (all values are different, and they are arranged in either consistently increasing or consistently decreasing order).
 Missing values are not allowed in coordinate variables.</p>
 </dd>
 <dt class="hdlist1">grid mapping variable</dt>
@@ -5744,7 +5744,7 @@ Details and examples of storage of each of these feature types are provided in A
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>timeSeries</strong></p></td>
-<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">a series of data points at the same spatial location with monotonically increasing times</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">a series of data points at the same spatial location with time values in strict monotonically increasing order</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -5755,7 +5755,7 @@ Details and examples of storage of each of these feature types are provided in A
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>trajectory</strong></p></td>
-<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">a series of data points along a path through space with monotonically increasing times</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">a series of data points along a path through space with time values in strict monotonically increasing order</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -5777,7 +5777,7 @@ Details and examples of storage of each of these feature types are provided in A
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong>timeSeriesProfile</strong></p></td>
-<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">a series of profile features at the same horizontal position with monotonically increasing times</p></td>
+<td class="tableblock halign-left valign-top" colspan="2"><p class="tableblock">a series of profile features at the same horizontal position with time values in strict monotonically increasing order</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
@@ -7349,7 +7349,7 @@ The <code>nsigma</code> parameter is deprecated and optional in <code>formula_te
 <div class="paragraph">
 <p>The <code>standard_name</code> for the vertical coordinate variable is <code>ocean_sigma_z_coordinate</code>.
 This variable should contain <code>sigma(k)*depth_c</code> for the layers where <code>sigma</code> is defined and <code>zlev(k)</code> for the other layers, with units of length.
-The layers must be arranged so that the vertical coordinate variable contains a monotonic set of indicative values for the heights of the levels relative to the datum, either increasing or decreasing, and the direction must be indicated by the <code>positive</code> attribute, in the usual way for a vertical coordinate variable.</p>
+The layers must be arranged so that the vertical coordinate variable contains a strictly monotonic set of indicative values for the heights of the levels relative to the datum, either increasing or decreasing, and the direction must be indicated by the <code>positive</code> attribute, in the usual way for a vertical coordinate variable.</p>
 </div>
 </div>
 <div class="sect2">
@@ -8712,7 +8712,7 @@ The global attribute <strong><code>featureType=&#8221;timeSeries&#8221;</code></
 <h4 id="_orthogonal_multidimensional_array_representation_of_time_series"><a class="anchor" href="#_orthogonal_multidimensional_array_representation_of_time_series"></a>H.2.1. Orthogonal multidimensional array representation of time series</h4>
 <div class="paragraph">
 <p>If the time series instances have the same number of elements and the time values are identical for all instances, you may use the orthogonal multidimensional array representation.
-This has either a one-dimensional coordinate variable, time(time), provided the time values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, time(o), where o is the element dimension.
+This has either a one-dimensional coordinate variable, time(time), provided the time values are in strict monotonically increasing order, or a one-dimensional auxiliary coordinate variable, time(o), where o is the element dimension.
 In the former case, listing the time variable in the <strong><code>coordinates</code></strong> attributes of the data variables is optional.</p>
 </div>
 <div id="example-h.2" class="exampleblock">
@@ -9130,7 +9130,7 @@ The global attribute <strong><code>featureType=&#8221;profile&#8221;</code></str
 <h4 id="_orthogonal_multidimensional_array_representation_of_profiles"><a class="anchor" href="#_orthogonal_multidimensional_array_representation_of_profiles"></a>H.3.1. Orthogonal multidimensional array representation of profiles</h4>
 <div class="paragraph">
 <p>If the profile instances have the same number of elements and the vertical coordinate values are identical for all instances, you may use the orthogonal multidimensional array representation.
-This has either a one-dimensional coordinate variable, z(z), provided the vertical coordinate values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, alt(o), where o is the element dimension.
+This has either a one-dimensional coordinate variable, z(z), provided the vertical coordinate values are in strict monotonic order, or a one-dimensional auxiliary coordinate variable, alt(o), where o is the element dimension.
 In the former case, listing the vertical coordinate variable in the <strong>coordinates</strong> attributes of the data variables is optional.</p>
 </div>
 <div id="example-h.8" class="exampleblock">
@@ -9814,7 +9814,7 @@ Any of the three dimensions could be the netCDF unlimited dimension, if it might
 </div>
 <div class="paragraph">
 <p>If all of the profiles at any given station have the same set of vertical coordinates values, the vertical auxiliary coordinate variable could be dimensioned alt(station, z).
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are in strict monotonic order.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.</p>
 </div>
 <div class="paragraph">
@@ -9934,7 +9934,7 @@ In these cases, any unused elements of the data and auxiliary coordinate variabl
 </div>
 <div class="paragraph">
 <p>The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of profile p are associated with the coordinate values time(p), alt(p,o), lat, and lon.
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are in strict monotonic order.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.</p>
 </div>
 </div>
@@ -10118,7 +10118,7 @@ Any of the three dimensions could be the netCDF unlimited dimension, if it might
 </div>
 <div class="paragraph">
 <p>If all of the profiles along any given trajectory have the same set of vertical coordinates values, the vertical auxiliary coordinate variable could be dimensioned alt(trajectory, z).
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are in strict monotonic order.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.</p>
 </div>
 <div class="paragraph">
@@ -10195,7 +10195,7 @@ In these cases, any unused elements of the data and auxiliary coordinate variabl
 </div>
 <div class="paragraph">
 <p>The pressure(p,o), temperature(p,o), and humidity(p,o) data for element o of profile p are associated with the coordinate values time(p), alt(p,o), lat(p), and lon(p).
-If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are ordered monotonically.
+If all the profiles have the same set of vertical coordinates, the vertical auxiliary coordinate variable could be one-dimensional alt(z), or replaced by a one-dimensional coordinate variable z(z), provided the values are in strict monotonic order.
 In the latter case, listing the vertical coordinate variable in the coordinates attribute is optional.</p>
 </div>
 </div>
@@ -11422,6 +11422,9 @@ Repeat this step for each combination of indices of the non-interpolated dimensi
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/423">Issue #423</a>: Always use "strictly monotonic" when describing coordinate variables</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/420">Issue #420</a>: Add List of Figures</p>
 </li>
 <li>
@@ -11989,7 +11992,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.11 draft<br>
-Last updated 2023-09-26 21:21:01 UTC
+Last updated 2023-09-27 11:26:23 UTC
 </div>
 </div>
 </body>
