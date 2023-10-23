@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.20">
-<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, Jon&#160;Blower, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring">
+<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, Jon&#160;Blower, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring, Chris&#160;Barker">
 <title>NetCDF Climate and Forecast (CF) Metadata Conventions</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -467,6 +467,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author27" class="author">Sylvain&#160;Herlédan</span><br>
 <span id="author28" class="author">Fernando&#160;Manzano</span><br>
 <span id="author29" class="author">Lars&#160;Bärring</span><br>
+<span id="author30" class="author">Chris&#160;Barker</span><br>
 <span id="revnumber">version 1.11 draft,</span>
 <span id="revdate">31 August, 2022</span>
 </div>
@@ -487,6 +488,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#terminology">1.3. Terminology</a></li>
 <li><a href="#_overview">1.4. Overview</a></li>
 <li><a href="#coards-relationship">1.5. Relationship to the COARDS Conventions</a></li>
+<li><a href="#ugrid-conventions">1.6. UGRID Conventions</a></li>
 </ul>
 </li>
 <li><a href="#_netcdf_files_and_components">2. NetCDF Files and Components</a>
@@ -557,6 +559,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#scalar-coordinate-variables">5.7. Scalar Coordinate Variables</a></li>
 <li><a href="#domain-variables">5.8. Domain Variables</a></li>
+<li><a href="#mesh-topology-variables">5.9. Mesh Topology Variables</a></li>
 </ul>
 </li>
 <li><a href="#_labels_and_alternative_coordinates">6. Labels and Alternative Coordinates</a>
@@ -722,6 +725,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#data-model-coordinate-reference">Coordinate reference construct</a></li>
 <li><a href="#data-model-domain-ancillary">Domain ancillary construct</a></li>
 <li><a href="#data-model-cell-measure">Cell measure construct</a></li>
+<li><a href="#data-model-domain-topology">Domain topology construct</a></li>
+<li><a href="#data-model-cell-connectivity">Cell connectivity construct</a></li>
 <li><a href="#data-model-field-ancillary">Field ancillary constructs</a></li>
 <li><a href="#data-model-cell-method">Cell method construct</a></li>
 </ul>
@@ -748,6 +753,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#coordinate-uncompression-steps">Coordinate Uncompression Steps</a></li>
 </ul>
 </li>
+<li><a href="#appendix-mesh-topology-attributes">Appendix K: Mesh Topologies</a></li>
 <li><a href="#revhistory">Revision History</a>
 <ul class="sectlevel2">
 <li><a href="#_working_version_most_recent_first">Working version (most recent first)</a></li>
@@ -780,11 +786,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 3.3. <a href="#table-flag-variable-bit-2-and-3">Flag Variable Bit 2 and Bit 3 (from Example)</a><br>
 A.1. <a href="#table-attributes">Attributes</a><br>
 C.1. <a href="#table-standard-name-modifiers">Standard Name Modifiers</a><br>
-D.1. <a href="#table-computed-standard-names">Consistent sets of values for the standard_names of formula terms and the computed_standard_name needed in defining the ocean sigma coordinate, the ocean s-coordinate,  the ocean_sigma over z coordinate, and the ocean double sigma coordinate.</a><br>
+D.1. <a href="#table-computed-standard-names">Consistent sets of values for the standard_names of formula terms and the computed_standard_name needed in defining the ocean sigma coordinate, the ocean s-coordinate, the ocean_sigma over z coordinate, and the ocean double sigma coordinate.</a><br>
 E.1. <a href="#table-cell-methods">Cell Methods</a><br>
 F.1. <a href="#table-grid-mapping-attributes">Grid Mapping Attributes</a><br>
 I.1. <a href="#table-cf-concepts">The elements of the CF-netCDF conventions. The relationships to netCDF elements are shown in [figure-cf-concepts].</a><br>
-I.2. <a href="#table-cf-constructs">The constructs of the CF data model. The relationships between the constructs and CF-netCDF elements are shown in in [figure-field], [figure-dim-aux] and [figure-coordinate-reference].</a></p>
+I.2. <a href="#table-cf-constructs">The constructs of the CF data model. The relationships between the constructs and CF-netCDF elements are shown in in [figure-field], [figure-dim-aux] and [figure-coordinate-reference].</a><br>
+K.2. <a href="#table-mesh-topology-attributes">Mesh topology attributes</a></p>
 </div>
 <div class="paragraph">
 <p><strong>List of Figures</strong></p>
@@ -800,6 +807,7 @@ I.1. <a href="#figure-cf-concepts">Figure I.1</a><br>
 I.2. <a href="#figure-field">Figure I.2</a><br>
 I.3. <a href="#figure-dim-aux">Figure I.3</a><br>
 I.4. <a href="#figure-coordinate-reference">Figure I.4</a><br>
+I.5. <a href="#figure-mesh-example">Figure I.5</a><br>
 J.1. <a href="#interpolation_subareas_1d">Figure J.1</a><br>
 J.2. <a href="#interpolation_subarea_2d">Figure J.2</a><br>
 J.3. <a href="#quadratic1">Figure J.3</a><br>
@@ -842,6 +850,7 @@ J.5. <a href="#quadratic3">Figure J.5</a></p>
 5.18. <a href="#a-domain-with-no-explicit-dimensions">A domain with no explicit dimensions.</a><br>
 5.19. <a href="#a-domain-containing-a-timeseries-geometry">A domain containing a timeseries geometry.</a><br>
 5.20. <a href="#a-domain-containing-a-timeseries-of-station-data-in-the-indexed-ragged-array-representation">A domain containing a timeseries of station data in the indexed ragged array representation.</a><br>
+5.21. <a href="#example-mesh-topology-variable">A two-dimensional UGRID mesh topology variable</a><br>
 6.1. <a href="#northward-heat-transport-in-atlantic-ocean-ex">Northward heat transport in Atlantic Ocean</a><br>
 6.1.2. <a href="#taxa-ex">Taxon names and identifiers</a><br>
 6.2. <a href="#model-level-numbers-ex">Model level numbers</a><br>
@@ -992,6 +1001,9 @@ I.1. <a href="#cdl-domain-anc-coordinate">A single CF-netCDF variable correspond
 </li>
 <li>
 <p>Lars Bärring, SMHI</p>
+</li>
+<li>
+<p>Chris Barker, NOAA</p>
 </li>
 </ul>
 </div>
@@ -1362,6 +1374,19 @@ Briefly the new attributes allow:</p>
 </ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="ugrid-conventions"><a class="anchor" href="#ugrid-conventions"></a>1.6. UGRID Conventions</h3>
+<div class="paragraph">
+<p>These conventions implicitly incorporate parts of the UGRID conventions for storing unstructured (or flexible mesh) data in netCDF files using mesh topologies <a href="#UGRID">[UGRID]</a>.
+Only version 1.0 of the UGRID conventions is allowed.
+The UGRID conventions description is referenced from, rather than rewritten into, this document and the canonical description of how to store mesh topologies is only to be found at <a href="#UGRID">[UGRID]</a>.
+A summary indicating how UGRID relates to other parts of the CF conventions, and which features of UGRID are excluded from CF, can be found in <a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a>.
+To reduce the chance of ambiguities arising from their accidental re-use, all of the UGRID standardized attributes are specified in <a href="#appendix-mesh-topology-attributes">Appendix K, Mesh Topology Attributes</a> and <a href="#attribute-appendix">Appendix A, Attributes</a>.</p>
+</div>
+<div class="paragraph">
+<p>The UGRID conventions have their own conformance document, which should be used in conjunction with the CF conformance document when checking the validity of datasets.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1538,6 +1563,9 @@ If the string contains any commas, it is assumed to be a comma-separated list.</
 <div class="paragraph">
 <p>When CF is listed with other conventions, this asserts the same full compliance with CF requirements and interpretations as if CF was the sole convention.
 It is the responsibility of the data-writer to ensure that all common metadata is used with consistent meaning between conventions.</p>
+</div>
+<div class="paragraph">
+<p>The UGRID conventions, which are fully incorporated into the CF conventions, do not need to be included in the <strong><code>Conventions</code></strong> attribute.</p>
 </div>
 </div>
 <div class="sect3">
@@ -3733,6 +3761,98 @@ attributes:
 </div>
 <div class="paragraph">
 <p>In this example the data variables <strong><code>humidity</code></strong> and <strong><code>temp</code></strong> from the <a href="#example-h.7">Timeseries of station data in the indexed ragged array representation.</a> example have been replaced by the domain variable <strong><code>domain</code></strong>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mesh-topology-variables"><a class="anchor" href="#mesh-topology-variables"></a>5.9. Mesh Topology Variables</h3>
+<div class="paragraph">
+<p>A <em>mesh topology variable</em> defines the geospatial topology of cells arranged in two or three dimensions in real space but indexed by a single dimension.
+It explicitly describes the topological relationships between cells, i.e. spatial relationships which do not depend on the cell locations, via a mesh of connected nodes.
+A mesh topology variable may provide the topology for one or more domains, defined at the nodes, edges, or faces of the mesh.
+See the <a href="#data-model-domain-topology">Domain topology construct</a> and <a href="#data-model-cell-connectivity">Cell connectivity construct</a> descriptions in the CF data model for more details, including on how the mesh relates to the cells of the domain.</p>
+</div>
+<div class="paragraph">
+<p>The canonical definitions of mesh topology variables and location index set variables are given externally by the UGRID conventions <a href="#UGRID">[UGRID]</a>, but their standardized attributes, many of which are optional, are listed in <a href="#appendix-mesh-topology-attributes">Appendix K, Mesh Topology Attributes</a> and <a href="#attribute-appendix">Appendix A, Attributes</a>.
+Some features of the UGRID conventions <a href="#UGRID">[UGRID]</a> are not currently recognized by the CF conventions: mesh topology volume cells (that are used to describe fully three-dimensional unstructured mesh topologies); and the "boundary node connectivity" variable (that specifies an index variable identifying the nodes that define where boundary condtions have been provided).</p>
+</div>
+<div class="paragraph">
+<p>A data or domain variable may use one of a mesh topology variable&#8217;s domains by referencing the mesh topology variable with the <strong><code>mesh</code></strong> attribute; along with the identity of required domain provided by the <strong><code>location</code></strong> attribute (see example <a href="#example-mesh-topology-variable">A two-dimensional UGRID mesh topology variable</a>).</p>
+</div>
+<div class="paragraph">
+<p>The variables containing the coordinate values for cells indexed by the mesh topology are defined by the mesh topology variable but are equivalent to one-dimensional auxiliary coordinate variables, and so may also be provided by the data or domain variable&#8217;s <strong><code>coordinates</code></strong> attribute.
+Note that the mesh topology variable allows cell bounds to be provided without any cell coordinate values, via its <em><strong><code>node_coordinates</code></strong></em> attribute.</p>
+</div>
+<div class="paragraph">
+<p>A <em>location index set variable</em> defines a subset of locations of a mesh topology variable, e.g. only special locations like weirs and gates.
+It is provided as a space saving device to prevent the need to redefine parts of an existing mesh topology variable, and as such is logically equivalent to a mesh topology variable.
+A data or domain variable references a location index set variable via its <strong><code>location_index_set</code></strong> attribute.</p>
+</div>
+<div id="example-mesh-topology-variable" class="exampleblock">
+<div class="title">Example 5.21. A two-dimensional UGRID mesh topology variable</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  node = 5 ;  // Number of mesh nodes
+  edge = 6 ;  // Number of mesh edges
+  face = 2 ;  // Number of mesh faces
+  two = 2 ;   // Number of nodes per edge
+  four = 4 ;  // Maximum number of nodes per face
+  time = 12 ;
+
+variables:
+  // Mesh topology variable
+  integer mesh ;
+    mesh:cf_role = "mesh_topology" ;
+    mesh:long_name = "Topology of a 2-d unstructured mesh" ;
+    mesh:topology_dimension = 2 ;
+    mesh:node_coordinates = "mesh_node_x mesh_node_y" ;
+    mesh:edge_node_connectivity = "mesh_edge_nodes" ;
+    mesh:face_node_connectivity = "mesh_face_nodes" ;
+
+  // Mesh node coordinates
+  double mesh2_node_x(node) ;
+    mesh_node_x:standard_name = "longitude" ;
+    mesh_node_x:units = "degrees_east" ;
+  double mesh2_node_y(node) ;
+    mesh_node_y:standard_name = "latitude" ;
+    mesh_node_y:units = "degrees_north" ;
+
+  // Mesh connectivity variables
+  integer mesh_face_nodes(face, four) ;
+    mesh_face_nodes:long_name = "Maps each face to its 3 or 4 corner nodes" ;
+  integer mesh_edge_nodes(edge, two) ;
+    mesh_edge_nodes:long_name = "Maps each edge to the 2 nodes it connects" ;
+
+  // Coordinate variables
+  float time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2004-06-01" ;
+
+  // Data at mesh faces
+  double volume_at_faces(time, face) ;
+    volume_at_faces:standard_name = "air_density" ;
+    volume_at_faces:units = "kg m-3" ;
+    volume_at_faces:mesh = "mesh" ;
+    volume_at_faces:location = "face" ;
+  // Data at mesh edges
+  double flux_at_edges(time, edge) ;
+    fluxe_at_edges:standard_name = "northward_wind" ;
+    fluxe_at_edges:units = "m s-1" ;
+    fluxe_at_edges:mesh = "mesh"
+    fluxe_at_edges:location = "edge" ;
+  // Data at mesh nodes
+  double height_at_nodes(time, node) ;
+    height_at_nodes:standard_name = "sea_surface_height_above_geoid" ;
+    height_at_nodes:units = "m" ;
+    height_at_nodes:mesh = "mesh" ;
+    height_at_nodes:location = "node" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A two-dimensional UGRID mesh topology variable for the mesh depicted in <a href="#figure-mesh-example">Figure I.5</a>, with data variables defined at face, edge and node elements of the mesh. All optional attributes have been omitted.</p>
 </div>
 </div>
 </div>
@@ -6304,8 +6424,8 @@ Data variables should (as usual) also contain missing values to indicate when th
 <h2 id="attribute-appendix"><a class="anchor" href="#attribute-appendix"></a>Appendix A: Attributes</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>All CF attributes are listed here except for those that are used to describe grid mappings.
-See Appendix F for the grid mapping attributes.</p>
+<p>All CF attributes are listed here except for those that are used to describe grid mappings and mesh topologies.
+See Appendix F for the grid mapping attributes, and Appendix K for mesh topology attributes.</p>
 </div>
 <div class="paragraph">
 <p>The "Type" values are <strong>S</strong> for string, <strong>N</strong> for numeric, and <strong>D</strong> for the type of the data variable.
@@ -6393,8 +6513,8 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>cf_role</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#coordinates-metadata">Section 9.5, "Coordinates and metadata"</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies the roles of variables that identify features in discrete sampling geometries.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#coordinates-metadata">Section 9.5, "Coordinates and metadata"</a>, and <a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies the roles of variables that identify features in discrete sampling geometries; and the roles of mesh topology and location index set variables.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>climatology</code></strong></p></td>
@@ -6570,12 +6690,33 @@ The index variable indicates that the indexed ragged array representation is bei
 It is assumed that all years that differ from this year by a multiple of four are also leap years.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>location</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, Do</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a>, and <a href="#appendix-mesh-topology-attributes">Appendix K, Mesh Topology Attributes</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the location type within the mesh topology at which the variable is defined.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>location_index_set</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, Do</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a>, and <a href="#appendix-mesh-topology-attributes">Appendix K, Mesh Topology Attributes</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a variable that defines the subset of locations of a mesh topology at which the variable is defined.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>long_name</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C, D, Do</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a>, and <a href="#long-name">Section 3.2, "Long Name"</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A descriptive name that indicates a variable"s content.
+<td class="tableblock halign-left valign-top"><p class="tableblock">A descriptive name that indicates a variable&#8217;s content.
 This name is not standardized.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>mesh</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, Do</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a>, and <a href="#appendix-mesh-topology-attributes">Appendix K, Mesh Topology Attributes</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a variable that defines a mesh topology.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>missing_value</code></strong></p></td>
@@ -7400,7 +7541,7 @@ No <code>standard_name</code> has been defined for <code>z1</code>, <code>z2</co
 <div class="content">
 <img src="NFFFFFF-1.0.png" alt="NFFFFFF 1.0">
 </div>
-<div class="title">Consistent sets of values for the standard_names of formula terms and the computed_standard_name needed in defining the ocean sigma coordinate, the ocean s-coordinate,  the ocean_sigma over z coordinate, and the ocean double sigma coordinate.</div>
+<div class="title">Consistent sets of values for the standard_names of formula terms and the computed_standard_name needed in defining the ocean sigma coordinate, the ocean s-coordinate, the ocean_sigma over z coordinate, and the ocean double sigma coordinate.</div>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
@@ -10391,6 +10532,14 @@ The CF data model has been derived from these CF-netCDF elements and relationshi
 <td class="tableblock halign-left valign-top"><p class="tableblock">Metadata that depends on the domain</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Mesh topology variable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">One or more related domains with cell connectivity</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Location index set variable</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A domain with cell connectivity</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Formula terms attribute</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Vertical coordinate system</p></td>
 </tr>
@@ -10461,6 +10610,14 @@ The constructs, listed in <a href="#table-cf-constructs">Table I.2</a>, are rela
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cell measure</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cell size or shape</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Domain topology</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Geospatial topology of domain cells</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cell connectivity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Connectivity of domain cells</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Field ancillary</p></td>
@@ -10554,6 +10711,12 @@ The domain construct contains properties to describe the domain (in the same sen
 <li>
 <p>Cell measure constructs.</p>
 </li>
+<li>
+<p>Domain topology constructs.</p>
+</li>
+<li>
+<p>Cell connectivity constructs.</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -10562,6 +10725,25 @@ The domain construct contains properties to describe the domain (in the same sen
 <div class="paragraph">
 <p>In CF-netCDF, domain information is stored either implicitly via data variable attributes (such as <code>coordinates</code>), or explicitly in a domain variable.
 In the latter case, the domain exists without reference to a data array.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>implicitly via data variable attributes (such as <code>coordinates</code>);</p>
+</li>
+<li>
+<p>explicitly in a domain variable;</p>
+</li>
+<li>
+<p>explicitly in a mesh topology variable, in which case the domain may be one of multiple domains defined by the same variable (for instance, a single mesh topology variable could contain different domains defined respectively at node, edge, and face mesh elements);</p>
+</li>
+<li>
+<p>explicitly in a location index set variable that references a subset of another domain defined by a mesh topology variable.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For the explicit cases, the domain exists without reference to a data array.</p>
 </div>
 </div>
 <div class="sect3">
@@ -10617,7 +10799,7 @@ For example, a cell describing the land area surrounding a lake would require tw
 For example, this is the case for an axis that runs over ocean basins or area types, or for a domain axis that indexes a time series at scattered points.
 These axes are discrete axes in CF-netCDF.
 In such cases cells may be described with one-dimensional auxiliary coordinate constructs for which, provided that there is a cell bounds array to describe the cell extents, the coordinate array is optional, since coordinates are not always well defined for such cells.
-A CF-netCDF geometry container variable is used to store cell bounds without coordinates for a discrete axis.</p>
+A CF-netCDF geometry container variable or mesh topology variable is used to store cell bounds without coordinates for a discrete axis.</p>
 </div>
 <div class="paragraph">
 <p>In CF-netCDF, when a geometry container variable is present it explicitly describes the geometry type and identifies the node coordinate variables that contain the cell vertices.
@@ -10743,6 +10925,105 @@ Cell measure constructs have to be used when the size or shape of the cells cann
 The properties must contain a "measure" property, which indicates which metric of the space it supplies, e.g. cell horizontal areas, and a units property consistent with the measure property, e.g. m2.
 It is assumed that the metric does not depend on axes of the domain which are not spanned by the array, along which the values are implicitly propagated.
 CF-netCDF cell measure variables correspond to cell measure constructs.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="data-model-domain-topology"><a class="anchor" href="#data-model-domain-topology"></a>Domain topology construct</h4>
+<div class="paragraph">
+<p>A domain topology construct defines the geospatial topology of cells arranged in two or three dimensions in real space but indexed by a single (discrete) domain axis construct, and at most one domain topology construct may be associated with any such domain axis.
+The topology describes topological relationships between the cells - spatial relationships which do not depend on the cell locations - and is represented by an undirected graph, i.e. a mesh in which pairs of nodes are connected by links.
+Each node has a unique arbitrary identity that is independent of its spatial location, and different nodes may be spatially co-located.</p>
+</div>
+<div class="paragraph">
+<p>The topology may only describe cells that have a common spatial dimensionality, one of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Point: A point is zero-dimensional and has no boundary vertices.</p>
+</li>
+<li>
+<p>Edge: An edge is one-dimensional and corresponds to a line connecting two boundary vertices.</p>
+</li>
+<li>
+<p>Face: A face is two-dimensional and corresponds to a surface enclosed by a set of edges.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each type of cell implies a restricted topology for which only some kinds of mesh are allowed.
+For point cells, every node corresponds to exactly one cell; and two cells have a topological relationship if and only if their nodes are connected by a mesh link.
+For edge and face cells, every node corresponds to a boundary vertex of a cell; the same node can represent vertices in multiple cells; every link in the mesh connects two cell boundary vertices; and two cells have a topological relationship if and only if they share at least one node.</p>
+</div>
+<div id="figure-mesh-example" class="imageblock text-center text-center">
+<div class="content">
+<img src="images/mesh_figure.svg" alt="mesh figure" width="100%">
+</div>
+<div class="title">Figure I.5. A topology defined by a mesh with five nodes and six links.</div>
+</div>
+<div class="paragraph">
+<p>For example, the mesh depicted in <a href="#figure-mesh-example">Figure I.5</a> may be used with any of three domain topology constructs for domains comprising two face cells (one triangle and one quadrilateral), six edge cells, and five point cells respectively.</p>
+</div>
+<div class="paragraph">
+<p>A domain topology construct contains an array defining the mesh, and properties to describe it.
+There must be a property indicating the spatial dimensionality of the cells.
+The array values comprise the node identities, and all array elements that refer to the same node must contain the same value, which must differ from any other value in the array.
+The array spans the domain axis construct and also has a ragged dimension, whose function depends on the spatial dimensionality of the cells.</p>
+</div>
+<div class="paragraph">
+<p>For each point cell, the first element along the ragged dimension contains the node identity of the cell, and the following elements contain in arbitrary order the identities of all the cells to which it is connected by a mesh link.</p>
+</div>
+<div class="paragraph">
+<p>For each edge or face cell, the elements along the ragged dimension contain the node identities of the boundary vertices of the cell, in the same order that the boundary vertices are stored by the auxiliary coordinate constructs.
+Each boundary vertex except the last is connected by a mesh link to the next vertex along the ragged dimension, and the last vertex is connected to the first.</p>
+</div>
+<div class="paragraph">
+<p>When a domain topology construct is present it is considered to be definitive and must be used in preference to the topology implied by inspection of any other constructs, which is not guaranteed to be the same.</p>
+</div>
+<div class="paragraph">
+<p>In CF-netCDF a domain topology construct can only be provided for a UGRID mesh topology variable.
+The information in the construct array is supplied by the UGRID "edge_nodes_connectivity" variable (for edge cells) or "face_nodes_connectivity" variable (for face cells).
+The topology for node cells may be provided by any of these three UGRID variables.
+The integer indices contained in the UGRID variable may be used as the mesh node identities, although the CF data model attaches no significance to the values other than the fact that some values are the same as others.
+The spatial dimensionality property is provided by the "location" attribute of a variable that references the UGRID mesh topology variable, i.e. a data variable or a UGRID location index set variable.</p>
+</div>
+<div class="paragraph">
+<p>A single UGRID mesh topology defines multiple domain constructs and defines how they relate to each other.
+For instance, when "face_node_connectivity" and "edge_node_connectivity" variables are both present there are three implied domain constructs - one each for face, edge and point cells - all of which have the same mesh and so are explicitly linked (e.g. it is known which edge cells define each face cell).
+The CF data model has no mechanism for explicitly recording such relationships between multiple domain constructs.
+Whether or not two domains have the same mesh may be reliably deternined by inspection, thereby allowing the creation of netCDF datasets containing UGRID mesh topology variables.</p>
+</div>
+<div class="paragraph">
+<p>The restrictions on the type of mesh that may be used with a given cell spatial dimensionality excludes some meshes which can be described by an undirected graph, but is consistent with UGRID encoding within CF-netCDF.
+UGRID also describes meshes for three-dimensional volume cells that correspond to a volume enclosed by a set of faces, but how the nodes relate to volume boundary vertices is undefined and so volume cells are currently omitted from the CF data model.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="data-model-cell-connectivity"><a class="anchor" href="#data-model-cell-connectivity"></a>Cell connectivity construct</h4>
+<div class="paragraph">
+<p>A cell connectivity construct defines explicitly how cells arranged in two or three dimensions in real space but indexed by a single domain (discrete) axis are connected.
+Connectivity can only be provided when the domain axis construct also has a domain topology construct, and two cells can only be connected if they also have a topological relationship.
+For instance, the connectivity of two-dimensional face cells could be characterised by whether or not they have shared edges, where the edges are defined by connected nodes of the domain topology construct.</p>
+</div>
+<div class="paragraph">
+<p>The cell connectivity construct consists of an array recording the connectivity, and properties to describe the data.
+There must be a property indicating the condition by which the connectivity is derived from the domain topology.
+The array spans the domain axis construct with the addition of a ragged dimension.
+For each cell, the first element along the ragged dimension contains the unique identity of the cell, and the following elements contain in arbitrary order the identities of all the other cells to which the cell is connected.
+Note that the connectivity array for point cells is, by definition, equivalent to the array of the domain topology construct.</p>
+</div>
+<div class="paragraph">
+<p>When cell connectivity constructs are present, they are considered to define the connectivity of the cells.
+Exactly the same connectivity information could be derived from the domain topology construct.
+Connectivity information inferred from inspection of any other constructs is not guaranteed to be the same.</p>
+</div>
+<div class="paragraph">
+<p>In CF-netCDF a cell topology construct can only be provided by a UGRID mesh topology variable.
+The construct array is supplied either indirectly by any of the UGRID variables that are used to define a domain topology construct, or directly by the UGRID "face_face_connectivity" variable (for face cells).
+In the direct case, the integer indices contained in the UGRID variable may be used as the cell identities, although the CF data model attaches no significance to the values other than the fact that some values are the same as others.</p>
+</div>
+<div class="paragraph">
+<p>Restricting the types of connectivity to those implied by the geospatial topology of the cells precludes connectivity derived from any other sources, but is consistent with UGRID encoding within CF-netCDF.</p>
 </div>
 </div>
 <div class="sect3">
@@ -11415,6 +11696,189 @@ Repeat this step for each combination of indices of the non-interpolated dimensi
 </div>
 </div>
 <div class="sect1">
+<h2 id="appendix-mesh-topology-attributes"><a class="anchor" href="#appendix-mesh-topology-attributes"></a>Appendix K: Mesh Topologies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The CF attributes listed here may be used to define mesh topologies (<a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a>).
+This list is intended as a summary of the attributes that have been standardized via the UGRID conventions <a href="#UGRID">[UGRID]</a>, which should be consulted for further details.
+UGRID attributes that are not currently recognised by the CF convensions are included in the list.</p>
+</div>
+<div class="paragraph">
+<p>The "Type" values are <strong>S</strong> for string and <strong>I</strong> for integer.
+The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LIS</strong> for location index set variables, <strong>D</strong> for data variables, <strong>Do</strong> for domain variables, and <strong>Con</strong> for connectivity index variables.</p>
+</div>
+<table id="table-mesh-topology-attributes" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table K.1. Mesh topology attributes</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 8.3333%;">
+<col style="width: 16.6666%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Attribute</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Use</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>boundary_node_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying the nodes that define where boundary condtions have been provided. Not currently recognised by the CF conventions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>cf_role</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT, LIS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the roles of mesh topology or location index set variables.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>coordinates</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LIS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the auxiliary coordinate variables associated with the characteristic locations of the subset of mesh topology locations.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>edge_coordinates</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the auxiliary coordinate variables associated with the characteristic location of the edges (commonly the midpoint).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>edge_dimension</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the dimension used to index the nodes in the edge connectivity variable.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>edge_face_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying all faces that share the same edge, i.e. are neighbours to an edge.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>edge_node_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying for every edge the indices of its begin and end nodes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>face_coordinates</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the auxiliary coordinate variables associated with the characteristic location of faces.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>face_dimension</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the dimension used to index the edges in the face connectivity variable.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>face_edge_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying for every face the indices of its edges.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>face_face_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying all faces that share an edge with each face, i.e. are neighbours.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>face_node_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying for every face the indices of its corner nodes.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>location</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, Do, LIS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the location within the mesh topology at which the variable is defined.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>location_index_set</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, Do</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a variable that defines the subset of locations of a mesh topology at which the variable is defined.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>mesh</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">D, Do, LIS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a variable that defines a mesh topology.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>node_coordinates</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the auxiliary coordinate variables representing the node locations (latitude, longitude, or other spatial coordinates, and optional elevation or other coordinates).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>start_index</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">I</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">LIS, Con</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates whether 0- or 1-based indexing is used to identify connected geometric elements; connectivity indices are 0-based by default.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>topology_dimension</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">I</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Indicates the highest dimensionality of the geometric elements.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>volume_coordinates</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the auxiliary coordinate variables associated with the characteristic location of volumes. Not currently recognised by the CF conventions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>volume_dimension</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the dimension used to index the faces in the volume connectivity variable. Not currently recognised by the CF conventions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>volume_edge_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying for every volume the indices of its edges.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>volume_face_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying for every volume the indices of its faces. Not currently recognised by the CF conventions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>volume_node_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying for every volume the indices of its corner nodes. Not currently recognised by the CF conventions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>volume_shape_type</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies a flag variable that specifies for every volume its shape. Not currently recognised by the CF conventions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>volume_volume_connectivity</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">MT</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies an index variable identifying all volumes that share a face with each volume, i.e. are neighbours. Not currently recognised by the CF conventions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
 <h2 id="revhistory"><a class="anchor" href="#revhistory"></a>Revision History</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -11477,6 +11941,9 @@ Repeat this step for each combination of indices of the non-interpolated dimensi
 </li>
 <li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/410">Issue #410</a>: Delete "on a spherical Earth" from the definition of the <code>latitude_longitude</code> grid mapping in Appendix F</p>
+</li>
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/153">Issue #153</a>: Reference UGRID conventions in CF</p>
 </li>
 </ul>
 </div>
@@ -11986,6 +12453,9 @@ OGC document 12-063. 1st May 2015.</p>
 <li>
 <p><a id="CFDM"></a>[CFDM]  <a href="http://doi.org/10.5194/gmd-10-4619-2017">A data model of the Climate and Forecast metadata conventions (CF-1.6) with a software implementation (cf-python v2.1)</a>. Hassell, D., Gregory, J., Blower, J., Lawrence, B. N., and Taylor, K. E.: <em>Geosci. Model Dev.</em>, 10, 4619-4646, 2017.</p>
 </li>
+<li>
+<p><a id="UGRID"></a>[UGRID]  <a href="https://ugrid-conventions.github.io/ugrid-conventions">UGRID Conventions for storing unstructured (or flexible mesh) data in netCDF files</a></p>
+</li>
 </ul>
 </div>
 </div>
@@ -11995,7 +12465,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.11 draft<br>
-Last updated 2023-10-16 19:56:40 UTC
+Last updated 2023-10-23 17:38:29 UTC
 </div>
 </div>
 </body>
