@@ -288,7 +288,7 @@ If the **`calendar`** attribute is given a non-standard value, then the attribut
 All specified variable names must exist in the file.
 * The dimensions of each auxiliary coordinate must be a subset of the dimensions of the variable they are attached to, with three exceptions.
 First, a label variable of type **`char`** will have a trailing dimension for the maximum string length.
-Second, if the data variable to which the auxiliary coordinate variable is attached has a dimension whose coordinate variable has a **`compress`** attribute, the auxiliary coordinate variable may have any of the dimensions named by that attribute.
+Second, if an auxiliary coordinate variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable.
 Third, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) uses special, more indirect, methods to connect the data and coordinates.
 
 *Recommendations:*
@@ -398,7 +398,8 @@ If a named variable in the **`formula_terms`** attribute of the vertical coordin
 * The type of the **`cell_measures`** attribute is a string whose value is list of blank separated word pairs in the form **`measure: var`**.
 The valid values for **`measure`** are **`area`** or **`volume`**.
 The **`var`** token specifies a variable that must either exist in the file or be named by the **`external_variables`** attribute.
-The dimensions of the variable specified by **`var`** must be the same as, or be a subset of, the dimensions of the variable to which they are related.
+The dimensions of the variable specified by **`var`** must be the same as, or be a subset of, the dimensions of the variable to which they are related, with one exception:
+If a cell measure variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable.
 * A measure variable must have units that are consistent with the measure type, i.e., square meters for area measures and cubic meters for volume measures.
 
 [[section-20]]
