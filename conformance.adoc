@@ -368,8 +368,8 @@ If there are two dimensions, the leading dimension (CDL order) must match one of
 The specified variable must exist in the file.
 * A boundary variable must have the same dimensions as its associated variable, plus have a trailing dimension (CDL order) for the maximum number of vertices in a cell.
 * A boundary variable must be a numeric data type.
-
-*  If a boundary variable has **`units`**,**`standard_name`**, **`axis`**, **`positive`**, **`calendar`**, **`leap_month`**, **`leap_year`** or **`month_lengths`** attributes, they must agree with those of its associated variable.
+* If a boundary variable has an inheritable attribute, i.e. any of those marked "BI" in the "Use" column of http://cfconventions.org/cf-conventions/cf-conventions.html#attribute-appendix[Appendix A], then the same attribute must exist on the parent variable, with the same data type and value.
+* A boundary variable can only have inheritable attributes if they are also present on its parent coordinate variable.
 * Starting with version 1.7, a boundary variable must have a **`formula_terms`** attribute when it contains bounds for a parametric vertical coordinate variable that has a **`formula_terms`** attribute.
 In this case the same terms and named variables must appear in both except for terms that depend on the vertical dimension.
 For such terms the variable name appearing in the boundary variable's **`formula_terms`** attribute must differ from that found in the **`formula_terms`** attribute of the coordinate variable itself.
@@ -380,7 +380,7 @@ If a named variable in the **`formula_terms`** attribute of the vertical coordin
 *Recommendations:*
 
 * The points specified by a coordinate or auxiliary coordinate variable should lie within, or on the boundary, of the cells specified by the associated boundary variable.
-* Boundary variables should not have the **`_FillValue`**, **`missing_value`**, **`units`**, **`standard_name`**, **`axis`**, **`positive`**, **`calendar`**, **`leap_month`**, **`leap_year`** or **`month_lengths`** attributes.
+* Boundary variables should not include inheritable attributes, i.e. any of those marked "BI" in the "Use" column of http://cfconventions.org/cf-conventions/cf-conventions.html#attribute-appendix[Appendix A].
 
 
 [[section-19]]
@@ -502,6 +502,7 @@ The specified variable must be a node coordinate variable that exists in the fil
 * The type of the **`compress`** attribute is a string whose value is a blank separated list of dimension names.
 The specified dimensions must exist in the file.
 * The values of the associated coordinate variable must be in the range starting with 0 and going up to the product of the compressed dimension sizes minus 1 (CDL index conventions).
+* The associated coordinate variable must not have an associated boundary variable.
 
 [[compression-by-coordinate-subsampling]]
 === 8.3 Lossy Compression by Coordinate Subsampling
