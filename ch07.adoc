@@ -20,10 +20,15 @@ To represent cells we add the attribute **`bounds`** to the appropriate coordina
 The value of **`bounds`** is the name of the variable that contains the vertices of the cell boundaries.
 We refer to this type of variable as a "boundary variable."
 __A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.__ The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices.
-Since a boundary variable is considered to be part of a coordinate variable's metadata, it is not necessary to provide it with attributes such as **`long_name`** and **`units`**.
 
-Boundary variable attributes which determine the coordinate type (**`units`**, **`standard_name`**, **`axis`** and **`positive`**) or those which affect the interpretation of the array values (**`units`**, **`calendar`**, **`leap_month`**, **`leap_year`** and **`month_lengths`**) must always agree exactly with the same attributes of its associated coordinate, scalar coordinate or auxiliary coordinate variable.
-To avoid duplication, however, it is recommended that these are not provided to a boundary variable.
+A boundary variable inherits the values of some attributes from its parent coordinate variable.
+If a coordinate variable has any of the attributes marked "BI" (for "inherit") in the "Use" column of <<attribute-appendix>>, they are assumed to apply to its bounds variable as well.
+It is recommended not to include any of these attributes on a bounds variable.
+If such an attribute is included, its data type and its value must be exactly the same as the parent variable's attribute.
+A boundary variable can only have inheritable attributes if they are also present on its parent coordinate variable.
+A bounds variable may have any of the attributes marked "BO" for ("own") in the "Use" column of <<attribute-appendix>>.
+These attributes take precedence over any corresponding attributes of the parent variable.
+In these cases, the parent variable's attribute does not apply to the bounds variable, regardless of whether the latter has its own attribute.
 
 If a parametric coordinate variable with a **`formula_terms`** attribute (section 4.3.2) also has a **`bounds`** attribute, its boundary variable must have a **`formula_terms`** attribute too.
 In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula.
