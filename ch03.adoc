@@ -35,7 +35,7 @@ A variable with no **`units`** attribute is assumed to be dimensionless.
 However, a **`units`** attribute specifying a dimensionless unit may optionally be included.
 The canonical unit (see also <<standard-name>>) for dimensionless quantities that represent fractions, or parts of a whole, is `1`.
 The UDUNITS package defines a few dimensionless units, such as `percent`, `ppm` (parts per million, 1e-6), and `ppb` (parts per billion, 1e-9).
-When a dimensionless quantity is a ratio of dimensional quantities, CF suggests that it may be informative to users of data if the **`units`** are given as ratio of dimensional units, for instance `mg kg-1` for a mass ratio of 1e-6, or `microlitre litre-1` for a volume ratio of 1e-6.
+As an alternative to the canonical **`units`** of `1` or some other unitless number, the **`units`** for a dimensionless quantity may be given as a ratio of dimensional units, for instance `mg kg-1` for a mass ratio of 1e-6, or `microlitre litre-1` for a volume ratio of 1e-6. Data-producers are invited to consider whether this alternative would be more helpful to the users of their data.
 
 The CF convention supports dimensionless units that are UDUNITS compatible, with one exception, concerning the dimensionless units defined by UDUNITS for volume ratios, such as `ppmv` and `ppbv`.
 These units are allowed in the **`units`** attribute by CF only if the data variable has no **`standard_name`**.
@@ -57,7 +57,10 @@ Use of these attributes for data packing, which is their most important applicat
 The **`units`** of temperature imply an origin (i.e. zero point) for the associated measurement scale.
 When the temperature value is the degree of warmth with respect to the origin of the measurement scale, we call it an _on-scale temperature_.
 When **`units`** of on-scale temperature are converted, the data may require the addition of an offset as well as multiplication by a scale factor, because the physical meaning of a numerical value of zero for an on-scale temperature depends on the unit of measurement.
-On-scale temperature is _unique_ among quantities in this respect; for all other quantities, zero means the same whatever the unit of measurement. For example (using **bold** to indicate a numerical data value), **0** `kilogram` is the same mass as **0** `pound`, but **0** `degC` is not the same temperature as **0** `degF` (= **-17.8** `degC`), because these two temperature **`units`** implicitly refer to measurement scales which have different origins.
+On-scale temperature is _unique_ among quantities in the respect that the origin and the unit of measurement are both defined by the **`units`** and therefore cannot be chosen independently.
+For all other quantities, the origin and the unit of measurement are independent.
+Converting the unit of measurement alone, without changing the origin, does not change the meaning of zero.
+For example (using **bold** to indicate a numerical data value), **0** `kilogram` is the same mass as **0** `pound`, and **0** `seconds since 1970-1-1` means the same as **0** `days since 1970-1-1`, but **0** `degC` is not the same temperature as **0** `degF` (= **-17.8** `degC`), because these two temperature **`units`** implicitly refer to measurement scales which have different origins.
 
 On the other hand, when the temperature value is a _temperature difference_, which compares two on-scale temperatures with the same origin, the value of that origin is irrelevant as it cancels out when taking the difference.
 Therefore to convert the **`units`** of a temperature difference requires only multiplication by a scale factor, without the addition of an offset.
@@ -103,10 +106,8 @@ In data written according to versions before 1.11, `temperature: unknown` should
 We note (for guidance only for `temperature: unknown`, not as a CF convention) that the UDUNITS software assumes `temperature: on_scale` for **`units`** strings containing only a unit of temperature, and `temperature: difference` for **`units`** strings in which a unit of temperature is raised to any power other than unity, or multiplied or divided by any other unit.
 
 With `temperature: on_scale`, correct conversion can be guaranteed only for pure temperature **`units`**.
-If the unit is an on-scale temperature multiplied by some other quantity, it is generally not possible to convert the data correctly from the **`units`** given, whether the canonical or some other, to any other **`units`**, because the **`units`** does not give sufficient information.
-For example, the **`standard_name`** of `integral_wrt_depth_of_product_of_conservative_temperature_and_sea_water_density` specifies a canonical unit of `kg degree_C m-2`.
-A numerical value of **1** with `units="kg degree_C m-2"` could mean **1** `degree_C` multiplied by **1** `kg m-2`, or **10** `degree_C` multiplied by **0.1** `kg m-2`.
-If `temperature: on_scale`, these convert to **274.15** `kg K m-2` and **28.315** `kg K m-2`, respectively, and there are infinitely many other possibilities.
+If the quantity is an on-scale temperature multiplied by some other quantity, it is not possible to convert the data from the **`units`** given to any other **`units`** that involve a temperature with a different origin, given only the **`units`**.
+For instance, when temperature is on-scale, a value in `kg degree_C m-2` can be converted to a value in `kg K m-2` only if we know separately the values in `degree_C` and `kg m-2` of which it is the product.
 
 
 [[units-multiples, Section 3.1.3, "Scale factors and offsets"]]
