@@ -2004,7 +2004,9 @@ For example, instrument data may have associated measures of uncertainty.
 The attribute <strong><code>ancillary_variables</code></strong> is used to express these types of relationships.
 It is a string attribute whose value is a blank separated list of variable names.
 The nature of the relationship between variables associated via <strong><code>ancillary_variables</code></strong> must be determined by other attributes.
-The variables listed by the <strong><code>ancillary_variables</code></strong> attribute will often have the standard name of the variable which points to them including a modifier (<a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>) to indicate the relationship.</p>
+The variables listed by the <strong><code>ancillary_variables</code></strong> attribute will often have the standard name of the variable which points to them including a modifier (<a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>) to indicate the relationship.
+The dimensions of an ancillary variable must be the same as or a subset of the dimensions of the variable to which it is related, but their order is not restricted, and with one exception:
+If an ancillary variable of a data variable that has been compressed by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>) does not span the compressed dimension, then its dimensions may be any subset of the data variable&#8217;s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the <strong><code>compress</code></strong> attribute of the compressed coordinate variable.</p>
 </div>
 <div id="instrument-data-ex" class="exampleblock">
 <div class="title">Example 3.2. Ancillary instrument data</div>
@@ -2723,7 +2725,7 @@ The value of the <strong><code>coordinates</code></strong> attribute is <em>a bl
 There is no restriction on the order in which the auxiliary coordinate variables appear in the <strong><code>coordinates</code></strong> attribute string.
 The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated, with three exceptions.
 First, string-valued coordinates (<a href="#labels">Section 6.1, "Labels"</a>) will have a dimension for maximum string length if the coordinate variable has a type of <strong><code>char</code></strong> rather than a type of <strong><code>string</code></strong>.
-Second, if the data variable has a list dimension resulting from lossless compression by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>), its auxiliary coordinate variables may have any of the dimensions named by the compress attribute of the list variable.
+Second, if an auxiliary coordinate variable of a data variable that has been compressed by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>) does not span the compressed dimension, then its dimensions may be any subset of the data variable&#8217;s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the <strong><code>compress</code></strong> attribute of the compressed coordinate variable.
 Third, in the ragged array representations of data (<a href="#discrete-sampling-geometries">Chapter 9, Discrete Sampling Geometries</a>), special methods are needed to connect the data and coordinates.</p>
 </div>
 <div class="paragraph">
@@ -4207,7 +4209,8 @@ In this case, rather than (or in addition to) indicating grid cell area, it may 
 This is a string attribute comprising a list of blank-separated pairs of words of the form "<strong><code>measure: name</code></strong>".
 For the moment, "<strong><code>area</code></strong>" and "<strong><code>volume</code></strong>" are the only defined measures, but others may be supported in future.
 The "name" is the name of the variable containing the measure values, which we refer to as a "measure variable".
-The dimensions of the measure variable should be the same as or a subset of the dimensions of the variable to which they are related, but their order is not restricted.
+The dimensions of a measure variable must be the same as or a subset of the dimensions of the variable to which it is related, but their order is not restricted, and with one exception:
+If a cell measure variable of a data variable that has been compressed by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>) does not span the compressed dimension, then its dimensions may be any subset of the data variable&#8217;s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the <strong><code>compress</code></strong> attribute of the compressed coordinate variable.
 In the case of area, for example, the field itself might be a function of longitude, latitude, and time, but the variable containing the area values would only include longitude and latitude dimensions (and the dimension order could be reversed, although this is not recommended).
 The variable must have a <strong><code>units</code></strong> attribute and may have other attributes such as a <strong><code>standard_name</code></strong>.</p>
 </div>
@@ -11866,6 +11869,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/147">Issue #147</a>: Clarify the use of compressed dimensions in related variables</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/483">Issue #483</a>: Add a missing author</p>
 </li>
 <li>
@@ -12457,7 +12463,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version 1.11 draft<br>
-Last updated 2023-11-21 16:36:15 UTC
+Last updated 2023-11-21 19:37:35 UTC
 </div>
 </div>
 </body>
