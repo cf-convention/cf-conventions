@@ -2,11 +2,11 @@
 
 Dear CF community member,
 
-Thank you for taking the time to consider making a contribution to the [cf-conventions](http://cfconventions.org/).
+Thank you for taking the time to consider making a contribution to the [cf-conventions](https://cfconventions.org/).
 The netCDF Climate and Forecasting conventions are a product by and for a broad community and your contribution is the key to their usefulness.
 
 This set of guidelines provides a brief overview of the practices and procedures that should be used in fixing, updating, or adding to the conventions.
-It builds on the [rules for CF Convention changes.](http://cfconventions.org/rules.html)
+It builds on the [rules for CF Convention changes.](https://cfconventions.org/rules.html)
 
 As a prerequisite to this guide, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md).
 The CF community takes great pride in respectful and collegial discourse.
@@ -32,7 +32,7 @@ Currently this is achieved by using an appropriate issue template when creating 
 1. **Comments in pull requests.** These should be avoided, unless discussing changes to the wording of a proposal that do not impact on the agreed meaning.
 This is so that the scientific development of the proposal is easily found in one place, i.e. the GitHub issue.
 2. **Role of the issue moderator.** Each issue should have a moderator who guides the discussion through the change process and summarises it occasionally.
-This is described in greater detail in the [CF Conventions Rules](http://cfconventions.org/rules.html).
+This is described in greater detail in the [CF Conventions Rules](https://cfconventions.org/rules.html).
 
 ## Issues and pull requests
 Note that it takes a minimum of three weeks for a change to the content of the CF Conventions to be merged into the Convention's next version.
@@ -54,7 +54,7 @@ A maintainer (who might be the moderator!) merges the issue at earliest on the a
 
 ## Merging of pull requests, and closing and reopening of issues
 
-When an issue and accompanying pull request concludes with an agreed change to the conventions, the pull request is merged into the main branch according to the [Rules for CF Convention Changes](http://cfconventions.org/rules.html).
+When an issue and accompanying pull request concludes with an agreed change to the conventions, the pull request is merged into the main branch according to the [Rules for CF Convention Changes](https://cfconventions.org/rules.html).
 
 The pull request is merged by a member of the Governance Panel or the CF Conventions and Standard Names Committee.
 The person who merges the pull request also closes the issue.
