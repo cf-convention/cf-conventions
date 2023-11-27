@@ -470,7 +470,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.11 draft,</span>
-<span id="revdate">&#160;&#160;27&#160;November,&#160;2023&#160;13:05:49Z</span>
+<span id="revdate">&#160;&#160;27&#160;November,&#160;2023&#160;13:43:26Z</span>
 <br><span id="revremark">See https://cfconventions.org for further information</span>
 </div>
 </div>
@@ -4014,12 +4014,17 @@ For cases when data pertain to geospatial features with highly variable geometry
 <p>To represent cells we add the attribute <strong><code>bounds</code></strong> to the appropriate coordinate variable(s).
 The value of <strong><code>bounds</code></strong> is the name of the variable that contains the vertices of the cell boundaries.
 We refer to this type of variable as a "boundary variable."
-<em>A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.</em> The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices.
-Since a boundary variable is considered to be part of a coordinate variable&#8217;s metadata, it is not necessary to provide it with attributes such as <strong><code>long_name</code></strong> and <strong><code>units</code></strong>.</p>
+<em>A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.</em> The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices.</p>
 </div>
 <div class="paragraph">
-<p>Boundary variable attributes which determine the coordinate type (<strong><code>units</code></strong>, <strong><code>standard_name</code></strong>, <strong><code>axis</code></strong> and <strong><code>positive</code></strong>) or those which affect the interpretation of the array values (<strong><code>units</code></strong>, <strong><code>calendar</code></strong>, <strong><code>leap_month</code></strong>, <strong><code>leap_year</code></strong> and <strong><code>month_lengths</code></strong>) must always agree exactly with the same attributes of its associated coordinate, scalar coordinate or auxiliary coordinate variable.
-To avoid duplication, however, it is recommended that these are not provided to a boundary variable.</p>
+<p>A boundary variable inherits the values of some attributes from its parent coordinate variable.
+If a coordinate variable has any of the attributes marked "BI" (for "inherit") in the "Use" column of <a href="#attribute-appendix">Appendix A, Attributes</a>, they are assumed to apply to its bounds variable as well.
+It is recommended that BI attributes not be included on a boundary variable.
+If a BI attribute is included, it must also be present in the parent variable, and it must exactly match the parent attribute&#8217;s data type and value.
+A boundary variable can only have inheritable attributes if they are also present on its parent coordinate variable.
+A bounds variable may have any of the attributes marked "BO" for ("own") in the "Use" column of <a href="#attribute-appendix">Appendix A, Attributes</a>.
+These attributes take precedence over any corresponding attributes of the parent variable.
+In these cases, the parent variable&#8217;s attribute does not apply to the bounds variable, regardless of whether the latter has its own attribute.</p>
 </div>
 <div class="paragraph">
 <p>If a parametric coordinate variable with a <strong><code>formula_terms</code></strong> attribute (section 4.3.2) also has a <strong><code>bounds</code></strong> attribute, its boundary variable must have a <strong><code>formula_terms</code></strong> attribute too.
@@ -5092,7 +5097,8 @@ If any auxiliary coordinate variable has all the dimensions to be compressed, ad
 The list variable has a string attribute <strong><code>compress</code></strong>, <em>containing a blank-separated list of the dimensions which were affected by the compression in the order of the CDL declaration of the uncompressed array</em>.
 The presence of this attribute identifies the list variable as such.
 The list, the original dimensions and coordinate variables (including boundary variables), and the compressed variables with all the attributes of the uncompressed variables are written to the netCDF file.
-The uncompressed variables can be reconstituted exactly as they were using this information.</p>
+The uncompressed variables can be reconstituted exactly as they were using this information.
+The list variable must not have an associated boundary variable.</p>
 </div>
 <div id="horiz-compression-of-three-d-array-ex" class="exampleblock">
 <div class="title">Example 8.1. Horizontal compression of a three-dimensional array</div>
@@ -6418,7 +6424,8 @@ See Appendix F for the grid mapping attributes, and Appendix K for mesh topology
 </div>
 <div class="paragraph">
 <p>The "Type" values are <strong>S</strong> for string, <strong>N</strong> for numeric, and <strong>D</strong> for the type of the data variable.
-The "Use" values are <strong>G</strong> for global, <strong>Gr</strong> for applying to groups, <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for data variables, <strong>M</strong> for geometry container variables, <strong>Do</strong> for domain variables, and <strong>-</strong> for variables with a special purpose.
+Each attribute may be used in any of the ways shown in its "Use" entry.
+<strong>G</strong> indicates it can appear as a global attribute, and <strong>Gr</strong> as a group attribute; if use of an attribute is restricted to certain kinds of variables this is indicated as follows: <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for data variables, <strong>M</strong> for geometry container variables, <strong>Do</strong> for domain variables, <strong>BI</strong> and <strong>BO</strong> for boundary variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> for the distinction between <strong>BI</strong> and <strong>BO</strong>), and <strong>-</strong> for variables with some other purpose.
 "Links" indicates the location of the attribute"s original definition (first link) and sections where the attribute is discussed in this document (additional links as necessary).</p>
 </div>
 <table id="table-attributes" class="tableblock frame-all grid-all stretch">
@@ -6443,14 +6450,14 @@ The "Use" values are <strong>G</strong> for global, <strong>Gr</strong> for appl
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>actual_range</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#missing-data">Section 2.5.1, "Missing data, valid and actual range of data"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The smallest and the largest valid non-missing values occurring in the variable.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>add_offset</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a>, and <a href="#packed-data">Section 8.1, "Packed Data"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If present for a variable, this number is to be added to the data after it is read by an application.
 If both <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes are present, the data are first scaled before the offset is added.
@@ -6466,7 +6473,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>axis</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#coordinate-types">Chapter 4, Coordinate Types</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies latitude, longitude, vertical, or time axes.</p></td>
 </tr>
@@ -6480,7 +6487,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>calendar</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#calendar">Section 4.4.1, "Calendar"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Calendar used for encoding time axes.</p></td>
 </tr>
@@ -6501,7 +6508,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>cf_role</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#coordinates-metadata">Section 9.5, "Coordinates and metadata"</a>, and <a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies the roles of variables that identify features in discrete sampling geometries; and the roles of mesh topology and location index set variables.</p></td>
 </tr>
@@ -6529,7 +6536,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>computed_standard_name</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#parametric-vertical-coordinate">Section 4.3.3, "Parametric Vertical Coordinate"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Indicates the standard name, from the standard name table, of the computed vertical coordinate values, computed according to the formula in the definition.</p></td>
 </tr>
@@ -6571,7 +6578,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>_FillValue</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">D</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a>, and <a href="#missing-data">Section 2.5.1, "Missing data, valid and actual range of data"</a>, and <a href="#ch9-missing-data">Section 9.6, "Missing Data"</a>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A value used to represent missing or undefined data.
 Allowed for auxiliary coordinate variables but not allowed for coordinate variables.</p></td>
@@ -6609,7 +6616,7 @@ Use in conjunction with <strong><code>flag_meanings</code></strong>.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>formula_terms</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#parametric-vertical-coordinate">Section 4.3.3, "Parametric Vertical Coordinate"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies variables that correspond to the terms in a formula.</p></td>
 </tr>
@@ -6666,14 +6673,14 @@ The index variable indicates that the indexed ragged array representation is bei
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>leap_month</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#calendar">Section 4.4.1, "Calendar"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies which month is lengthened by a day in leap years for a user defined calendar.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>leap_year</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#calendar">Section 4.4.1, "Calendar"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Provides an example of a leap year for a user defined calendar.
 It is assumed that all years that differ from this year by a multiple of four are also leap years.</p></td>
@@ -6695,7 +6702,7 @@ It is assumed that all years that differ from this year by a multiple of four ar
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>long_name</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, Do</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, Do, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a>, and <a href="#long-name">Section 3.2, "Long Name"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A descriptive name that indicates a variable&#8217;s content.
 This name is not standardized.</p></td>
@@ -6710,7 +6717,7 @@ This name is not standardized.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>missing_value</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">D</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#missing-data">Section 2.5.1, "Missing data, valid and actual range of data"</a>, and <a href="#ch9-missing-data">Section 9.6, "Missing Data"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A value or values used to represent missing or undefined data.
 Allowed for auxiliary coordinate variables but not allowed for coordinate variables.</p></td>
@@ -6718,7 +6725,7 @@ Allowed for auxiliary coordinate variables but not allowed for coordinate variab
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>month_lengths</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#calendar">Section 4.4.1, "Calendar"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the length of each month in a non-leap year for a user defined calendar.</p></td>
 </tr>
@@ -6753,7 +6760,7 @@ Allowed for auxiliary coordinate variables but not allowed for coordinate variab
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>positive</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#COARDS">[COARDS]</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Direction of increasing vertical coordinate value.</p></td>
 </tr>
@@ -6775,7 +6782,7 @@ The count variable indicates that the contiguous ragged array representation is 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>scale_factor</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a>, and <a href="#packed-data">Section 8.1, "Packed Data"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">If present for a variable, the data are to be multiplied by this factor after the data are read by an application.
 See also the <strong><code>add_offset</code></strong> attribute.
@@ -6798,7 +6805,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>standard_name</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#standard-name">Section 3.3, "Standard Name"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A standard name that references a description of a variable"s content in the standard name table.</p></td>
 </tr>
@@ -6812,28 +6819,28 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>units</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BI</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a>, and <a href="#units">Section 3.1, "Units"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Units of a variable"s content.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>valid_max</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Largest valid value of a variable.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>valid_min</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Smallest valid value of a variable.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>valid_range</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">C, D</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C, D, BO</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, "Attribute Conventions"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Smallest and largest valid values of a variable.</p></td>
 </tr>
@@ -11950,6 +11957,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <p><a href="https://github.com/cf-convention/cf-conventions/pull/408">Pull request #408</a>: Deleted a sentence on "rotated Mercator" under <code>Oblique Mercator</code> grid mapping in Appendix F</p>
 </li>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/265">Issue #265</a>: Clarification of the requirements on bounds variable attributes</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/260">Issue #260</a>: Clarify use of dimensionless units</p>
 </li>
 <li>
@@ -12478,7 +12488,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.11 draft<br>
-Last updated 2023-11-27 13:05:49 UTC
+Last updated 2023-11-27 13:43:25 UTC
 </div>
 </div>
 </body>
