@@ -57,7 +57,7 @@ jobs:
       with:
         shellcommand: 'asciidoctor --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) cf-conventions.adoc -D conventions_build; cp -r images conventions_build'
     # Patch the cfconventions.org link
-    - run: sed -i 's+https://cfconventions.org+<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>+' ./conventions_build/cf-conventions.html
+    - run: sed -E -i 's+(https://cfconventions.org)+<a href="\1" target="_blank">\1</a>+' ./conventions_build/cf-conventions.html
     # Build cf-conventions.pdf using the Analog-inc asciidoctor-action
     - name: Build cf-conventions.pdf
       uses: Analog-inc/asciidoctor-action@v1.2
