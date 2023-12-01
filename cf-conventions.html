@@ -470,7 +470,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.11 draft,</span>
-<span id="revdate">&#160;&#160;28&#160;November,&#160;2023&#160;15:35:21Z</span>
+<span id="revdate">&#160;&#160;01&#160;December,&#160;2023&#160;07:30:03Z</span>
 <br><span id="revremark">See https://cfconventions.org for further information</span>
 </div>
 </div>
@@ -5672,9 +5672,16 @@ That bounds are computed only once ensures that the reconstituted bounds are con
 </div>
 <div id="compressing_one_dimensional" class="paragraph">
 <p><strong>Compressing one-dimensional coordinate bounds</strong><br>
-In the one-dimensional case, a coordinate point at index <code>i</code> in the interpolated dimension will be bounded by the two bounds<br>
-<code>B0 = (n0) = (i); B1 = (n1) = (i+1)</code><br>
-where <code>n</code> is the bound index in the interpolated bound dimension.</p>
+In the one-dimensional case, a coordinate point at index <code>i</code> in the interpolated dimension will be bounded by the two bounds:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>B0 = (n0) = (i)
+B1 = (n1) = (i+1)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>n</code> is the bound index in the interpolated bound dimension.</p>
 </div>
 <div class="paragraph">
 <p>For one-dimensional bound interpolation, an interpolation subarea is defined by two bounds tie points.
@@ -5682,10 +5689,18 @@ The full set of bounds tie points is formed by appending, for each continuous ar
 </div>
 <div id="compressing_two_dimensional" class="paragraph">
 <p><strong>Compressing two-dimensional coordinate bounds</strong><br>
-In the two-dimensional case, a coordinate point at indices <code>(j, i)</code> in the interpolated dimension will be bounded by the four bounds<br>
-<code>B0 = (n0, m0) = (j, i); B1 = (n1, m1) = (j, i+1)</code><br>
-<code>B3 = (n3, m3) = (j+1, i); B2 = (n2, m2) = (j+1, i+1)</code><br>
-where <code>(n, m)</code> are the bounds point indices in the interpolated bound dimensions.</p>
+In the two-dimensional case, a coordinate point at indices <code>(j, i)</code> in the interpolated dimension will be bounded by the four bounds:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>B0 = (n0, m0) = (j, i)
+B1 = (n1, m1) = (j, i+1)
+B3 = (n3, m3) = (j+1, i)
+B2 = (n2, m2) = (j+1, i+1)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>(n, m)</code> are the bounds point indices in the interpolated bound dimensions.</p>
 </div>
 <div class="paragraph">
 <p>For two-dimensional bound interpolation, an interpolation subarea is defined by four bounds tie points.
@@ -5695,7 +5710,7 @@ The full set of bounds tie points is formed by appending, for each continuous ar
 <p><strong>Bounds Tie Point Attribute and Bounds Tie Point Variable</strong><br>
 A <strong><code>bounds_tie_points</code></strong> attribute must be defined for each tie point coordinate variable corresponding to reconstituted coordinates with cell boundaries.
 It is a single word of the form <em>“bounds_tie_point_variable”</em> that identifies a bounds tie point variable, containing a bounds tie point coordinate value for each tie point stored in its tie point coordinate variable, and therefore the bounds tie point variable has the same set of dimensions as its tie point coordinate variable.
-An example of the usage of the <strong><code>bounds_tie_points</code></strong> is shown in <a href="#example_interpolation_of_cell_boundaries">[example_interpolation_of_cell_boundaries]</a>.
+An example of the usage of the <strong><code>bounds_tie_points</code></strong> is shown in <a href="#example-interpolation-of-cell-boundaries">Interpolation of 2D Cell Boundaries corresponding to [figure_interpolation_of_cell_boundaries]</a>.
 Since a bounds tie point variable is considered to be part of a tie point coordinate variable’s metadata, it is not necessary to provide it with attributes such as long_name and units, following the same rules as for the bounds of an uncompressed coordinate variable, see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>.</p>
 </div>
 <div class="paragraph">
@@ -11086,10 +11101,13 @@ Equivalently, the interpolation method named <code>quadratic</code> provides qua
 </div>
 <div class="paragraph">
 <p>For convenience, an interpolation argument <code>s</code> is introduced, calculated as a function of the index in the target domain of the coordinate value to be reconstituted.
-In the case of one-dimensional interpolation the variable is computed as</p>
+In the case of one-dimensional interpolation the variable is computed as:</p>
 </div>
-<div class="paragraph">
-<p><code>s = s(ia, ib, i) = (i - ia)/(ib - ia)</code></p>
+<div class="listingblock">
+<div class="content">
+<pre>s = s(ia, ib, i)
+  = (i - ia)/(ib - ia)</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>where <code>ia</code> and <code>ib</code> are the indices in the target domain of the tie points <code>A</code> and <code>B</code> and <code>i</code> is the index in the target domain of the coordinate value to be reconstituted.</p>
@@ -11099,11 +11117,15 @@ In the case of one-dimensional interpolation the variable is computed as</p>
 For example, if <code>ia = 100</code> and <code>ib = 110</code> and the index in the target domain of the coordinate value to be reconstituted is <code>i = 105</code>, then <code>s = (105 - 100)/(110 - 100) = 0.5</code>.</p>
 </div>
 <div class="paragraph">
-<p>In the case of two-dimensional interpolation, the interpolation arguments are similarly computed as</p>
+<p>In the case of two-dimensional interpolation, the interpolation arguments are similarly computed as:</p>
 </div>
-<div class="paragraph">
-<p><code>s1 = s(ia1, ib1, i1) = (i1 - ia1)/(ib1 - ia1)</code> <br>
-<code>s2 = s(ia2, ic2, i2) = (i2 - ia2)/(ic2 - ia2)</code></p>
+<div class="listingblock">
+<div class="content">
+<pre>s1 = s(ia1, ib1, i1)
+   = (i1 - ia1)/(ib1 - ia1)
+s2 = s(ia2, ic2, i2)
+   = (i2 - ia2)/(ic2 - ia2)</pre>
+</div>
 </div>
 <div class="paragraph">
 <p>where <code>ia1</code> and <code>ib1</code> are the first dimension indices in the target domain of the tie points <code>A</code> and <code>B</code> respectively, <code>ia2</code> and <code>ic2</code> are the second dimension indices in the target domain of the tie points <code>A</code> and <code>C</code> respectively and the indices <code>i1</code> and <code>i2</code> are the first and second dimension indices respectively in the target domain of the coordinate value to be reconstituted.</p>
@@ -11121,7 +11143,7 @@ See also description in <a href="#compression-by-coordinate-subsampling-tie-poin
 <div class="content">
 <img src="images/ci_1d_interpolation_subarea.svg" alt="ci 1d interpolation subarea" width="100%">
 </div>
-<div class="title">Figure J.1. One-dimensional interpolation subareas, one including and one excluding tie point A.</div>
+<div class="title">Figure J.1. One-dimensional interpolation subareas, one including and one excluding tie point <code>A</code>.</div>
 </div>
 <div class="paragraph">
 <p>For two-dimensional interpolation, an interpolation subarea is defined by four tie points, one at each corner of a rectangular area aligned with the domain axes, see <a href="#interpolation_subarea_2d">Figure J.2</a>.</p>
@@ -11149,7 +11171,7 @@ See also description in <a href="#compression-by-coordinate-subsampling-tie-poin
 </div>
 <div class="paragraph">
 <p>For two-dimensional interpolation, <code>i1</code> and <code>i2</code> are indices in the interpolated dimensions, <code>tpi1</code> and <code>tpi2</code> are indices in the subsampled dimensions and <code>is1</code> and <code>is2</code> are indices in the interpolation subarea dimensions.
-Dimension 1 is the dimension with index values increasing from tie point A to tie point B, dimension 2 is the dimension with index values increasing from tie point A to tie point C.</p>
+Dimension 1 is the dimension with index values increasing from tie point <code>A</code> to tie point <code>B</code>, dimension 2 is the dimension with index values increasing from tie point <code>A</code> to tie point <code>C</code>.</p>
 </div>
 <div class="paragraph">
 <p>Note that, for simplicity of notation, the descriptions of the interpolation methods in most places leave out the indices of tie point related variables and refer to these with <code>a</code> and <code>b</code> in the one-dimensional case and with <code>a</code>, <code>b</code>, <code>c</code> and <code>d</code> in the two-dimensional case.
@@ -11174,12 +11196,12 @@ In the two-dimensional case, <code>a = tp(tpi2, tpi1)</code>, <code>b = tp(tpi2,
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sqrt</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Square Root</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s = sqrt(t)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>s = sqrt(t)</code><br></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>atan2</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Inverse Tangent of y/x</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = atan2(y, x)</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Inverse Tangent of <code>y/x</code><br></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>a = atan2(y, x)</code><br></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>fll2v</code></p></td>
@@ -11225,7 +11247,7 @@ In the two-dimensional case, <code>a = tp(tpi2, tpi1)</code>, <code>b = tp(tpi2,
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>fdot</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Vector Dot Product</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d = fdot(va, vb) = va.x*vb.x + va.y*vb.y + va.z*vb.z</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>d = fdot(va, vb) = va.x*vb.x + va.y*vb.y + va.z*vb.z</code><br></p></td>
 </tr>
 </tbody>
 </table>
@@ -11235,294 +11257,473 @@ In the two-dimensional case, <code>a = tp(tpi2, tpi1)</code>, <code>b = tp(tpi2,
 <h3 id="interpolation-methods"><a class="anchor" href="#interpolation-methods"></a>Interpolation Methods</h3>
 <div class="sect3">
 <h4 id="_linear_interpolation"><a class="anchor" href="#_linear_interpolation"></a>Linear Interpolation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 28.5714%;">
-<col style="width: 71.4286%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>interpolation_name = "linear"</code></strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">General purpose one-dimensional linear interpolation method for one or more coordinates</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interpolation Parameter terms</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Compression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Uncompression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The coordinate value <code>u(i)</code> at index <code>i</code> between tie points <code>A</code> and <code>B</code> is calculated from:  <br>
- <code>u(i) = fl(ua, ub, s(i)) = ua + s*(ub-ua)</code>;<br>
-where <code>ua</code> and <code>ub</code> are the coordinate values at tie points <code>A</code> and <code>B</code> respectively.</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p><strong>Name</strong><br>
+<strong><code>interpolation_name = "linear"</code></strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Description</strong><br>
+General purpose one-dimensional linear interpolation method for one or more coordinates</p>
+</div>
+<div class="paragraph">
+<p><strong>Interpolation parameter terms</strong><br>
+None.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate compression calculations</strong><br>
+None.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate uncompression calculations</strong><br>
+The coordinate value <code>u(i)</code> at index <code>i</code> between tie points <code>A</code> and <code>B</code> is calculated from:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>u(i) = fl(ua, ub, s(i))
+     = ua + s*(ub-ua)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>ua</code> and <code>ub</code> are the coordinate values at tie points <code>A</code> and <code>B</code> respectively.</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_bilinear_interpolation"><a class="anchor" href="#_bilinear_interpolation"></a>Bilinear Interpolation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 28.5714%;">
-<col style="width: 71.4286%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>interpolation_name = "bi_linear"</code></strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">General purpose two-dimensional linear interpolation method for one or more coordinates</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interpolation Parameter terms</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Compression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">None</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Uncompression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The interpolation function fl() defined for linear interpolation above is first applied twice in the interpolated dimension 2, once between tie points <code>A</code> and <code>C</code> and once between tie points <code>B</code> and <code>D</code>.
-It is then applied once in the interpolated dimension 1, between the two resulting coordinate points, yielding the interpolated coordinate value <code>u(i2, i1)</code>: <br>
-<code>uac = fl(ua, uc, s(ia2, ic2, i2))</code>;<br>
-<code>ubd = fl(ub, ud, s(ia2, ic2, i2))</code>;<br>
-<code>u(i2, i1) = fl(uac, ubd, s(ia1, ib1, i1))</code>;</p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p><strong>Name</strong><br>
+<strong><code>interpolation_name = "bi_linear"</code></strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Description</strong><br>
+General purpose two-dimensional linear interpolation method for one or more coordinates.</p>
+</div>
+<div class="paragraph">
+<p><strong>Interpolation parameter terms</strong><br>
+None.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate compression calculations</strong><br>
+None.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate uncompression calculations</strong><br>
+The interpolation function fl() defined for linear interpolation above is first applied twice in the interpolated dimension 2, once between tie points <code>A</code> and <code>C</code> and once between tie points <code>B</code> and <code>D</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is then applied once in the interpolated dimension 1, between the two resulting coordinate points, yielding the interpolated coordinate value <code>u(i2, i1)</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>uac       = fl(ua, uc, s(ia2, ic2, i2))
+ubd       = fl(ub, ud, s(ia2, ic2, i2))
+u(i2, i1) = fl(uac, ubd, s(ia1, ib1, i1))</pre>
+</div>
+</div>
 </div>
 <div class="sect3">
 <h4 id="quadratic"><a class="anchor" href="#quadratic"></a>Quadratic Interpolation</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 28.5714%;">
-<col style="width: 71.4286%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>interpolation_name = "quadratic"</code></strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">General purpose one-dimensional quadratic interpolation method for one coordinate.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interpolation Parameter terms</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Optionally the term <code>w</code>, specifying a numerical variable spanning the interpolation subarea dimension.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Compression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The expression<br>
-<code>w = fw(ua, ub, u(i), s(i)) = (u - (1 - s) * ua - s * ub)/(4 * (1 - s) * s)</code><br>
-enables the creator of the dataset to calculate the coefficient <code>w</code> from the coordinate values <code>ua</code> and <code>ub</code> at tie points <code>A</code> and <code>B</code> respectively, and the coordinate value <code>u(i)</code> at index <code>i</code> between the tie points <code>A</code> and <code>B</code>.
-If the number of points in the interpolation subarea <code>(ib - ia + 1)</code> is odd, then the data point at index <code>i = (ib + ia)/2</code> shall be selected for this calculation, otherwise the data point at index <code>i = (ib + ia - 1)/2</code> shall be selected.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Uncompression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The coordinate value <code>u(i)</code> at index <code>i</code> between tie points <code>A</code> and <code>B</code> is calculated from:  <br>
- <code>u(i) = fq(ua, ub, w, s(i)) = ua + s * (ub - ua + 4 * w * (1 - s))</code>;<br>
-where <code>ua</code> and <code>ub</code> are the coordinate values at tie points <code>A</code> and <code>B</code> respectively and the coefficient <code>w</code> is available as a term in the <code>interpolation_parameters</code>, or otherwise defaults to <code>0.0</code>.<br></p></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p><strong>Name</strong><br>
+<strong><code>interpolation_name = "quadratic"</code></strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Description</strong><br>
+General purpose one-dimensional quadratic interpolation method for one coordinate.</p>
+</div>
+<div class="paragraph">
+<p><strong>Interpolation parameter terms</strong><br>
+Optionally the term <code>w</code>, specifying a numerical variable spanning the interpolation subarea dimension.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate compression calculations</strong><br>
+The expression</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>w = fw(ua, ub, u(i), s(i))
+  = (u - (1 - s) * ua - s * ub)/(4 * (1 - s) * s)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>enables the creator of the dataset to calculate the coefficient <code>w</code> from the coordinate values <code>ua</code> and <code>ub</code> at tie points <code>A</code> and <code>B</code> respectively, and the coordinate value <code>u(i)</code> at index <code>i</code> between the tie points <code>A</code> and <code>B</code>.
+If the number of points in the interpolation subarea <code>(ib - ia + 1)</code> is odd, then the data point at index <code>i = (ib + ia)/2</code> shall be selected for this calculation, otherwise the data point at index <code>i = (ib + ia - 1)/2</code> shall be selected.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate uncompression calculations</strong><br>
+The coordinate value <code>u(i)</code> at index <code>i</code> between tie points <code>A</code> and <code>B</code> is calculated from:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>u(i) = fq(ua, ub, w, s(i))
+     = ua + s * (ub - ua + 4 * w * (1 - s))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>ua</code> and <code>ub</code> are the coordinate values at tie points <code>A</code> and <code>B</code> respectively and the coefficient <code>w</code> is available as a term in the <code>interpolation_parameters</code>, or otherwise defaults to <code>0.0</code>.</p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="quadratic_geo"><a class="anchor" href="#quadratic_geo"></a>Quadratic Interpolation of Geographic Coordinates Latitude and Longitude</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 28.5714%;">
-<col style="width: 71.4286%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>interpolation_name = "quadratic_latitude_longitude"</code></strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A one-dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used for remote sensing products with geographic coordinates on the reference ellipsoid.<br></p>
-<p class="tableblock">Requires a pair of latitude and longitude tie point variables, as defined unambiguously in <a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>.
+<div class="paragraph">
+<p><strong>Name</strong><br>
+<strong><code>interpolation_name = "quadratic_latitude_longitude"</code></strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Description</strong><br>
+A one-dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used for remote sensing products with geographic coordinates on the reference ellipsoid.</p>
+</div>
+<div class="paragraph">
+<p>Requires a pair of latitude and longitude tie point variables, as defined unambiguously in <a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>.
 For each interpolation subarea, none of the tie points defining the interpolation subarea are permitted to coincide.</p>
-<p class="tableblock">By default, interpolation is performed directly in the latitude and longitude coordinates, but may be performed in three-dimensional cartesian coordinates where required for achieving the desired accuracy.
+</div>
+<div class="paragraph">
+<p>By default, interpolation is performed directly in the latitude and longitude coordinates, but may be performed in three-dimensional cartesian coordinates where required for achieving the desired accuracy.
 This must be indicated by setting the <code>location_use_3d_cartesian</code> flag within the interpolation parameter <code>interpolation_subarea_flags</code> for each interpolation subarea where interpolation in three-dimensional cartesian coordinates is required.</p>
-<p class="tableblock">The quadratic interpolation coefficients <code>cea = (ce, ca)</code>, stored as interpolation parameters in the product, describe a point <code>P</code> between the tie points <code>A</code> and <code>B</code>, which is equivalent of an additional tie point in the sense that the method will accurately reconstitute the point <code>P</code> in the same way as it accurately reconstitutes the tie points <code>A</code> and <code>B</code>.
+</div>
+<div class="paragraph">
+<p>The quadratic interpolation coefficients <code>cea = (ce, ca)</code>, stored as interpolation parameters in the product, describe a point <code>P</code> between the tie points <code>A</code> and <code>B</code>, which is equivalent of an additional tie point in the sense that the method will accurately reconstitute the point <code>P</code> in the same way as it accurately reconstitutes the tie points <code>A</code> and <code>B</code>.
 See <a href="#quadratic1">Figure J.3</a> and <a href="#quadratic2">Figure J.4</a>.</p>
-<p class="tableblock">Although equivalent to a tie point, the coefficients <code>ce</code> and <code>ca</code> have two advantages over tie points.
+</div>
+<div class="paragraph">
+<p>Although equivalent to a tie point, the coefficients <code>ce</code> and <code>ca</code> have two advantages over tie points.
 Firstly, they can often be stored as a lower precision floating point number compared to the tie points, as <code>ce</code> and <code>ca</code> only describes the position of <code>P</code> relative to the midpoint <code>M</code> between the tie points <code>A</code> and <code>B</code>.
 Secondly, if any of <code>ce</code> and <code>ca</code> do not contribute significantly to the accuracy of the reconstituted points, it can be left out of the data set and its value will default to zero during uncompression.</p>
-<p class="tableblock">The coefficients may be represented in three different ways:</p>
-<p class="tableblock">For storage in the dataset as the non-dimensional coefficients <code>cea = (ce, ca)</code>, referred to as the parametric representation.
+</div>
+<div class="paragraph">
+<p>The coefficients may be represented in three different ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>For storage in the dataset as the non-dimensional coefficients <code>cea = (ce, ca)</code>, referred to as the parametric representation.
 The component <code>ce</code> is the offset projected on the line from tie point <code>B</code> to tie point <code>A</code> and expressed as a fraction of the distance between <code>A</code> and <code>B</code>.
-The component <code>ca</code> is the offset projected on the line perpendicular to the line from tie point <code>B</code> to tie point <code>A</code> and perpendicular to the plane spanned by <code>va</code> and <code>vb</code>, the vector representations of the two tie points, and expressed as a fraction of the length of <code>A x B</code>.<br></p>
-<p class="tableblock">For interpolation in three-dimensional cartesian coordinates as the coefficients <code>cv = (cv.x, cv.y, cv.z)</code>, expressing the offset components along the three-dimensional cartesian axes X, Y and Z respectively.</p>
-<p class="tableblock">For interpolation in geographic coordinates latitude and longitude as the coefficients <code>cll = (cll.lat, cll.lon)</code>, expressing the offset components along the longitude and latitude directions respectively.</p>
-<p class="tableblock">The functions <code>fq()</code> and <code>fw()</code> referenced in the following are defined in <a href="#quadratic">Quadratic Interpolation</a>.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interpolation Parameter terms</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Optionally, any subset of terms <code>ce, ca</code>, each specifying a numerical variable spanning the interpolation subarea dimension.<br></p>
-<p class="tableblock">The mandatory term <code>interpolation_subarea_flags</code>, specifying a flag variable spanning the interpolation subarea dimension and including <code>location_use_3d_cartesian</code> in the <code>flag_meanings</code> attribute.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Compression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">First calculate the tie point vector representations from the tie point latitude-longitude representations<br>
-<code>va = fll2v(lla);  vb = fll2v(llb);</code><br>
-Then calculate the three-dimensional cartesian representation of the interpolation coefficients from the tie points <code>va</code> and <code>vb</code> as well as the point <code>vp(i)</code> at index <code>i</code> between the tie points <code>A</code> and <code>B</code>.
-If the number of points in an interpolation subarea <code>(ib - ia + 1)</code> is odd, then the data point at index <code>i = (ib + ia)/2</code> shall be selected for this calculation, otherwise the data point at index <code>i = (ib + ia - 1)/2</code> shall be selected.<br></p>
-<p class="tableblock">The three-dimensional cartesian interpolation coefficients are found from<br>
-<code>cv = fcv(va, vb, vp(i), s(i)) = (fw(va.x, vb.x, vp(i).x, s(i)), fw(va.y, vb.y, vp(i).y, s(i)), fw(va.z, vb.z, vp(i).z, s(i))).</code><br>
-Finally, for storage in the dataset, convert the coefficients to the parametric representation<br>
-<code>cea(is) = (ce(is), ca(is)) = fcv2cea(va, vb, cv) = (fdot(cv, fminus(va, vb))/gsqr, fdot(cv, fcross(va, vb))/(rsqr*gsqr));</code><br>
-where <code>vr = fmultiply(0.5, fplus(va, vb))</code>, <code>rsqr = fdot(vr, vr)</code>, <code>vg = fminus(va, vb)</code> and <code>gsqr = fdot(vg, vg).</code><br>
-The interpolation parameter term <code>interpolation_subarea_flags(is)</code> shall have the flag <code>location_use_3d_cartesian</code> set if the interpolation subarea intersects the <code>longitude = 180.0</code> or if the interpolation subarea extends into <code>latitude &gt; latitude_limit</code> or <code>latitude &lt; -latitude_limit</code>.
+The component <code>ca</code> is the offset projected on the line perpendicular to the line from tie point <code>B</code> to tie point <code>A</code> and perpendicular to the plane spanned by <code>va</code> and <code>vb</code>, the vector representations of the two tie points, and expressed as a fraction of the length of <code>A x B</code>.</p>
+</li>
+<li>
+<p>For interpolation in three-dimensional cartesian coordinates as the coefficients <code>cv = (cv.x, cv.y, cv.z)</code>, expressing the offset components along the three-dimensional cartesian axes X, Y and Z respectively.</p>
+</li>
+<li>
+<p>For interpolation in geographic coordinates latitude and longitude as the coefficients <code>cll = (cll.lat, cll.lon)</code>, expressing the offset components along the longitude and latitude directions respectively.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The functions <code>fq()</code> and <code>fw()</code> referenced in the following are defined in <a href="#quadratic">Quadratic Interpolation</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Interpolation parameter terms</strong><br>
+Optionally, any subset of terms <code>ce, ca</code>, each specifying a numerical variable spanning the interpolation subarea dimension.</p>
+</div>
+<div class="paragraph">
+<p>The mandatory term <code>interpolation_subarea_flags</code>, specifying a flag variable spanning the interpolation subarea dimension and including <code>location_use_3d_cartesian</code> in the <code>flag_meanings</code> attribute.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate compression calculations</strong><br>
+First calculate the tie point vector representations from the tie point latitude-longitude representations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>va = fll2v(lla)
+vb = fll2v(llb)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then calculate the three-dimensional cartesian representation of the interpolation coefficients from the tie points <code>va</code> and <code>vb</code> as well as the point <code>vp(i)</code> at index <code>i</code> between the tie points <code>A</code> and <code>B</code>.
+If the number of points in an interpolation subarea <code>(ib - ia + 1)</code> is odd, then the data point at index <code>i = (ib + ia)/2</code> shall be selected for this calculation, otherwise the data point at index <code>i = (ib + ia - 1)/2</code> shall be selected.</p>
+</div>
+<div class="paragraph">
+<p>The three-dimensional cartesian interpolation coefficients are found from:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>cv = fcv(va, vb, vp(i), s(i))
+   = (fw(va.x, vb.x, vp(i).x, s(i)),
+      fw(va.y, vb.y, vp(i).y, s(i)),
+      fw(va.z, vb.z, vp(i).z, s(i)))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, for storage in the dataset, convert the coefficients to the parametric representation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>cea(is) = (ce(is), ca(is))
+        = fcv2cea(va, vb, cv)
+        = (fdot(cv, fminus(va, vb))/gsqr,
+           fdot(cv, fcross(va, vb))/(rsqr*gsqr))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>vr   = fmultiply(0.5, fplus(va, vb))
+rsqr = fdot(vr, vr)
+vg   = fminus(va, vb)
+gsqr = fdot(vg, vg)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The interpolation parameter term <code>interpolation_subarea_flags(is)</code> shall have the flag <code>location_use_3d_cartesian</code> set if the interpolation subarea intersects the <code>longitude = 180.0</code> or if the interpolation subarea extends into <code>latitude &gt; latitude_limit</code> or <code>latitude &lt; -latitude_limit</code>.
 The value of <code>latitude_limit</code> is set by the data set creator and defines the high latitude areas where interpolation in three-dimensional cartesian coordinates is required for reasons of coordinate reconstitution accuracy.
-The <code>latitude_limit</code> is used solely for setting the flag <code>location_use_3d_cartesian</code>, and is not required in a compressed dataset.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Uncompression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">First calculate the tie point vector representations from the tie point latitude-longitude representations<br>
-<code>va = fll2v(lla);  vb = fll2v(llb);</code><br>
-Then calculate the three-dimensional cartesian representation of the interpolation coefficients from the parametric representation stored in the dataset using<br>
-<code>cv = fcea2cv(va, vb, cea(is)) = fplus(fmultiply(ce, fminus(va, vb)), fmultiply(ca, fcross(va, vb)), fmultiply(cr, vr));</code><br>
-where<br>
-<code>vr = fmultiply(0.5, fplus(va, vb))</code>;<br>
-<code>rsqr = fdot(vr, vr);</code><br>
-<code>cr = sqrt(1 - ce(is)*ce(is) - ca(is)*ca(is)) - sqrt(rsqr).</code><br>
-If the flag <code>location_use_3d_cartesian</code> of the interpolation parameter term <code>interpolation_subarea_flags(is2, is1)</code> is set, use the following expression to reconstitute any point <code>llp(i)</code> between the tie points <code>A</code> and <code>B</code> using interpolation in three-dimensional cartesian coordinates<br>
-<code>vp(i) = fqv(va, vb, cv, s(i)) = (fq(va.x, vb.x, cv.x, s(i)), fq(va.y, vb.y, cv.y, s(i)), fq(va.z, vb.z, cv.z, s(i)));</code><br>
-<code>llp(i) = fv2ll(vp(i)).</code><br>
-Otherwise, first calculate latitude-longitude representation of the interpolation coefficients<br>
-<code>cll = fcll(lla, llb, llab) = (fw(lla.lat, llb.lat, llab.lat, 0.5), fw(lla.lon, llb.lon, llab.lon, 0.5));</code><br>
-where <code>llab = fv2ll(fqv(va, vb, cv, 0.5))</code>.<br>
-Then use the following expression to reconstitute any point <code>llp(i)</code> between the tie points <code>A</code> and <code>B</code> using interpolation in latitude-longitude coordinates<br>
-<code>llp(i) = (llp(i).lat, llp(i).lon) = fqll(lla, llb, cll, s(i)) = (fq(lla.lat, llb.lat, cll.lat, s(i)), fq(lla.lon, llb.lon, cll.lon, s(i)))</code>.<br></p></td>
-</tr>
-</tbody>
-</table>
+The <code>latitude_limit</code> is used solely for setting the flag <code>location_use_3d_cartesian</code>, and is not required in a compressed dataset.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate uncompression calculations</strong><br>
+First calculate the tie point vector representations from the tie point latitude-longitude representations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>va = fll2v(lla)
+vb = fll2v(llb)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then calculate the three-dimensional cartesian representation of the interpolation coefficients from the parametric representation stored in the dataset using:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>cv = fcea2cv(va, vb, cea(is))
+   = fplus(fmultiply(ce, fminus(va, vb)),
+           fmultiply(ca, fcross(va, vb)),
+           fmultiply(cr, vr))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>vr   = fmultiply(0.5, fplus(va, vb))
+rsqr = fdot(vr, vr)
+cr   = sqrt(1 - ce(is)*ce(is) - ca(is)*ca(is)) - sqrt(rsqr)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the flag <code>location_use_3d_cartesian</code> of the interpolation parameter term <code>interpolation_subarea_flags(is2, is1)</code> is set, use the following expression to reconstitute any point <code>llp(i)</code> between the tie points <code>A</code> and <code>B</code> using interpolation in three-dimensional cartesian coordinates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>vp(i)  = fqv(va, vb, cv, s(i))
+       = (fq(va.x, vb.x, cv.x, s(i)),
+          fq(va.y, vb.y, cv.y, s(i)),
+          fq(va.z, vb.z, cv.z, s(i)))
+llp(i) = fv2ll(vp(i))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Otherwise, first calculate latitude-longitude representation of the interpolation coefficients:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>cll = fcll(lla, llb, llab)
+    = (fw(lla.lat, llb.lat, llab.lat, 0.5),
+       fw(lla.lon, llb.lon, llab.lon, 0.5))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>llab = fv2ll(fqv(va, vb, cv, 0.5))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then use the following expression to reconstitute any point <code>llp(i)</code> between the tie points <code>A</code> and <code>B</code> using interpolation in latitude-longitude coordinates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>llp(i) = (llp(i).lat, llp(i).lon)
+       = fqll(lla, llb, cll, s(i))
+       = (fq(lla.lat, llb.lat, cll.lat, s(i)),
+          fq(lla.lon, llb.lon, cll.lon, s(i)))</pre>
+</div>
+</div>
 <div id="quadratic1" class="imageblock text-center text-center">
 <div class="content">
 <img src="images/ci_quadratic1.svg" alt="ci quadratic1" width="100%">
 </div>
-<div class="title">Figure J.3. With the expansion coefficient ce = 0 and the alignment coefficient ca = 0, the method reconstitutes the points at regular intervals along a great circle between tie points A and B.</div>
+<div class="title">Figure J.3. With the expansion coefficient <code>ce = 0</code> and the alignment coefficient <code>ca = 0</code>, the method reconstitutes the points at regular intervals along a great circle between tie points <code>A</code> and <code>B</code>.</div>
 </div>
 <div id="quadratic2" class="imageblock text-center text-center">
 <div class="content">
 <img src="images/ci_quadratic2.svg" alt="ci quadratic2" width="100%">
 </div>
-<div class="title">Figure J.4. With the expansion coefficient ce &gt; 0 and the alignment coefficient ca &gt; 0, the method reconstitutes the points at intervals of expanding size (ce) along an arc with an alignment offset (ca) from the great circle between tie points A and B.</div>
+<div class="title">Figure J.4. With the expansion coefficient <code>ce &gt; 0</code> and the alignment coefficient <code>ca &gt; 0</code>, the method reconstitutes the points at intervals of expanding size (<code>ce</code>) along an arc with an alignment offset (<code>ca</code>) from the great circle between tie points <code>A</code> and <code>B</code>.</div>
 </div>
 </div>
 <div class="sect3">
 <h4 id="bi_quadratic_geo"><a class="anchor" href="#bi_quadratic_geo"></a>Biquadratic Interpolation of Geographic Coordinates Latitude and Longitude</h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 28.5714%;">
-<col style="width: 71.4286%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>interpolation_name = "bi_quadratic_latitude_longitude"</code></strong></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Description</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">A two-dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used for remote sensing products with geographic coordinates on the reference ellipsoid.</p>
-<p class="tableblock">Requires a pair of latitude and longitude tie point variables, as defined unambiguously in <a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>.
+<div class="paragraph">
+<p><strong>Name</strong><br>
+<strong><code>interpolation_name = "bi_quadratic_latitude_longitude"</code></strong></p>
+</div>
+<div class="paragraph">
+<p><strong>Description</strong><br>
+A two-dimensional quadratic method for interpolation of the geographic coordinates latitude and longitude, typically used for remote sensing products with geographic coordinates on the reference ellipsoid.</p>
+</div>
+<div class="paragraph">
+<p>Requires a pair of latitude and longitude tie point variables, as defined unambiguously in <a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>.
 For each interpolation subarea, none of the tie points defining the interpolation subarea are permitted to coincide.</p>
-<p class="tableblock">The functions <code>fcv()</code>, <code>fcv2cea()</code>, <code>fcea2cv()</code>, <code>fcll()</code>, <code>fqv()</code> and <code>fqll()</code> referenced in the following are defined in <a href="#quadratic_geo">Quadratic Interpolation of Geographic Coordinates Latitude and Longitude</a>.
+</div>
+<div class="paragraph">
+<p>The functions <code>fcv()</code>, <code>fcv2cea()</code>, <code>fcea2cv()</code>, <code>fcll()</code>, <code>fqv()</code> and <code>fqll()</code> referenced in the following are defined in <a href="#quadratic_geo">Quadratic Interpolation of Geographic Coordinates Latitude and Longitude</a>.
 As for that method, interpolation is performed directly in the latitude and longitude coordinates or in three-dimensional cartesian coordinates, where required for achieving the desired accuracy.
 Similarly, it shares the three different representations of the quadratic interpolation coefficients, the parametric representation <code>cea = (ce, ca)</code> for storage in the dataset, <code>cll = (cll.lat, cll.lon)</code> for interpolation in geographic coordinates latitude and longitude and <code>cv = (cv.x, cv.y, cv.z)</code> for interpolation in three-dimensional cartesian coordinates.</p>
-<p class="tableblock">The parametric representation of the interpolation coefficients, stored in the interpolation parameters <code>ce1, ca1, ce2, ca2, ce3</code> and <code>ca3</code>, is equivalent to five additional tie points for the interpolation subarea as shown in <a href="#quadratic3">Figure J.5</a>, which also shows the orientation and indices of the parameters.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interpolation Parameter terms</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Optionally, any subset of terms <code>ce1, ca1</code>, each specifying a numerical variable spanning the subsampled dimension 2 and the interpolation subarea dimension 1;<br>
-Optionally, any subset of terms <code>ce2, ca2</code>, each specifying a numerical variable spanning the interpolation subarea dimension 2 and the subsampled dimension 1;<br>
-Optionally, any subset of terms <code>ce3, ca3</code>, each specifying a numerical variable spanning the interpolation subarea dimension 2 and the interpolation subarea dimension 1;<br></p>
-<p class="tableblock">The mandatory term <code>interpolation_subarea_flags</code>, specifying a flag variable spanning the interpolation subarea dimension 2 and the interpolation subarea dimension 1 and including <code>location_use_3d_cartesian</code> in the <code>flag_meanings</code> attribute.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Compression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">First calculate the tie point vector representations from the tie point latitude-longitude representations<br>
-<code>va = fll2v(lla);  vb = fll2v(llb); vc = fll2v(llc); vd = fll2v(lld).</code><br>
-Then calculate the three-dimensional cartesian representation of the interpolation coefficients sets from the tie points as well as a point <code>vp(i2, i1)</code> between the tie points.
+</div>
+<div class="paragraph">
+<p>The parametric representation of the interpolation coefficients, stored in the interpolation parameters <code>ce1</code>, <code>ca1</code>, <code>ce2</code>, <code>ca2</code>, <code>ce3</code> and <code>ca3</code>, is equivalent to five additional tie points for the interpolation subarea as shown in <a href="#quadratic3">Figure J.5</a>, which also shows the orientation and indices of the parameters.</p>
+</div>
+<div class="paragraph">
+<p><strong>Interpolation parameter terms</strong><br>
+Optionally, any subset of terms <code>ce1</code> and <code>ca1</code>, each specifying a numerical variable spanning the subsampled dimension 2 and the interpolation subarea dimension 1.</p>
+</div>
+<div class="paragraph">
+<p>Optionally, any subset of terms <code>ce2</code> and <code>ca2</code>, each specifying a numerical variable spanning the interpolation subarea dimension 2 and the subsampled dimension 1.</p>
+</div>
+<div class="paragraph">
+<p>Optionally, any subset of terms <code>ce3</code> and <code>ca3</code>, each specifying a numerical variable spanning the interpolation subarea dimension 2 and the interpolation subarea dimension 1.</p>
+</div>
+<div class="paragraph">
+<p>The mandatory term <code>interpolation_subarea_flags</code>, specifying a flag variable spanning the interpolation subarea dimension 2 and the interpolation subarea dimension 1 and including <code>location_use_3d_cartesian</code> in the <code>flag_meanings</code> attribute.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate compression calculations</strong><br>
+First calculate the tie point vector representations from the tie point latitude-longitude representations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>va = fll2v(lla)
+vb = fll2v(llb)
+vc = fll2v(llc)
+vd = fll2v(lld)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then calculate the three-dimensional cartesian representation of the interpolation coefficients sets from the tie points as well as a point <code>vp(i2, i1)</code> between the tie points.
 If the number of points in the first dimension of the interpolation subarea <code>(ib1 - ia1 + 1)</code> is odd, then the data point at index i1 = <code>(ib1 + ia1)/2</code> shall be selected for this calculation, otherwise the data point at index <code>i1 = (ib1 + ia1 - 1)/2</code> shall be selected.
-If the number of points in the second dimension of the interpolation subarea <code>(ic2 - ia2 + 1)</code> is odd, then the data point at index <code>i2 = (ic2 + ica)/2</code> shall be selected for this calculation, otherwise the data point at index <code>i2 = (ic2 + ia2 - 1)/2</code> shall be selected.<br></p>
-<p class="tableblock">Using the selected <code>(i2, i1)</code>, the three-dimensional cartesian interpolation coefficients are found from<br>
-<code>s1 = s(ia1, ib1, i1);</code>
-<code>s2 = s(ia2, ic2, i2);</code><br>
-<code>vac = fll2v(ll(i2, ia1));</code>
-<code>vbd = fll2v(ll(i2, ib1));</code><br>
-<code>cv_ac = fcv(va, vc, vac, s2);</code><br>
-<code>cv_bd = fcv(vb, vd, vbd, s2);</code><br>
-<code>cv_ab = fcv(va, vb, fll2v(ll(ia2, i1)), s1);</code><br>
-<code>cv_cd = fcv(vc, vd, fll2v(ll(ic2, i1)), s1);</code><br>
-<code>cv_zz = fcv(vac, vbd, fll2v(ll(i2, i1)), s1);</code><br>
-<code>vz = fqv(vac, vbd, cv_zz, 0.5);</code><br>
-<code>vab = fqv(va, vb, cv_ab, 0.5);</code><br>
-<code>vcd = fqv(vc, vd, cv_cd, 0.5);</code><br>
-<code>cv_z = fcv(vab, vcd, vz, s2);</code><br>
-Finally, before storing them in the dataset&#8217;s interpolation parameters, convert the coefficients to the parametric representation<br>
-<code>cea1(tpi2, is1)  = fcv2cea(va, vb, cv_ab);</code><br>
-<code>cea1(tpi2+1, is1)  = fcv2cea(vc, vd, cv_cd);</code><br>
-<code>cea2(is2, tpi1)  = fcv2cea(va, vc, cv_ac);</code><br>
-<code>cea2(is2, tpi1+1)  = fcv2cea(vb, vd, cv_bd);</code><br>
-<code>cea3(is2, is1)  = fcv2cea(vab, vcd, cv_z).</code><br>
-The interpolation parameter term <code>interpolation_subarea_flags(is2, is1)</code> shall have the flag <code>location_use_3d_cartesian</code> set if the interpolation subarea intersects the <code>longitude = 180.0</code> or if the interpolation subarea extends into <code>latitude &gt; latitude_limit</code> or <code>latitude &lt; -latitude_limit</code>.
+If the number of points in the second dimension of the interpolation subarea <code>(ic2 - ia2 + 1)</code> is odd, then the data point at index <code>i2 = (ic2 + ica)/2</code> shall be selected for this calculation, otherwise the data point at index <code>i2 = (ic2 + ia2 - 1)/2</code> shall be selected.</p>
+</div>
+<div class="paragraph">
+<p>Using the selected <code>(i2, i1)</code>, the three-dimensional cartesian interpolation coefficients are found from:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>s1    = s(ia1, ib1, i1)
+s2    = s(ia2, ic2, i2)
+vac   = fll2v(ll(i2, ia1))
+vbd   = fll2v(ll(i2, ib1))
+cv_ac = fcv(va, vc, vac, s2)
+cv_bd = fcv(vb, vd, vbd, s2)
+cv_ab = fcv(va, vb, fll2v(ll(ia2, i1)), s1)
+cv_cd = fcv(vc, vd, fll2v(ll(ic2, i1)), s1)
+cv_zz = fcv(vac, vbd, fll2v(ll(i2, i1)), s1)
+vz    = fqv(vac, vbd, cv_zz, 0.5)
+vab   = fqv(va, vb, cv_ab, 0.5)
+vcd   = fqv(vc, vd, cv_cd, 0.5)
+cv_z  = fcv(vab, vcd, vz, s2)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Finally, before storing them in the dataset&#8217;s interpolation parameters, convert the coefficients to the parametric representation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>cea1(tpi2, is1)   = fcv2cea(va, vb, cv_ab)
+cea1(tpi2+1, is1) = fcv2cea(vc, vd, cv_cd)
+cea2(is2, tpi1)   = fcv2cea(va, vc, cv_ac)
+cea2(is2, tpi1+1) = fcv2cea(vb, vd, cv_bd)
+cea3(is2, is1)    = fcv2cea(vab, vcd, cv_z)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The interpolation parameter term <code>interpolation_subarea_flags(is2, is1)</code> shall have the flag <code>location_use_3d_cartesian</code> set if the interpolation subarea intersects the <code>longitude = 180.0</code> or if the interpolation subarea extends into <code>latitude &gt; latitude_limit</code> or <code>latitude &lt; -latitude_limit</code>.
 The value of <code>latitude_limit</code> is set by the data set creator and defines the high latitude areas where interpolation in three-dimensional cartesian coordinates is required for reasons of coordinate reconstitution accuracy.
-The <code>latitude_limit</code> is used solely for setting the flag <code>location_use_3d_cartesian</code>, and is not required in a compressed dataset.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Coordinate Uncompression Calculations</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">First calculate the tie point vector representations from the tie point latitude-longitude representations<br>
-<code>va = fll2v(lla);  vb = fll2v(llb); vc = fll2v(llc); vd = fll2v(lld).</code><br>
-Then calculate the three-dimensional cartesian representation of the interpolation coefficient sets from the parametric representation stored in the dataset<br>
-<code>cv_ac = fcea2cv(va, vc, cea2(is2, tpi1));</code><br>
-<code>cv_bd = fcea2cv(vb, vd, cea2(is2, tpi1 + 1));</code><br>
-<code>vab = fqv(va, vb, fcea2cv(va, vb, cea1(tpi2, is1)), 0.5);</code><br>
-<code>vcd = fqv(vc, vd, fcea2cv(vc, vd,  cea1(tpi2 + 1, is1)), 0.5);</code><br>
-<code>cv_z = fcea2cv(vab, vcd, cea3(is2, is1));</code><br>
-If the flag <code>location_use_3d_cartesian</code> of the interpolation parameter term <code>interpolation_subarea_flags</code> is set, use the following expression to reconstitute any point <code>llp(i2, i1)</code> between the tie points <code>A</code> and <code>B</code> using interpolation in three-dimensional cartesian coordinates<br>
-<code>llp(i2, i1) = fv2ll(fqv(vac, vbd, cv_zz, s(ia1, ib1, i1)));</code><br>
-where<br>
-<code>s2 = s(ia2, ic2, i2);</code><br>
-<code>vac = fqv(va, vc, cv_ac, s2);</code><br>
-<code>vbd = fqv(vb, vd, cv_bd, s2);</code><br>
-<code>vz = fqv(vab, vcd, cv_z, s2);</code><br>
-<code>cv_zz = fcv(vac, vbd, vz, 0.5);</code><br>
-Otherwise, first calculate latitude-longitude representation of the interpolation coefficients<br>
-<code>llc_ac = fcll(lla, llc, fv2ll(fqv(va, vc, cv_ac, 0.5)));</code><br>
-<code>llc_bd = fcll(llb, lld, fv2ll(fqv(vb, vd, cv_bd, 0.5)));</code><br>
-<code>llab = fv2ll(vab);</code><br>
-<code>llcd = fv2ll(vcd);</code><br>
-<code>llc_z = fcll(llab, llcd, fv2ll(fqv(vab, vcd, cv_z, 0.5)));</code><br>
-Then use the following expression to reconstitute any point <code>llp(i2, i1)</code> in the interpolation subarea using interpolation in latitude-longitude coordinates<br>
-<code>llp(i2, i1) = fqll(llac, llbd, cl_zz, s(ia1, ib1, i1));</code><br>
-where<br>
-<code>s2 = s(ia2, ic2, i2);</code><br>
-<code>llac = fqll(lla, llc, llc_ac, s2);</code><br>
-<code>llbd = fqll(llb, lld, llc_bd, s2);</code><br>
-<code>llz = fqll(llab, llcd, llc_z, s2);</code><br>
-<code>cl_zz = fcll(llac, llbd, llz);</code><br></p></td>
-</tr>
-</tbody>
-</table>
+The <code>latitude_limit</code> is used solely for setting the flag <code>location_use_3d_cartesian</code>, and is not required in a compressed dataset.</p>
+</div>
+<div class="paragraph">
+<p><strong>Coordinate uncompression calculations</strong><br>
+First calculate the tie point vector representations from the tie point latitude-longitude representations:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>va = fll2v(lla)
+vb = fll2v(llb)
+vc = fll2v(llc)
+vd = fll2v(lld)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then calculate the three-dimensional cartesian representation of the interpolation coefficient sets from the parametric representation stored in the dataset:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>cv_ac = fcea2cv(va, vc, cea2(is2, tpi1))
+cv_bd = fcea2cv(vb, vd, cea2(is2, tpi1 + 1))
+vab   = fqv(va, vb, fcea2cv(va, vb, cea1(tpi2, is1)), 0.5)
+vcd   = fqv(vc, vd, fcea2cv(vc, vd,  cea1(tpi2 + 1, is1)), 0.5)
+cv_z  = fcea2cv(vab, vcd, cea3(is2, is1))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the flag <code>location_use_3d_cartesian</code> of the interpolation parameter term <code>interpolation_subarea_flags</code> is set, use the following expression to reconstitute any point <code>llp(i2, i1)</code> between the tie points <code>A</code> and <code>B</code> using interpolation in three-dimensional cartesian coordinates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>llp(i2, i1) = fv2ll(fqv(vac, vbd, cv_zz, s(ia1, ib1, i1)))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>s2    = s(ia2, ic2, i2)
+vac   = fqv(va, vc, cv_ac, s2)
+vbd   = fqv(vb, vd, cv_bd, s2)
+vz    = fqv(vab, vcd, cv_z, s2)
+cv_zz = fcv(vac, vbd, vz, 0.5)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Otherwise, first calculate latitude-longitude representation of the interpolation coefficients:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>llc_ac = fcll(lla, llc, fv2ll(fqv(va, vc, cv_ac, 0.5)))
+llc_bd = fcll(llb, lld, fv2ll(fqv(vb, vd, cv_bd, 0.5)))
+llab   = fv2ll(vab)
+llcd   = fv2ll(vcd)
+llc_z  = fcll(llab, llcd, fv2ll(fqv(vab, vcd, cv_z, 0.5)))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then use the following expression to reconstitute any point <code>llp(i2, i1)</code> in the interpolation subarea using interpolation in latitude-longitude coordinates:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>llp(i2, i1) = fqll(llac, llbd, cl_zz, s(ia1, ib1, i1))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>s2    = s(ia2, ic2, i2)
+llac  = fqll(lla, llc, llc_ac, s2)
+llbd  = fqll(llb, lld, llc_bd, s2)
+llz   = fqll(llab, llcd, llc_z, s2)
+cl_zz = fcll(llac, llbd, llz)</pre>
+</div>
+</div>
 <div id="quadratic3" class="imageblock text-center text-center">
 <div class="content">
 <img src="images/ci_quadratic3.svg" alt="ci quadratic3" width="50%">
 </div>
-<div class="title">Figure J.5. The parametric representation of the interpolation coefficients <code>cea = (ce, ca)</code>, stored in the interpolation parameters <code>ce1, ca1, ce2, ca2, ce3</code> and <code>ca3</code>, is equivalent to five additional tie points for the interpolation subarea. Shown with parameter orientation and indices.</div>
+<div class="title">Figure J.5. The parametric representation of the interpolation coefficients <code>cea = (ce, ca)</code>, stored in the interpolation parameters <code>ce1</code>, <code>ca1</code>, <code>ce2</code>, <code>ca2</code>, <code>ce3</code> and <code>ca3</code>, is equivalent to five additional tie points for the interpolation subarea. Shown with parameter orientation and indices.</div>
 </div>
 </div>
 </div>
@@ -11881,6 +12082,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <h3 id="_working_version_most_recent_first"><a class="anchor" href="#_working_version_most_recent_first"></a>Working version (most recent first)</h3>
 <div class="ulist">
 <ul>
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/486">Issue #486</a>: Fix PDF formatting problems and invalid references</p>
+</li>
 <li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/490">Issue #490</a>: Simple correction to Example 6.1.2</p>
 </li>
@@ -12345,7 +12549,7 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <p><a href="https://cfconventions.org/Data/trac.html17.html">Ticket #17</a>: Changes related to removing ambiguity in <a href="#cell-methods">Section 7.3, "Cell Methods"</a>.</p>
 </li>
 <li>
-<p><a href="https://cfconventions.org/Data/trac.html36.html">Ticket #36</a>: Fixed defect related to subsection headings in <a href="#dimensionless-v-coord">[dimensionless-v-coord]</a>.</p>
+<p><a href="https://cfconventions.org/Data/trac.html36.html">Ticket #36</a>: Fixed defect related to subsection headings in <a href="#parametric-v-coord">Appendix D, Parametric Vertical Coordinates</a>.</p>
 </li>
 <li>
 <p><a href="https://cfconventions.org/Data/trac.html35.html">Ticket #35</a>: Fixed defect in wording of <a href="#coordinate-system">Chapter 5, Coordinate Systems and Domain</a>.</p>
@@ -12390,7 +12594,7 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <p>17 January 2008: <a href="#coordinate-types">Chapter 4, Coordinate Types</a>, <a href="#coordinate-system">Chapter 5, Coordinate Systems and Domain</a>: Made changes regarding use of the axis attribute to identify horizontal coordinate variables.</p>
 </li>
 <li>
-<p>17 January 2008: <a href="#preface">[preface]</a>: Changed text to refer to rules of CF governance, and provisional status.</p>
+<p>17 January 2008: Changed text to refer to rules of CF governance, and provisional status.</p>
 </li>
 <li>
 <p>21 March 2006: Added <a href="#atmosphere-natural-log-pressure-coordinate">the section called "Atmosphere natural log pressure coordinate"</a>.</p>
@@ -12491,7 +12695,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.11 draft<br>
-Last updated 2023-11-28 15:35:21 UTC
+Last updated 2023-12-01 07:30:03 UTC
 </div>
 </div>
 </body>
