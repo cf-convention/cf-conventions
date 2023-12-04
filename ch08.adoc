@@ -57,6 +57,7 @@ The list variable has a string attribute **`compress`**, __containing a blank-se
 The presence of this attribute identifies the list variable as such.
 The list, the original dimensions and coordinate variables (including boundary variables), and the compressed variables with all the attributes of the uncompressed variables are written to the netCDF file.
 The uncompressed variables can be reconstituted exactly as they were using this information.
+The list variable must not have an associated boundary variable.
 
 [[horiz-compression-of-three-d-array-ex]]
 [caption="Example 8.1. "]
@@ -566,8 +567,13 @@ For the generation of bounds tie points as part of the process of compressing bo
 
 [[compressing_one_dimensional, "Compressing one-dimensional coordinate bounds"]]
 **Compressing one-dimensional coordinate bounds** +
-In the one-dimensional case, a coordinate point at index `i` in the interpolated dimension will be bounded by the two bounds +
-`B0 = (n0) = (i); B1 = (n1) = (i+1)` +
+In the one-dimensional case, a coordinate point at index `i` in the interpolated dimension will be bounded by the two bounds:
+
+----
+B0 = (n0) = (i)
+B1 = (n1) = (i+1)
+----
+
 where `n` is the bound index in the interpolated bound dimension.
 
 For one-dimensional bound interpolation, an interpolation subarea is defined by two bounds tie points.
@@ -575,9 +581,15 @@ The full set of bounds tie points is formed by appending, for each continuous ar
 
 [[compressing_two_dimensional, "Compressing two-dimensional coordinate bounds"]]
 **Compressing two-dimensional coordinate bounds** +
-In the two-dimensional case, a coordinate point at indices `(j, i)` in the interpolated dimension will be bounded by the four bounds +
-`B0 = (n0, m0) = (j, i); B1 = (n1, m1) = (j, i+1)` +
-`B3 = (n3, m3) = (j+1, i); B2 = (n2, m2) = (j+1, i+1)` +
+In the two-dimensional case, a coordinate point at indices `(j, i)` in the interpolated dimension will be bounded by the four bounds:
+
+----
+B0 = (n0, m0) = (j, i)
+B1 = (n1, m1) = (j, i+1)
+B3 = (n3, m3) = (j+1, i)
+B2 = (n2, m2) = (j+1, i+1)
+----
+
 where `(n, m)` are the bounds point indices in the interpolated bound dimensions.
 
 For two-dimensional bound interpolation, an interpolation subarea is defined by four bounds tie points.
@@ -586,7 +598,7 @@ The full set of bounds tie points is formed by appending, for each continuous ar
 **Bounds Tie Point Attribute and Bounds Tie Point Variable** +
 A **`bounds_tie_points`** attribute must be defined for each tie point coordinate variable corresponding to reconstituted coordinates with cell boundaries.
 It is a single word of the form __“bounds_tie_point_variable”__ that identifies a bounds tie point variable, containing a bounds tie point coordinate value for each tie point stored in its tie point coordinate variable, and therefore the bounds tie point variable has the same set of dimensions as its tie point coordinate variable.
-An example of the usage of the **`bounds_tie_points`** is shown in <<example_interpolation_of_cell_boundaries>>.
+An example of the usage of the **`bounds_tie_points`** is shown in <<example-interpolation-of-cell-boundaries>>.
 Since a bounds tie point variable is considered to be part of a tie point coordinate variable’s metadata, it is not necessary to provide it with attributes such as long_name and units, following the same rules as for the bounds of an uncompressed coordinate variable, see <<cell-boundaries>>.
 
 **Uncompressing coordinate bounds** +

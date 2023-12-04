@@ -33,7 +33,6 @@ on:
   release:
     types:
       - published
-
 jobs:
   # Job to build cf-conventions.html, cf-conventions.pdf
   build_conventions:
@@ -44,20 +43,26 @@ jobs:
     - uses: actions/checkout@v2
     # Create build directory
     - run: mkdir conventions_build
-    - name: Set "final" tag
+    - name: Set draft date-time formatting
+      if: github.event_name != 'release'
+      run: |
+        echo "DATE_FMT=+%d&#160;%B,&#160;%Y&#160;%H:%M:%SZ" >> "$GITHUB_ENV"
+    - name: Set "final" tag and date-time formatting
       if: github.event_name == 'release'
       run: |
-        echo "FINAL_TAG=-a final" >> "$GITHUB_ENV"
+        echo "FINAL_TAG=-a final" >> "$GITHUB_ENV"; echo "DATE_FMT=+%d&#160;%B,&#160;%Y" >> "$GITHUB_ENV"
     # Build cf-conventions.html using the Analog-inc asciidoctor-action
     - name: Build cf-conventions.html
       uses: Analog-inc/asciidoctor-action@v1.2
       with:
-        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} cf-conventions.adoc -D conventions_build; cp -r images conventions_build'
+        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) cf-conventions.adoc -D conventions_build; cp -r images conventions_build'
+    # Patch the cfconventions.org link
+    - run: sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' ./conventions_build/cf-conventions.html
     # Build cf-conventions.pdf using the Analog-inc asciidoctor-action
     - name: Build cf-conventions.pdf
       uses: Analog-inc/asciidoctor-action@v1.2
       with:
-        shellcommand: 'asciidoctor-pdf --verbose ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml --trace cf-conventions.adoc -D conventions_build'
+        shellcommand: 'asciidoctor-pdf --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) -d book -a pdf-theme=default-theme-CF-version.yml --trace cf-conventions.adoc -D conventions_build'
     # Upload artifact containing cf-conventions.html, cf-conventions.pdf
     - name: Upload cf-conventions doc preview
       uses: actions/upload-artifact@v2

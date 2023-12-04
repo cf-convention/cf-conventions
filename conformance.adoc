@@ -37,7 +37,7 @@ See https://github.com/ugrid-conventions/ugrid-conventions for the UGRID conform
 
 *Recommendations:*
 
-* Variable, dimension and attribute names should begin with a letter and be composed of letters, digits, and underscores.
+* Variable, dimension and attribute names should begin with a letter and be composed of letters (A-Z, a-z), digits (0-9), and underscores(_). This corresponds to ASCII characters in the decimal ranges (65-90), (97-122), (48-57), and (95). The corresponding Unicode codepoints are (U+0041-U+005A), (U+0061-U+007A), (U+0030-U+0039), and (U+005F).  
 * No two variable names should be identical when case is ignored.
 
 [[section-2]]
@@ -302,7 +302,7 @@ Third, a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) u
 [[grid-mappings-and-projections]]
 === 5.6 Grid Mappings and Projections
 
-[[requirements]]
+[[requirements-5.6]]
 *Requirements:*
 
 * The type of the **`grid_mapping`** attribute is a string whose value is of the following form, in which brackets indicate optional text:
@@ -327,6 +327,7 @@ The legal values for the **`grid_mapping_name`** attribute are contained in Appe
 *Recommendations:*
 
 * The grid mapping variables should have 0 dimensions.
+* Deprecated attributes for the **`grid_mapping_name`** are: **`scale_factor_at_projection_origin`** for **`grid_mapping_name = lambert_cylindrical_equal_area`** only, where **`standard_parallel`** should instead be used; and **`straight_vertical_longitude_from_pole`** for **`grid_mapping_name = polar_stereographic`** only, where **`longitude_of_projection_origin`** should instead be used.
 
 
 [[section-17]]
@@ -334,7 +335,7 @@ The legal values for the **`grid_mapping_name`** attribute are contained in Appe
 [[domain-variables]]
 === 5.8 Domain Variables
 
-[[requirements]]
+[[requirements-5.8]]
 *Requirements:*
 
 * Domain variables must have a **`dimensions`** attribute.
@@ -349,7 +350,7 @@ Second a ragged array (Chapter 9, Discrete sampling geometries and Appendix H) u
 *Recommendations:*
 
 * Domain variables should have a **`long_name`** attribute.
-* Domain variables should not have any of the attributes marked in <<attribute-appendix>> as applicable to data variables except those which are also marked as applicable to domain variables.
+* Domain variables should not have any of the attributes marked in Appendix A as applicable to data variables except those which are also marked as applicable to domain variables.
 
 
 [[labels]]
@@ -373,8 +374,8 @@ If there are two dimensions, the leading dimension (CDL order) must match one of
 The specified variable must exist in the file.
 * A boundary variable must have the same dimensions as its associated variable, plus have a trailing dimension (CDL order) for the maximum number of vertices in a cell.
 * A boundary variable must be a numeric data type.
-
-*  If a boundary variable has **`units`**,**`standard_name`**, **`axis`**, **`positive`**, **`calendar`**, **`leap_month`**, **`leap_year`** or **`month_lengths`** attributes, they must agree with those of its associated variable.
+* A boundary variable can only have inheritable attributes, i.e. any of those marked "BI" in the "Use" column of http://cfconventions.org/cf-conventions/cf-conventions.html#attribute-appendix[Appendix A], if they are also present on its parent coordinate variable.
+* If a boundary variable has an inheritable attribute then its data type and its value must be exactly the same as the parent variable's attribute.
 * Starting with version 1.7, a boundary variable must have a **`formula_terms`** attribute when it contains bounds for a parametric vertical coordinate variable that has a **`formula_terms`** attribute.
 In this case the same terms and named variables must appear in both except for terms that depend on the vertical dimension.
 For such terms the variable name appearing in the boundary variable's **`formula_terms`** attribute must differ from that found in the **`formula_terms`** attribute of the coordinate variable itself.
@@ -385,7 +386,7 @@ If a named variable in the **`formula_terms`** attribute of the vertical coordin
 *Recommendations:*
 
 * The points specified by a coordinate or auxiliary coordinate variable should lie within, or on the boundary, of the cells specified by the associated boundary variable.
-* Boundary variables should not have the **`_FillValue`**, **`missing_value`**, **`units`**, **`standard_name`**, **`axis`**, **`positive`**, **`calendar`**, **`leap_month`**, **`leap_year`** or **`month_lengths`** attributes.
+* Boundary variables should not include inheritable attributes, i.e. any of those marked "BI" in the "Use" column of http://cfconventions.org/cf-conventions/cf-conventions.html#attribute-appendix[Appendix A].
 
 
 [[section-19]]
@@ -508,6 +509,7 @@ The specified variable must be a node coordinate variable that exists in the fil
 * The type of the **`compress`** attribute is a string whose value is a blank separated list of dimension names.
 The specified dimensions must exist in the file.
 * The values of the associated coordinate variable must be in the range starting with 0 and going up to the product of the compressed dimension sizes minus 1 (CDL index conventions).
+* The associated coordinate variable must not have an associated boundary variable.
 
 [[compression-by-coordinate-subsampling]]
 === 8.3 Lossy Compression by Coordinate Subsampling
