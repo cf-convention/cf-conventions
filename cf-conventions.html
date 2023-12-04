@@ -470,7 +470,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.11 draft,</span>
-<span id="revdate">&#160;&#160;04&#160;December,&#160;2023&#160;13:34:20Z</span>
+<span id="revdate">&#160;&#160;04&#160;December,&#160;2023&#160;14:34:55Z</span>
 <br><span id="revremark">See&#160;<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>&#160;for&#160;further&#160;information.</span>
 </div>
 </div>
@@ -520,7 +520,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_description_of_the_data">3. Description of the Data</a>
 <ul class="sectlevel2">
-<li><a href="#units">3.1. Units</a></li>
+<li><a href="#units">3.1. Units</a>
+<ul class="sectlevel3">
+<li><a href="#dimensionless-units">3.1.1. Dimensionless units</a></li>
+<li><a href="#temperature-units">3.1.2. Temperature units</a></li>
+<li><a href="#units-multiples">3.1.3. Scale factors and offsets</a></li>
+</ul>
+</li>
 <li><a href="#long-name">3.2. Long Name</a></li>
 <li><a href="#standard-name">3.3. Standard Name</a></li>
 <li><a href="#ancillary-data">3.4. Ancillary Data</a></li>
@@ -782,7 +788,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p><strong>List of Tables</strong></p>
 </div>
 <div class="paragraph">
-<p>3.1. <a href="#table-supported-units">Supported Units</a><br>
+<p>3.1. <a href="#table-supported-units">Prefixes for decimal multiples and submultiples of units</a><br>
 3.2. <a href="#table-flag-variable-bits">Flag Variable Bits (from Example)</a><br>
 3.3. <a href="#table-flag-variable-bit-2-and-3">Flag Variable Bit 2 and Bit 3 (from Example)</a><br>
 A.1. <a href="#table-attributes">Attributes</a><br>
@@ -820,13 +826,14 @@ J.5. <a href="#quadratic3">Figure J.5</a></p>
 </div>
 <div class="paragraph">
 <p>2.1. <a href="#char-and-string-variables-ex">String Variable Representations</a><br>
-3.1. <a href="#use-of-standard-name-ex">Use of <strong><code>standard_name</code></strong></a><br>
-3.2. <a href="#instrument-data-ex">Ancillary instrument data</a><br>
-3.3. <a href="#quality-flag-ex">Ancillary quality flag data</a><br>
-3.4. <a href="#flag-variable-flag-values-ex">A flag variable, using <strong><code>flag_values</code></strong></a><br>
-3.5. <a href="#flag-variable-flag-masks-ex">A flag variable, using <strong><code>flag_masks</code></strong></a><br>
-3.6. <a href="#region-variable-flag-values-ex">A region variable, using <strong><code>flag_values</code></strong></a><br>
-3.7. <a href="#flag-variable-flag-masks-flag-values-ex">A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></a><br>
+3.1. <a href="#use-of-units-metadata-ex">Use of <strong><code>units_metadata</code></strong> to distinguish temperature quantities</a><br>
+3.2. <a href="#use-of-standard-name-ex">Use of <strong><code>standard_name</code></strong></a><br>
+3.3. <a href="#instrument-data-ex">Ancillary instrument data</a><br>
+3.4. <a href="#quality-flag-ex">Ancillary quality flag data</a><br>
+3.5. <a href="#flag-variable-flag-values-ex">A flag variable, using <strong><code>flag_values</code></strong></a><br>
+3.6. <a href="#flag-variable-flag-masks-ex">A flag variable, using <strong><code>flag_masks</code></strong></a><br>
+3.7. <a href="#region-variable-flag-values-ex">A region variable, using <strong><code>flag_values</code></strong></a><br>
+3.8. <a href="#flag-variable-flag-masks-flag-values-ex">A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></a><br>
 4.1. <a href="#latitude-axis-ex">Latitude axis</a><br>
 4.2. <a href="#longitude-axis-ex">Longitude axis</a><br>
 4.3. <a href="#atm-sigma-coord-ex">Atmosphere sigma coordinate</a><br>
@@ -1765,24 +1772,32 @@ But since it is an optional attribute, applications that implement these standar
 <h3 id="units"><a class="anchor" href="#units"></a>3.1. Units</h3>
 <div class="paragraph">
 <p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> and climatology variables defined in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>).
-The value of the <strong><code>units</code></strong> attribute is a string that can be recognized by the UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>, with a few exceptions that are given below.
-Note that case is significant in the <strong><code>units</code></strong> strings.</p>
+The <strong><code>units</code></strong> attribute is permitted but not required for dimensionless quantities (see <a href="#dimensionless-units">Section 3.1.1, "Dimensionless units"</a>).</p>
+</div>
+<div class="paragraph">
+<p>The value of the <strong><code>units</code></strong> attribute is a string that can be recognized by the UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>, with the exceptions that are given in <a href="#dimensionless-units">Section 3.1.1, "Dimensionless units"</a> and <a href="#units-multiples">Section 3.1.3, "Scale factors and offsets"</a>.
+Note that case is significant in the <strong><code>units</code></strong> strings.
+Note also that CF depends on UDUNITS only for the definition of legal <strong><code>units</code></strong> strings.
+CF does not assume or require that the UDUNITS software will be used for <strong><code>units</code></strong> conversion.
+In most <strong><code>units</code></strong> conversions, the sole operation on the data is multiplication by a scale factor.
+Special treatment is required in converting the <strong><code>units</code></strong> of variables that involve temperature (<a href="#temperature-units">Section 3.1.2, "Temperature units"</a>) and the <strong><code>units</code></strong> of time coordinate variables (<a href="#time-coordinate">Section 4.4, "Time Coordinate"</a>).</p>
 </div>
 <div class="paragraph">
 <p>The COARDS convention prohibits the unit <code>degrees</code> altogether, but this unit is not forbidden by the CF convention because it may in fact be appropriate for a variable containing, say, solar zenith angle.
 The unit <code>degrees</code> is also allowed on coordinate variables such as the latitude and longitude coordinates of a transformed grid.
 In this case the coordinate values are not true latitudes and longitudes which must always be identified using the more specific forms of <code>degrees</code> as described in <a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>.</p>
 </div>
+<div class="sect3">
+<h4 id="dimensionless-units"><a class="anchor" href="#dimensionless-units"></a>3.1.1. Dimensionless units</h4>
 <div class="paragraph">
-<p>Units are not required for dimensionless quantities.
-A variable with no <strong><code>units</code></strong> attribute is assumed to be dimensionless.
+<p>A variable with no <strong><code>units</code></strong> attribute is assumed to be dimensionless.
 However, a <strong><code>units</code></strong> attribute specifying a dimensionless unit may optionally be included.
 The canonical unit (see also <a href="#standard-name">Section 3.3, "Standard Name"</a>) for dimensionless quantities that represent fractions, or parts of a whole, is <code>1</code>.
-When a dimensionless quantity is a ratio of dimensional quantities, CF suggests that it may be informative to users of data if the <strong><code>units</code></strong> are given as ratio of dimensional units, for instance <code>mg kg-1</code> for a mass ratio of 1e-6, or <code>microlitre litre-1</code> for a volume ratio of 1e-6.</p>
+The UDUNITS package defines a few dimensionless units, such as <code>percent</code>, <code>ppm</code> (parts per million, 1e-6), and <code>ppb</code> (parts per billion, 1e-9).
+As an alternative to the canonical <strong><code>units</code></strong> of <code>1</code> or some other unitless number, the <strong><code>units</code></strong> for a dimensionless quantity may be given as a ratio of dimensional units, for instance <code>mg kg-1</code> for a mass ratio of 1e-6, or <code>microlitre litre-1</code> for a volume ratio of 1e-6. Data-producers are invited to consider whether this alternative would be more helpful to the users of their data.</p>
 </div>
 <div class="paragraph">
-<p>The UDUNITS package defines a few dimensionless units, such as <code>percent</code>, <code>ppm</code> (parts per million, 1e-6), and <code>ppb</code> (parts per billion, 1e-9).
-The CF convention supports dimensionless units that are UDUNITS compatible, with one exception, concerning the dimensionless units defined by UDUNITS for volume ratios, such as <code>ppmv</code> and <code>ppbv</code>.
+<p>The CF convention supports dimensionless units that are UDUNITS compatible, with one exception, concerning the dimensionless units defined by UDUNITS for volume ratios, such as <code>ppmv</code> and <code>ppbv</code>.
 These units are allowed in the <strong><code>units</code></strong> attribute by CF only if the data variable has no <strong><code>standard_name</code></strong>.
 These units are prohibited by CF if there is a <strong><code>standard_name</code></strong>, because the <strong><code>standard_name</code></strong> defines whether the quantity is a volume ratio, so the <strong><code>units</code></strong> are needed only to indicate a dimensionless number.</p>
 </div>
@@ -1793,15 +1808,87 @@ As an exception, to maintain backwards compatibility with COARDS, the text strin
 This use of <strong><code>units</code></strong> is not compatible with UDUNITS, and is deprecated by this standard because conventions for more precisely identifying dimensionless vertical coordinates are available (see <a href="#dimensionless-vertical-coordinate">Section 4.3.2, "Dimensionless Vertical Coordinate"</a>).</p>
 </div>
 <div class="paragraph">
-<p>The UDUNITS syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard, except for case of specifying reference time, see section <a href="#time-coordinate">Time Coordinate</a>.
+<p>The UDUNITS syntax that allows scale factors and offsets to be applied to a unit is not supported by this standard, except for case of specifying reference time, see section <a href="#time-coordinate">Section 4.4, "Time Coordinate"</a>.
 The application of any scale factors or offsets to data should be indicated by the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes.
 Use of these attributes for data packing, which is their most important application, is discussed in detail in <a href="#packed-data">Section 8.1, "Packed Data"</a>.</p>
 </div>
+</div>
+<div class="sect3">
+<h4 id="temperature-units"><a class="anchor" href="#temperature-units"></a>3.1.2. Temperature units</h4>
 <div class="paragraph">
-<p>UDUNITS recognizes the following prefixes and their abbreviations.</p>
+<p>The <strong><code>units</code></strong> of temperature imply an origin (i.e. zero point) for the associated measurement scale.
+When the temperature value is the degree of warmth with respect to the origin of the measurement scale, we call it an <em>on-scale temperature</em>.
+When <strong><code>units</code></strong> of on-scale temperature are converted, the data may require the addition of an offset as well as multiplication by a scale factor, because the physical meaning of a numerical value of zero for an on-scale temperature depends on the unit of measurement.
+On-scale temperature is <em>unique</em> among quantities in the respect that the origin and the unit of measurement are both defined by the <strong><code>units</code></strong> and therefore cannot be chosen independently.
+For all other quantities, the origin and the unit of measurement are independent.
+Converting the unit of measurement alone, without changing the origin, does not change the meaning of zero.
+For example (using <strong>bold</strong> to indicate a numerical data value), <strong>0</strong> <code>kilogram</code> is the same mass as <strong>0</strong> <code>pound</code>, and <strong>0</strong> <code>seconds since 1970-1-1</code> means the same as <strong>0</strong> <code>days since 1970-1-1</code>, but <strong>0</strong> <code>degC</code> is not the same temperature as <strong>0</strong> <code>degF</code> (= <strong>-17.8</strong> <code>degC</code>), because these two temperature <strong><code>units</code></strong> implicitly refer to measurement scales which have different origins.</p>
+</div>
+<div class="paragraph">
+<p>On the other hand, when the temperature value is a <em>temperature difference</em>, which compares two on-scale temperatures with the same origin, the value of that origin is irrelevant as it cancels out when taking the difference.
+Therefore to convert the <strong><code>units</code></strong> of a temperature difference requires only multiplication by a scale factor, without the addition of an offset.</p>
+</div>
+<div class="paragraph">
+<p>The <strong><code>units</code></strong> attribute does not distinguish between on-scale temperatures and temperature differences.
+This ambiguity also affects units of temperature raised to some power e.g. <code>K^2</code> or multiplied by other units e.g. <code>W m-2 K-1</code>, <code>degF/foot</code> or <code>degC m s-1</code>.
+A <strong><code>standard_name</code></strong> (<a href="#standard-name">Section 3.3, "Standard Name"</a>) or <strong><code>standard_name</code></strong> modifier (<a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>) may clarify the intention, but they are optional.
+Some statistical operations described by the <strong><code>cell_methods</code></strong> attribute (<a href="#cell-methods">Section 7.3, "Cell Methods"</a>; <a href="#appendix-cell-methods">Appendix E, Cell Methods</a>) imply that temperature must be interpreted as temperature difference, but this attribute is optional too.</p>
+</div>
+<div class="paragraph">
+<p>In order to convert the <strong><code>units</code></strong> correctly, it is essential to know whether a temperature is on-scale or a difference.
+Therefore this standard strongly recommends that any variable whose <strong><code>units</code></strong> involve a temperature unit should also have a <strong><code>units_metadata</code></strong> attribute to make the distinction.
+This attribute must have one of the following three values: <code>temperature: on_scale</code>, <code>temperature: difference</code>, <code>temperature: unknown</code>.
+The <strong><code>units_metadata</code></strong> attribute, <strong><code>standard_name</code></strong> modifier (<a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>) and <strong><code>cell_methods</code></strong> attribute (<a href="#appendix-cell-methods">Appendix E, Cell Methods</a>) must be consistent if present.
+A variable must not have a <strong><code>units_metadata</code></strong> attribute if it has no <strong><code>units</code></strong> attribute or if its <strong><code>units</code></strong> do not involve a temperature unit.</p>
+</div>
+<div id="use-of-units-metadata-ex" class="exampleblock">
+<div class="title">Example 3.1. Use of <strong><code>units_metadata</code></strong> to distinguish temperature quantities</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>variables:
+  float Tonscale;
+    Tonscale:long_name="global-mean surface temperature";
+    Tonscale:standard_name="surface_temperature";
+    Tonscale:units="degC";
+    Tonscale:units_metadata="temperature: on_scale";
+    Tonscale:cell_methods="area: mean";
+  float Tdifference;
+    Tdifference:long_name="change in global-mean surface temperature relative to pre-industrial";
+    Tdifference:standard_name="surface_temperature";
+    Tdifference:units="degC";
+    Tdifference:units_metadata="temperature: difference";
+    Tdifference:cell_methods="area: mean";</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>With <code>temperature: unknown</code>, correct conversion of the <strong><code>units</code></strong> cannot be guaranteed.
+This value of <strong><code>units_metadata</code></strong> indicates that the data-writer does not know whether the temperature is on-scale or a difference.
+If the <strong><code>units_metadata</code></strong> attribute is not present, the data-reader should assume <code>temperature: unknown</code>.
+The <strong><code>units_metadata</code></strong> attribute was introduced in CF 1.11.
+In data written according to versions before 1.11, <code>temperature: unknown</code> should be assumed for all <strong><code>units</code></strong> involving temperature, if it cannot be deduced from other metadata.
+We note (for guidance only for <code>temperature: unknown</code>, not as a CF convention) that the UDUNITS software assumes <code>temperature: on_scale</code> for <strong><code>units</code></strong> strings containing only a unit of temperature, and <code>temperature: difference</code> for <strong><code>units</code></strong> strings in which a unit of temperature is raised to any power other than unity, or multiplied or divided by any other unit.</p>
+</div>
+<div class="paragraph">
+<p>With <code>temperature: on_scale</code>, correct conversion can be guaranteed only for pure temperature <strong><code>units</code></strong>.
+If the quantity is an on-scale temperature multiplied by some other quantity, it is not possible to convert the data from the <strong><code>units</code></strong> given to any other <strong><code>units</code></strong> that involve a temperature with a different origin, given only the <strong><code>units</code></strong>.
+For instance, when temperature is on-scale, a value in <code>kg degree_C m-2</code> can be converted to a value in <code>kg K m-2</code> only if we know separately the values in <code>degree_C</code> and <code>kg m-2</code> of which it is the product.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="units-multiples"><a class="anchor" href="#units-multiples"></a>3.1.3. Scale factors and offsets</h4>
+<div class="paragraph">
+<p>UDUNITS recognises the SI prefixes shown in <a href="#table-supported-units">Prefixes for decimal multiples and submultiples of units</a> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.
+UDUNITS offers a syntax for indicating arbitrary scale factors and offsets to be applied to a unit.
+(Note that this is different from the scale factors and offsets used for converting between <strong><code>units</code></strong>, as discussed for temperature in <a href="#temperature-units">Section 3.1.2, "Temperature units"</a>.)
+This UDUNITS syntax for arbitrary transformation of <strong><code>units</code></strong> is not supported by <strong>the CF</strong> standard, except for the case of specifying reference time (<a href="#time-coordinate">Section 4.4, "Time Coordinate"</a>).
+The application of any scale factors or offsets to data should be indicated by the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes.
+Use of these attributes for data packing, which is their most important application, is discussed in detail in <a href="#packed-data">Section 8.1, "Packed Data"</a>.</p>
 </div>
 <table id="table-supported-units" class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3.1. Supported Units</caption>
+<caption class="title">Table 3.1. Prefixes for decimal multiples and submultiples of units</caption>
 <colgroup>
 <col style="width: 14.2857%;">
 <col style="width: 14.2857%;">
@@ -1916,6 +2003,7 @@ Use of these attributes for data packing, which is their most important applicat
 </tbody>
 </table>
 </div>
+</div>
 <div class="sect2">
 <h3 id="long-name"><a class="anchor" href="#long-name"></a>3.2. Long Name</h3>
 <div class="paragraph">
@@ -1958,7 +2046,7 @@ Unless it is dimensionless, a variable with a <strong><code>standard_name</code>
 <dd>
 <p>The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are.
 We don&#8217;t attempt to provide precise definitions of fundumental physical quantities (e.g., temperature) which may be found in the literature.
-The description may define rules on the variable type, attributes and coordinates which must be complied with by any variable carrying that standard name (such as in example 3.4).</p>
+The description may define rules on the variable type, attributes and coordinates which must be complied with by any variable carrying that standard name (such as in Example 3.5).</p>
 </dd>
 </dl>
 </div>
@@ -1986,7 +2074,7 @@ Other types of quantity modifiers are expressed using the optional modifier part
 The permissible values of these modifiers are given in <a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>.</p>
 </div>
 <div id="use-of-standard-name-ex" class="exampleblock">
-<div class="title">Example 3.1. Use of <strong><code>standard_name</code></strong></div>
+<div class="title">Example 3.2. Use of <strong><code>standard_name</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -2015,7 +2103,7 @@ The dimensions of an ancillary variable must be the same as or a subset of the d
 If an ancillary variable of a data variable that has been compressed by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>) does not span the compressed dimension, then its dimensions may be any subset of the data variable&#8217;s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the <strong><code>compress</code></strong> attribute of the compressed coordinate variable.</p>
 </div>
 <div id="instrument-data-ex" class="exampleblock">
-<div class="title">Example 3.2. Ancillary instrument data</div>
+<div class="title">Example 3.3. Ancillary instrument data</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -2059,7 +2147,7 @@ Several examples are listed below:</p>
 <p>The following example illustrates the use of three of these flags to represent two independent quality control tests and an aggregate flag that combines the results of the two tests.</p>
 </div>
 <div id="quality-flag-ex" class="exampleblock">
-<div class="title">Example 3.3. Ancillary quality flag data</div>
+<div class="title">Example 3.4. Ancillary quality flag data</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -2103,7 +2191,7 @@ If multi-word phrases are used to describe the flag values, then the words withi
 The following example illustrates the use of flag values to express a speed quality with an enumerated status code.</p>
 </div>
 <div id="flag-variable-flag-values-ex" class="exampleblock">
-<div class="title">Example 3.4. A flag variable, using <strong><code>flag_values</code></strong></div>
+<div class="title">Example 3.5. A flag variable, using <strong><code>flag_values</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -2131,7 +2219,7 @@ Thus, any or all of the flagged conditions may be true, depending on the variabl
 The following example illustrates the use of flag_masks to express six sensor status conditions.</p>
 </div>
 <div id="flag-variable-flag-masks-ex" class="exampleblock">
-<div class="title">Example 3.5. A flag variable, using <strong><code>flag_masks</code></strong></div>
+<div class="title">Example 3.6. A flag variable, using <strong><code>flag_masks</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -2154,7 +2242,7 @@ The following example illustrates the use of flag_masks to express six sensor st
 The following example illustrates this using integer flag values for a variable with standard name <code>region</code> and <code>flag_values</code> selected from the <a href="https://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html">standardized region names</a> (see section 6.1.1).</p>
 </div>
 <div id="region-variable-flag-values-ex" class="exampleblock">
-<div class="title">Example 3.6. A region variable, using <strong><code>flag_values</code></strong></div>
+<div class="title">Example 3.7. A region variable, using <strong><code>flag_values</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -2178,7 +2266,7 @@ Each <strong><code>flag_values</code></strong> and <strong><code>flag_masks</cod
 The following example illustrates the use of <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong> to express two sensor status conditions and one enumerated status code.</p>
 </div>
 <div id="flag-variable-flag-masks-flag-values-ex" class="exampleblock">
-<div class="title">Example 3.7. A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></div>
+<div class="title">Example 3.8. A flag variable, using <strong><code>flag_masks</code></strong> and <strong><code>flag_values</code></strong></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -7042,7 +7130,7 @@ The use of this modifier is deprecated and the standard_name number_of_observati
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>standard_error</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>u</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The uncertainty of the data value.
+<td class="tableblock halign-left valign-top"><p class="tableblock">*The uncertainty of the data value.
 The standard error includes both systematic and statistical uncertainty.
 By default it is assumed that the values supplied are for one standard error.
 If the values supplied are for some multiple of the standard error, the <code>standard_error</code> ancillary variable should have an attribute <strong><code>standard_error_multiplier</code></strong> stating the multiplication factor.</p></td>
@@ -7056,6 +7144,11 @@ The use of this modifier is deprecated and the standard_name status_flag is pref
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>*The definition of this modifier implies that if <em>u</em> is a either unit of temperature, or a unit of temperature multiplied by some other unit, the temperature in <em>u</em> must be interpreted as a temperature difference.
+Therefore the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>, even if the corresponding data variable without the modifier would have <code>units_metadata="temperature: on_scale"</code>.
+See <a href="#temperature-units">Section 3.1.2, "Temperature units"</a> for explanation.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -7717,7 +7810,7 @@ This is the default method for a quantity that is extensive with respect to the 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>range</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>u</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Absolute difference between maximum and minimum</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*Absolute difference between maximum and minimum</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>root_mean_square</code></p></td>
@@ -7727,7 +7820,7 @@ This is the default method for a quantity that is extensive with respect to the 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>standard_deviation</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>u</em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Standard deviation</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*Standard deviation</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>sum_of_squares</code></p></td>
@@ -7737,10 +7830,15 @@ This is the default method for a quantity that is extensive with respect to the 
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>variance</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>u<sup>2</sup></em></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Variance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">*Variance</p></td>
 </tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p>*The definition of this method implies that if <em>u</em> is a either a unit of temperature, or a unit of temperature multiplied by some other unit, the temperature in <em>u</em> must be interpreted as a temperature difference.
+Therefore the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>.
+See <a href="#temperature-units">Section 3.1.2, "Temperature units"</a> for explanation.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -12083,6 +12181,12 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/481">Issue #481</a>: Introduce <strong><code>units_metadata</code></strong> attribute and clarify some other aspects of <strong><code>units</code></strong></p>
+</li>
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/458">Issue #147</a>: Clarify the use of compressed dimensions in related variables</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/486">Issue #486</a>: Fix PDF formatting problems and invalid references</p>
 </li>
 <li>
@@ -12695,7 +12799,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.11 draft<br>
-Last updated 2023-12-04 13:34:20 UTC
+Last updated 2023-12-04 14:34:55 UTC
 </div>
 </div>
 </body>
