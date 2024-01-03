@@ -82,6 +82,10 @@ Be aware that elements of the https://github.com/cf-convention/cf-conventions an
 
 * Check for any other occurences of hard-wired version numbers in any file.
 
+## Create a milestone for the next release
+
+* This is done at https://github.com/cf-convention/cf-conventions/milestones. Do not set a due date.
+
 ## Announce the release
 
 * Wait until all changes are visible via the web site, and then announce the release on the `discuss` repository issue tracker: https://github.com/cf-convention/discuss/issues (note that there may already be a open issue in which to do this.
