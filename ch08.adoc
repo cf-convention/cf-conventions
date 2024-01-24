@@ -1,5 +1,4 @@
-
-==  Reduction of Dataset Size
+==  Reduction of Dataset Size 
 :doc-part: 8
 :figure: 0
 
@@ -13,9 +12,6 @@ In this case it is possible to make use of standard utilities, e.g., UNIX **`com
 In this section we offer an alternative compression method that is applied on a variable by variable basis.
 This has the advantage that only one variable need be uncompressed at a given time.
 The disadvantage is that generic utilities that don't recognize the CF conventions will not be able to operate on compressed variables.
-
-
-
 
 [[packed-data, Section 8.1, "Packed Data"]]
 === Packed Data
@@ -35,9 +31,6 @@ When packed data is read, it should be unpacked to the type of the **`scale_fact
 
 When data to be packed contains missing values the attributes that indicate missing values (**`_FillValue`**, **`valid_min`**, **`valid_max`**, **`valid_range`**) must be of the same data type as the packed data.
 See <<missing-data>> for a discussion of how applications should treat variables that have attributes indicating both missing values and transformations defined by a scale and/or offset.
-
-
-
 
 [[compression-by-gathering, Section 8.2, "Lossless Compression by Gathering"]]
 === Lossless Compression by Gathering
@@ -65,7 +58,8 @@ The list variable must not have an associated boundary variable.
 ====
 We eliminate sea points at all depths in a longitude-latitude-depth array of soil temperatures.
 In this case, only the longitude and latitude axes would be affected by the compression.
-We construct a list `landpoint(landpoint)` containing the indices of land points.
+We construct a list `landpoint(landpoint)` containing the indices of land points. 
+
 ----
 dimensions:
   lat=73;
@@ -93,7 +87,8 @@ This corresponds to indices `(3,75)`, i.e., `363 = 3*96 + 75`.
 .Compression of a three-dimensional field
 ====
 We compress a longitude-latitude-depth field of ocean salinity by eliminating points below the sea-floor.
-In this case, all three dimensions are affected by the compression, since there are successively fewer active ocean points at increasing depths.
+In this case, all three dimensions are affected by the compression, since there are successively fewer active ocean points at increasing depths. 
+
 ----
 variables:
   float salinity(time,oceanpoint);
@@ -523,7 +518,6 @@ In this the projection coordinates are two-dimensional, but are only linearly in
 
 ====
 
-
 [[compression-by-coordinate-subsampling-interpolation-of-cell-boundaries, Section 8.3.9, "Interpolation of Cell Boundaries"]]
 ==== Interpolation of Cell Boundaries
 
@@ -542,16 +536,13 @@ For the example of 2D bounds, the resulting set of bounds tie points are marked 
 
 Note that within a continuous area, there is one more reconstituted bounds point than there are reconstituted coordinate points in each dimension.
 For this reason, a  virtual __interpolated bounds dimension__ is introduced for each dimension, having a size equal to the size of the interpolated dimension plus one.
-This dimension is used for solely descriptive purposes, and is not required in a compressed dataset.
-
-
+This dimension is used for solely descriptive purposes, and is not required in a compressed dataset. 
 
 [[figure_interpolation_of_cell_boundaries]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
 [.text-center]
 .Example of 2D bounds interpolation showing the bounds tie points and reconstituted bound points within a continuous area consisting of four interpolation subareas. The dimensions are shown for one of the two axes only. The index relationship between coordinate point indices and the related bound points indices is indicated.
 image::images/ci_bounds_interpolation.svg[,100%,pdfwidth=50vw,align="center"]
-
 
 Both the process of compressing bounds and the process of uncompressing bounds requires the steps to be carried out for a full continuous area, however, individual continuous areas can be processed independently.
 In the following description of these processes, indices relative to the origin of each continuous area are used for the interpolated dimension and the interpolated bounds dimension.
@@ -613,8 +604,7 @@ For one-dimensional coordinate bounds, in the second step of the process, for ea
 **Uncompression of two-dimensional coordinate bounds** +
 For two-dimensional coordinate bounds, in the second step of the process, for each index pair `(j, i)` of the interpolated dimension, the four bounds of the boundary variable is set to the value of the interpolated bounds point grid at index pairs `B0`, `B1`, `B2` and `B3`, respectively, where the index pairs are defined above under <<compressing_two_dimensional>>.
 
-
-[[example-interpolation-of-cell-boundaries]]
+[[example_interpolation_of_cell_boundaries, Example 8.7]]
 [caption="Example 8.7. "]
 .Interpolation of 2D Cell Boundaries corresponding to <<figure_interpolation_of_cell_boundaries>>
 ====
@@ -684,3 +674,4 @@ The data creator shall specify the floating-point arithmetic precision used duri
 
 Using the given computational precision in the interpolation computations is a necessary, but not sufficient, condition for the data user to be able to reconstitute the coordinates to an accuracy comparable to that intended by the data creator.
 For instance, a **`computational_precision**` value of **`"64"**` would specify that, using the same implementation and hardware as the creator of the compressed dataset, sufficient accuracy could not be reached when using a floating-point precision lower than 64-bit floating-point arithmetic in the interpolation computations required to reconstitute the coordinates.
+

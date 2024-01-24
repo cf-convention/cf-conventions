@@ -1,4 +1,3 @@
-
 ==  Description of the Data
 
 The attributes described in this section are used to provide a description of the content and the units of measurement for each variable.
@@ -8,7 +7,6 @@ This is important for data exchange since one cannot necessarily identify a part
 
 The **`standard_name`** attribute can be used to identify variables that contain coordinate data.
 But since it is an optional attribute, applications that implement these standards must continue to be able to identify coordinate types based on the COARDS conventions.
-
 
 [[units, Section 3.1, "Units"]]
 === Units
@@ -146,9 +144,6 @@ For backwards compatibility with COARDS this attribute is optional.
 But it is highly recommended that either this or the **`standard_name`** attribute defined in the next section be provided to make the file self-describing.
 If a variable has no **`long_name`** attribute then an application may use, as a default, the **`standard_name`** if it exists, or the variable name itself.
 
-
-
-
 [[standard-name, Section 3.3, "Standard Name"]]
 === Standard Name
 
@@ -207,11 +202,7 @@ float psl(lat,lon) ;
 ----
 The description in the standard name table entry for `air_pressure_at_sea_level` clarifies that "sea level" refers to the mean sea level, which is close to the geoid in sea areas.
 
-
 ====
-
-
-
 
 
 [[ancillary-data, Section 3.4, "Ancillary Data"]]
@@ -248,8 +239,7 @@ If an ancillary variable of a data variable that has been compressed by gatherin
 
 ====
 
-
-Alternatively, **`ancillary_variables`** may be used as status flags indicating the operational status of an instrument producing the data or as quality flags indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable.
+Alternatively, **`ancillary_variables`** may be used as status flags indicating the operational status of an instrument producing the data or as quality flags indicating the results of a quality control test, or some other quantitative quality assessment, performed against the measurements contained in the source variable. 
 In these cases, the flag variable will include a standard name that differs from that of the source variable and indicates the specific type of flag the variable represents.
 
 The standard names table includes many names intended to be used in this situation, both general names meant to be used to flexibly represent any type of status or quality assessment, as well as names for specific quality control tests commonly applied to geophysical phenomena timeseries data.
@@ -290,7 +280,6 @@ float salinity(time, z);
 Note that the ancillary variables in this example are simplified to exclude  **`flag_values`**, **`flag_masks`** and **`flag_meanings`** attributes described in <<flags>> that they would ordinarily require
 ====
 
-
 [[flags, Section 3.5, "Flags"]]
 === Flags
 
@@ -322,7 +311,6 @@ The following example illustrates the use of flag values to express a speed qual
 
 Note that the data variable containing current speed has an ancillary_variables attribute with a value containing current_speed_qc.
 
-
 ====
 
 The flag_masks and flag_meanings attributes describe a number of independent Boolean conditions using bit field notation by setting unique bits in each flag_masks value.
@@ -331,7 +319,6 @@ The flag_meanings attribute is defined as above, one for each flag_masks value.
 A flagged condition is identified by performing a bitwise AND of the variable value and each flag_masks value; a non-zero result indicates a true condition.
 Thus, any or all of the flagged conditions may be true, depending on the variable bit settings.
 The following example illustrates the use of flag_masks to express six sensor status conditions.
-
 
 [[flag-variable-flag-masks-ex]]
 [caption="Example 3.6. "]
@@ -355,7 +342,6 @@ The following example illustrates the use of flag_masks to express six sensor st
 
 A variable with standard name of `region`, `area_type` or any other standard name which requires string-valued values from a defined list may use flags together with `flag_values` and `flag_meanings` attributes to record the translation to the string values.
 The following example illustrates this using integer flag values for a variable with standard name `region` and `flag_values` selected from the link:$$https://cfconventions.org/Data/cf-standard-names/docs/standardized-region-names.html$$[standardized region names] (see section 6.1.1).
-
 
 [[region-variable-flag-values-ex]]
 [caption="Example 3.7. "]
@@ -400,7 +386,6 @@ The following example illustrates the use of **`flag_masks`** and **`flag_values
           offline_mode calibration_mode maintenance_mode" ;
 ----
 
-
 ====
 
 In this case, mutually exclusive values are blended with Boolean values to maximize use of the available bits in a flag value.
@@ -434,3 +419,4 @@ The "12b" flag mask is repeated in the **`sensor_status_qc`** **`flag_masks`** d
 An application determines if any of the conditions declared in the **`flag_meanings`** list are **`true`** by simply iterating through each of the **`flag_masks`** and AND'ing them with the variable.
 When a result is equal to the corresponding **`flag_values`** element, that condition is **`true`**.
 The repeated **`flag_masks`** enable a simple mechanism for clients to detect all possible conditions.
+
