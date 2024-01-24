@@ -16,10 +16,15 @@ To represent cells we add the attribute **`bounds`** to the appropriate coordina
 The value of **`bounds`** is the name of the variable that contains the vertices of the cell boundaries.
 We refer to this type of variable as a "boundary variable."
 __A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.__ The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices.
-Since a boundary variable is considered to be part of a coordinate variable's metadata, it is not necessary to provide it with attributes such as **`long_name`** and **`units`**.
 
-Boundary variable attributes which determine the coordinate type (**`units`**, **`standard_name`**, **`axis`** and **`positive`**) or those which affect the interpretation of the array values (**`units`**, **`calendar`**, **`leap_month`**, **`leap_year`** and **`month_lengths`**) must always agree exactly with the same attributes of its associated coordinate, scalar coordinate or auxiliary coordinate variable.
-To avoid duplication, however, it is recommended that these are not provided to a boundary variable.
+A boundary variable inherits the values of some attributes from its parent coordinate variable.
+If a coordinate variable has any of the attributes marked "BI" (for "inherit") in the "Use" column of <<attribute-appendix>>, they are assumed to apply to its bounds variable as well.
+It is recommended that BI attributes not be included on a boundary variable.
+If a BI attribute is included, it must also be present in the parent variable, and it must exactly match the parent attribute's data type and value.
+A boundary variable can only have inheritable attributes if they are also present on its parent coordinate variable.
+A bounds variable may have any of the attributes marked "BO" for ("own") in the "Use" column of <<attribute-appendix>>.
+These attributes take precedence over any corresponding attributes of the parent variable.
+In these cases, the parent variable's attribute does not apply to the bounds variable, regardless of whether the latter has its own attribute.
 
 If a parametric coordinate variable with a **`formula_terms`** attribute (section 4.3.2) also has a **`bounds`** attribute, its boundary variable must have a **`formula_terms`** attribute too.
 In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula.
@@ -181,7 +186,8 @@ To indicate extra information about the spatial properties of a variable's grid 
 This is a string attribute comprising a list of blank-separated pairs of words of the form "**`measure: name`**".
 For the moment, "**`area`**" and "**`volume`**" are the only defined measures, but others may be supported in future.
 The "name" is the name of the variable containing the measure values, which we refer to as a "measure variable".
-The dimensions of the measure variable should be the same as or a subset of the dimensions of the variable to which they are related, but their order is not restricted.
+The dimensions of a measure variable must be the same as or a subset of the dimensions of the variable to which it is related, but their order is not restricted, and with one exception:
+If a cell measure variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable.
 In the case of area, for example, the field itself might be a function of longitude, latitude, and time, but the variable containing the area values would only include longitude and latitude dimensions (and the dimension order could be reversed, although this is not recommended).
 The variable must have a **`units`** attribute and may have other attributes such as a **`standard_name`**.
 
@@ -320,7 +326,7 @@ The horizontal coordinate variables to which "**`area`**" refers are in this cas
 To indicate more precisely how the cell method was applied, extra information may be included in parentheses () after the identification of the method.
 This information includes standardized and non-standardized parts.
 Currently the only standardized information is to provide the typical interval between the original data values to which the method was applied, in the situation where the present data values are statistically representative of original data values which had a finer spacing.
-The syntax is (**`interval`**: __value unit__), where __value__ is a numerical value and __unit__ is a string that can be recognized by UNIDATA's Udunits package <<UDUNITS>>.
+The syntax is (**`interval`**: __value unit__), where __value__ is a numerical value and __unit__ is a string that can be recognized by UNIDATA's UDUNITS package <<UDUNITS>>.
 The __unit__ will usually be dimensionally equivalent to the unit of the corresponding dimension, but this is not required (which allows, for example, the interval for a standard deviation calculated from points evenly spaced in distance along a parallel to be reported in units of length even if the zonal coordinate of the cells is given in degrees).
 Recording the original interval is particularly important for standard deviations.
 For example, the standard deviation of daily values could be indicated by **`cell_methods="time: standard_deviation (interval: 1 day)"`** and of annual values by **`cell_methods="time: standard_deviation (interval: 1 year)"`**.
@@ -616,7 +622,7 @@ variables:
   double climatology_bounds(time,nv);
 data: // time coordinates translated to date/time format
   time="2008-1-16 6:00";
-  climatology_bounds="2007-12-1 6:00", "2000-8-2 6:00";
+  climatology_bounds="2007-12-1 6:00", "2008-3-1 6:00";
   threshold=0.;
 ----
 ====

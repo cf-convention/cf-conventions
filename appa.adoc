@@ -3,11 +3,12 @@
 [appendix]
 == Attributes
 
-All CF attributes are listed here except for those that are used to describe grid mappings.
-See Appendix F for the grid mapping attributes.
+All CF attributes are listed here except for those that are used to describe grid mappings and mesh topologies.
+See Appendix F for the grid mapping attributes, and Appendix K for mesh topology attributes.
 
 The "Type" values are **S** for string, **N** for numeric, and **D** for the type of the data variable.
-The "Use" values are **G** for global, **Gr** for applying to groups, **C** for variables containing coordinate data, **D** for data variables, **M** for geometry container variables, **Do** for domain variables, and **-** for variables with a special purpose.
+Each attribute may be used in any of the ways shown in its "Use" entry.
+**G** indicates it can appear as a global attribute, and **Gr** as a group attribute; if use of an attribute is restricted to certain kinds of variables this is indicated as follows: **C** for variables containing coordinate data, **D** for data variables, **M** for geometry container variables, **Do** for domain variables, **BI** and **BO** for boundary variables (see <<cell-boundaries>> for the distinction between **BI** and **BO**), and **-** for variables with some other purpose.
 "Links" indicates the location of the attribute"s original definition (first link) and sections where the attribute is discussed in this document (additional links as necessary).
 
 [[table-attributes]]
@@ -23,14 +24,14 @@ Attribute
 
 | **`actual_range`**
 | N
-| C, D
+| C, D, BO
 | <<missing-data>>
 | The smallest and the largest valid non-missing values occurring in the variable.
 
 | **`add_offset`**
 | N
-| C, D
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<packed-data>>
+| C, D, BO
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<packed-data>>
 | If present for a variable, this number is to be added to the data after it is read by an application.
 If both **`scale_factor`** and **`add_offset`** attributes are present, the data are first scaled before the offset is added.
 In cases where there is a strong constraint on dataset size, it is allowed to pack the coordinate variables (using add_offset and/or scale_factor), but this is not recommended in general.
@@ -43,7 +44,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 
 | **`axis`**
 | S
-| C
+| C, BI
 | <<coordinate-types>>
 | Identifies latitude, longitude, vertical, or time axes.
 
@@ -55,7 +56,7 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 
 | **`calendar`**
 | S
-| C
+| C, BI
 | <<calendar>>
 | Calendar used for encoding time axes.
 
@@ -73,9 +74,9 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 
 | **`cf_role`**
 | S
-| C
-| <<coordinates-metadata>>
-| Identifies the roles of variables that identify features in discrete sampling geometries.
+| C, BI
+| <<coordinates-metadata>>, and <<mesh-topology-variables>> 
+| Identifies the roles of variables that identify features in discrete sampling geometries; and the roles of mesh topology and location index set variables.
 
 | **`climatology`**
 | S
@@ -97,14 +98,14 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 
 | **`computed_standard_name`**
 | S
-| C
+| C, BI
 | <<parametric-vertical-coordinate>>
 | Indicates the standard name, from the standard name table, of the computed vertical coordinate values, computed according to the formula in the definition.
 
 | **`Conventions`**
 | S
 | G
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
 | Name of the conventions followed by the dataset.
 
 | **`coordinate_interpolation`**
@@ -134,8 +135,9 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 
 | **`_FillValue`**
 | D
-| C, D
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<missing-data>>, and <<ch9-missing-data>>.
+| C, D, BO
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<missing-data>>, and <<ch9-missing-data>>.
+
 | A value used to represent missing or undefined data.
 Allowed for auxiliary coordinate variables but not allowed for coordinate variables.
 
@@ -167,7 +169,7 @@ Use in conjunction with **`flag_meanings`**.
 
 | **`formula_terms`**
 | S
-| C
+| C, BO
 | <<parametric-vertical-coordinate>>
 | Identifies variables that correspond to the terms in a formula.
 
@@ -192,7 +194,7 @@ Use in conjunction with **`flag_meanings`**.
 | **`history`**
 | S
 | G, Gr
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
 | List of the applications that have modified the original data.
 
 | **`instance_dimension`**
@@ -216,34 +218,52 @@ The index variable indicates that the indexed ragged array representation is bei
 
 | **`leap_month`**
 | N
-| C
+| C, BI
 | <<calendar>>
 | Specifies which month is lengthened by a day in leap years for a user defined calendar.
 
 | **`leap_year`**
 | N
-| C
+| C, BI
 | <<calendar>>
 | Provides an example of a leap year for a user defined calendar.
 It is assumed that all years that differ from this year by a multiple of four are also leap years.
 
+| **`location`**
+| S
+| D, Do
+| <<mesh-topology-variables>>, and <<appendix-mesh-topology-attributes>>
+| Specifies the location type within the mesh topology at which the variable is defined.
+
+| **`location_index_set`**
+| S
+| D, Do
+| <<mesh-topology-variables>>, and <<appendix-mesh-topology-attributes>>
+| Specifies a variable that defines the subset of locations of a mesh topology at which the variable is defined.
+
 | **`long_name`**
 | S
-| C, D, Do
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<long-name>>
-| A descriptive name that indicates a variable"s content.
+| C, D, Do, BI
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<long-name>>
+| A descriptive name that indicates a variable's content.
 This name is not standardized.
+
+| **`mesh`**
+| S
+| D, Do 
+| <<mesh-topology-variables>>, and <<appendix-mesh-topology-attributes>>
+| Specifies a variable that defines a mesh topology.
 
 | **`missing_value`**
 | D
-| C, D
+| C, D, BO
 | <<missing-data>>, and <<ch9-missing-data>>
 | A value or values used to represent missing or undefined data.
 Allowed for auxiliary coordinate variables but not allowed for coordinate variables.
 
 | **`month_lengths`**
 | N
-| C
+| C, BI
 | <<calendar>>
 | Specifies the length of each month in a non-leap year for a user defined calendar.
 
@@ -273,7 +293,7 @@ Allowed for auxiliary coordinate variables but not allowed for coordinate variab
 
 | **`positive`**
 | S
-| C
+| C, BI
 | <<COARDS>>
 | Direction of increasing vertical coordinate value.
 
@@ -292,8 +312,8 @@ The count variable indicates that the contiguous ragged array representation is 
 
 | **`scale_factor`**
 | N
-| C, D
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<packed-data>>
+| C, D, BO
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<packed-data>>
 | If present for a variable, the data are to be multiplied by this factor after the data are read by an application.
 See also the **`add_offset`** attribute.
 In cases where there is a strong constraint on dataset size, it is allowed to pack the coordinate variables (using add_offset and/or scale_factor), but this is not recommended in general.
@@ -312,37 +332,43 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 
 | **`standard_name`**
 | S
-| C, D
+| C, D, BI
 | <<standard-name>>
 | A standard name that references a description of a variable"s content in the standard name table.
 
 | **`title`**
 | S
 | G, Gr
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
 | Short description of the file contents.
 
 | **`units`**
 | S
-| C, D
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<units>>
-| Units of a variable"s content.
+| C, D, BI
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"], and <<units>>
+| Units of a variable's content.
+
+| **`units_metadata`**
+| S
+| C, D, BI
+| <<units>>
+| Specifies the interpretation (on-scale, difference or unknown) of the unit of temperature appearing in the **`units`** attribute.
 
 | **`valid_max`**
 | N
-| C, D
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
+| C, D, BO
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
 | Largest valid value of a variable.
 
 | **`valid_min`**
 | N
-| C, D
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
+| C, D, BO
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
 | Smallest valid value of a variable.
 
 | **`valid_range`**
 | N
-| C, D
-| link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
+| C, D, BO
+| link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, "Attribute Conventions"]
 | Smallest and largest valid values of a variable.
 |===============

@@ -11,7 +11,7 @@ NetCDF files should have the file name extension "**`.nc`**".
 === Data Types
 
 // TODO: Check, should this be a bullet list?
-Data variables must be one of the following data types: **`string`**, **`char`**, **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**, **`int64`**, **`unsigned int64`**, **`float`** or **`real`**, and **`double`** (which are all the [netCDF external data types](https://www.unidata.ucar.edu/software/netcdf/docs/data_type.html#external_types) supported by netCDF-4).
+Data variables must be one of the following data types: **`string`**, **`char`**, **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**, **`int64`**, **`unsigned int64`**, **`float`** or **`real`**, and **`double`** (which are all the link:$$https://docs.unidata.ucar.edu/nug/current/md_types.html$$[netCDF external data types] supported by netCDF-4).
 The **`string`** type is only available in files using the netCDF version 4 (netCDF-4) format.
 The **`char`** and **`string`** types are not intended for numeric data.
 One byte numeric data should be stored using the **`byte`** or **`unsigned byte`** data types.
@@ -27,7 +27,7 @@ If the atomic string option is chosen, each element of the variable can be assig
 The CDL example below shows one variable of each type.
 
 [[char-and-string-variables-ex]]
-[caption="Example 1.1. "]
+[caption="Example 2.1. "]
 .String Variable Representations
 ====
 ----
@@ -47,7 +47,9 @@ The examples in this document that use string-valued variables alternate between
 === Naming Conventions
 
 Variable, dimension, attribute and group names should begin with a letter and be composed of letters, digits, and underscores.
-Note that this is in conformance with the COARDS conventions, but is more restrictive than the netCDF interface which allows use of the hyphen character.
+By the word _letters_ we mean the standard ASCII letters uppercase `A` to `Z` and lowercase `a` to `z`.
+By the word _digits_ we mean the standard ASCII digits `0` to `9`, and similarly _underscores_ means the standard ASCII underscore `_`.
+Note that this is in conformance with the COARDS conventions, but is more restrictive than the netCDF interface which allows almost all Unicode characters encoded as multibyte UTF-8 characters (link:$$https://docs.unidata.ucar.edu/nug/current/file_format_specifications.html$$[NUG Appendix B]).
 The netCDF interface also allows leading underscores in names, but the NUG states that this is reserved for system use.
 
 Case is significant in netCDF names, but it is recommended that names should not be distinguished purely by case, i.e., if case is disregarded, no two names should be the same.
@@ -90,7 +92,7 @@ NetCDF variables that contain coordinate data are referred to as __coordinate va
 ==== Missing data, valid and actual range of data
 
 The NUG conventions
-(link:$$http://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, Attribute Conventions])
+(link:$$https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html$$[NUG Appendix A, Attribute Conventions])
 provide the **`_FillValue`**, **`missing_value`**, **`valid_min`**, **`valid_max`**, and **`valid_range`** attributes to indicate missing data.
 Missing data is allowed in data variables and auxiliary coordinate variables.
 Generic applications should treat the data as missing where any auxiliary coordinate variables have missing values; special-purpose applications might be able to make use of the data.
@@ -104,7 +106,7 @@ Doing this guarantees that the missing value will be recognized by generic appli
 The scalar attribute with the name **`_FillValue`** and of the same type as its variable is recognized by the netCDF library as the value used to pre-fill disk space allocated to the variable.
 This value is considered to be a special value that indicates undefined or missing data, and is returned when reading values that were not written.
 The **`_FillValue`** should be outside the range specified by **`valid_range`** (if used) for a variable.
-The netCDF library defines a default fill value for each data type (See the "Note on fill values" in link:$$http://www.unidata.ucar.edu/software/netcdf/docs/file_format_specifications.html#classic_format_spec$$[NUG Appendix B, File Format Specifications]).
+The netCDF library defines a default fill value for each data type (See the "Note on fill values" in link:$$https://www.unidata.ucar.edu/software/netcdf/docs/file_format_specifications.html#classic_format_spec$$[NUG Appendix B, File Format Specifications]).
 
 The missing values of a variable with **`scale_factor`** and/or **`add_offset`** attributes (see <<packed-data>>) are interpreted relative to the variable's external values (a.k.a. the packed values, the raw values, the values stored in the netCDF file), not the values that result after the scale and offset are applied.
 Applications that process variables that have attributes to indicate both a transformation (via a scale and/or offset) and missing values should first check that a data value is valid, and then apply the transformation.
@@ -137,7 +139,7 @@ See <<attribute-appendix>> for a list of attributes described by this standard.
 ==== Identification of Conventions
 
 Files that follow this version of the CF Conventions must indicate this by setting the NUG defined global attribute **`Conventions`** to a string value that contains "**`CF-{current-version-as-attribute}`**".
-The Conventions version number contained in that string can be used to find the web based versions of this document are from the link:$$http://cfconventions.org/$$[netCDF Conventions web page].
+The Conventions version number contained in that string can be used to find the web based versions of this document are from the link:$$https://cfconventions.org/$$[netCDF Conventions web page].
 Subsequent versions of the CF Conventions will not make invalid a compliant usage of this or earlier versions of the CF terms and forms.
 
 It is possible for a netCDF file to adhere to more than one set of conventions, even when there is no inheritance relationship among the conventions.
@@ -147,6 +149,8 @@ If the string contains any commas, it is assumed to be a comma-separated list.
 
 When CF is listed with other conventions, this asserts the same full compliance with CF requirements and interpretations as if CF was the sole convention.
 It is the responsibility of the data-writer to ensure that all common metadata is used with consistent meaning between conventions.
+
+The UGRID conventions, which are fully incorporated into the CF conventions, do not need to be included in the **`Conventions`** attribute.  
 
 [[description-of-file-contents, Section 2.6.2, "Description of file contents"]]
 ==== Description of file contents

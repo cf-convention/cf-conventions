@@ -11,7 +11,7 @@ Because each feature contains only a single data element, there is no need for a
 The representation of point features is a special, degenerate case of the standard four representations. 
 The `coordinates` attribute is used on the data variables to unambiguously identify the relevant space and time auxiliary coordinate variables.
 
-[[example-h.1, Example H.1, "Point data"]]
+[[example-h.1, "Point data"]]
 [caption="Example H.1. "]
 .Point data.
 ====
@@ -73,8 +73,8 @@ The global attribute `featureType={rdquo}timeSeries{rdquo}` (case-insensitive) m
 ==== Orthogonal multidimensional array representation of time series
 
 If the time series instances have the same number of elements and the time values are identical for all instances, you may use the orthogonal multidimensional array representation.
-This has either a one-dimensional coordinate variable, `time(time)`, provided the time values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, `time(o)`, where `o` is the element dimension.
-In the former case, listing the time variable in the `coordinates` attributes of the data variables is optional.
+This has either a one-dimensional coordinate variable, time(time), provided the time values are in strict monotonically increasing order, or a one-dimensional auxiliary coordinate variable, time(o), where o is the element dimension.
+In the former case, listing the time variable in the **`coordinates`** attributes of the data variables is optional.
 
 [[example-h.2]]
 [caption="Example H.2. "]
@@ -232,8 +232,8 @@ When the intention of a data variable is to contain only a single time series, t
 ----
 ====
 
-While an idealized time series is defined at a single, stable point location, there are examples of time series, such as cabled ocean surface mooring measurements, in which the precise position of the observations varies slightly from a nominal fixed point.
-In the following example we show how the spatial positions of such a time series should be encoded in CF.
+While an idealized time series is defined at a single, stable point location, there are examples of time series, such as cabled ocean surface mooring measurements, in which the precise position of the observations varies slightly from a nominal fixed point. It is quite common that the deployment position of a station changes after maintenance or repositioning after it drifts. 
+In the following example we show how the spatial positions of such a time series should be encoded in CF. In addition, this example shows how lossless compression by gathering <<compression-by-gathering>> has been applied to the deployment coordinate variables, which otherwise would contain a lot of missing or repetitive data.
 Note that although this example shows only a single time series, the technique is applicable to all of the representations.
 
 [[example-h.5]]
@@ -242,54 +242,65 @@ Note that although this example shows only a single time series, the technique i
 ====
 ----
    dimensions:
-      time = 100233 ;
-      name_strlen = 23 ;
+      time = 100233 ;
+      name_strlen = 23 ;
+      deployment = 5 ;
 
    variables:
-      float lon ;
-          lon:standard_name = "longitude";
-          lon:long_name = "station longitude";
-          lon:units = "degrees_east";
-          lon:axis = “X”;
-      float lat ;
-          lat:standard_name = "latitude";
-          lat:long_name = "station latitude" ;
-          lat:units = "degrees_north" ;
-          lat: axis = “Y” ;
-      float precise_lon (time);
-          precise_lon:standard_name = "longitude";
-          precise_lon:long_name = "station longitude";
-          precise_lon:units = "degrees_east";
-      float precise_lat (time);
-          precise_lat:standard_name = "latitude";
-          precise_lat:long_name = "station latitude" ;
-          precise_lat:units = "degrees_north" ;
-      float alt ;
-          alt:long_name = "vertical distance above the surface" ;
-          alt:standard_name = "height" ;
-          alt:units = "m";
-          alt:positive = "up";
-          alt:axis = "Z";
-      char station_name(name_strlen) ;
-          station_name:long_name = "station name" ;
-          station_name:cf_role = "timeseries_id";
-
-      double time(time) ;
-          time:standard_name = "time";
-          time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-      float humidity(time) ;
-          humidity:standard_name = “specific_humidity” ;
-          humidity:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
-          humidity:_FillValue = -999.9f;
-      float temp(time) ;
-          temp:standard_name = “air_temperature” ;
-          temp:units = "Celsius" ;
-          temp:coordinates = "time lat lon alt precise_lon precise_lat station_name" ;
-          temp:_FillValue = -999.9f;
+      float lon ;
+          lon:standard_name = "longitude";
+          lon:long_name = "station longitude";
+          lon:units = "degrees_east";
+          lon:axis = “X”;
+      float lat ;
+          lat:standard_name = "latitude";
+          lat:long_name = "station latitude" ;
+          lat:units = "degrees_north" ;
+          lat: axis = “Y” ;
+      float precise_lon (time);
+          precise_lon:standard_name = "longitude";
+          precise_lon:long_name = "station longitude";
+          precise_lon:units = "degrees_east";
+      float precise_lat (time);
+          precise_lat:standard_name = "latitude";
+          precise_lat:long_name = "station latitude" ;
+          precise_lat:units = "degrees_north" ;
+      float deploy_lon (deployment);
+          deploy_lon:standard_name = "deployment_longitude";
+          deploy_lon:long_name = station longitude";
+          deploy_lon:units = "degrees_east";
+      float deploy_lat (deployment);
+          deploy_lat:standard_name = "deployment_latitude";
+          deploy_lat:long_name = station latitude";
+          deploy_lat:units = "degrees_north";
+      int deployment (deployment) ;
+          deployment:long_name = "index of the first time after (re)deployment" ;
+          deployment:compress="time";
+      float alt ;
+          alt:long_name = "vertical distance above the surface" ;
+          alt:standard_name = "height" ;
+          alt:units = "m";
+          alt:positive = "up";
+          alt:axis = "Z";
+      char station_name(name_strlen) ;
+          station_name:long_name = "station name" ;
+          station_name:cf_role = "timeseries_id";
+      double time(time) ;
+          time:standard_name = "time";
+          time:long_name = "time of measurement" ;
+          time:units = "days since 1970-01-01 00:00:00" ;
+      float humidity(time) ;
+          humidity:standard_name = “specific_humidity” ;
+          humidity:coordinates = "time lat lon alt precise_lon precise_lat deploy_lon deploy_lat station_name" ;
+          humidity:_FillValue = -999.9f;
+      float temp(time) ;
+          temp:standard_name = “air_temperature” ;
+          temp:units = "Celsius" ;
+          temp:coordinates = "time lat lon alt precise_lon precise_lat deploy_lon deploy_lat station_name" ;
+          temp:_FillValue = -999.9f;
 
    attributes:
-          :featureType = "timeSeries";
+          :featureType = "timeSeries";
 ----
 ====
 
@@ -454,7 +465,7 @@ If the profile instances have the same number of elements and the vertical coord
 This has either a one-dimensional coordinate variable, `z(z)`, provided the vertical coordinate values are ordered monotonically, or a one-dimensional auxiliary coordinate variable, `alt(o)`, where `o` is the element dimension.
 In the former case, listing the vertical coordinate variable in the **coordinates** attributes of the data variables is optional.
 
-[[example-h.8, Example H.8, "Atmospheric sounding profiles for a common set of vertical coordinates stored in the orthogonal multidimensional array representation."]]
+[[example-h.8, "Atmospheric sounding profiles for a common set of vertical coordinates stored in the orthogonal multidimensional array representation."]]
 [caption="Example H.8. "]
 .Atmospheric sounding profiles for a common set of vertical coordinates stored in the orthogonal multidimensional array representation.
 ====
@@ -562,9 +573,8 @@ This is a special case of the orthogonal multidimensional array representation (
           pressure:coordinates = "time lon lat z" ;
 
       float temperature(z) ;
-          temperature:standard_name = "surface_temperature" ;
-          temperature:long_name = "skin temperature" ;
-          temperature:units = "Celsius" ;
+          temperature:standard_name = "air_temperature" ;
+          temperature:units = "degree_celsius" ;
           temperature:coordinates = "time lon lat z" ;
 
       float humidity(z) ;
@@ -627,9 +637,8 @@ The canonical use case for this is when rewriting raw data, and you expect that 
           pressure:coordinates = "time lon lat z" ;
 
       float temperature(obs) ;
-          temperature:standard_name = "surface_temperature" ;
-          temperature:long_name = "skin temperature" ;
-          temperature:units = "Celsius" ;
+          temperature:standard_name = "air_temperature" ;
+          temperature:units = "degree_celsius" ;
           temperature:coordinates = "time lon lat z" ;
 
       float humidity(obs) ;
@@ -668,7 +677,7 @@ If the sample dimension is the unlimited dimension, this allows data to be appen
 
    variables:
       int profile(profile) ;
-          profile:cf_name = "profile_id";
+          profile:cf_role = "profile_id";
       double time(profile);
           time:standard_name = "time";
           time:long_name = "time" ;
@@ -700,9 +709,8 @@ If the sample dimension is the unlimited dimension, this allows data to be appen
           pressure:coordinates = "time lon lat z" ;
 
       float temperature(obs) ;
-          temperature:standard_name = "surface_temperature" ;
-          temperature:long_name = "skin temperature" ;
-          temperature:units = "Celsius" ;
+          temperature:standard_name = "air_temperature" ;
+          temperature:units = "degree_celsius" ;
           temperature:coordinates = "time lon lat z" ;
 
       float humidity(obs) ;
@@ -752,8 +760,8 @@ In that case, any unused elements of the data and auxiliary coordinate variables
 
    variables:
       string trajectory(trajectory) ;
-        trajectory:cf_role = "trajectory_id";
-        trajectory:long_name = "trajectory name" ;
+          trajectory:cf_role = "trajectory_id";
+          trajectory:long_name = "trajectory name" ;
       int trajectory_info(trajectory) ;
           trajectory_info:long_name = "some kind of trajectory info"
 
@@ -775,7 +783,7 @@ In that case, any unused elements of the data and auxiliary coordinate variables
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-           z:axis = "Z" ;
+          z:axis = "Z" ;
 
       float O3(trajectory, obs) ;
           O3:standard_name = “mass_fraction_of_ozone_in_air”;
@@ -835,7 +843,7 @@ This is a special case of the multidimensional array representation.
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-           z:axis = "Z" ;
+          z:axis = "Z" ;
 
       float O3(time) ;
           O3:standard_name = “mass_fraction_of_ozone_in_air”;
@@ -898,7 +906,7 @@ The canonical use case for this is when rewriting raw data, and you expect that 
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-           z:axis = "Z" ;
+          z:axis = "Z" ;
 
       float O3(obs) ;
           O3:standard_name = “mass_fraction_of_ozone_in_air”;
@@ -1045,7 +1053,7 @@ When storing time series of profiles at multiple stations in the same data varia
           alt:long_name = "height above mean sea level" ;
           alt:units = "km" ;
           alt:positive = "up" ;
-           alt:axis = "Z" ;  
+          alt:axis = "Z" ;  
 
       double time(station, profile ) ;
           time:standard_name = "time";
@@ -1245,7 +1253,7 @@ The canonical use case is when writing real-time data streams that contain profi
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:axis = "Z" ;  
-           z:positive = "up" ;
+          z:positive = "up" ;
 
       float pressure(obs) ;
           pressure:standard_name = "air_pressure" ;
@@ -1398,7 +1406,7 @@ If there is only one trajectory in the data variable, there is no need for the t
           alt:long_name = "height above mean sea level" ;
           alt:units = "km" ;
           alt:positive = "up" ;
-           alt:axis = "Z" ;  
+          alt:axis = "Z" ;  
 
       double time(profile ) ;
           time:standard_name = "time";

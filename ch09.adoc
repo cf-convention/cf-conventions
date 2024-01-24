@@ -25,16 +25,16 @@ Details and examples of storage of each of these feature types are provided in A
 | **point** 2+| a single data point (having no implied coordinate relationship to other points)
 |||       data(i) | x(i) y(i)  t(i) | <<point-data>>
 
-| **timeSeries** 2+| a series of data points at the same spatial location with monotonically increasing times
+| **timeSeries** 2+| a series of data points at the same spatial location with time values in strict monotonically increasing order
 |||      data(i,o) | x(i) y(i) t(i,o) | <<time-series-data>>
 
-| **trajectory** 2+| a series of data points along a path through space with monotonically increasing times
+| **trajectory** 2+| a series of data points along a path through space with time values in strict monotonically increasing order
 |||        data(i,o)    | x(i,o) y(i,o) t(i,o) | <<trajectory-data>>
 
 | **profile** 2+| an ordered set of data points along a vertical line at a fixed horizontal position and fixed time
 |||        data(i,o)    | x(i) y(i) z(i,o) t(i) | <<profile-data>>
 
-| **timeSeriesProfile** 2+| a series of profile features at the same horizontal position with monotonically increasing times
+| **timeSeriesProfile** 2+| a series of profile features at the same horizontal position with time values in strict monotonically increasing order
 |||        data(i,p,o)      | x(i) y(i) z(i,p,o) t(i,p) | <<time-series-profiles>>
 
 | **trajectoryProfile** 2+| a series of profile features located at points ordered along a trajectory
@@ -434,8 +434,8 @@ Every feature within a Discrete Geometry CF file must be unambiguously associate
 Every element of every feature must be unambiguously associated with its space and time coordinates and with the feature that contains it.
 The **`coordinates`** attribute must be attached to every data variable to indicate the spatiotemporal coordinate variables that are needed to geo-locate the data.
 
-Where feasible a coordinate or auxiliary coordinate variable with the attribute **`cf_role`** should be included. 
-The only acceptable values of **`cf_role`** for Discrete Geometry CF data sets are **`timeseries_id`**, **`profile_id`**, and **`trajectory_id`**.  
+Where feasible, one of the coordinate or auxiliary coordinate variables of a discrete sampling geometry should have an attribute named **`cf_role`**.
+This attribute has no other function in the CF convention (despite its general-sounding name), and its only permitted values are **`timeseries_id`**, **`profile_id`**, and **`trajectory_id`**.
 The variable carrying the **`cf_role`** attribute may have any data type.
 When a variable is assigned this attribute, it must provide a unique identifier for each feature instance.  
 CF files that contain timeSeries, profile or trajectory featureTypes, should include only a single occurrence of a **`cf_role`** attribute;  CF files that contain timeSeriesProfile or trajectoryProfile may contain two occurrences, corresponding to the two levels of structure in these feature types.
@@ -446,7 +446,7 @@ Similarly, although an idealized time series exists at a fixed lat-long position
 
 CF Discrete Geometries provides a mechanism to encode both the nominal and the precise positions, while retaining the semantics of the idealized feature type.
 Only the set of coordinates which are regarded as the nominal (default or preferred) positions should be indicated by the attribute **`axis`**, which should be assigned string values to indicate the orientations of the axes (**`X`**, **`Y`**, **`Z`**, or **`T`**).
-See example A9.2.3.2.
+See <<example-h.5>> (a single timeseries with time-varying deviations from a nominal point spatial location): 
 Auxiliary coordinate variables containing the nominal and the precise positions should be listed in the relevant **`coordinates`** attributes of data variables.
 In orthogonal representations the nominal positions could be  coordinate variables, which do not need to be listed in the **`coordinates`** attribute, rather than auxiliary coordinate variables.
 

@@ -8,12 +8,13 @@ This section presents two methods for making that association: the use of __coor
 Any of a variable's dimensions that is an independently varying latitude, longitude, vertical, or time dimension (see <<terminology>>) and that has a size greater than one must have a corresponding coordinate variable, i.e., a one-dimensional variable with the same name as the dimension (see examples in <<coordinate-types>>).
 This is the only method of associating dimensions with coordinates that is supported by <<COARDS>>.
 
-Any longitude, latitude, vertical or time coordinate which depends on more than one spatiotemporal dimension must be identified by the `coordinates` attribute of the data variable.
-The value of the `coordinates` attribute is __a blank separated list of the names of auxiliary coordinate variables__.
-There is no restriction on the order in which the auxiliary coordinate variables appear in the `coordinates` attribute string.  
-The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated, with two exceptions.
-First, string-valued coordinates (<<labels>>) will have a dimension for maximum string length if the coordinate variable has a type of `char` rather than a type of `string`.
-Second, in the ragged array representations of data (<<discrete-sampling-geometries>>), special methods are needed to connect the data and coordinates.
+Any longitude, latitude, vertical or time coordinate which depends on more than one spatiotemporal dimension must be identified by the **`coordinates`** attribute of the data variable.
+The value of the **`coordinates`** attribute is __a blank separated list of the names of auxiliary coordinate variables__.
+There is no restriction on the order in which the auxiliary coordinate variables appear in the **`coordinates`** attribute string.
+The dimensions of an auxiliary coordinate variable must be a subset of the dimensions of the variable with which the coordinate is associated, with three exceptions.
+First, string-valued coordinates (<<labels>>) will have a dimension for maximum string length if the coordinate variable has a type of **`char`** rather than a type of **`string`**.
+Second, if an auxiliary coordinate variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable.
+Third, in the ragged array representations of data (<<discrete-sampling-geometries>>), special methods are needed to connect the data and coordinates.
 
 We recommend that the name of a multidimensional coordinate variable should not match the name of any of its dimensions because that precludes supplying a coordinate variable for the dimension.
 This practice also avoids potential bugs in applications that determine coordinate variables by only checking for a name match between a dimension and a variable and not checking that the variable is one dimensional.
@@ -271,7 +272,7 @@ Note that the units of the rotated longitude and latitude axes are given as `deg
 This should prevent a COARDS compliant application from mistaking the variables `rlon` and `rlat` to be actual longitude and latitude coordinates.
 The entries for these names in the standard name table indicate the appropriate sign conventions for the units of `degrees`.
 
-[[lambert-conformal-projection,Example 5.7, "Lambert conformal projection"]]
+[[lambert-conformal-projection, "Lambert conformal projection"]]
 [caption="Example 5.7. "]
 .Lambert conformal projection
 ====
@@ -653,7 +654,7 @@ For this reason we strongly recommend against using a name for a scalar coordina
 If a data variable has two or more scalar coordinate variables, they are regarded as though they were all independent coordinate variables with dimensions of size one.
 If two or more single-valued coordinates are not independent, but have related values (this might be the case, for instance, for time and forecast period, or vertical coordinate and model level number, <<alternative-coordinates>>), they should be stored as coordinate or auxiliary coordinate variables of the same size one dimension, not as scalar coordinate variables.
 
-[[multiple-forecasts-from-single-analysis,Example 5.13, "Multiple forecasts from a single analysis"]]
+[[multiple-forecasts-from-single-analysis, "Multiple forecasts from a single analysis"]]
 [caption="Example 5.14. "]
 .Multiple forecasts from a single analysis
 ====
@@ -963,3 +964,89 @@ In this example the data variables `humidity` and `temp` from the <<example-h.7>
 
 ====
 
+[[mesh-topology-variables, Section 5.9, "Mesh Topology Variables"]]
+=== Mesh Topology Variables
+
+A __mesh topology variable__ defines the geospatial topology of cells arranged in two or three dimensions in real space but indexed by a single dimension.
+It explicitly describes the topological relationships between cells, i.e. spatial relationships which do not depend on the cell locations, via a mesh of connected nodes. 
+A mesh topology variable may provide the topology for one or more domains, defined at the nodes, edges, or faces of the mesh.
+See the <<data-model-domain-topology>> and <<data-model-cell-connectivity>> descriptions in the CF data model for more details, including on how the mesh relates to the cells of the domain.
+
+The canonical definitions of mesh topology variables and location index set variables are given externally by the UGRID conventions <<UGRID>>, but their standardized attributes, many of which are optional, are listed in <<appendix-mesh-topology-attributes>> and <<attribute-appendix>>.
+Some features of the UGRID conventions <<UGRID>> are not currently recognized by the CF conventions: mesh topology volume cells (that are used to describe fully three-dimensional unstructured mesh topologies); and the "boundary node connectivity" variable (that specifies an index variable identifying the nodes that define where boundary condtions have been provided). 
+
+A data or domain variable may use one of a mesh topology variable's domains by referencing the mesh topology variable with the **`mesh`** attribute; along with the identity of required domain provided by the **`location`** attribute (see example <<example-mesh-topology-variable>>).
+
+The variables containing the coordinate values for cells indexed by the mesh topology are defined by the mesh topology variable but are equivalent to one-dimensional auxiliary coordinate variables, and so may also be provided by the data or domain variable's **`coordinates`** attribute.
+Note that the mesh topology variable allows cell bounds to be provided without any cell coordinate values, via its __**`node_coordinates`**__ attribute.
+
+A __location index set variable__ defines a subset of locations of a mesh topology variable, e.g. only special locations like weirs and gates.
+It is provided as a space saving device to prevent the need to redefine parts of an existing mesh topology variable, and as such is logically equivalent to a mesh topology variable.
+A data or domain variable references a location index set variable via its **`location_index_set`** attribute.
+
+[[example-mesh-topology-variable]]
+[caption="Example 5.21. "]
+.A two-dimensional UGRID mesh topology variable
+====
+----
+dimensions:
+  node = 5 ;  // Number of mesh nodes
+  edge = 6 ;  // Number of mesh edges
+  face = 2 ;  // Number of mesh faces
+  two = 2 ;   // Number of nodes per edge
+  four = 4 ;  // Maximum number of nodes per face
+  time = 12 ;
+
+variables:
+  // Mesh topology variable
+  integer mesh ;
+    mesh:cf_role = "mesh_topology" ;
+    mesh:long_name = "Topology of a 2-d unstructured mesh" ;
+    mesh:topology_dimension = 2 ;
+    mesh:node_coordinates = "mesh_node_x mesh_node_y" ;
+    mesh:edge_node_connectivity = "mesh_edge_nodes" ;
+    mesh:face_node_connectivity = "mesh_face_nodes" ;
+
+  // Mesh node coordinates
+  double mesh2_node_x(node) ;
+    mesh_node_x:standard_name = "longitude" ;
+    mesh_node_x:units = "degrees_east" ;
+  double mesh2_node_y(node) ;
+    mesh_node_y:standard_name = "latitude" ;
+    mesh_node_y:units = "degrees_north" ;
+
+  // Mesh connectivity variables
+  integer mesh_face_nodes(face, four) ;
+    mesh_face_nodes:long_name = "Maps each face to its 3 or 4 corner nodes" ;
+  integer mesh_edge_nodes(edge, two) ;
+    mesh_edge_nodes:long_name = "Maps each edge to the 2 nodes it connects" ;
+
+  // Coordinate variables
+  float time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2004-06-01" ;
+
+  // Data at mesh faces
+  double volume_at_faces(time, face) ;
+    volume_at_faces:standard_name = "air_density" ;
+    volume_at_faces:units = "kg m-3" ;
+    volume_at_faces:mesh = "mesh" ;
+    volume_at_faces:location = "face" ;
+  // Data at mesh edges
+  double flux_at_edges(time, edge) ;
+    fluxe_at_edges:standard_name = "northward_wind" ;
+    fluxe_at_edges:units = "m s-1" ;
+    fluxe_at_edges:mesh = "mesh"
+    fluxe_at_edges:location = "edge" ;
+  // Data at mesh nodes
+  double height_at_nodes(time, node) ;
+    height_at_nodes:standard_name = "sea_surface_height_above_geoid" ;
+    height_at_nodes:units = "m" ;
+    height_at_nodes:mesh = "mesh" ;
+    height_at_nodes:location = "node" ;
+
+----
+
+A two-dimensional UGRID mesh topology variable for the mesh depicted in <<figure-mesh-example>>, with data variables defined at face, edge and node elements of the mesh. All optional attributes have been omitted.
+
+====
