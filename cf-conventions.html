@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.12 draft,</span>
-<span id="revdate">&#160;&#160;01&#160;March,&#160;2024&#160;17:10:07Z</span>
+<span id="revdate">&#160;&#160;18&#160;March,&#160;2024&#160;22:34:20Z</span>
 <br><span id="revremark">See&#160;<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>&#160;for&#160;further&#160;information.</span>
 </div>
 </div>
@@ -2012,7 +2012,7 @@ Use of these attributes for data packing, which is their most important applicat
 <div class="paragraph">
 <p>The <strong><code>long_name</code></strong> attribute is defined by the NUG to contain a long descriptive name which may, for example, be used for labeling plots.
 For backwards compatibility with COARDS this attribute is optional.
-But it is highly recommended that either this or the <strong><code>standard_name</code></strong> attribute defined in the next section be provided to make the file self-describing.
+But it is highly recommended that either this or the <strong><code>standard_name</code></strong> attribute defined in the next section be provided for all data variables and variables containing coordinate data, in order to make the file self-describing.
 If a variable has no <strong><code>long_name</code></strong> attribute then an application may use, as a default, the <strong><code>standard_name</code></strong> if it exists, or the variable name itself.</p>
 </div>
 </div>
@@ -6479,8 +6479,8 @@ Every element of every feature must be unambiguously associated with its space a
 The <strong><code>coordinates</code></strong> attribute must be attached to every data variable to indicate the spatiotemporal coordinate variables that are needed to geo-locate the data.</p>
 </div>
 <div class="paragraph">
-<p>Where feasible, one of the coordinate or auxiliary coordinate variables of a discrete sampling geometry should have an attribute named <strong><code>cf_role</code></strong>.
-This attribute has no other function in the CF convention (despite its general-sounding name), and its only permitted values are <strong><code>timeseries_id</code></strong>, <strong><code>profile_id</code></strong>, and <strong><code>trajectory_id</code></strong>.
+<p>Where feasible, one of the coordinate or auxiliary coordinate variables of a discrete sampling geometry should have an attribute named <strong><code>cf_role</code></strong>, whose only permitted values for this purposes are <strong><code>timeseries_id</code></strong>, <strong><code>profile_id</code></strong>, and <strong><code>trajectory_id</code></strong>.
+(Despite its general-sounding name, this attribute only one other function, namely in <a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a>.)
 The variable carrying the <strong><code>cf_role</code></strong> attribute may have any data type.
 When a variable is assigned this attribute, it must provide a unique identifier for each feature instance.  
 CF files that contain timeSeries, profile or trajectory featureTypes, should include only a single occurrence of a <strong><code>cf_role</code></strong> attribute;  CF files that contain timeSeriesProfile or trajectoryProfile may contain two occurrences, corresponding to the two levels of structure in these feature types.</p>
@@ -6526,12 +6526,14 @@ Data variables should (as usual) also contain missing values to indicate when th
 <div class="sectionbody">
 <div class="paragraph">
 <p>All CF attributes are listed here except for those that are used to describe grid mappings and mesh topologies.
-See Appendix F for the grid mapping attributes, and Appendix K for mesh topology attributes.</p>
+See <a href="#appendix-grid-mappings">Appendix F, Grid Mappings</a> for the grid mapping attributes, and <a href="#appendix-mesh-topology-attributes">Appendix K, Mesh Topology Attributes</a> for mesh topology attributes.</p>
 </div>
 <div class="paragraph">
 <p>The "Type" values are <strong>S</strong> for string, <strong>N</strong> for numeric, and <strong>D</strong> for the type of the data variable.
 Each attribute may be used in any of the ways shown in its "Use" entry.
-<strong>G</strong> indicates it can appear as a global attribute, and <strong>Gr</strong> as a group attribute; if use of an attribute is restricted to certain kinds of variables this is indicated as follows: <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for data variables, <strong>M</strong> for geometry container variables, <strong>Do</strong> for domain variables, <strong>BI</strong> and <strong>BO</strong> for boundary variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> for the distinction between <strong>BI</strong> and <strong>BO</strong>), and <strong>-</strong> for variables with some other purpose.
+<strong>G</strong> indicates it can appear as a global attribute, and <strong>Gr</strong> as a group attribute.
+For variable attributes, the possible values of "Use" are: <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for data variables, <strong>M</strong> for geometry container variables, <strong>Do</strong> for domain variables, <strong>BI</strong> and <strong>BO</strong> for boundary variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> for the distinction between <strong>BI</strong> and <strong>BO</strong>), and <strong>-</strong> for variables with some other purpose.
+CF does not prohibit any of these attributes from being attached to variables of different kinds from those listed as their "Use" in this table, but their meanings are not defined by CF if they are used in these other ways.
 "Links" indicates the location of the attribute"s original definition (first link) and sections where the attribute is discussed in this document (additional links as necessary).</p>
 </div>
 <table id="table-attributes" class="tableblock frame-all grid-all stretch">
@@ -6615,8 +6617,9 @@ In cases where there is a strong constraint on dataset size, it is allowed to pa
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>cf_role</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C, BI</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#coordinates-metadata">Section 9.5, "Coordinates and metadata"</a>, and <a href="#mesh-topology-variables">Section 5.9, "Mesh Topology Variables"</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies the roles of variables that identify features in discrete sampling geometries; and the roles of mesh topology and location index set variables.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#coordinates-metadata">Section 9.5, "Coordinates and metadata"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies the roles of variables that identify features in discrete sampling geometries.
+Identifies the roles of mesh topology and location index set variables (see <a href="#appendix-mesh-topology-attributes">Appendix K, Mesh Topology Attributes</a>).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>climatology</code></strong></p></td>
@@ -12201,6 +12204,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/501">Issue #501</a>: Clarify that data variables and variables containing coordinate data are highly recommended to have <strong><code>long_name</code></strong> or <strong><code>standard_name</code></strong> attributes, that <strong><code>cf_role</code></strong> is used only for discrete sampling geometries and UGRID mesh topologies, and that CF does not prohibit CF attributes from being used in ways that are not defined by CF but that in such cases their meaning is not defined by CF.</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/477">Issue #477</a>: Period and hyphen allowed in attribute names</p>
 </li>
 <li>
@@ -12832,7 +12838,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.12 draft<br>
-Last updated 2024-03-01 17:10:06 UTC
+Last updated 2024-03-18 22:34:20 UTC
 </div>
 </div>
 </body>
