@@ -678,30 +678,64 @@ For instance, a **`computational_precision**` value of **`"64"**` would specify 
 [[lossy-compression-by-quantization, Section 8.4, "Lossy Compression by Quantization"]]
 === Lossy Compression by Quantization
 
-Geoscientific models and measurements generate false precision (scientifically meaningless data bits) that wastes storage space. False precision can mislead (by implying noise is signal) and is scientifically pointless. Quantization is a technique that can eliminate false precision, usually by setting the least significant bits of IEEE floating-point values to zero. The results are themselves valid IEEE values with quantized precision---no special software or decoding is necessary to read them. Moreover, the quantized bits compress more efficiently than random bits. Thus quantization is often referred to as a form of lossy compression though, strictly speaking, quantization is a pre-conditioner for compression that must actually be performed by a subsequent codec.
+Geoscientific models and measurements generate false precision (scientifically meaningless data bits) that wastes storage space.
+False precision can mislead (by implying noise is signal) and is scientifically pointless.
+The quantization technique can eliminate false precision, usually by setting the least significant bits of [<<IEEE_754>>] floating-point mantissas to zeros.
+The quantized results are valid [<<IEEE_754>>] values---no special software or decoder is necessary to read them.
+Importantly, the quantized bits compress more efficiently than random bits.
+Thus quantization is often referred to as a lossy compression technique though, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent codec.
 
-These CF conventions constitute a framework to provide quantization properties as metadata that accompanies quantized data. The goals are twofold. First, to inform the interested user how, and to what degree, the quantized data differ from the original (and irrecoverable) unquantized data. Second, to provide the necessary provenance metadata for users to reproduce the data transformations on the same or other raw data. These conventions also allow users to better understand the precision that the data producer expects from the source model or measurement. 
+These CF conventions constitute a framework to provide quantization properties as metadata that accompanies quantized data.
+The goals are twofold.
+First, to inform interested users how, and to what degree, the quantized data differ from the original (and irrecoverable) unquantized data.
+Second, to provide the necessary provenance metadata for users to reproduce the data transformations on the same or other raw data.
+These conventions also allow users to better understand the precision that data producers expect from source models or measurements. 
 
-Software can use a variety of algorithms to quantize data and write it in netCDF format. In practice, data purveyors are likely to employ the same quantization algorithm to multiple variables in a single file, possibly with variable-specific levels of quantization. This suggests the use of a hybrid version of the container variable model for each quantization algorithm employed on variables in a given file. The lossy compression container variable records the generic properties of the algorithm, while the algorithm parameters applied to specific variables are as attributes of those variables. The values of many of the attributes make use of controlled vocabularies that are case-insensitive, with white space replaced by underscores.
+Software can use a variety of algorithms to quantize data and write it in netCDF format.
+In practice, data purveyors are likely to employ the same lossy quantization algorithm to multiple variables in a single file, possibly with variable-specific levels of compression.
+This suggests the use of a hybrid version of the container variable model for each quantization algorithm employed on variables in a given file.
+The **`lossy compression`** container variable records the generic properties of the algorithm, while the algorithm parameters are stored as attributes of the specific data variables to which they were applied.
+Keeping with CF precedents, many attributes make use of controlled vocabularies that are case-insensitive, with white space replaced by underscores.
 
-[[lossy-compression-variable, Section 8.4.1, "Lossy Compression Varible"]]
+[[lossy-compression-variable, Section 8.4.1, "Lossy Compression Variable"]]
 ==== Lossy compression variable
 
-A lossy compression variable provides the description of a lossy compression algorithm via a collection of attached attributes. It is of arbitrary type since it contains no data. Its purpose is to act as a container for the generic attributes of the algorithm. Lossy compression variables are recommended to have at least three attributes: family, algorithm, and implementation.
+A **`lossy compression`** variable provides the description of a lossy compression algorithm via a collection of attached attributes.
+It is of arbitrary type since it contains no data.
+Its purpose is to act as a container for the generic attributes of an algorithm.
+Lossy compression variables are recommended to have at least three attributes: **`family`**, **`algorithm`**, and **`implementation`**.
 
-The family attribute conveys the general class of lossy algorithm to the user who may not be familiar with the names of all possible algorithms in each class. The only valid value of family currently is quantize. For this reason family is an optional though recommended attribute. If and when algorithms outside the quantize family are supported, the family attribute may become required. Other potential families of lossy algorithms include rounding, packing, zfp, and fpzip. 
+The **`family`** attribute conveys the general class of lossy algorithm to the user who may not be familiar with the names of all possible algorithms in each class.
+The only valid value of **`family`** currently is **`quantize`**.
+For this reason **`family`** is an optional though recommended attribute.
+If and when algorithms outside the quantize family are supported, the **`family`** attribute may become required.
+Other potential families of lossy algorithms include rounding, packing, zfp, and fpzip. 
 
-The algorithm attribute that defines a specific algorithm depends on the value of family. The netCDF library itself has supported three quantization algorithms since 2023: BitGroom, BitRound, and Granular BitRound. The controlled vocabulary for the quantize family of algorithm is thus bitgroom, bitround, and granular_bitround.
+The **`algorithm`** attribute name a specific algorithm from those defined for the give **`family`**.
+The netCDF library itself has supported three quantization algorithms since 2023: BitGroom, BitRound, and Granular BitRound.
+The controlled vocabulary for the **`quantize`** algorithms consists of **`bitgroom`**, **`bitround`**, and **`granular_bitround`**.
 
-The final attribute in a lossy compression variable is implementation. This required attribute contains free-form text that concisely conveys the algorithm provenance, including the name of the library or client that performed the quantization, the software version, and, if deemed relevant, the author name(s).
+The final attribute in a lossy compression variable is **`implementation`**.
+This required attribute contains free-form text that concisely conveys the algorithm provenance, including the name of the library or client that performed the quantization, and the software version.
+Other information such as the author name(s) may be included in **`implementation`** if it is required convey a reproducible version of the algorithm employed.
 
 [[per-variable-lossy-compression-attributes, Section 8.4.2, "Per-variable lossy compression attributes"]]
 ==== Per-variable lossy compression attributes
 
-Each variable that has been lossily compressed must include at least two attributes. The lossy compression variables are associated with the data variables by the lossy_compression attribute. This attribute is attached to data variables so that variables with compressed with different algorithms may be present in a single file.
+Each variable that has been lossily compressed must include at least two attributes.
+The lossy compression variables are associated with the data variables by the lossy_compression attribute.
+This attribute is attached to data variables so that variables with compressed with different algorithms may be present in a single file.
 
-Data variables that have been lossily compressed must also record the specific parameter value(s) used in the compression algorithm. The input parameter for all algorithms in the quantize family specifies the preserved precision. BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantize the trailing bits. Thus all data variables quantized by BitRound shall have a corresponding attribute lossy_compression_nsb. The value of lossy_compression_nsb is an integer with 1 <= NSB <= 23 for data type float or real, and 1 <= NSB <= 52 for data type double.
+Data variables that have been lossily compressed must also record the specific parameter value(s) used in the compression algorithm.
+The input parameter for all algorithms in the quantize family specifies the preserved precision.
+BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantize the trailing bits.
+Thus all data variables quantized by BitRound shall have a corresponding attribute lossy_compression_nsb.
+The value of lossy_compression_nsb is an integer with 1 <= NSB <= 23 for data type float or real, and 1 <= NSB <= 52 for data type double.
 
-The Bitgroom and Granular Bitgroom algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation. The actual number of mantissa bits quantized depends on the algorithm. Thus all data variables quantized by BitGroom or Granular BitGroom shall have a corresponding attribute lossy_compression_nsd. The value of lossy_compression_nsd is an integer with 1 <= NSD <= 7 for data type float or real, and 1 <= NSD <= 16 for data type double.
+The Bitgroom and Granular Bitgroom algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation.
+The actual number of mantissa bits quantized depends on the algorithm.
+Thus all data variables quantized by BitGroom or Granular BitGroom shall have a corresponding attribute lossy_compression_nsd.
+The value of lossy_compression_nsd is an integer with 1 <= NSD <= 7 for data type float or real, and 1 <= NSD <= 16 for data type double.
 
+fxm got to here editing
 The number of bits so quantized can be chosen by multiples criteria including: 1) Preserving a desired floating point precision that corresponds to the known measurement or model precision or accuracy; 2) Achieving a desired reduction in required storage space.
