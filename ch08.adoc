@@ -678,14 +678,15 @@ For instance, a **`computational_precision**` value of **`"64"**` would specify 
 [[lossy-compression-by-quantization, Section 8.4, "Lossy Compression by Quantization"]]
 === Lossy Compression by Quantization
 
-Geoscientific models and measurements generate false precision (scientifically meaningless data bits) that wastes storage space.
+Geoscientific models and measurements generate false floating-point precision (scientifically meaningless data bits) that wastes storage space.
 False precision can mislead (by implying noise is signal) and is scientifically pointless.
 The quantization technique can eliminate false precision, usually by setting the least significant bits of [<<IEEE_754>>] floating-point mantissas to zeros.
+(Quantization of integer types, although theoretically allowed, is not covered by this convention.)
 The quantized results are valid [<<IEEE_754>>] values---no special software or decoder is necessary to read them.
 Importantly, the quantized bits compress more efficiently than random bits.
 Thus quantization is often referred to as a lossy compression technique though, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent codec.
 
-These CF conventions constitute a framework to provide quantization properties as metadata that accompanies quantized data.
+These CF conventions define a metadata framework to provide quantization properties alongside quantized data.
 The goals are twofold.
 First, to inform interested users how, and to what degree, the quantized data differ from the original (and irrecoverable) unquantized data.
 Second, to provide the necessary provenance metadata for users to reproduce the data transformations on the same or other raw data.
@@ -711,31 +712,101 @@ For this reason **`family`** is an optional though recommended attribute.
 If and when algorithms outside the quantize family are supported, the **`family`** attribute may become required.
 Other potential families of lossy algorithms include rounding, packing, zfp, and fpzip. 
 
-The **`algorithm`** attribute name a specific algorithm from those defined for the give **`family`**.
-The netCDF library itself has supported three quantization algorithms since 2023: BitGroom, BitRound, and Granular BitRound.
-The controlled vocabulary for the **`quantize`** algorithms consists of **`bitgroom`**, **`bitround`**, and **`granular_bitround`**.
+The **`algorithm`** attribute names a specific lossy compression algorithm.
+Four quantization algorithms are currently recognized for **`family = quantize`**: BitRound, BitGroom, DigitRound, and Granular BitRound.
+The controlled vocabulary for the **`quantize`** algorithms thus consists of **`bitround`**, **`bitgroom`**, **`digitround`**, and **`granular_bitround`**.
+See <<quantization-algorithms-description>> for a brief summary of these algorithms.
 
 The final attribute in a lossy compression variable is **`implementation`**.
 This required attribute contains free-form text that concisely conveys the algorithm provenance, including the name of the library or client that performed the quantization, and the software version.
-Other information such as the author name(s) may be included in **`implementation`** if it is required convey a reproducible version of the algorithm employed.
+**`implementation`** should include any other information required to disambiguate the source of the algorithm employed.
 
 [[per-variable-lossy-compression-attributes, Section 8.4.2, "Per-variable lossy compression attributes"]]
 ==== Per-variable lossy compression attributes
 
 Each variable that has been lossily compressed must include at least two attributes.
-The lossy compression variables are associated with the data variables by the lossy_compression attribute.
-This attribute is attached to data variables so that variables with compressed with different algorithms may be present in a single file.
+Data variables use the **`lossy_compression`** attribute to associate themselves with a **`lossy compression`** variable.
+This attribute is attached to data variables so that variables compressed with different algorithms may be present in a single file.
 
-Data variables that have been lossily compressed must also record the specific parameter value(s) used in the compression algorithm.
-The input parameter for all algorithms in the quantize family specifies the preserved precision.
-BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantize the trailing bits.
-Thus all data variables quantized by BitRound shall have a corresponding attribute lossy_compression_nsb.
-The value of lossy_compression_nsb is an integer with 1 <= NSB <= 23 for data type float or real, and 1 <= NSB <= 52 for data type double.
+Data variables that have been lossily compressed must also record the specific parameter value(s) used in the lossy compression algorithm.
+The input parameter for all algorithms in the **`quantize`** family determines the precision preserved by the algorithm.
+BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantizes the trailing bits.
+All data variables quantized by BitRound must record the NSB in the **`lossy_compression_nsb`** attribute.
+Note that BitRound __counts only explicitly represented mantissa bits__.
+It does not include the most-significant-bit with value 1 that implicitly begins all [<<IEEE_754>>] mantissas.
+Thus **`lossy_compression_nsb`** is an integer type attribute with **`1 \<= NSB \<= 23`** for data type **`float`** or **`real`**, and **`1 \<= NSB \<= 52`** for data type **`double`**.
 
-The Bitgroom and Granular Bitgroom algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation.
+The Bitgroom, Granular Bitgroom, and DigitRound algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation.
 The actual number of mantissa bits quantized depends on the algorithm.
-Thus all data variables quantized by BitGroom or Granular BitGroom shall have a corresponding attribute lossy_compression_nsd.
-The value of lossy_compression_nsd is an integer with 1 <= NSD <= 7 for data type float or real, and 1 <= NSD <= 16 for data type double.
+Thus all data variables quantized by BitGroom, Granular BitGroom, or DigitRound must have a corresponding attribute **`lossy_compression_nsd`**.
+The value of **`lossy_compression_nsd`** is an integer with **`1 \<= NSD \<= 7`** for data type **`float`** or **`real`**, and **`1 \<= NSD \<= 15`** for data type **`double`**.
 
-fxm got to here editing
-The number of bits so quantized can be chosen by multiples criteria including: 1) Preserving a desired floating point precision that corresponds to the known measurement or model precision or accuracy; 2) Achieving a desired reduction in required storage space.
+[[example-lossy-compression-nsb-libnetcdf]]
+[caption="Example 8.8. "]
+.Lossy compression performed by BitRound algorithm in libnetcdf
+====
+----
+  variables:
+    char compression_info ;
+      compression_info:family = "quantize" ;
+      compression_info:algorithm = "bitround" ;
+      compression_info:implementation = "libnetcdf version 4.9.3-development" ;
+
+    float ps(time,lat,lon) ;
+      ps:_QuantizeBitRoundNumberOfSignificantBits = 9 ;
+      ps:lossy_compression = "compression_info" ;
+      ps:lossy_compression_nsb = 9 ;
+      ps:standard_name = "surface_air_pressure" ;
+      ps:units = "Pa" ;
+----
+Note how the same NSB is reported in two attributes of the data variable **`ps`**. The **`lossy_compression`** container variable (**`compression_info`**) **`implementation`** attribute reveals that the netCDF library applied the BitRound algorithm. The netCDF library wrote the system-defined **`_QuantizeBitRoundNumberOfSignificantBits`** attribute [<<NetCDF>>] which contains the same parameter value as the CF **`lossy_compression_nsb`** attribute.
+====
+
+[[example-lossy-compression-nsd-multiple-variables-nco]]
+[caption="Example 8.9. "]
+.Lossy compression performed by Granular BitGroom algorithm in NCO
+====
+Quantization of different variables to different levels often makes good scientific sense. Here the pressure variable **`ps`** has four significant digits of precision while the temperature variable **`ts`** retains only three significant digits. 
+----
+  variables:
+    char compression_info ;
+      compression_info:family = "quantize" ;
+      compression_info:algorithm = "granular_bitround" ;
+      compression_info:implementation = "NCO version 5.2.5-alpha01" ;
+
+    float ps(time,lat,lon) ;
+      ps:standard_name = "surface_air_pressure" ;
+      ps:units = "Pa" ;
+      ps:lossy_compression = "compression_info" ;
+      ps:lossy_compression_nsd = 4 ;
+
+    float ts(time) ;
+      ts:standard_name = "surface_temperature" ;
+      ts:units = "K" ;
+      ts:lossy_compression = "compression_info" ;
+      ts:lossy_compression_nsd = 3 ;
+----
+Both variables were quantized by the same algorithm and so utilize the same **`lossy_compression`** variable. **`compression_info`** reveals that the Granular BitRound algorithm in NCO performed the quantization. Since the netCDF library did not perform the quantization, there is no system-defined long quantization attribute.
+====
+
+[[quantization-algorithms-description, Section 8.4.3, "Description of Quantization Algorithms"]]
+==== Description of Quantization Algorithms
+
+This section briefly describes and contrasts each recognized **`quantize`** algorithm and points to further documentation.
+BitRound is also called the "round-to-nearest" method [<<KRD21>>] and the "half-to-even" method [<<Kou21>>].
+This is the default [<<IEEE_754>>] rounding method and is thus bias-free and conservative for random distributions of numbers.
+BitRound is preferred when the number of significant bits (NSB) to retain is known.
+
+The other **`quantize`** algorithms guarantee to preserve a given number of significant (base-10 representation) digits (NSD).
+Their quantization errors never exceed half of the unit value at the NSD decimal place [<<Zen16>>].
+BitGroom [<<Zen16>>] appeared first, though is now known to be suboptimal in accuracy [<<Kou21>>] and in compressibility compared to later methods.
+DigitRound [<<DCG19>>] has superior compressibility for a given NSD compared to BitGroom.
+Granular BitGroom combines the DigitRound approach for compressibility with the BitRound approach for quantization.
+Granular BitGroom and DigitRound are both good choices when the NSD to retain is known.
+
+The netCDF C and Fortran libraries can directly invoke BitRound, BitGroom, and Granular BitRound [<<NetCDF>>].
+The netCDF library attaches a long, system-defined attribute to every data variable that it quantizes, such as 
+**`_QuantizeBitRoundNumberOfSignificantBits = 9`** in Example 8.8.
+The leading underscore indicates that the netCDF library wrote this attribute [<<NUG>>].
+Any data variable that has the library-defined attribute should, in addition, contain the corresponding CF metadata.
+Example 8.9 shows how the CF metadata might appear for other (non-netCDF library) implementations of **`quantize`** algorithms.
