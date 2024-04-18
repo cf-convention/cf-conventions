@@ -1,0 +1,542 @@
+﻿[[appendix-aggregation-examples, Appendix L, Aggregation Variable Examples]]
+
+[appendix]
+== Aggregation Variable Examples
+
+This appendix contains examples of aggregation variables. Details of how to encode and decode aggregation variables may found in <<aggregation-variables>>.
+
+[[example-L.1]]
+[caption=]
+.Example L.1 
+====
+----
+dimensions:
+  // Aggregated dimensions
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Fragment dimensions
+  f_time = 2 ;
+  f_level = 1 ;
+  f_latitude = 1 ;
+  f_longitude = 1 ;
+  // Extra dimensions
+  j = 4 ;         // Equal to the number of aggregated dimensions
+  i = 2 ;         // Equal to the size of the largest fragment dimension
+  
+variables:
+  // Data variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "file: fragment_file
+                                   format: fragment_format
+                                   address: fragment_address
+                                   shape: fragment_shape" ;
+  // Coordinate variables
+  double time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+
+  // Fragment array variables
+  string fragment_file(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_format ;
+  string fragment_address ;
+  int fragment_shape(j, i) ;
+  
+data:
+  temperature = _ ;
+  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_file = "January-March.nc", "April-December.nc" ;
+  fragment_format = "nc" ;
+  fragment_address = "temperature" ;
+  fragment_shape = 3, 9,  
+                   1, _,  
+                   73, _, 
+                   144, _ ;
+----
+In this example, the `temperature` data variable is an aggregation variable. Its four-dimensional aggregated data with shape `(12, 1, 73, 144)` is constructed from two non-overlapping fragments, with shapes `(3, 1, 73, 144)` and `(9, 1, 73, 144)`, which span the first 3 and last 9 elements respectively of the `time` aggregated dimension. The fragment files names are taken as being relative to the current directory location of the aggregation file, since they are not fully qualified URIs. The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.  
+====
+
+
+[[example-L.2]]
+[caption=]
+.Example L.2
+====
+----
+dimensions:
+  // Aggregated dimensions
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Fragment dimensions
+  f_time = 2 ;
+  f_level = 1 ;
+  f_latitude = 1 ;
+  f_longitude = 1 ;
+  // Extra dimensions
+  j = 4 ;         // Equal to the number of aggregated dimensions
+  i = 2 ;         // Equal to the size of the largest fragment dimension
+  versions = 2 ;  // The maximum number of versions for a fragment
+
+variables:
+  // Data variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "file: fragment_file
+                                   format: fragment_format
+                                   address: fragment_address
+                                   shape: fragment_shape" ;
+  // Coordinate variables
+  double time ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+
+  // Fragment array variables
+  string fragment_file(f_time, f_level, f_latitude, f_longitude, versions) ;
+  string fragment_format ;
+  string fragment_address ;
+  int fragment_shape(j, i) ;
+  
+data:
+  temperature = _ ;
+  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_file = "file://local/data/January-March.nc",
+                  _,
+                  "file://local/data/April-December.nc",
+                  "https://remote/data/April-December.nc" ;
+  fragment_format = "nc" ;
+  fragment_address = "temperature" ;
+  fragment_address_time = "time" ;
+  fragment_shape = 3, 9,  
+                   1, _,  
+                   73, _, 
+                   144, _ ;
+----
+This example is similar to <<example-L.1>>, but now the fragment file names are fully qualified URIs, and two versions of the second fragment have been provided. The `fragment_file` fragment array variable has the extra trailing dimension `versions` to accommodate the extra fragment version. There is only one version of the first fragment, so its trailing dimension is padded with missing data. The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
+====
+
+[[example-L.3]]
+[caption=]
+.Example L.3
+====
+----
+dimensions:
+  // Aggregated dimensions
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Fragment dimensions
+  f_time = 2 ;
+  f_level = 1 ;
+  f_latitude = 1 ;
+  f_longitude = 1 ;
+  // Extra dimensions
+  j = 4 ;         // Equal to the number of aggregated dimensions
+  i = 2 ;         // Equal to the size of the largest fragment dimension
+  versions = 2 ;  // The maximum number of versions for a fragment
+  j_time = 1 ;    // Equal to the he number of aggregated dimensions for time
+  
+variables:
+  // Data variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "file: fragment_file
+                                   format: fragment_format
+                                   address: fragment_address
+                                   shape: fragment_shape" ;
+  // Coordinate variables
+  double time ;    // This is an aggregation coordinate variable
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+    time:aggregated_dimensions = "time" ;
+    time:aggregated_data = "file: fragment_file
+                            format: fragment_format
+                            address: fragment_address_time
+                            shape: fragment_shape_time" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+
+  // Fragment array variables
+  string fragment_file(f_time, f_level, f_latitude, f_longitude, versions) ;
+    fragment_file:substitutions = "${local}: file://local/data/
+                                   ${remote}: https://remote/data/" ;
+  string fragment_file_time(f_time, versions) ;
+    fragment_file:substitutions = "${local}: file://local/data/
+                                   ${remote}: https://remote/data/" ;
+  string fragment_format ;
+  string fragment_address ;
+  string fragment_address_time ;
+  int fragment_shape(j, i) ;
+  int fragment_shape_time(j_time, i) ;
+  
+data:
+  temperature = _ ;
+  time = _ ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_file = "${local}January-March.nc",
+                  _,
+                  "${local}April-December.nc",
+                  "${remote}April-December.nc" ;
+  fragment_file_time = "${local}January-March.nc",
+                       _,
+                       "${local}April-December.nc",
+                       "${remote}April-December.nc" ;
+  fragment_format = "nc" ;
+  fragment_address = "temperature" ;
+  fragment_address_time = "time" ;
+  fragment_shape = 3, 9,  
+                   1, _,  
+                   73, _, 
+                   144, _ ;
+  fragment_shape_time = 3, 9 ;
+----
+This example is similar to <<example-L.2>>, but now the fragment file names have been defined using the string substitutions given by the **`substitutions`** attribute of the `fragment_file` fragment array variable `fragment_file`. The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
+
+In addition, `time` is now an aggregation coordinate variable, with its aggregated data being derived from the same fragment files as `temperature`.
+====
+
+[[example-L.4]]
+[caption=]
+.Example L.4
+====
+----
+dimensions:
+  // Aggregated dimensions
+  level = 17 ;
+  latitude = 181 ;
+  longitude = 360 ;
+  // Fragment dimensions
+  f_level = 1 ;
+  f_latitude = 3 ;
+  f_longitude = 2 ;
+  // Extra dimensions
+  j = 3 ;         // Equal to the number of aggregated dimensions
+  i = 3 ;         // Equal to the size of the largest fragment dimension
+  
+variables:
+  // Data variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "file: fragment_file
+                                   format: fragment_format
+                                   address: fragment_address
+                                   shape: fragment_shape" ;
+  // Coordinate variables
+  double level(level) ;
+    level:standard_name = "air_pressure" ;
+    level:units = "hPa" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+
+  // Fragment array variables
+  string fragment_file(f_level, f_latitude, f_longitude) ;
+  string fragment_format ;
+  string fragment_address ;
+  int fragment_shape(j, i) ;
+  
+data:
+  temperature = _ ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_file = "file_A.nc", "file_B.nc",
+                  "file_C.nc", "file_D.nc",
+                  "file_E.nc", "file_F.nc" ;
+  fragment_format = "nc" ;
+  fragment_address = "temperature" ;
+  fragment_shape = 17, _, _,
+                   91, 45, 45,
+                   180, 180, _ ;
+----
+This example is an encoding for the fragment array described in <<example-fragment-array>>. The `temperature` data variable is an aggregation of 6 fragments. The fragment array shape is `(1, 3, 2)`, indicating that two of the three aggregated dimensions are spanned by multiple fragments. The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
+====
+
+[[example-L.5]]
+[caption=]
+.Example L.5
+====
+----
+dimensions:
+  // Aggregated dimensions
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Fragment dimensions
+  f_time = 12 ;
+  f_level = 1 ;
+  f_latitude = 2 ;
+  f_longitude = 4 ;
+  // Extra dimensions
+  j = 4 ;          // Equal to the number of aggregated dimensions
+  i = 12 ;         // Equal to the size of the largest fragment dimension
+  
+variables:
+  // Data variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "file: fragment_file
+                                   format: fragment_format
+                                   address: fragment_address
+                                   shape: fragment_shape" ;
+  double pressure(time, level, latitude, longitude) ;
+    temperature:standard_name = "air_pressure" ;
+    temperature:units = "hPa" ;
+    temperature:cell_methods = "time: mean" ;
+
+  // Coordinate variables
+  double time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+
+  // Fragment array variables
+  string fragment_file(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_format ;
+  string fragment_address ;
+  int fragment_shape(j, i) ;
+  
+data:
+  temperature = _ ;
+  pressure = ...  ;
+  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_file = ... ;
+  fragment_format = "nc" ;
+  fragment_address = "temperature" ;
+  fragment_shape = 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                   1, _, _, _, _, _, _, _, _, _, _, _,
+                   37, 36, _, _, _, _, _, _, _, _, _, _,
+                   36, 36, 36, 36, _, _, _, _, _, _, _, _ ;
+----
+In this example, the `temperature` data variable is an aggregation of 96 fragments. The fragment array shape is `(12, 1, 2, 4)`, indicating that three of the four aggregated dimensions are spanned by multiple fragments. The `pressure` data variable is not an aggregation variable. The data for the `pressure`, `level`, `latitude` and  `longitude` variables, and the `fragment_file` fragment array variable, are omitted for clarity.
+====
+
+[[example-L.6]]
+[caption=]
+.Example L.6
+====
+----
+dimensions:
+  // Aggregated dimensions
+  station = 3 ;
+  obs = 15000 ;
+  // Fragment dimensions
+  f_station = 3 ;
+  f_obs = 3 ;
+  // Extra dimensions
+  j = 1 ;
+  i = 3 ;
+
+variables:
+  // Data variable
+  float tas(obs) ;
+    tas:standard_name = "air_temperature" ;
+    tas:units = "K" ;
+    tas:coordinates = "time lat lon alt station_name" ;
+    tas:aggregated_dimensions = "obs" ;
+    tas:aggregated_data = "file: fragment_file
+                           format: fragment_format
+                           address: fragment_address_tas
+                           shape: fragment_shape" ;
+  // DSG count variable
+  int row_size(station) ;
+    row_size:long_name = "number of observations per station" ;
+    row_size:sample_dimension = "obs" ;
+
+  // Auxiliary coordinate variables
+  float time ;
+    time:standard_name = "time" ;
+    time:units = "days since 1970-01-01" ;
+    time:aggregated_dimensions = "obs" ;
+    time:aggregated_data = "file: fragment_file
+                            format: fragment_format
+                            address: fragment_address_time
+                            shape: fragment_shape" ;
+  float lon(station) ;
+    lon:standard_name = "longitude";
+    lon:long_name = "station longitude";
+    lon:units = "degrees_east";
+    lon:aggregated_dimensions = "station" ;
+    lon:aggregated_data = "file: fragment_file
+                           format: fragment_format
+                           address: fragment_address_lon
+                           shape: fragment_shape_latlon" ;
+  float lat(station) ;
+    lat:standard_name = "latitude";
+    lat:long_name = "station latitude" ;
+    lat:units = "degrees_north" ;
+    lat:aggregated_dimensions = "station" ;
+    lat:aggregated_data = "file: fragment_file
+                           format: fragment_format
+                           address: fragment_address_lat
+                           shape: fragment_shape_latlon" ;
+
+  // Fragment array variables
+  string fragment_file(f_station) ;
+  string fragment_format ;
+  string fragment_address_tas ;
+  string fragment_address_time(f_station) ;
+  string fragment_address_lat ;
+  string fragment_address_lon ;
+  int fragment_shape(j, i) ;
+  int fragment_shape_latlon(j, i) ;
+
+// global attributes:
+  :featureType = "timeSeries";
+  
+data:
+  tas = _ ;    
+  row_size = 5000, 4000, 6000 ;
+  time = _ ;   
+  lat = _ ;   
+  lon = _ ;
+  fragment_file = "Harwell.nc", "Abingdon.nc", "Lambourne.nc" ;
+  fragment_format = "nc" ;
+  fragment_address_tas = "tas" ;
+  fragment_address_time = "t1", "t2", "t3" ;
+  fragment_address_lat = "lat" ;
+  fragment_address_lon = "lon" ;
+  fragment_shape = 5000, 4000, 6000 ;
+  fragment_shape_latlon = 1, 1, 1 ;
+----
+In this example, three fragments are aggregated into a collection of DSG timeseries feature types with contiguous ragged array representation. The auxiliary coordinate variables which span either the `obs` or `station` dimensions are also aggregation variables. The time variables in the fragment files all have different netCDF variables names, which differ from the netCDF name of the `time` aggregation variable. The fragments for all aggregation variable come from the same three fragment files. No data have been omitted from the CDL.
+====
+
+[[example-L.7]]
+[caption=]
+.Example L.7
+====
+----
+dimensions:
+  // Aggregated dimensions
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Fragment dimensions
+  f_time = 2 ;
+  f_level = 1 ;
+  f_latitude = 1 ;
+  f_longitude = 1 ;
+  // Extra dimensions
+  j = 4 ;         // Equal to the number of aggregated dimensions
+  i = 2 ;         // Equal to the size of the largest fragment dimension
+  
+variables:
+  // Data variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "file: fragment_file
+                                   format: fragment_format
+                                   address: fragment_address
+                                   shape: fragment_shape
+                                   id: fragment_id" ;	// Non-standardized feature
+
+  // Coordinate variables
+  double time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+
+  // Fragment array variables
+  string fragment_file(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_format ;
+  string fragment_address ;
+  int fragment_shape(j, i) ;
+  string fragment_id(f_time, f_level, f_latitude, f_longitude) ;
+    fragment_id:long_name = "Fragment file unique identifiers"
+  
+data:
+  temperature = _ ;
+  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_file = "January-March.nc", "April-December.nc" ;
+  fragment_format = "nc" ;
+  fragment_address = "temperature" ;
+  fragment_shape = 3, 9,  
+                   1, _,  
+                   73, _, 
+                   144, _ ;
+  fragment_id = "04821b9-7eb5-4046-937b-0bf06b01588", "056d1ee0-a183-43b3-ae67-1ec6aa1532a" ;
+----
+This example is similar to <<example-L.1>>, but now the **`aggregated_data`** attribute also includes the non-standardized keyword `id`, which has the fragment array variable `fragment_id`. The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
+====
