@@ -12,7 +12,6 @@ Details of how to encode and decode aggregation variables may found in <<aggrega
 ====
 ----
 dimensions:
-  // Aggregated dimensions
   time = 12 ;
   level = 1 ;
   latitude = 73 ;
@@ -160,7 +159,6 @@ The data for the `level`, `latitude` and  `longitude` variables are omitted for 
 ====
 ----
 dimensions:
-  // Aggregated dimensions
   time = 12 ;
   level = 1 ;
   latitude = 73 ;
@@ -254,7 +252,6 @@ In addition, `time` is now an aggregation coordinate variable, with its aggregat
 ====
 ----
 dimensions:
-  // Aggregated dimensions
   level = 17 ;
   latitude = 181 ;
   longitude = 360 ;
@@ -320,7 +317,6 @@ The data for the `level`, `latitude` and  `longitude` variables are omitted for 
 ====
 ----
 dimensions:
-  // Aggregated dimensions
   time = 12 ;
   level = 1 ;
   latitude = 73 ;
@@ -397,15 +393,13 @@ The data for the `pressure`, `level`, `latitude` and  `longitude` variables, and
 ====
 ----
 dimensions:
-  // Aggregated dimensions
   station = 3 ;
   obs = 15000 ;
   // Fragment dimensions
   f_station = 3 ;
-  f_obs = 3 ;
   // Extra dimensions
-  j = 1 ;
-  i = 3 ;
+  j = 1 ;         // Equal to the number of aggregated dimensions
+  i = 3 ;         // Equal to the size of the largest fragment dimension
 
 variables:
   // Data variable
@@ -416,7 +410,7 @@ variables:
     tas:aggregated_dimensions = "obs" ;
     tas:aggregated_data = "file: fragment_file
                            format: fragment_format
-                           address: fragment_address_tas
+                           address: fragment_address
                            shape: fragment_shape" ;
   // DSG count variable
   int row_size(station) ;
@@ -454,7 +448,7 @@ variables:
   // Fragment array variables
   string fragment_file(f_station) ;
   string fragment_format ;
-  string fragment_address_tas ;
+  string fragment_address ;
   string fragment_address_time(f_station) ;
   string fragment_address_lat ;
   string fragment_address_lon ;
@@ -472,7 +466,7 @@ data:
   lon = _ ;
   fragment_file = "Harwell.nc", "Abingdon.nc", "Lambourne.nc" ;
   fragment_format = "nc" ;
-  fragment_address_tas = "tas" ;
+  fragment_address = "tas" ;
   fragment_address_time = "t1", "t2", "t3" ;
   fragment_address_lat = "lat" ;
   fragment_address_lon = "lon" ;
@@ -480,9 +474,9 @@ data:
   fragment_shape_latlon = 1, 1, 1 ;
 ----
 In this example, three fragments are aggregated into a collection of DSG timeseries feature types with contiguous ragged array representation.
-The auxiliary coordinate variables which span either the `obs` or `station` dimensions are also aggregation variables.
+The auxiliary coordinate variables `time`, `lon`, and `lat` are also aggregation variables.
 The time variables in the fragment files all have different netCDF variables names, which differ from the netCDF name of the `time` aggregation variable.
-The fragments for all aggregation variable come from the same three fragment files.
+The fragments for all aggregation variables come from the same three fragment files, in this case.
 No data have been omitted from the CDL.
 ====
 
@@ -492,7 +486,6 @@ No data have been omitted from the CDL.
 ====
 ----
 dimensions:
-  // Aggregated dimensions
   time = 12 ;
   level = 1 ;
   latitude = 73 ;
