@@ -318,11 +318,11 @@ The aggregated dimensions must exist as dimensions in the aggregation file.
 ==== Aggregated Data
 
 The fragments are conceptually organised into a __fragment array__ that has the same number of dimensions as the aggregated data.
-Each dimension of the fragment array is called a __fragment dimension__, and corresponds to the aggregated dimension with the same position in the aggregated data.
-The size of a fragment dimension is equal to the number of fragments that are needed to span its corresponding aggregated dimension.
+Each dimension of the fragment array is called a __fragment array dimension__, and corresponds to the aggregated dimension with the same position in the aggregated data.
+The size of a fragment array dimension is equal to the number of fragments that are needed to span its corresponding aggregated dimension.
 See <<example-fragment-array>>.
 
-The aggregated data is created by concatenating the fragments' data along each fragment dimension, and in the order in which they appear in the fragment array.
+The aggregated data are created by concatenating the fragments' data along each fragment array dimension, and in the order in which they appear in the fragment array.
 Any text applying to the data of a variable in the CF conventions applies in exactly the same way to the aggregated data of an aggregation variable.
 
 
@@ -376,7 +376,7 @@ Fragment data shape `(17, 45, 180)` +
 |===============
 Six fragments are arranged in a three-dimensional fragment array with shape `(1, 3, 2)`.
 Each fragment spans the entirety of the Z dimension, but only a part of the Y-X plane, which has 1 degree resolution.
-The fragments combine to create three-dimensional aggregated data that has global `(Z, Y, X)` coverage, with shape `(17, 181, 360)`.
+The fragments combine to create three-dimensional aggregated data that have global `(Z, Y, X)` coverage, with shape `(17, 181, 360)`.
 The Z aggregated dimension is spanned by 1 fragment, the Y aggregated dimension is spanned by 3 fragments, and the X aggregated dimension is spanned by 2 fragments.
 See <<example-L.4>> for a CDL representation of this fragment array.
 ====
@@ -387,10 +387,10 @@ The order of elements in the **`aggregated_data`** attribute is not significant.
 
 There are four standardized and mandatory features, given by the `file`, `format`, `address`, and `shape` keywords; and any amount of non-standardized features are also allowed:
 
-`file`
+*file*
 
 The string-valued `file` fragment array variable defines how to find each fragment file.
-In general it has the same shape as the fragment array, and its values provide the fragment file names.
+In general its data have the same shape as the fragment array, and its values provide the fragment file names.
 Each file name must take one of the following forms:
 
 * A fully qualified Uniform Resource Identifier (URI <<URI>>, i.e. one that starts with `file://`, `http://`, `s3://`, etc.).
@@ -401,12 +401,12 @@ If the aggregation file is moved to another location then the fragment files mus
 
 Note that the only way to specify an absolute local file path (i.e. one that specifies the file location from the root directory) is with a file URI that starts with `file://`.
 
-Multiple versions of a fragment may be provided if an extra trailing dimension is included in the `file` fragment array variable.
+An extra trailing trailing dimension, that is not a fragment array dimension, may be provided for specifying multiple versions of the fragments.
 Each version is expected to contain equivalent information, so that any version whose file exists may be selected for use in the aggregated data.
 This may be be used when it is known that various fragment file locations will be possible, but it is not known in advance which of them might exist at any given time.
 For instance, providing remotely stored and locally cached versions of the same fragment could allow an application program to only commit to the expense of accessing the remote version if the local version does not exist.
 Every fragment must have at least one version, but not all fragments need have the same number of versions.
-If a fragment has fewer versions than some others, then its trailing dimension must be padded with missing values.
+Where fragments have fewer versions than others, the trailing dimension must be padded with missing values.
 See <<example-L.2>>.
 
 A fragment file name may contain any number of string substitutions, each of which is defined by the `file` fragment array variable's **`substitutions`** attribute.
@@ -417,39 +417,39 @@ The __substitution__ keyword must have the form `${\*}`, where `*` represents an
 For instance, a fragment file name of `\file://data/store/file.nc` could also be stored as `${local}file.nc`, in conjunction with `substitutions="${local}: \file://data/store/"`.
 See <<example-L.3>>.
 
-`format`
+*format*
 
 The string-valued `format` fragment array variable defines the format of the fragment files.
-In general it has the same shape as the `file` fragment array variable, and must contain a non-missing value corresponding to each fragment version.
-However, if the `format` fragment array variable is a scalar, then its single value is assumed to apply to all fragment versions.
+In general it must have the same dimensions in the same order as the `file` fragment array variable, and must contain a non-missing value corresponding to each fragment version.
+However, if the `format` fragment array variable is a scalar, then its single value is assumed to apply to all fragments.
 The format of a netCDF fragment file must be indicated with the value `nc`.
 Other fragment file formats may be provided, on the understanding that an application program may choose to ignore any values that it does not understand.
 The `format` fragment array variable may contain a range of different values, i.e. not all fragment files need to have the same format, provided that the `address` fragment array variable can still be used to find each fragment within its fragment file. See <<example-L.1>>.
 
  
-`address`
+*address*
 
 The `address` fragment array variable defines how to find each fragment within its fragment file, i.e. the address of the fragment.
-In general it has the same shape as the `file` fragment array variable, and must contain a non-missing value corresponding to each fragment version.
-However, if the `address` fragment array variable is a scalar, then its single value is assumed to apply to all fragment versions.
+In general it must have the same dimensions in the same order as the `file` fragment array variable, and must contain a non-missing value corresponding to each fragment version.
+However, if the `address` fragment array variable is a scalar, then its single value is assumed to apply to all fragments.
 It may have any data type.
 For a netCDF fragment file, the string-valued address must be the fragment's netCDF variable name.
 Addresses for other fragment file formats are allowed, on the understanding that an application program may choose to ignore any values that it does not understand.
 See <<example-L.1>> and <<example-L.6>>.
 
-`shape`
+*shape*
 
-The integer-valued `shape` fragment array variable defines the shape of each fragment in its canonical form (see <<fragment-interpretation>>).
-In general, the `shape` fragment array variable is two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of fragment dimensions, and the size of the more rapidly varying dimension (i.e. the number of columns) being the size of the largest fragment dimension.
+The integer-valued `shape` fragment array variable defines the shape of the data of each fragment in its canonical form (see <<fragment-interpretation>>).
+In general, the `shape` fragment array variable is two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of fragment array dimensions, and the size of the more rapidly varying dimension (i.e. the number of columns) being the size of the largest fragment array dimension.
 Each row provides the sizes of the fragments along that dimension of the fragment array.
-Rows corresponding to fragment dimensions that are smaller than the largest fragment dimension are padded with missing values.
+Rows corresponding to fragment array dimensions that are smaller than the largest fragment array dimension are padded with missing values.
 When the aggregated data is a scalar there are no aggregated dimensions, and the `shape` fragment array variable must be one-dimensional, of size one, and contain the value `1`.
 See <<appendix-aggregation-examples>>.
 
 *Non-standardized features*
 
 Any number of non-standardized features are allowed, on the understanding that an application program may choose to ignore any such features that it does not understand, or which are irrelevant for its purpose.
-The fragment array variable for a non-standardized feature must either be a scalar, or else have the same dimensions in the same order as the `file` fragment array variable, with or without the extra trailing dimension if the `file` fragment array variable has one.
+The fragment array variable for a non-standardized feature must either be a scalar, or else have the same dimensions in the same order as the `file` fragment array variable, optionally omitting the extra trailing dimension for multiple fragment versions, if it exists.
 
 Use cases for non-standardized features include, but are not limited to:
 
@@ -464,22 +464,22 @@ See <<example-L.7>>.
 ==== Fragment Interpretation
 
 A fragment stored in a fragment file, of any format, must be converted to its __canonical form__ prior to being inserted into the aggregated data.  
-This means that the fragment file must contain data with sufficient metadata for the application program creating the aggregated data to do the conversion.
+The fragment file must contain an array of data with sufficient metadata for it to be convertible to its canonical form by the application program that is creating the aggregated data.
 It is up to the creator of the aggregation variable to ensure that it is possible to convert all fragments to their canonical forms.
 
 The canonical form of a fragment is such that:
 
-* The fragment's data, in its entirety, provides the values for a unique, contiguous part of the aggregated data.
+* The fragment's data, in its entirety, provide the values for a unique, contiguous part of the aggregated data.
 
-* The fragment's data has the same number of dimensions as the aggregated data, and each of those dimensions must uniquely correspond to an aggregated dimension, and be in the same order.
+* The fragment's data have the same number of dimensions as the aggregated data, and each of those dimensions must uniquely correspond to an aggregated dimension, and be in the same order.
 
-* The fragment's data has the same units as the aggregation variable. 
+* The fragment's data have the same units as the aggregation variable. 
 
-* The fragment's data is not numerically packed (i.e. stored using a smaller data type than its original data).
+* The fragment's data are not numerically packed (i.e. stored using a smaller data type than its original data).
 
-* The fragment's data has the same data type as the aggregation variable.
+* The fragment's data have the same data type as the aggregation variable.
 
-* The fragment's data has the same indication of missing values as the aggregation variable.
+* The fragment's data have the same indication of missing values as the aggregation variable.
 
 The conversion of fragments to their canonical form is the responsibility of the application program which is creating the aggregated data, and it is up to the application program to decide what to do in the event that the conversion is not possible.
 The application program may need to carry out any combination of the following operations when converting a fragment to its canonical form:
@@ -495,4 +495,4 @@ Note that some transformations may result in a loss of information (as could be 
 Note that if the aggregation variable indicates that the aggregated data is numerically packed (as determined by the attributes defined in <<packed-data>>), then the unpacked fragment data values represent packed values in the aggregated data.
 
 * Replacing missing values in the fragment's data with values indicated by the aggregation variable as missing.
-Note that it is up to the creator of the aggregation variable to ensure that the non-missing fragment data values do not coincide with any of the aggregation variable's missing values.
+Note that it is up to the creator of the aggregation variable to ensure that none of the aggregation variable's missing values coincide with non-missing fragment data values.
