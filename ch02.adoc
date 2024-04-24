@@ -389,17 +389,10 @@ There are four standardized and mandatory features, given by the `file`, `format
 
 *file*
 
-The string-valued `file` fragment array variable defines how to find each fragment file.
-In general its data have the same shape as the fragment array, and its values provide the fragment file names.
-Each file name must take one of the following forms:
-
-* A fully qualified Uniform Resource Identifier (URI <<URI>>, i.e. one that starts with `file://`, `http://`, `s3://`, etc.).
-If the aggregation file is moved to another location then it will still be able to access the fragment files which haven't moved.
-
-* A local file path that is relative to the current location of the aggregation file.
-If the aggregation file is moved to another location then the fragment files must also be moved to preserve their relative locations.
-
-Note that the only way to specify an absolute local file path (i.e. one that specifies the file location from the root directory) is with a file URI that starts with `file://`.
+The string-valued `file` fragment array variable defines the locations of the fragment files.
+In general its dimensions are the fragment array dimensions in the same order as they occur in the fragment array, and its values provide the fragment file names.
+Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>>. If the fragment file name is a relative URI (i.e. a URI that does __not__ start with a scheme name followed by a colon, such as `file:`, `http:`, `s3:`, etc.) then it is taken as being relative to the current location of the aggregation file, and if the aggregation file is moved to another location then the fragment file may also need be moved for it to remain accessible.
+See <<example-L.1>> and <<example-L.2>>.
 
 An extra trailing trailing dimension, that is not a fragment array dimension, may be provided for specifying multiple versions of the fragments.
 Each version is expected to contain equivalent information, so that any version whose file exists may be selected for use in the aggregated data.
@@ -411,7 +404,7 @@ See <<example-L.2>>.
 
 A fragment file name may contain any number of string substitutions, each of which is defined by the `file` fragment array variable's **`substitutions`** attribute.
 The use of substitutions can save space in the aggregation file; and in the event that the fragment file names need to be modified it may be possible to achieve this by editing the **`substitutions`** attribute, rather than by changing the actual `file` fragment array variable values.
-The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines the part of a fragment file name which is to be replaced by the string defined by __replacement__, prior to locating the fragment file.
+The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines the part of a fragment file name which is to be replaced by __replacement__, prior to locating the fragment file.
 The order of elements in the **`substitutions`** attribute is not significant.
 The __substitution__ keyword must have the form `${\*}`, where `*` represents any number of any characters.
 For instance, a fragment file name of `\file://data/store/file.nc` could also be stored as `${local}file.nc`, in conjunction with `substitutions="${local}: \file://data/store/"`.
@@ -426,7 +419,6 @@ The format of a netCDF fragment file must be indicated with the value `nc`.
 Other fragment file formats may be provided, on the understanding that an application program may choose to ignore any values that it does not understand.
 The `format` fragment array variable may contain a range of different values, i.e. not all fragment files need to have the same format, provided that the `address` fragment array variable can still be used to find each fragment within its fragment file. See <<example-L.1>>.
 
- 
 *address*
 
 The `address` fragment array variable defines how to find each fragment within its fragment file, i.e. the address of the fragment.
@@ -444,12 +436,12 @@ In general, the `shape` fragment array variable is two-dimensional, with the siz
 Each row provides the sizes of the fragments along that dimension of the fragment array.
 Rows corresponding to fragment array dimensions that are smaller than the largest fragment array dimension are padded with missing values.
 When the aggregated data is a scalar there are no aggregated dimensions, and the `shape` fragment array variable must be one-dimensional, of size one, and contain the value `1`.
-See <<appendix-aggregation-examples>>.
+See <<example-L.4>>.
 
 *Non-standardized features*
 
 Any number of non-standardized features are allowed, on the understanding that an application program may choose to ignore any such features that it does not understand, or which are irrelevant for its purpose.
-The fragment array variable for a non-standardized feature must either be a scalar, or else have the same dimensions in the same order as the `file` fragment array variable, optionally omitting the extra trailing dimension for multiple fragment versions, if it exists.
+The fragment array variable for a non-standardized feature must be either a scalar, or else have the same dimensions in the same order as the `file` fragment array variable, optionally omitting the extra trailing dimension for multiple fragment versions, if it exists.
 
 Use cases for non-standardized features include, but are not limited to:
 
