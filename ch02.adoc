@@ -283,19 +283,8 @@ An aggregation variable must be a scalar (i.e. it has no dimensions) and the val
 It acts as a container for all of the usual attributes that describe the data, with the addition of two special attributes: one that defines the _aggregated dimensions_, i.e. the dimensions of the aggregated data; and one that provides the instructions on how the aggregated data is to be created.
 The data type of the aggregated data is the same as the data type of the aggregation variable.
 
-Aggregation variables may be used as:
-
-* data variables
-* ancillary variables
-* coordinate variables
-* auxiliary coordinate variables
-* scalar coordinate variables
-* boundary variables
-* cell measure variables
-* connectivity index variables
-* location index set variables 
-
-Any text applying to any of these kinds of variable in the CF conventions applies in exactly the same way to an aggregation variable in the same role, and any reference to a dimension of such a variable applies to the aggregated dimension of an aggregation variable.
+Aggregation variables may be used as any kind of variable (data variable, coordinate variable, cell measures variable, grid mapping variable, etc.), and any text applying to a variable in the CF conventions applies in exactly the same way to an aggregation variable in the same role.
+Any reference to the data or dimensions of a variable applies to the aggregated data or aggregated dimensions, respectively, of an aggregation variable.
 For instance:
 
 * the dimension of a coordinate variable of an aggregation data variable must be one of the aggregated dimensions of the aggregation data variable,
@@ -323,8 +312,6 @@ The size of a fragment array dimension is equal to the number of fragments that 
 See <<example-fragment-array>>.
 
 The aggregated data are created by concatenating the fragments' data along each fragment array dimension, and in the order in which they appear in the fragment array.
-Any text applying to the data of a variable in the CF conventions applies in exactly the same way to the aggregated data of an aggregation variable.
-
 
 [[example-fragment-array]]
 [caption="Example 2.2. "]
@@ -391,9 +378,9 @@ There are four standardized and mandatory features, given by the `file`, `format
 
 The string-valued `file` fragment array variable defines the locations of the fragment files.
 In general its dimensions are the fragment array dimensions in the same order as they occur in the fragment array, and its values provide the fragment file names.
-Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (one that begins with a scheme component followed by a colon, such as `file:`, `http:`, `s3:`, etc.), or else a __relative-path URI reference__ (typically one that is not an absolute URI and does not begin with a `/` character).
+Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file://data/store/file.nc`, `\https://data/store/file.nc`, and `s3://data/store/file.nc`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, and `data/file.nc`).
 A relative-path URI reference is taken as being relative to the current location of the aggregation file.
-If the aggregation file is moved to another location then a fragment file identified by an absolute URI will still be accessible, whereas a fragment file identified by a relative-path URI reference will also need be moved so that the reference resolution still locates the fragment.
+When the aggregation file is moved to another location then a fragment file identified by an absolute URI will still be accessible, whereas a fragment file identified by a relative-path URI reference will also need be moved to preserve the relative reference.
 See <<example-L.1>> and <<example-L.2>>.
 
 An extra trailing trailing dimension, that is not a fragment array dimension, may be provided for specifying multiple versions of the fragments.
@@ -435,9 +422,9 @@ See <<example-L.1>> and <<example-L.6>>.
 
 The integer-valued `shape` fragment array variable defines the shape of the data of each fragment in its canonical form (see <<fragment-interpretation>>).
 In general, the `shape` fragment array variable is two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of fragment array dimensions, and the size of the more rapidly varying dimension (i.e. the number of columns) being the size of the largest fragment array dimension.
-Each row provides the sizes of the fragments along that dimension of the fragment array.
+Each row provides the sizes of the fragments along that dimension of the fragment array, whose sum must equal the size of the corresponding aggregated dimension.
 Rows corresponding to fragment array dimensions that are smaller than the largest fragment array dimension are padded with missing values.
-When the aggregated data is a scalar there are no aggregated dimensions, and the `shape` fragment array variable must be one-dimensional, of size one, and contain the value `1`.
+When the aggregated data is scalar there are no aggregated dimensions, and the `shape` fragment array variable must be one-dimensional, of size one, and contain the value `1`.
 See <<example-L.4>>.
 
 *Non-standardized features*
@@ -469,7 +456,7 @@ The canonical form of a fragment is such that:
 
 * The fragment's data have the same units as the aggregation variable. 
 
-* The fragment's data are not numerically packed (i.e. stored using a smaller data type than its original data).
+* The fragment's data are not numerically packed (i.e. not stored using a smaller data type than its original data).
 
 * The fragment's data have the same data type as the aggregation variable.
 
