@@ -297,7 +297,7 @@ The details of how to encode and decode aggregation variables are given in this 
 [[aggregated-dimensions, Section 2.8.1, Aggregated Dimensions]]
 ==== Aggregated Dimensions
 
-The aggregated dimensions must be stored with the aggregation variable's **`aggregated_dimensions`** attribute, and it is the presence of this attribute that identifies the variable as an aggregation variable.
+The aggregated dimensions of an aggregation variable are stored with the aggregation variable's **`aggregated_dimensions`** attribute, and it is the presence of this attribute that identifies the variable as an aggregation variable.
 The value of the **`aggregated_dimensions`** attribute is a blank separated list of the aggregated dimension names given in the order which matches the dimensions of the aggregated data.
 If the aggregated data is scalar then the **`aggregated_dimensions`** attribute must be an empty string.
 The aggregated dimensions must exist as dimensions in the aggregation file.
@@ -368,7 +368,7 @@ The Z aggregated dimension is spanned by 1 fragment, the Y aggregated dimension 
 See <<example-L.4>> for a CDL representation of this fragment array.
 ====
 
-The fragment array is defined by the aggregation variable's **`aggregated_data`** attribute.
+The fragment array must be defined by an aggregation variable's **`aggregated_data`** attribute.
 This attribute takes a string value comprising blank-separated elements of the form "__feature: variable__", where __feature__ is a case-sensitive keyword that identifies a feature of the fragment array, and __variable__ is a __fragment array variable__ that provides the feature's values for each fragment in the fragment array.
 The order of elements in the **`aggregated_data`** attribute is not significant.
 
@@ -377,8 +377,9 @@ There are four standardized and mandatory features, given by the `file`, `format
 *file*
 
 The string-valued `file` fragment array variable defines the locations of the fragment files.
-In general its dimensions are the fragment array dimensions in the same order as they occur in the fragment array, and its values provide the fragment file names.
-Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file://data/store/file.nc`, `\https://data/store/file.nc`, and `s3://data/store/file.nc`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, and `data/file.nc`).
+In general its dimensions correspond to, and have the same sizes as, the fragment array dimensions in the same order as they appear in the conceptual fragment array.
+The  `file` fragment array variable values provide the fragment file names.
+Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file://data/file.nc`, `\https://data/file.nc`, and `s3://data/file.nc`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, and `data/file.nc`).
 A relative-path URI reference is taken as being relative to the current location of the aggregation file.
 When the aggregation file is moved to another location then a fragment file identified by an absolute URI will still be accessible, whereas a fragment file identified by a relative-path URI reference will also need be moved to preserve the relative reference.
 See <<example-L.1>> and <<example-L.2>>.
@@ -392,7 +393,7 @@ Where fragments have fewer versions than others, the trailing dimension must be 
 See <<example-L.2>>.
 
 A fragment file name may contain any number of string substitutions, each of which is defined by the `file` fragment array variable's **`substitutions`** attribute.
-The use of substitutions can save space in the aggregation file; and in the event that the fragment file names need to be modified it may be possible to achieve this by editing the **`substitutions`** attribute, rather than by changing the actual `file` fragment array variable values.
+The use of substitutions can save space in the aggregation file; and in the event that the fragment file names need to be modified, it may be possible to achieve this by editing the **`substitutions`** attribute, rather than by changing the actual `file` fragment array variable values.
 The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines the part of a fragment file name which is to be replaced by __replacement__, prior to locating the fragment file.
 The order of elements in the **`substitutions`** attribute is not significant.
 The __substitution__ keyword must have the form `${\*}`, where `*` represents any number of any characters.
