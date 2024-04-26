@@ -279,11 +279,12 @@ Aggregation provides the utility of being able to view, as a single entity, a da
 The fragment files may be CF-compliant or have any other format, thereby allowing an aggregation variable to act as CF-compliant view of non-CF datasets.
 Storing aggregations is useful for data analysis, as it avoids the computational expense of deriving the aggregation at the time of analysis; and for archive curation, as the aggregation can act as a metadata-rich archive index.
 
-An aggregation variable must be a scalar (i.e. it has no dimensions) and the value of its single element is immaterial.
+An aggregation variable must be a scalar (i.e. it has no dimensions).
 It acts as a container for all of the usual attributes that describe the data, with the addition of two special attributes: one that defines the _aggregated dimensions_, i.e. the dimensions of the aggregated data; and one that provides the instructions on how the aggregated data is to be created.
-The data type of the aggregated data is the same as the data type of the aggregation variable.
+The data type of the aggregation variable must be the data type of the aggregated data, but the value of the aggregation variable's single element is immaterial.
 
-Aggregation variables may be used as any kind of variable (data variable, coordinate variable, cell measures variable, grid mapping variable, etc.), and any text applying to a variable in the CF conventions applies in exactly the same way to an aggregation variable in the same role.
+Aggregation variables may be used as any kind of variable (data variable, coordinate variable, cell measures variable, grid mapping variable, etc.), but it is recommended that container variables whose data are immaterial (such as grid mapping variables) are not encoded as aggregation variables.
+Any text applying to a variable in the CF conventions applies in exactly the same way to an aggregation variable in the same role.
 Any reference to the data or dimensions of a variable applies to the aggregated data or aggregated dimensions, respectively, of an aggregation variable.
 For instance:
 
@@ -379,14 +380,15 @@ There are four standardized and mandatory features, given by the `file`, `format
 The string-valued `file` fragment array variable defines the locations of the fragment files.
 In general its dimensions correspond to, and have the same sizes as, the fragment array dimensions in the same order as they appear in the conceptual fragment array.
 The  `file` fragment array variable values provide the fragment file names.
-Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file://data/file.nc`, `\https://data/file.nc`, and `s3://data/file.nc`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, and `data/file.nc`).
-A relative-path URI reference is taken as being relative to the current location of the aggregation file.
+Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file://data/file.nc`, `\https://remote.host/data/file.nc`, `s3://remote.host/data/file.nc`, or `locally_meaningful_protocol://UID`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, or `data/file.nc`).
+The location of a fragment file given by a relative-path URI reference is taken as being relative to the location of the aggregation file.
 If the aggregation file is moved to another location, then a fragment file identified by an absolute URI will still be accessible, whereas a fragment file identified by a relative-path URI reference will also need be moved to preserve the relative reference.
+Not all fragment file names need be of the same URI type.
 See <<example-L.1>> and <<example-L.2>>.
 
 An extra trailing trailing dimension, that is not a fragment array dimension, may be provided for specifying multiple versions of the fragments.
+This may be useful when it is known that multiple fragment file locations are possible, but it is not known in advance which of them might exist at any given time.
 Each version is expected to contain equivalent information, so that any version whose file exists may be selected for use in the aggregated data.
-This may be used when it is known that multiple fragment file locations are possible, but it is not known in advance which of them might exist at any given time.
 For instance, providing remotely stored and locally cached versions of the same fragment could allow an application program to only commit to the expense of accessing the remote version if the local version does not exist.
 Every fragment must have at least one version, but not all fragments need have the same number of versions.
 Where fragments have fewer versions than others, the trailing dimension must be padded with missing values.
@@ -423,10 +425,11 @@ See <<example-L.1>> and <<example-L.6>>.
 
 The integer-valued `shape` fragment array variable defines the shape of the data of each fragment in its canonical form (see <<fragment-interpretation>>).
 In general, the `shape` fragment array variable is two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of fragment array dimensions, and the size of the more rapidly varying dimension (i.e. the number of columns) being the size of the largest fragment array dimension.
-Each row provides the sizes of the fragments along that dimension of the fragment array, whose sum must equal the size of the corresponding aggregated dimension.
-Rows corresponding to fragment array dimensions that are smaller than the largest fragment array dimension are padded with missing values.
+The rows correspond to the fragment array dimensions in the same order, and each row provides the sizes of the fragments along that dimension of the fragment array, padded with missing values if there are fewer fragments than the number of columns.
+The sum of non-missing values in a row must therefore equal the size of the corresponding aggregated dimension.
 When the aggregated data is scalar there are no aggregated dimensions, and the `shape` fragment array variable must be one-dimensional, of size one, and contain the value `1`.
-See <<example-L.4>>.
+See <<example-L.4>>, which includes the `shape` fragment array variable for the fragment array described by <<example-fragment-array>>.
+
 
 *Non-standardized features*
 
