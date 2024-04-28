@@ -379,12 +379,21 @@ There are four standardized and mandatory features, given by the `file`, `format
 
 The string-valued `file` fragment array variable defines the locations of the fragment files.
 In general its dimensions correspond to, and have the same sizes as, the fragment array dimensions in the same order as they appear in the conceptual fragment array.
-The  `file` fragment array variable values provide the fragment file names.
-Each fragment file name must be a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file://data/file.nc`, `\https://remote.host/data/file.nc`, `s3://remote.host/data/file.nc`, or `locally_meaningful_protocol://UID`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, or `data/file.nc`).
-The location of a fragment file given by a relative-path URI reference is taken as being relative to the location of the aggregation file.
+The  `file` fragment array variable values provide the fragment file locations.
+A fragment file is located with a Uniform Resource Identifier (URI) <<URI>> that is either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file://data/file.nc`, `\https://remote.host/data/file.nc`, `s3://remote.host/data/file.nc`, or `locally_meaningful_protocol://UID`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, or `data/file.nc`). 
+The location of a fragment file that is given by a relative-path URI reference is taken as being relative to the location of the aggregation file.
 If the aggregation file is moved to another location, then a fragment file identified by an absolute URI will still be accessible, whereas a fragment file identified by a relative-path URI reference will also need be moved to preserve the relative reference.
-Not all fragment file names need be of the same URI type.
+Not all fragment file locations need be of the same URI type. 
 See <<example-L.1>> and <<example-L.2>>.
+
+A fragment file location may contain any number of string substitutions, each of which is defined by the `file` fragment array variable's **`substitutions`** attribute.
+The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines the part of a fragment file location which is to be replaced by __replacement__ in order to find the actual fragment file name.
+After the replacements have been made, the fragment file location must be an absolute URI or relative-path URI reference.
+The __substitution__ keyword must have the form `${\*}`, where `*` represents any number of any characters.
+For instance, the fragment file name `\file://data/store/file.nc` could be stored as the location `${local}file.nc`, in conjunction with `substitutions="${local}: \file://data/store/"`.
+The order of elements in the **`substitutions`** attribute is not significant.
+The use of substitutions can save space in the aggregation file; and in the event that the fragment locations need to be updated after the aggregation file has been created, it may be possible to achieve this by modifying the **`substitutions`** attribute, rather than by changing the actual `file` fragment array variable values.
+See <<example-L.3>>.
 
 An extra trailing trailing dimension, that is not a fragment array dimension, may be provided for specifying multiple versions of the fragments.
 This may be useful when it is known that multiple fragment file locations are possible, but it is not known in advance which of them might exist at any given time.
@@ -393,14 +402,6 @@ For instance, providing remotely stored and locally cached versions of the same 
 Every fragment must have at least one version, but not all fragments need have the same number of versions.
 Where fragments have fewer versions than others, the trailing dimension must be padded with missing values.
 See <<example-L.2>>.
-
-A fragment file name may contain any number of string substitutions, each of which is defined by the `file` fragment array variable's **`substitutions`** attribute.
-The use of substitutions can save space in the aggregation file; and in the event that the fragment file names need to be modified, it may be possible to achieve this by editing the **`substitutions`** attribute, rather than by changing the actual `file` fragment array variable values.
-The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines the part of a fragment file name which is to be replaced by __replacement__, prior to locating the fragment file.
-The order of elements in the **`substitutions`** attribute is not significant.
-The __substitution__ keyword must have the form `${\*}`, where `*` represents any number of any characters.
-For instance, a fragment file name of `\file://data/store/file.nc` could also be stored as `${local}file.nc`, in conjunction with `substitutions="${local}: \file://data/store/"`.
-See <<example-L.3>>.
 
 *format*
 
