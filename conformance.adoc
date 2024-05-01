@@ -135,36 +135,32 @@ Each aggregated dimension must name a dimension in the file.
 * An aggregation variable must be a scalar.
 
 * An aggregation variable must have an **`aggregated_data`** attribute whose string value comprises blank-separated elements of the form __feature: variable__. Each __variable__ must be the name of a variable in the file.
-The __feature__ keywords must include `file`, `format`, `address`, and `shape`.
+The __feature__ keywords must include `location`, `address`, and `shape`.
 
-  - The `file` variable must have a string data type.
+  - The `location` variable must have a string data type.
 
-  - The `file` variable must have the same number of dimensions as there are aggregated dimensions, with the optional addition of one extra trailing dimension.
+  - The `location` variable must have the same number of dimensions as there are aggregated dimensions, with the optional addition of one extra trailing dimension.
 
-  - The `file` variable's **`substitutions`** attribute, if it exists, must be a string whose value is list of blank-separated word pairs in the form __substitution: replacement__.
+  - The `location` variable's **`substitutions`** attribute, if it exists, must be a string whose value is list of blank-separated word pairs in the form __substitution: replacement__.
   Each __substitution__ keyword must have the form `${\*}`, where `*` represents any number of any characters.
 
-  - A data value of a `file` variable, after any string substitutions defined by the **`substitutions`** attribute have been applied, must be either an absolute URI or else a relative-path URI reference.
+  - A data value of a `location` variable, after any string substitutions defined by the **`substitutions`** attribute have been applied, must be either an absolute URI or else a relative-path URI reference.
 
-  - The `format` variable must have a string data type.
-
-  - The `format` variable must be either a scalar, or else have the same dimensions in the same order as the `file` variable.
-
-  - The `address` variable must be either a scalar, or else have the same dimensions in the same order as the `file` variable.
+  - The `address` variable must be either a scalar, or else have the same dimensions in the same order as the `location` variable.
 
   - The `shape` variable must have an integer data type.
 
   - If there are zero aggregated dimensions then the `shape` variable must be one-dimensional, of size one, and contain the value `1`.
 
-  - If there are one or more aggregated dimensions then the `shape` variable must be two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of aggregated dimensions, and the size of the more rapidly varying dimension being the size of the largest of the `file` variable dimensions, excluding the extra trailing dimension if the `file` variable has one.
+  - If there are one or more aggregated dimensions then the `shape` variable must be two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of aggregated dimensions, and the size of the more rapidly varying dimension being the size of the largest of the `location` variable dimensions, excluding the extra trailing dimension if the `location` variable has one.
 
   - The rows of a two-dimensional `shape` variable correspond to the aggregated dimensions in the order in which they are defined by the **`aggregated_dimensions`** attribute, and the sum of each row must equal the size of its corresponding aggregated dimension.
 
-  - A variable associated with a non-standardized feature keyword must either be a scalar, or else have the same dimensions in the same order as the `file` variable, optionally excluding the extra trailing dimension if the `file` variable has one.
+  - A variable associated with a non-standardized feature keyword must either be a scalar, or else have the same dimensions in the same order as the `location` variable, optionally excluding the extra trailing dimension if the `location` variable has one.
 
 *Recommendations:*
 
-* The following kinds of variable should not be aggregation variables: grid mapping variable, domain variable, mesh topology variable, geometry container variable, interpolation variable.
+* The following kinds of variable should not be aggregation variables: grid mapping variables, domain variables, mesh topology variables, geometry container variables, and interpolation variables.
 
 * An aggregation variable should not have the any of the attributes **`_FillValue`**, **`missing_value`**, **`valid_min`**, **`valid_max`**, and  **`valid_range`**.
 
