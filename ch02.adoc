@@ -362,15 +362,15 @@ Fragment data shape: `(17, 45, 180)` +
 `(-45, -90]` degrees north +
 `[180, 360)` degrees east
 |===============
-Six fragments are arranged in a three-dimensional fragment array with shape `(1, 3, 2)`.
+The six fragments are arranged in a three-dimensional fragment array with shape `(1, 3, 2)`.
 Each fragment spans the entirety of the Z dimension, but only a part of the Y-X plane, which has 1 degree resolution.
 The fragments combine to create three-dimensional aggregated data that have global Z-Y-X coverage, with shape `(17, 181, 360)`.
-The Z aggregated dimension is spanned by 1 fragment, the Y aggregated dimension is spanned by 3 fragments, and the X aggregated dimension is spanned by 2 fragments.
+The Z aggregated dimension is spanned by one fragment, the Y aggregated dimension is spanned by three fragments, and the X aggregated dimension is spanned by two fragments.
 See <<example-L.4>> for a CDL representation of this fragment array.
 ====
 
 The fragment array must be defined by an aggregation variable's **`aggregated_data`** attribute.
-This attribute takes a string value comprising blank-separated elements of the form "__feature: variable__", where __feature__ is a case-sensitive keyword that identifies a feature of the fragment array, and __variable__ is a __fragment array variable__ that provides values for that feature. The features and their values must unambiguously define the fragment array.
+This attribute takes a string value comprising blank-separated elements of the form "__feature: variable__", where __feature__ is a case-sensitive keyword that identifies a feature of the fragment array, and __variable__ is a __fragment array variable__ which provides values for that feature. The features and their values must unambiguously define the fragment array.
 The order of elements in the **`aggregated_data`** attribute is not significant.
 
 The features given by the `location`, `address`, and `shape` keywords are standardized and must be provided, and any amount of non-standardized features are also allowed:
@@ -389,30 +389,28 @@ Not all fragment dataset locations need be of the same URI type.
 See <<example-L.1>> and <<example-L.2>>.
 
 The `location` fragment array variable may have an extra trailing dimension that allows multiple versions of a fragment to be specified.
-This could be useful when it is known that multiple fragment dataset locations are possible, but it is not known in advance which of them might exist at any given time.
+This could be useful when it is known that multiple locations are possible for a given fragment, but it is not known in advance which of them might exist at any given time.
 Each version must contain equivalent information, so any version that exists may be selected for use in the aggregated data.
-For instance, when remotely stored and locally cached versions of the same fragment have been provided, an application program could choose to only retrieve the remote version if the local version does not exist.
+For instance, when remotely stored and locally cached versions of the same fragment have been defined, an application program could choose to only retrieve the remote version if the local version does not exist.
 Every fragment must have at least one version, but not all fragments need to have the same number of versions.
 Where fragments have fewer versions than others, the trailing dimension must be padded with missing values.
 See <<example-L.2>>.
 
-A fragment dataset location may be defined with any number of string substitutions, each of which is defined by the `location` fragment array variable's **`substitutions`** attribute.
+A fragment dataset location may be defined with any number of string substitutions, each of which is provided by the `location` fragment array variable's **`substitutions`** attribute.
 The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines part of a `location` fragment array variable value which is to be replaced by __replacement__ in order to find the actual fragment dataset location.
-A `location` fragment array variable value may contain then zero or more of the substitution keywords.
+A `location` fragment array variable value may include any subset of zero or more of the substitution keywords.
 After replacements have been made, the fragment dataset location must be an absolute URI or a relative-path URI reference.
 The substitution keyword must have the form `${\*}`, where `*` represents any number of any characters.
-For instance, the fragment dataset location `\https://remote.host/data/file.nc` could be stored as the string `$\{path}file.nc`, in conjunction with `substitutions="$\{path}: \https://remote.host/data/"`.
-The order of elements in the **`substitutions`** attribute is not significant.
-The string substitutions must be such that applying them in any order will result in the same fragment dataset location.
-The use of string substitutions can save space in the aggregation file; and in the event that the fragment locations need to be updated after the aggregation file has been created, it may be possible to achieve this by modifying the **`substitutions`** attribute rather than by changing the actual `location` fragment array variable values.
+For instance, the fragment dataset location `\https://remote.host/data/file.nc` could be stored as `$\{path}file.nc`, in conjunction with `substitutions="$\{path}: \https://remote.host/data/"`.
+The order of elements in the **`substitutions`** attribute is not significant, an the substitutions for a given fragment must be such that applying them in any order will result in the same fragment dataset location.
+The use of substitutions can save space in the aggregation file; and in the event that the fragment locations need to be updated after the aggregation file has been created, it may be possible to achieve this by modifying the **`substitutions`** attribute rather than by changing the actual `location` fragment array variable values.
 See <<example-L.3>>.
 
 ===== address
 
-The `address` fragment array variable defines how to find each fragment within its fragment dataset, i.e. the address of the fragment. This is necessary because a fragment dataset may also contain data that is not required by the aggregation.
+The `address` fragment array variable, that may have any data type, defines how to find each fragment within its fragment dataset, i.e. the address of the fragment.
 In general it has the same dimensions in the same order as the `location` fragment array variable, and must contain a non-missing value corresponding to each fragment version.
-However, if the `address` fragment array variable is a scalar, then its single value applies to all fragment versions.
-It may have any data type.
+However, if the `address` fragment array variable is a scalar, then its single value applies to all versions of all fragments.
 For a netCDF fragment dataset, the address must be the string-valued netCDF variable name of the fragment.
 Addresses for other fragment dataset formats are allowed, on the understanding that an application program may choose to ignore any values that it does not understand.
 See <<example-L.1>> and <<example-L.6>>.
@@ -459,8 +457,8 @@ The data of a fragment, stored in a fragment dataset of any format, must be conv
 * The fragment's data have the same data type as the aggregation variable.
 
 The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data.
-The application program may ignore any fragment dataset metadata that are not needed for the conversion to the canonical form.
-The conversion may require a combination of the following operations:
+The application program may ignore any fragment metadata that are not needed for the conversion to the canonical form, as well as any other variables that might exist in the fragment dataset.
+Converting a fragment's data to its canonical form may require a combination of the following operations:
 
 * Inserting missing size 1 dimensions into the fragment's data (e.g. as required when aggregating two-dimensional fragments into three-dimensional aggregated data).
 
@@ -470,4 +468,4 @@ The conversion may require a combination of the following operations:
 Note that some transformations may result in a loss of information (as could be the case when casting floating point numbers to integers), and an application program may choose to disallow these.
 
 * Unpacking the fragment's data.
-Note that if the aggregation variable indicates that the aggregated data are packed (as determined by the attributes defined in <<packed-data>>), then the unpacked fragment data values represent packed values in the aggregated data. It is therefore recommended that the aggregated data is not numerically packed, because of the potential for mistakes and confusion.
+Note that if the aggregation variable indicates that the aggregated data are packed (as determined by the attributes defined in <<packed-data>>), then the unpacked fragment data values will represent packed values in the aggregated data. It is therefore recommended that the aggregated data is not packed, because of the potential for mistakes and confusion.
