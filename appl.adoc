@@ -26,7 +26,7 @@ dimensions:
   i = 2 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Data variable
+  // Aggregated data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -97,7 +97,7 @@ dimensions:
   versions = 2 ;  // The maximum number of versions for a fragment
 
 variables:
-  // Data variable
+  // Aggregated data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -171,7 +171,7 @@ dimensions:
   versions = 2 ;  // The maximum number of versions for a fragment
 
 variables:
-  // Data variable
+  // Aggregated data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -180,7 +180,7 @@ variables:
     temperature:aggregated_data = "location: fragment_location
                                    address: fragment_address
                                    shape: fragment_shape" ;
-  // Coordinate variables
+  // Aggregated coordinate variable
   double time ;    // This is an aggregation coordinate variable
     time:standard_name = "time" ;
     time:units = "days since 2001-01-01" ;
@@ -188,6 +188,7 @@ variables:
     time:aggregated_data = "location: fragment_location
                             address: fragment_address_time
                             shape: fragment_shape_time" ;
+  // Coordinate variables
   double level(level) ;
     level:standard_name = "height_above_mean_sea_level" ;
     level:units = "m" ;
@@ -251,7 +252,7 @@ dimensions:
   i = 3 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Data variable
+  // Aggregated data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -316,7 +317,7 @@ dimensions:
   i = 12 ;        // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Data variable
+  // Aggregated data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -384,7 +385,7 @@ dimensions:
   i = 3 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Data variable
+  // Aggregated data variable
   float tas(obs) ;
     tas:standard_name = "air_temperature" ;
     tas:units = "K" ;
@@ -398,7 +399,7 @@ variables:
     row_size:long_name = "number of observations per station" ;
     row_size:sample_dimension = "obs" ;
 
-  // Auxiliary coordinate variables
+  // Aggregated auxiliary coordinate variables
   float time ;
     time:standard_name = "time" ;
     time:units = "days since 1970-01-01" ;
@@ -476,16 +477,22 @@ dimensions:
   i = 2 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Data variable
+  // Aggregated data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
     temperature:cell_methods = "time: mean" ;
+    temperature:ancillary_variables = "uid" ;
     temperature:aggregated_dimensions = "time level latitude longitude" ;
     temperature:aggregated_data = "location: fragment_location
                                    address: fragment_address
-                                   shape: fragment_shape
-                                   id: fragment_id" ;	// Non-standardized feature
+                                   shape: fragment_shape" ;
+  // Aggregated ancillary variable
+  string uid() ;
+    uid:long_name = "Fragment dataset unique identifiers" ;
+    uid:aggregated_dimensions = "time level latitude longitude" ;
+    uid:aggregated_data = "value: fragment_value
+                           shape: fragment_shape";
   // Coordinate variables
   double time(time) ;
     time:standard_name = "time" ;
@@ -503,8 +510,7 @@ variables:
   string fragment_location(f_time, f_level, f_latitude, f_longitude) ;
   string fragment_address ;
   int fragment_shape(j, i) ;
-  string fragment_id(f_time, f_level, f_latitude, f_longitude) ;
-    fragment_id:long_name = "Fragment dataset unique identifiers" ;
+  string fragment_value(f_time, f_level, f_latitude, f_longitude) ;
 
 data:
   temperature = _ ;
@@ -518,9 +524,9 @@ data:
                    1, _,
                    73, _,
                    144, _ ;
-  fragment_id = "04821b9-7eb5-4046-937b-0bf0588", "056d1ee0-a183-43b3-ae67-1ec632a" ;
+  fragment_value = "04821b9-7eb5-4046-937b-0bf0588", "056d1ee0-a183-43b3-ae67-1ec632a" ;
 ----
-This example is similar to <<example-L.1>>, but now the **`aggregated_data`** attribute also includes the non-standardized feature keyword `id`, which has the corresponding variable `fragment_id`.
+This example is similar to <<example-L.1>>, but now there is the aggregated  ancillary variable `uid` which defines its fragments as constant values stored int he `fragment_value` variable,that are intended to be broadcast across its aggregated data.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
 ====

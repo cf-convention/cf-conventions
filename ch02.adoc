@@ -272,7 +272,7 @@ If a group attribute is defined in a parent group, and one of the child group re
 [[aggregation-variables, Section 2.8, "Aggregation Variables"]]
 === Aggregation Variables
 
-An __aggregation variable__ is a variable which has been formed by combining (i.e. aggregating) multiple __fragments__ stored in __fragment datasets__ that are external to the file containing the aggregation variable, i.e. the __aggregation file__.
+An __aggregation variable__ is a variable which has been formed by combining (i.e. aggregating) multiple __fragments__ that are generally stored in __fragment datasets__ that are external to the file containing the aggregation variable, i.e. the __aggregation file__.
 A fragment is an array of data with sufficient metadata for it to be correctly interpreted in the context of the aggregation, as described by <<fragment-interpretation>>.
 The aggregation variable does not contain any actual data, instead it contains instructions on how to create its __aggregated data__ as an aggregation of the data from each fragment.
 
@@ -373,10 +373,19 @@ The fragment array must be defined by an aggregation variable's **`aggregated_da
 This attribute takes a string value comprising blank-separated elements of the form "__feature: variable__", where __feature__ is a case-sensitive keyword that identifies a feature of the fragment array, and __variable__ is a __fragment array variable__ which provides values for that feature. The features and their values must unambiguously define the fragment array.
 The order of elements in the **`aggregated_data`** attribute is not significant.
 
-The features given by the `location`, `address`, and `shape` keywords are standardized and must be provided, and any amount of non-standardized features are also allowed:
+The features must comprise either all three of the `shape`, `location`, and `address` keyords, or else both of the `shape` and `value` keywords. No other combination of these keywords is allowed, nor the use of any other feature keywords. The features are defined as follows:
 
 // Turn off section numbering for a bit
 :numbered!:
+
+===== shape
+
+The integer-valued `shape` fragment array variable defines the shape of the data of each fragment in its canonical form (see <<fragment-interpretation>>).
+In general, the `shape` fragment array variable is two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of fragment array dimensions, and the size of the more rapidly varying dimension (i.e. the number of columns) being the size of the largest fragment array dimension.
+The rows correspond to the fragment array dimensions in the same order, and each row provides the sizes of the fragments along its corresponding dimension of the fragment array, padded with missing values if there are fewer fragments than the number of columns.
+The sum of non-missing values in a row must therefore equal the size of the corresponding aggregated dimension.
+When the aggregated data is scalar there are no aggregated dimensions, and the `shape` fragment array variable must be a scalar and contain the value `1`.
+See <<example-L.4>>, which shows the `shape` fragment array variable for the fragment array described by <<example-fragment-array>>.
 
 ===== location
 
@@ -415,28 +424,13 @@ For a netCDF fragment dataset, the address must be the string-valued netCDF vari
 Addresses for other fragment dataset formats are allowed, on the understanding that an application program may choose to ignore any values that it does not understand.
 See <<example-L.1>> and <<example-L.6>>.
 
+===== value
 
-===== shape
-
-The integer-valued `shape` fragment array variable defines the shape of the data of each fragment in its canonical form (see <<fragment-interpretation>>).
-In general, the `shape` fragment array variable is two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of fragment array dimensions, and the size of the more rapidly varying dimension (i.e. the number of columns) being the size of the largest fragment array dimension.
-The rows correspond to the fragment array dimensions in the same order, and each row provides the sizes of the fragments along its corresponding dimension of the fragment array, padded with missing values if there are fewer fragments than the number of columns.
-The sum of non-missing values in a row must therefore equal the size of the corresponding aggregated dimension.
-When the aggregated data is scalar there are no aggregated dimensions, and the `shape` fragment array variable must be one-dimensional, of size one, and contain the value `1`.
-See <<example-L.4>>, which shows the `shape` fragment array variable for the fragment array described by <<example-fragment-array>>.
-
-===== Non-standardized features
-
-Any number of non-standardized features are allowed, on the understanding that an application program may choose to ignore any such features that it does not understand, or which are irrelevant for its purpose.
-The fragment array variable for a non-standardized feature must be either a scalar, or else have the same dimensions in the same order as the `location` fragment array variable, optionally omitting the extra trailing dimension for multiple fragment versions if there is one.
-
-Use cases for non-standardized features include, but are not limited to, the following:
-
-* To provide extra information that enables the aggregation of fragments stored in a dataset format for which the `address` fragment array variable alone is insufficient to identify the fragments within the fragment datasets.
-
-* To store extra metadata that relate to the fragments, but which are not necessary for the creation of the aggregated data.
-For instance, it may be convenient to store in the aggregation file an attribute from each fragment dataset, making it available without having to open and inspect the fragment datasets themselves.
-See <<example-L.7>>.
+When the data values within a fragment are all the same, for every fragment, the `value` fragment array variable allows each fragment to be represented explicitly by its unique data value, rather than by a fragment dataset.
+The `value` fragment array variable dimensions correspond to, and have the same sizes as, the fragment array dimensions in the same order as they appear in the conceptual fragment array.
+The `value` fragment array variable may have any data type, and each value is the unique value of a fragment's data.
+This feature could be used, for instance, to store an attribute from each fragment dataset, making them available without having to inspect the fragment datasets themselves.
+See <<example-L.7>>, which uses an aggregation ancillary variable to make fragment dataset attributes available to an aggregation data variable.
 
 // Turn section numbering back on
 :numbered:
@@ -460,6 +454,8 @@ The data of a fragment, stored in a fragment dataset of any format, must be conv
 The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data.
 The application program may ignore any fragment metadata that are not needed for the conversion to the canonical form, as well as any other variables that might exist in the fragment dataset.
 Converting a fragment's data to its canonical form may require a combination of the following operations:
+
+* When the fragment's data has been provided as its unique value (via the `value` feature keyword of the **`aggregated_data`** attribute), broadcasting that value across the fragment's canonical shape.
 
 * Inserting missing size 1 dimensions into the fragment's data (e.g. as required when aggregating two-dimensional fragments into three-dimensional aggregated data).
 

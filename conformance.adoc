@@ -134,8 +134,9 @@ Each aggregated dimension must name a dimension in the file.
 
 * An aggregation variable must be a scalar.
 
-* An aggregation variable must have an **`aggregated_data`** attribute whose string value comprises blank-separated elements of the form __feature: variable__. Each __variable__ must be the name of a variable in the file.
-The __feature__ keywords must include `location`, `address`, and `shape`.
+* An aggregation variable must have an **`aggregated_data`** attribute whose string value comprises blank-separated elements of the form __feature: variable__.
+  Each __variable__ must be the name of a variable in the file.
+  The __feature__ keywords must comprise either all three of the `shape`, `location`, and `address` keyords, or else both of the `shape` and `value` keywords.
 
   - The `location` variable must have a string data type.
 
@@ -148,15 +149,15 @@ The __feature__ keywords must include `location`, `address`, and `shape`.
 
   - The `address` variable must be either a scalar, or else have the same dimensions in the same order as the `location` variable.
 
+  - The `value` variable must have the same number of dimensions as there are aggregated dimensions.
+
   - The `shape` variable must have an integer data type.
 
-  - If there are zero aggregated dimensions then the `shape` variable must be one-dimensional, of size one, and contain the value `1`.
+  - If there are zero aggregated dimensions then the `shape` variable must a be scalar and contain the value `1`.
 
-  - If there are one or more aggregated dimensions then the `shape` variable must be two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of aggregated dimensions, and the size of the more rapidly varying dimension being the size of the largest of the `location` variable dimensions, excluding the extra trailing dimension if the `location` variable has one.
+  - If there are one or more aggregated dimensions then the `shape` variable must be two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of aggregated dimensions, and the size of the more rapidly varying dimension being the size of the largest of the `location` or `value` variable dimensions, excluding the extra trailing dimension if the `location` variable has one.
 
   - The rows of a two-dimensional `shape` variable correspond to the aggregated dimensions in the order in which they are defined by the **`aggregated_dimensions`** attribute, and the sum of each row must equal the size of its corresponding aggregated dimension.
-
-  - A variable associated with a non-standardized feature keyword must either be a scalar, or else have the same dimensions in the same order as the `location` variable, excluding the extra trailing dimension if the `location` variable has one.
 
 *Recommendations:*
 
