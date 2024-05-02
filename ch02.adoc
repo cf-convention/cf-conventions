@@ -373,7 +373,7 @@ The fragment array must be defined by an aggregation variable's **`aggregated_da
 This attribute takes a string value comprising blank-separated elements of the form "__feature: variable__", where __feature__ is a case-sensitive keyword that identifies a feature of the fragment array, and __variable__ is a __fragment array variable__ which provides values for that feature. The features and their values must unambiguously define the fragment array.
 The order of elements in the **`aggregated_data`** attribute is not significant.
 
-The features must comprise either all three of the `shape`, `location`, and `address` keyords, or else both of the `shape` and `value` keywords. No other combination of these keywords is allowed, nor the use of any other feature keywords. The features are defined as follows:
+The features must comprise either all three of the `shape`, `location`, and `address` keywords, or else both of the `shape` and `value` keywords. No other combinations of keywords are allowed. These features are defined as follows:
 
 // Turn off section numbering for a bit
 :numbered!:
@@ -429,7 +429,6 @@ See <<example-L.1>> and <<example-L.6>>.
 When the data values within a fragment are all the same, for every fragment, the `value` fragment array variable allows each fragment to be represented explicitly by its unique data value, rather than by a fragment dataset.
 The `value` fragment array variable dimensions correspond to, and have the same sizes as, the fragment array dimensions in the same order as they appear in the conceptual fragment array.
 The `value` fragment array variable may have any data type, and each value is the unique value of a fragment's data.
-This feature could be used, for instance, to store an attribute from each fragment dataset, making them available without having to inspect the fragment datasets themselves.
 See <<example-L.7>>, which uses an aggregation ancillary variable to make fragment dataset attributes available to an aggregation data variable.
 
 // Turn section numbering back on
@@ -439,7 +438,7 @@ See <<example-L.7>>, which uses an aggregation ancillary variable to make fragme
 [[fragment-interpretation, Section 2.8.2 "Fragment Interpretation"]]
 ==== Fragment Interpretation
 
-The data of a fragment, stored in a fragment dataset of any format, must be converted to its __canonical form__ prior to being inserted into the aggregated data. The canonical form of a fragment's data is such that:
+The data of a fragment must be converted to its __canonical form__ prior to being inserted into the aggregated data. The canonical form of a fragment's data is such that:
 
 * The fragment's data, in its entirety, provide the values for a unique and contiguous part of the aggregated data.
 
@@ -451,11 +450,10 @@ The data of a fragment, stored in a fragment dataset of any format, must be conv
 
 * The fragment's data have the same data type as the aggregation variable.
 
-The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data.
-The application program may ignore any fragment metadata that are not needed for the conversion to the canonical form, as well as any other variables that might exist in the fragment dataset.
+The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data. For fragment datasets, the application program may ignore any fragment metadata that are not needed for the conversion to the canonical form, as well as any other variables that might exist in the fragment dataset.
 Converting a fragment's data to its canonical form may require a combination of the following operations:
 
-* When the fragment's data has been provided as its unique value (via the `value` feature keyword of the **`aggregated_data`** attribute), broadcasting that value across the fragment's canonical shape.
+* When the fragment's data has been provided as its unique value (as opposed to being defined from a fragment dataset), broadcasting that value across the fragment's canonical shape.
 
 * Inserting missing size 1 dimensions into the fragment's data (e.g. as required when aggregating two-dimensional fragments into three-dimensional aggregated data).
 
