@@ -273,7 +273,7 @@ If a group attribute is defined in a parent group, and one of the child group re
 === Aggregation Variables
 
 An __aggregation variable__ is a variable which has been formed by combining (i.e. aggregating) multiple __fragments__ stored in __fragment datasets__ that are external to the file containing the aggregation variable, i.e. the __aggregation file__.
-A fragment dataset contains an array of data with sufficient metadata for it to be correctly interpreted in the context of the aggregation, as described by <<fragment-interpretation>>.
+A fragment is an array of data with sufficient metadata for it to be correctly interpreted in the context of the aggregation, as described by <<fragment-interpretation>>.
 The aggregation variable does not contain any actual data, instead it contains instructions on how to create its __aggregated data__ as an aggregation of the data from each fragment.
 
 Aggregation provides the utility of being able to view, as a single entity, a dataset that has been partitioned across multiple other datasets, whilst  taking up very little extra space on disk (since the aggregation file contains no copies of the data in the fragments).
@@ -310,7 +310,7 @@ The aggregated dimensions must exist as dimensions in the aggregation file.
 The fragments which provide the aggregated data are conceptually organised into a __fragment array__ that has the same number of dimensions as the aggregated data.
 Each dimension of the fragment array is called a __fragment array dimension__, and corresponds to the aggregated dimension with the same position in the aggregated data.
 The size of a fragment array dimension is equal to the number of fragments that are needed to span its corresponding aggregated dimension.
-See the example <<example-fragment-array>>.
+See <<example-fragment-array>>.
 
 The aggregated data are created by concatenating the canonical forms of the fragments' data (see <<fragment-interpretation>>) along each fragment array dimension, and in the order in which they appear in the fragment array.
 
@@ -389,20 +389,22 @@ Not all fragment dataset locations need be of the same URI type.
 See <<example-L.1>> and <<example-L.2>>.
 
 The `location` fragment array variable may have an extra trailing dimension that allows multiple versions of a fragment to be specified.
-Each version must contain equivalent information, so any version that exists may be selected for use in the aggregated data.
 This could be useful when it is known that multiple fragment dataset locations are possible, but it is not known in advance which of them might exist at any given time.
+Each version must contain equivalent information, so any version that exists may be selected for use in the aggregated data.
 For instance, when remotely stored and locally cached versions of the same fragment have been provided, an application program could choose to only retrieve the remote version if the local version does not exist.
 Every fragment must have at least one version, but not all fragments need to have the same number of versions.
 Where fragments have fewer versions than others, the trailing dimension must be padded with missing values.
 See <<example-L.2>>.
 
-A fragment dataset location may contain any number of string substitutions, each of which is defined by the `location` fragment array variable's **`substitutions`** attribute.
-The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines the part of a `location` fragment array variable value which is to be replaced by __replacement__ in order to find the actual fragment dataset location.
+A fragment dataset location may be defined with any number of string substitutions, each of which is defined by the `location` fragment array variable's **`substitutions`** attribute.
+The **`substitutions`** attribute takes a string value comprising blank-separated elements of the form "__substitution: replacement__", where __substitution__ is a case-sensitive keyword that defines part of a `location` fragment array variable value which is to be replaced by __replacement__ in order to find the actual fragment dataset location.
+A `location` fragment array variable value may contain then zero or more of the substitution keywords.
 After replacements have been made, the fragment dataset location must be an absolute URI or a relative-path URI reference.
-The __substitution__ keyword must have the form `${\*}`, where `*` represents any number of any characters.
-For instance, the fragment dataset location `\https://remote.host/data/file.nc` could be stored as `${path}file.nc`, in conjunction with `substitutions="${path}: \https://remote.host/data/"`.
+The substitution keyword must have the form `${\*}`, where `*` represents any number of any characters.
+For instance, the fragment dataset location `\https://remote.host/data/file.nc` could be stored as the string `$\{path}file.nc`, in conjunction with `substitutions="$\{path}: \https://remote.host/data/"`.
 The order of elements in the **`substitutions`** attribute is not significant.
-The use of substitutions can save space in the aggregation file; and in the event that the fragment locations need to be updated after the aggregation file has been created, it may be possible to achieve this by modifying the **`substitutions`** attribute rather than by changing the actual `location` fragment array variable values.
+The string substitutions must be such that applying them in any order will result in the same fragment dataset location.
+The use of string substitutions can save space in the aggregation file; and in the event that the fragment locations need to be updated after the aggregation file has been created, it may be possible to achieve this by modifying the **`substitutions`** attribute rather than by changing the actual `location` fragment array variable values.
 See <<example-L.3>>.
 
 ===== address
@@ -422,7 +424,7 @@ In general, the `shape` fragment array variable is two-dimensional, with the siz
 The rows correspond to the fragment array dimensions in the same order, and each row provides the sizes of the fragments along its corresponding dimension of the fragment array, padded with missing values if there are fewer fragments than the number of columns.
 The sum of non-missing values in a row must therefore equal the size of the corresponding aggregated dimension.
 When the aggregated data is scalar there are no aggregated dimensions, and the `shape` fragment array variable must be one-dimensional, of size one, and contain the value `1`.
-See <<example-L.4>>, which shows the `shape` fragment array variable for the fragment array described by the example <<example-fragment-array>>.
+See <<example-L.4>>, which shows the `shape` fragment array variable for the fragment array described by <<example-fragment-array>>.
 
 ===== Non-standardized features
 
