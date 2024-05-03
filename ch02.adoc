@@ -304,7 +304,7 @@ The details of how to encode and decode aggregation variables are given in this 
 
 The aggregated dimensions are stored with the aggregation variable's **`aggregated_dimensions`** attribute, and it is the presence of this attribute that identifies the variable as an aggregation variable.
 The value of the **`aggregated_dimensions`** attribute is a blank-separated list of the aggregated dimension names given in the order which matches the dimensions of the aggregated data.
-If the aggregated data is scalar then the **`aggregated_dimensions`** attribute must be an empty string.
+If the aggregated data is scalar then there are no aggregated dimensions and the **`aggregated_dimensions`** attribute must be an empty string.
 The aggregated dimensions must exist as dimensions in the aggregation file.
 
 The fragments which provide the aggregated data are conceptually organised into a __fragment array__ that has the same number of dimensions as the aggregated data.
@@ -384,8 +384,9 @@ The integer-valued `shape` fragment array variable defines the shape of the data
 In general, the `shape` fragment array variable is two-dimensional, with the size of the slower varying dimension (i.e. the number of rows) being the number of fragment array dimensions, and the size of the more rapidly varying dimension (i.e. the number of columns) being the size of the largest fragment array dimension.
 The rows correspond to the fragment array dimensions in the same order, and each row provides the sizes of the fragments along its corresponding dimension of the fragment array, padded with missing values if there are fewer fragments than the number of columns.
 The sum of non-missing values in a row must therefore equal the size of the corresponding aggregated dimension.
-When the aggregated data is scalar there are no aggregated dimensions, and the `shape` fragment array variable must be a scalar and contain the value `1`.
 See <<example-L.4>>, which shows the `shape` fragment array variable for the fragment array described by <<example-fragment-array>>.
+If the aggregated data is scalar then the `shape` fragment array variable must be a scalar and contain the value `1`.
+See <<example-L.8>>.
 
 ===== location
 
@@ -428,7 +429,7 @@ See <<example-L.1>> and <<example-L.6>>.
 
 When the data values within a fragment are all the same, for every fragment, the `value` fragment array variable allows each fragment to be represented explicitly by its unique data value, rather than by a fragment dataset.
 The `value` fragment array variable dimensions correspond to, and have the same sizes as, the fragment array dimensions in the same order as they appear in the conceptual fragment array.
-The `value` fragment array variable may have any data type, and each value is the unique value of a fragment's data.
+The `value` fragment array variable may have any data type, and contains the unique value of each fragment's data.
 See <<example-L.7>>, which uses an aggregation ancillary variable to make fragment dataset attributes available to an aggregation data variable.
 
 // Turn section numbering back on
@@ -451,16 +452,16 @@ The data of a fragment must be converted to its __canonical form__ prior to bein
 * The fragment's data have the same data type as the aggregation variable.
 
 The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data. For fragment datasets, the application program may ignore any fragment metadata that are not needed for the conversion to the canonical form, as well as any other variables that might exist in the fragment dataset.
-Converting a fragment's data to its canonical form may require a combination of the following operations:
+A combination of the following operations may be required to convert the fragment's data to its canonical form:
 
-* When, and only when, the fragment's data has been provided as its unique value (as opposed to being defined from a fragment dataset), broadcasting that value across the fragment's canonical shape.
+* If, and only if, the fragment's data has been explicitly defined as its unique value (as opposed to being defined from a fragment dataset), broadcasting that value across the fragment's canonical shape.
 
 * Inserting missing size 1 dimensions into the fragment's data (e.g. as required when aggregating two-dimensional fragments into three-dimensional aggregated data).
 
 * Transforming the fragment's data to have the aggregation variable's units (e.g. as required when aggregating time fragments whose units have different reference date/times).
 
 * Transforming the fragment's data to have the same data type as the aggregated data.
-Note that some transformations may result in a loss of information (as could be the case when casting floating point numbers to integers), and an application program may choose to disallow these.
+Note that some transformations may result in a loss of information (such as could be the case when casting floating point numbers to integers), and an application program may choose to disallow these.
 
 * Unpacking the fragment's data.
 Note that if the aggregation variable indicates that the aggregated data are packed (as determined by the attributes defined in <<packed-data>>), then the unpacked fragment data values will represent packed values in the aggregated data. It is therefore recommended that the aggregated data is not packed, because of the potential for mistakes and confusion.

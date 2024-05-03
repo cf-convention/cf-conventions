@@ -26,7 +26,7 @@ dimensions:
   i = 2 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Aggregated data variable
+  // Aggregation data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -80,7 +80,6 @@ The data for the `level`, `latitude` and  `longitude` variables are omitted for 
 ====
 ----
 dimensions:
-  // Aggregated dimensions
   time = 12 ;
   level = 1 ;
   latitude = 73 ;
@@ -97,7 +96,7 @@ dimensions:
   versions = 2 ;  // The maximum number of versions for a fragment
 
 variables:
-  // Aggregated data variable
+  // Aggregation data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -171,7 +170,7 @@ dimensions:
   versions = 2 ;  // The maximum number of versions for a fragment
 
 variables:
-  // Aggregated data variable
+  // Aggregation data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -180,7 +179,7 @@ variables:
     temperature:aggregated_data = "location: fragment_location
                                    address: fragment_address
                                    shape: fragment_shape" ;
-  // Aggregated coordinate variable
+  // Aggregation coordinate variable
   double time ;    // This is an aggregation coordinate variable
     time:standard_name = "time" ;
     time:units = "days since 2001-01-01" ;
@@ -252,7 +251,7 @@ dimensions:
   i = 3 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Aggregated data variable
+  // Aggregation data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -317,7 +316,7 @@ dimensions:
   i = 12 ;        // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Aggregated data variable
+  // Aggregation data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -385,7 +384,7 @@ dimensions:
   i = 3 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Aggregated data variable
+  // Aggregation data variable
   float tas(obs) ;
     tas:standard_name = "air_temperature" ;
     tas:units = "K" ;
@@ -399,7 +398,7 @@ variables:
     row_size:long_name = "number of observations per station" ;
     row_size:sample_dimension = "obs" ;
 
-  // Aggregated auxiliary coordinate variables
+  // Aggregation auxiliary coordinate variables
   float time ;
     time:standard_name = "time" ;
     time:units = "days since 1970-01-01" ;
@@ -477,7 +476,7 @@ dimensions:
   i = 2 ;         // Equal to the size of the largest fragment array dimension
 
 variables:
-  // Aggregated data variable
+  // Aggregation data variable
   double temperature ;
     temperature:standard_name = "air_temperature" ;
     temperature:units = "K" ;
@@ -487,7 +486,7 @@ variables:
     temperature:aggregated_data = "location: fragment_location
                                    address: fragment_address
                                    shape: fragment_shape" ;
-  // Aggregated ancillary variable
+  // Aggregation ancillary variable
   string uid() ;
     uid:long_name = "Fragment dataset unique identifiers" ;
     uid:aggregated_dimensions = "time level latitude longitude" ;
@@ -526,7 +525,55 @@ data:
                    144, _ ;
   fragment_value = "04821b9-7eb5-4046-937b-0bf0588", "056d1ee0-a183-43b3-ae67-1ec632a" ;
 ----
-This example is similar to <<example-L.1>>, but now there is the aggregated  ancillary variable `uid` which defines its fragments as constant values stored int he `fragment_value` variable,that are intended to be broadcast across its aggregated data.
+This example is similar to <<example-L.1>>, but now there is the aggregation ancillary variable `uid` which defines its fragments as constant values stored int he `fragment_value` variable,that are intended to be broadcast across its aggregated data.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
+====
+
+[[example-L.8]]
+[caption="Example L.8 "]
+.Aggregation variable example 8
+====
+----
+dimensions:
+
+variables:
+  // Aggregation data variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "" ;
+    temperature:aggregated_data = "location: fragment_location
+                                   address: fragment_address
+                                   shape: fragment_shape" ;
+  // Scalar coordinate variables
+  double time ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double height ;
+    level:standard_name = "height" ;
+    level:units = "m" ;
+  double latitude ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+  // Fragment array variables
+  string fragment_location ;
+  string fragment_address ;
+  int fragment_shape ;
+
+data:
+  temperature = _ ;
+  time = 0 ;
+  height = 1.5 ;
+  latitude = 18.53 ;
+  longitude = 73.81 ;
+  fragment_location = "file.nc" ;
+  fragment_address = "tas" ;
+  fragment_shape = 1 ;
+----
+An example of an aggregation variable with scalar aggregated data.
 ====
