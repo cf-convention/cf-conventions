@@ -472,8 +472,9 @@ dimensions:
   f_latitude = 1 ;
   f_longitude = 1 ;
   // Fragment shape dimensions
-  j = 4 ;         // Equal to the number of aggregated dimensions
+  j = 4 ;         // Equal to the number of temperature aggregated dimensions
   i = 2 ;         // Equal to the size of the largest fragment array dimension
+  j_uid = 1 ;     // Equal to the number of uid aggregated dimensions
 
 variables:
   // Aggregation data variable
@@ -489,9 +490,9 @@ variables:
   // Aggregation ancillary variable
   string uid ;
     uid:long_name = "Fragment dataset unique identifiers" ;
-    uid:aggregated_dimensions = "time level latitude longitude" ;
+    uid:aggregated_dimensions = "time" ;
     uid:aggregated_data = "value: fragment_value
-                           shape: fragment_shape";
+                           shape: fragment_shape_uid";
   // Coordinate variables
   double time(time) ;
     time:standard_name = "time" ;
@@ -509,7 +510,8 @@ variables:
   string fragment_location(f_time, f_level, f_latitude, f_longitude) ;
   string fragment_address ;
   int fragment_shape(j, i) ;
-  string fragment_value(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_value(f_time) ;
+  int fragment_shape_uid(j_uid, i) ;
 
 data:
   temperature = _ ;
@@ -524,6 +526,7 @@ data:
                    73, _,
                    144, _ ;
   fragment_value = "04821b9-7eb5-4046-937b-0bf0588", "056d1ee0-a183-43b3-ae67-1ec632a" ;
+  fragment_shape_uid = 3, 9 ;
 ----
 This example is similar to <<example-L.1>>, but now there is the aggregation ancillary variable `uid` which defines its fragments as constant values stored int he `fragment_value` variable,that are intended to be broadcast across its aggregated data.
 
