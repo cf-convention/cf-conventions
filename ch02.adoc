@@ -290,9 +290,10 @@ Any text applying to a variable in the CF conventions applies in exactly the sam
 For instance:
 
 * The dimension of a coordinate variable of an aggregation data variable must be one of the aggregated dimensions of the aggregation data variable.
-* An aggregation coordinate variable (which is a scalar) must have the same name as its aggregated dimension.
 
-Note that the missing values indicated by the aggregation variable apply to the aggregated data once it has been created, and not to the individual fragments, which may define their own missing data. It is up to the creator of the aggregation variable to ensure that none of the aggregation variable's missing values coincide with non-missing values in the fragments.
+* The name of an aggregation coordinate variable (which is a scalar) must
+be the same as the name of its single aggregated dimension (identified by its **`aggregated_dimensions`** attribute), just as the name of a coordinate variable (which is one-dimensional) must be the same as the name of its single
+dimension.
 
 The details of how to encode and decode aggregation variables are given in this section, with examples provided in <<appendix-aggregation-examples>>.
 
@@ -364,7 +365,8 @@ The fragments, stored in six fragment datasets, are arranged in a three-dimensio
 Each fragment spans the entirety of the Z dimension, but only a part of the Y-X plane, which has 1 degree resolution.
 The fragments combine to create three-dimensional aggregated data that have global Z-Y-X coverage, with shape `(17, 181, 360)`.
 The Z aggregated dimension is spanned by one fragment, the Y aggregated dimension is spanned by three fragments, and the X aggregated dimension is spanned by two fragments.
-See <<example-L.4>> for a CDL representation of this fragment array.
+Note that, since this example is a schematic representation, the C or Fortran order of the dimensions is of no consequence.
+See <<example-L.4>> for a CDL representation of this fragment array. 
 ====
 
 The fragment array must be defined by an aggregation variable's **`aggregated_data`** attribute.
@@ -379,7 +381,7 @@ The features must comprise either all three of the `shape`, `location`, and `add
 ===== shape
 
 The integer-valued `shape` fragment array variable defines the shape of each fragment's data in its canonical form (see <<fragment-interpretation>>).
-In general, the `shape` fragment array variable is two-dimensional, with the size of the slower-varying dimension (i.e. the number of rows) being the number of fragment array dimensions, and the size of the more rapidly-varying dimension (i.e. the number of columns) being the size of the largest fragment array dimension.
+In general, the `shape` fragment array variable is two-dimensional, with the size of the slower-varying dimension (i.e. the first dimension in CDL order, representing rows) being the number of fragment array dimensions, and the size of the more rapidly-varying dimension (i.e. the second dimension in CDL order, representing columns) being the size of the largest fragment array dimension.
 The rows correspond to the fragment array dimensions in the same order, and each row provides the sizes of the fragments along its corresponding dimension of the fragment array, padded with missing values if there are fewer fragments than the number of columns.
 The sum of non-missing values in a row must therefore equal the size of the corresponding aggregated dimension.
 See <<example-L.4>>, which shows the `shape` fragment array variable for the fragment array described by <<example-fragment-array>>.
@@ -446,6 +448,8 @@ The data of a fragment must be converted to its __canonical form__ prior to bein
 
 * The fragment's data have the same units as the aggregation variable.
 
+* The fragment's data have missing values as indicated by the aggregation variable.
+
 * The fragment's data are not packed (i.e. not stored using a smaller data type than the original data).
 
 * The fragment's data have the same data type as the aggregation variable.
@@ -457,10 +461,17 @@ A combination of the following operations may be required to convert the fragmen
 
 * Inserting missing size 1 dimensions into the fragment's data (e.g. as required when aggregating two-dimensional fragments into three-dimensional aggregated data).
 
+* Transforming the fragment's data to have the same data type as the aggregated data.
+Note that some transformations may result in a loss of information (such as could be the case when casting floating point numbers to integers), and the application program may choose to not create the aggregation data.
+
+* Transforming missing values in the fragment's data to a value indicated as missing by the aggregation variable.
+Note that it is up to the application program to choose a new missing value, from those provided by the aggregation variable, that does not coincide with any non-missing value from any fragment, and if that is not possible then the application program may choose to not create the aggregation data.
+
 * Transforming the fragment's data to have the aggregation variable's units (e.g. as required when aggregating time fragments whose units have different reference date/times).
 
-* Transforming the fragment's data to have the same data type as the aggregated data.
-Note that some transformations may result in a loss of information (such as could be the case when casting floating point numbers to integers), and an application program may choose to disallow these.
-
 * Unpacking the fragment's data.
-Note that if the aggregation variable indicates that the aggregated data are packed (as determined by the attributes defined in <<packed-data>>), then the unpacked fragment data values will represent packed values in the aggregated data. It is therefore recommended that the aggregated data is not packed, because of the potential for mistakes and confusion.
+Note that if the aggregation variable indicates that the aggregated data are packed (as determined by the attributes defined in <<packed-data>>), then the unpacked fragment data values will represent packed values in the aggregated data.
+It is recommended that the aggregated data is not packed, because of the potential for mistakes and confusion.
+It is recommended that the aggregated data is not packed, because of the potential for mistakes and confusion that could arise from
+
+For instance if a variable has datatype `int` and double precision packing attributes `scale_factor=0.0392156862745098` and add_offset=`275.01960784313724`, then we would expect the upacked data to be in the range `270` to `280`. If that variable is an aggregated variable 
