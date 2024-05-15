@@ -274,7 +274,7 @@ If a group attribute is defined in a parent group, and one of the child group re
 
 An __aggregation variable__ is a variable which has been formed by combining (i.e. aggregating) multiple __fragments__ that are generally stored in __fragment datasets__ that are external to the file containing the aggregation variable, i.e. the __aggregation file__.
 A fragment is an array of data with sufficient metadata for it to be correctly interpreted in the context of the aggregation, as described by <<fragment-interpretation>>.
-The aggregation variable does not contain any actual data, instead it contains instructions on how to create its __aggregated data__ as an aggregation of the data from each fragment.
+The aggregation variable does not contain any actual data, instead it contains instructions on how to create its __aggregated data__ in memory as an aggregation of the data from each fragment.
 
 Aggregation provides the utility of being able to view, as a single entity, a dataset that has been partitioned across multiple other datasets, whilst  taking up very little extra space on disk (since the aggregation file contains no copies of the data in the fragments).
 Fragment datasets may be CF-compliant or have any other format, thereby allowing an aggregation variable to act as a CF-compliant view of non-CF datasets.
@@ -454,7 +454,7 @@ The data of a fragment must be converted to its __canonical form__ prior to bein
 
 * The fragment's data have the same data type as the aggregation variable.
 
-The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data array in memory. For fragment datasets, the application program may ignore any fragment metadata that are not needed for the conversion to the canonical form, as well as any other variables that might exist in the fragment dataset.
+The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data in memory. For fragment datasets, the application program may ignore any fragment metadata that are not needed for the conversion to the canonical form, as well as any other variables that might exist in the fragment dataset.
 A combination of the following operations may be required to convert the fragment's data to its canonical form:
 
 * If, and only if, the fragment's data has been explicitly defined by its unique value (as opposed to being defined by a fragment dataset), broadcasting that value across the shape of the canonical form of the fragment's data.
@@ -462,13 +462,15 @@ A combination of the following operations may be required to convert the fragmen
 * Inserting missing size 1 dimensions into the fragment's data (e.g. as required when aggregating two-dimensional fragments into three-dimensional aggregated data).
 
 * Transforming the fragment's data to have the same data type as the aggregated data.
-Note that some transformations may result in a loss of information (such as could be the case when casting floating point numbers to integers), and the application program may choose to not create the aggregation data.
+Note that some transformations may result in a loss of information, such as could be the case when casting floating point numbers to integers.
 
 * Transforming missing values in the fragment's data to a value indicated as missing by the aggregation variable.
-Note that it is up to the application program to choose a new missing value, from those provided by the aggregation variable, that does not coincide with any non-missing value from any fragment, and if that is not possible then the application program may choose to not create the aggregation data.
+Note that it is the responsibility of the creator of the aggregation file to ensure that all non-missing fragment data values do not coincide with any of the missing values indicated by the aggregation variable.
 
 * Transforming the fragment's data to have the aggregation variable's units (e.g. as required when aggregating time fragments whose units have different reference date/times).
 
 * Unpacking the fragment's data.
-Note that if the aggregation variable indicates that the aggregated data are packed (as determined by the attributes defined in <<packed-data>>), then the unpacked fragment data values will represent packed values in the aggregated data.
-It is recommended that the aggregated data is not packed, because of the potential for mistakes and confusion.
+
+Note that if the aggregation variable indicates that the aggregated data values are packed (as determined by the attributes defined in <<packed-data>>), then the canonical fragment data values will represent packed values in the aggregated data.
+In this case, the canonical (i.e. unpacked) fragment data values will be further transformed when the aggregation variable's unpacking is applied.
+To avoid the potential for mistakes and confusion as to what the canonical fragment data values represent in the aggregated data, it is recommended that the aggregated variable does not include any packing attributes.
