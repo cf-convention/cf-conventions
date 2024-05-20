@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.12 draft,</span>
-<span id="revdate">&#160;&#160;15&#160;May,&#160;2024&#160;09:11:35Z</span>
+<span id="revdate">&#160;&#160;20&#160;May,&#160;2024&#160;08:10:19Z</span>
 <br><span id="revremark">See&#160;<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>&#160;for&#160;further&#160;information.</span>
 </div>
 </div>
@@ -1257,8 +1257,8 @@ For backwards compatibility with COARDS none of these attributes is required, bu
 The <strong><code>units</code></strong>, and <strong><code>long_name</code></strong> attributes are defined in the NUG and the <strong><code>standard_name</code></strong> attribute is defined in this document.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>.
-The values of the <strong><code>units</code></strong> attributes are character strings that are recognized by UNIDATA&#8217;s UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>, (with exceptions allowed as discussed in <a href="#units">Section 3.1, "Units"</a>).</p>
+<p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>).
+The values of the <strong><code>units</code></strong> attributes are character strings that are recognized by UNIDATA&#8217;s UDUNITS package <a href="#UDUNITS">[UDUNITS]</a> (with exceptions allowed as discussed in <a href="#units">Section 3.1, "Units"</a>).</p>
 </div>
 <div class="paragraph">
 <p>The <strong><code>long_name</code></strong> and <strong><code>standard_name</code></strong> attributes are used to describe the content of each variable.
@@ -1287,11 +1287,8 @@ Because identification of a coordinate type by its units involves the use of an 
 <div class="paragraph">
 <p>Latitude, longitude, and time are defined by internationally recognized standards, and hence, identifying the coordinates of these types is sufficient to locate data values uniquely with respect to time and a point on the earth&#8217;s surface.
 On the other hand identifying the vertical coordinate is not necessarily sufficient to locate a data value vertically with respect to the earth&#8217;s surface.
-In particular a model may output data on the dimensionless vertical coordinate used in its mathematical formulation.
-To achieve the goal of being able to spatially locate all data values, this convention includes the definitions of common dimensionless vertical coordinates in <a href="#parametric-v-coord">Appendix D, Parametric Vertical Coordinates</a>.
-These definitions provide a mapping between the dimensionless coordinate values and dimensional values that can be uniquely located with respect to a point on the earth&#8217;s surface.
-The definitions are associated with a coordinate variable via the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes.
-For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.</p>
+In particular a model may output data on the parametric (usually dimensionless) vertical coordinate used in its mathematical formulation.
+To achieve the goal of being able to spatially locate all data values, this convention provides a mapping, via the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes of a parametric vertical coordinate variable, between its values and dimensional vertical coordinate values that can be uniquely located with respect to a point on the earth&#8217;s surface (<a href="#parametric-vertical-coordinate">Section 4.3.3, "Parametric Vertical Coordinate"</a>; <a href="#parametric-v-coord">Appendix D, Parametric Vertical Coordinates</a>).</p>
 </div>
 <div class="paragraph">
 <p>It is often the case that data values are not representative of single points in time and/or space, but rather of intervals or multidimensional cells.
@@ -1328,7 +1325,7 @@ Often a buffering operation can be used to miminize performance penalties when a
 <div class="paragraph">
 <p>COARDS addresses the issue of identifying dimensionless vertical coordinates, but does not provide any mechanism for mapping the dimensionless values to dimensional ones that can be located with respect to the earth&#8217;s surface.
 For backwards compatibility we continue to allow (but do not require) the <strong><code>units</code></strong> attribute of dimensionless vertical coordinates to take the values "level", "layer", or "sigma_level."
-But we recommend that the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes be used to identify the appropriate definition of the dimensionless vertical coordinate (see <a href="#dimensionless-vertical-coordinate">Section 4.3.2, "Dimensionless Vertical Coordinate"</a>).</p>
+But we recommend that the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes be used to identify the appropriate definition of the dimensionless vertical coordinate (see <a href="#parametric-vertical-coordinate">Section 4.3.3, "Parametric Vertical Coordinate"</a>).</p>
 </div>
 <div class="paragraph">
 <p>The CF conventions define attributes which enable the description of data properties that are outside the scope of the COARDS conventions.
@@ -2375,9 +2372,7 @@ The repeated <strong><code>flag_masks</code></strong> enable a simple mechanism 
 <div class="paragraph">
 <p>Four types of coordinates receive special treatment by these conventions: latitude, longitude, vertical, and time.
 We continue to support the special role that the <strong><code>units</code></strong> and <strong><code>positive</code></strong> attributes play in the COARDS convention to identify coordinate type.
-We extend COARDS by providing explicit definitions of dimensionless vertical coordinates.
-The definitions are associated with a coordinate variable via the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes.
-For backwards compatibility with COARDS use of these attributes is not required, but is strongly recommended.</p>
+As an extension to COARDS, we strongly recommend that a parametric (usually dimensionless) vertical coordinate variable should be associated, via <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes, with its explicit definition, which provides a mapping between its values and dimensional vertical coordinate values that can be uniquely located with respect to a point on the earth&#8217;s surface.</p>
 </div>
 <div class="paragraph">
 <p>Because identification of a coordinate type by its units is complicated by requiring the use of an external package <a href="#UDUNITS">[UDUNITS]</a>, we provide two optional methods that yield a direct identification.
@@ -12222,6 +12217,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/515">Issue #515</a>: Clarify the recommendation to use the convention of 4.3.3 for parametric vertical coordinates, because the previous wording caused confusion.</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/511">Issue #511</a>: Appendix B: New element in XML file header to record the "first published date"</p>
 </li>
 <li>
@@ -12862,7 +12860,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.12 draft<br>
-Last updated 2024-05-15 09:11:34 UTC
+Last updated 2024-05-20 08:10:18 UTC
 </div>
 </div>
 </body>
