@@ -23,7 +23,7 @@ CONF_DOC_INC := version
 
 
 .PHONY: all clean
-all: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html $(addpreffix images/, $(MAIN_DOC_IMG_BLD)) $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html
+all: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html $(addpreffix images/, $(MAIN_DOC_IMG_BLD)) $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(addprefix images/, $(MAIN_DOC_IMG)) $(addsuffix .adoc, $(MAIN_DOC_INC)) | $(MAIN_DOC_BUILD_DIR)
 	asciidoctor --verbose ${FINAL_TAG} -a data-uri -a docprodtime=$(date -u ${DATE_FMT}) $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
@@ -60,4 +60,3 @@ images/order_horizontal_bounds__1D_coord_variables.png: images/order_horizontal_
 
 images/order_horizontal_bounds__2D_coord_variables.png: images/order_horizontal_bounds__2D_coord_variables.pdf
 	pdftoppm -progress -singlefile -r 300 -png $< $(basename $@)
-
