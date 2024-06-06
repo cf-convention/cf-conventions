@@ -20,19 +20,23 @@ CONF_DOC := conformance
 CONF_DOC_BUILD_DIR := ./conformance_build
 CONF_DOC_INC := version
 
-
+DATE_DOCPROD != LC_ALL=C date -u "+%d&\#160;%B,&\#160;%Y&\#160;%H:%M:%SZ"
 
 .PHONY: all clean
-all: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html $(addpreffix images/, $(MAIN_DOC_IMG_BLD)) $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
+all: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html $(addpreffix images/, $(MAIN_DOC_IMG_BLD)) $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(addprefix images/, $(MAIN_DOC_IMG)) $(addsuffix .adoc, $(MAIN_DOC_INC)) | $(MAIN_DOC_BUILD_DIR)
-	asciidoctor --verbose ${FINAL_TAG} -a data-uri -a docprodtime=$(date -u ${DATE_FMT}) $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	asciidoctor --verbose --trace ${FINAL_TAG} -a data-uri -a docprodtime="$(DATE_DOCPROD)" $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(MAIN_DOC).adoc $(addprefix images/, $(MAIN_DOC_IMG)) $(addsuffix .adoc, $(MAIN_DOC_INC)) | $(MAIN_DOC_BUILD_DIR)
-	asciidoctor-pdf --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) -d book -a pdf-theme=default-theme-CF-version.yml --trace $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	asciidoctor-pdf --verbose --trace ${FINAL_TAG} -a docprodtime="$(DATE_DOCPROD)" -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC).adoc $(addsuffix .adoc, $(CONF_DOC_INC)) | $(CONF_DOC_BUILD_DIR)
-	asciidoctor --verbose ${FINAL_TAG} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
+	asciidoctor --verbose --trace ${FINAL_TAG} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
+
+$(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC).adoc $(addsuffix .adoc, $(CONF_DOC_INC)) | $(CONF_DOC_BUILD_DIR)
+	asciidoctor-pdf --verbose --trace ${FINAL_TAG} -d book $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
 $(MAIN_DOC_BUILD_DIR):
 	mkdir -vp $(MAIN_DOC_BUILD_DIR)
@@ -42,6 +46,7 @@ $(CONF_DOC_BUILD_DIR):
 
 clean:
 	rm -rvf $(MAIN_DOC_BUILD_DIR)
+	rm -rvf $(CONF_DOC_BUILD_DIR)
 
 images/cfdm_cf_concepts.svg: images/cfdm_cf_concepts.gv
 	dot -Tsvg $< -o $@
