@@ -50,14 +50,16 @@ jobs:
     - name: Set "final" tag and date-time formatting
       if: github.event_name == 'release'
       run: |
-        echo "FINAL_TAG=-a final" >> "$GITHUB_ENV"; echo "DATE_FMT=+%d&#160;%B,&#160;%Y" >> "$GITHUB_ENV"
+        echo "DATE_FMT=+%d&#160;%B,&#160;%Y" >> "$GITHUB_ENV"
+        echo "DOI=$(tail -n 1: doi-catalog.txt |cut -d : -f 2)" >> $GITHUB_ENV
+        echo "FINAL_TAG=-a final" >> "$GITHUB_ENV"; 
     # Build cf-conventions.html using the Analog-inc asciidoctor-action
     - name: Build cf-conventions.html
       uses: Analog-inc/asciidoctor-action@v1.2
       with:
-        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) cf-conventions.adoc -D conventions_build; cp -r images conventions_build'
-    # Patch the cfconventions.org link
-    - run: sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' ./conventions_build/cf-conventions.html
+        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} -a doi=${DOI} -a docprodtime=$(date -u ${DATE_FMT}) cf-conventions.adoc -D conventions_build; cp -r images conventions_build'
+    # Remove the empty "Colophon" title and toc entry from the html version
+    - run: sed -i '/>&#160;</{N;N;d;}' ./conventions_build/cf-conventions.html
     # Build cf-conventions.pdf using the Analog-inc asciidoctor-action
     - name: Build cf-conventions.pdf
       uses: Analog-inc/asciidoctor-action@v1.2
