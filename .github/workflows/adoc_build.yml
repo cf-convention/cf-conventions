@@ -21,6 +21,8 @@
 #
 name: Asciidoctor Build Workflow
 on:
+  # manually run workflow
+  workflow_dispatch:
   # trigger on PR event against main (will not run publish job)
   pull_request:
     branches: [ main ]
@@ -40,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Check out PR
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     # Create build directory
     - run: mkdir conventions_build
     - name: Set draft date-time formatting
@@ -55,7 +57,7 @@ jobs:
     - name: Build cf-conventions.html
       uses: Analog-inc/asciidoctor-action@v1.2
       with:
-        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) cf-conventions.adoc -D conventions_build; cp -r images conventions_build'
+        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) -a data-uri cf-conventions.adoc -D conventions_build'
     # Patch the cfconventions.org link
     - run: sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' ./conventions_build/cf-conventions.html
     # Build cf-conventions.pdf using the Analog-inc asciidoctor-action
@@ -65,7 +67,7 @@ jobs:
         shellcommand: 'asciidoctor-pdf --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) -d book -a pdf-theme=default-theme-CF-version.yml --trace cf-conventions.adoc -D conventions_build'
     # Upload artifact containing cf-conventions.html, cf-conventions.pdf
     - name: Upload cf-conventions doc preview
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: conventions_docs
         path: conventions_build/
@@ -75,7 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     # Checkout PR
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     # Create build directory
     - run: mkdir conformance_build
     - name: Set "final" tag
@@ -94,26 +96,10 @@ jobs:
         shellcommand: 'asciidoctor-pdf --verbose ${FINAL_TAG} -d book conformance.adoc -D conformance_build'
     # Upload artifact containing conformance.html, conformance.pdf
     - name: Upload conformance doc preview
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: conformance_docs
         path: conformance_build/
-
-  # Job to an artifact of the images/ directory.
-  # Only needed if we are going to run the publish job.
-  images_artifact:
-    name: Create artifact of image directory
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-    # Checkout ref
-    - uses: actions/checkout@v3
-    # Create the image_directory artifact
-    - name: Upload images directory
-      uses: actions/upload-artifact@v3
-      with:
-        name: image_directory
-        path: images/
 
   # Use artifacts from the build_conventions, build_conformance, and
   # images_artifact jobs to update the gh-pages branch. The location of the
@@ -126,11 +112,11 @@ jobs:
     # Do not run on pull requests
     if: github.event_name != 'pull_request'
     # Wait for the build artifacts to become available
-    needs: [build_conventions, build_conformance, images_artifact]
+    needs: [build_conventions, build_conformance]
     runs-on: ubuntu-latest
     steps:
       # Checkout gh-pages branch
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: 'gh-pages'
       # Will new docs go into root, or into a directory named after the
@@ -145,7 +131,7 @@ jobs:
           fi
       # Obtain the build artifacts from the previous jobs and place them in the
       # build/ directory
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: build/
       # If we are doing a release, we need to create the release directory
@@ -157,8 +143,6 @@ jobs:
       - name: Remove old images directory
         if: github.event_name != 'release'
         run: rm -rf ${{ env.TARGET_DIR }}/images
-      - name: Move images directory to target directory
-        run: mv build/image_directory ${{ env.TARGET_DIR }}/images
       - name: Copy conventions and conformance documents
         run: |
           cp build/conventions_docs/cf-conventions.html ${{ env.TARGET_DIR }}/
