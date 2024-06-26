@@ -5,7 +5,7 @@
 There are three methods for reducing dataset size: packing, lossless compression, and lossy compression.
 By packing we mean altering the data in a way that reduces its precision (but has no other effect on accuracy).
 By lossless compression we mean techniques that store the data more efficiently and result in no loss of precision or accuracy.
-By lossy compression we mean techniques that store the data more efficiently and retain its precision but result in some loss in accuracy.
+By lossy compression we mean techniques that either store the data more efficiently and retain its precision but result in some loss in accuracy, or techniques that intentionally reduce data precision to improve the efficiency of subsequent lossless compression.
 
 Lossless compression only works in certain circumstances, e.g., when a variable contains a significant amount of missing or repeated data values.
 In this case it is possible to make use of standard utilities, e.g., UNIX **`compress`** or GNU **`gzip`**, to compress the entire file after it has been written.
@@ -675,118 +675,112 @@ The data creator shall specify the floating-point arithmetic precision used duri
 Using the given computational precision in the interpolation computations is a necessary, but not sufficient, condition for the data user to be able to reconstitute the coordinates to an accuracy comparable to that intended by the data creator.
 For instance, a **`computational_precision**` value of **`"64"**` would specify that, using the same implementation and hardware as the creator of the compressed dataset, sufficient accuracy could not be reached when using a floating-point precision lower than 64-bit floating-point arithmetic in the interpolation computations required to reconstitute the coordinates.
 
-[[lossy-compression-by-quantization, Section 8.4, "Lossy Compression by Quantization"]]
-=== Lossy Compression by Quantization
+[[lossy-compression-via-quantization, Section 8.4, "Lossy Compression via Quantization"]]
+=== Lossy Compression via Quantization
 
 Geoscientific models and measurements generate false floating-point precision (scientifically meaningless data bits) that wastes storage space.
 False precision can mislead (by implying noise is signal) and is scientifically pointless.
-The quantization technique can eliminate false precision, usually by setting the least significant bits of [<<IEEE_754>>] floating-point mantissas to zeros.
+The quantization technique can eliminate false precision, usually by rounding the least significant bits of [<<IEEE_754>>] floating-point mantissas to zeros.
 (Quantization of integer types, although theoretically allowed, is not covered by this convention.)
 The quantized results are valid [<<IEEE_754>>] values---no special software or decoder is necessary to read them.
 Importantly, the quantized bits compress more efficiently than random bits.
-Thus quantization is often referred to as a lossy compression technique though, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent codec.
+Thus quantization is sometimes referred to as a form of lossy compression though, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent codec.
 
 These CF conventions define a metadata framework to provide quantization properties alongside quantized data.
 The goals are twofold.
-First, to inform interested users how, and to what degree, the quantized data differ from the original (and irrecoverable) unquantized data.
+First, to inform interested users how, and to what degree, the quantized data differ from the original unquantized data, which are not stored in the dataset and may no longer exist.
 Second, to provide the necessary provenance metadata for users to reproduce the data transformations on the same or other raw data.
 These conventions also allow users to better understand the precision that data producers expect from source models or measurements. 
 
-Software can use a variety of algorithms to quantize data and write it in netCDF format.
-In practice, data purveyors are likely to employ the same lossy quantization algorithm to multiple variables in a single file, possibly with variable-specific levels of compression.
+Quantization is irreversible so data providers must exercise judgement about which fields to quantize, and to what level. Observed and simulated geophysical fields always have finite accuracy and precision. Domain specialists are best qualified to suggest appropriate quantization levels. However, fields that describe idealized or reference coordinate grids, or grid transformations, are often known to the highest precision possible. These fields can include spatial and temporal coordinate variables (e.g., **`latitude`**, **`longitude`**, **`time`**) and properties derived from these coordinates (e.g., **`area`**, **`volume`**). Degrading the precision of such grid properties may have unintended side effects on the accuracy of subsequent operations such regridding, interpolation, and conservation checks which should generally be performed with the highest precision possible. In general, we recommend against quantizing any **`coordinate variable`**, **`bounds`** variable, **`cell_measures`** variables, and any variables employed in **`formula_terms`**. Use of these conventions ensures that all quantized variables are clearly marked as such, and thus alerts users to cases where these guidelines have not been followed. 
+
+Software can use a variety of algorithms to quantize data and to write it in netCDF format.
+In practice, data purveyors are likely to employ the same quantization algorithm to multiple variables in a single file, possibly with variable-specific levels of quantization.
 This suggests the use of a hybrid version of the container variable model for each quantization algorithm employed on variables in a given file.
-The **`lossy compression`** container variable records the generic properties of the algorithm, while the algorithm parameters are stored as attributes of the specific data variables to which they were applied.
-Keeping with CF precedents, many attributes make use of controlled vocabularies that are case-insensitive, with white space replaced by underscores.
+The **`quantization`** container variable records the generic properties of the algorithm, while the algorithm parameters are stored as attributes of the specific data variables to which they were applied.
+Keeping with CF precedents, quantization attributes that make use of controlled vocabularies are case-insensitive, with white space replaced by underscores.
 
-[[lossy-compression-variable, Section 8.4.1, "Lossy Compression Variable"]]
-==== Lossy compression variable
+[[quantization-variable, Section 8.4.1, "Quantization Variable"]]
+==== Quantization variable
 
-A **`lossy compression`** variable provides the description of a lossy compression algorithm via a collection of attached attributes.
+A **`quantization`** variable describes a quantization algorithm via a collection of attached attributes.
 It is of arbitrary type since it contains no data.
 Its purpose is to act as a container for the generic attributes of an algorithm.
-Lossy compression variables are recommended to have at least three attributes: **`family`**, **`algorithm`**, and **`implementation`**.
+Quantization variables are recommended to have at least two attributes: **`algorithm`**, and **`implementation`**.
 
-The **`family`** attribute conveys the general class of lossy algorithm to the user who may not be familiar with the names of all possible algorithms in each class.
-The only valid value of **`family`** currently is **`quantize`**.
-For this reason **`family`** is an optional though recommended attribute.
-If and when algorithms outside the quantize family are supported, the **`family`** attribute may become required.
-Other potential families of lossy algorithms include rounding, packing, zfp, and fpzip. 
-
-The **`algorithm`** attribute names a specific lossy compression algorithm.
-Four quantization algorithms are currently recognized for **`family = quantize`**: BitRound, BitGroom, DigitRound, and Granular BitRound.
-The controlled vocabulary for the **`quantize`** algorithms thus consists of **`bitround`**, **`bitgroom`**, **`digitround`**, and **`granular_bitround`**.
+The **`algorithm`** attribute names a specific quantization algorithm.
+Four quantization algorithms are currently recognized: BitRound, BitGroom, DigitRound, and Granular BitRound.
+The controlled vocabulary these algorithms thus consists of **`bitround`**, **`bitgroom`**, **`digitround`**, and **`granular_bitround`**.
 See <<quantization-algorithms-description>> for a brief summary of these algorithms.
 
-The final attribute in a lossy compression variable is **`implementation`**.
+The second attribute in a quantization variable is **`implementation`**.
 This required attribute contains free-form text that concisely conveys the algorithm provenance, including the name of the library or client that performed the quantization, and the software version.
 **`implementation`** should include any other information required to disambiguate the source of the algorithm employed.
 
-[[per-variable-lossy-compression-attributes, Section 8.4.2, "Per-variable lossy compression attributes"]]
-==== Per-variable lossy compression attributes
+[[per-variable-quantization-attributes, Section 8.4.2, "Per-variable quantization attributes"]]
+==== Per-variable quantization attributes
 
-Each variable that has been lossily compressed must include at least two attributes.
-Data variables use the **`lossy_compression`** attribute to associate themselves with a **`lossy compression`** variable.
+Each variable that has been quantized must include at least two attributes.
+Data variables use the **`quantization`** attribute to associate themselves with a **`quantization`** container variable.
 This attribute is attached to data variables so that variables compressed with different algorithms may be present in a single file.
 
-Data variables that have been lossily compressed must also record the specific parameter value(s) used in the lossy compression algorithm.
-The input parameter for all algorithms in the **`quantize`** family determines the precision preserved by the algorithm.
+Data variables that have been quantized must also record the specific parameter value(s) used in the quantization algorithm.
+The input parameter for all quantization algorithms determines the precision preserved by the algorithm.
 BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantizes the trailing bits.
-All data variables quantized by BitRound must record the NSB in the **`lossy_compression_nsb`** attribute.
+All data variables quantized by BitRound must record the NSB in the **`quantization_nsb`** attribute.
 Note that BitRound __counts only explicitly represented mantissa bits__.
 It does not include the most-significant-bit with value 1 that implicitly begins all [<<IEEE_754>>] mantissas.
-Thus **`lossy_compression_nsb`** is an integer type attribute with **`1 \<= NSB \<= 23`** for data type **`float`** or **`real`**, and **`1 \<= NSB \<= 52`** for data type **`double`**.
+Thus **`quantization_nsb`** is an integer type attribute with **`1 \<= NSB \<= 23`** for data type **`float`** or **`real`**, and **`1 \<= NSB \<= 52`** for data type **`double`**.
 
 The Bitgroom, Granular Bitgroom, and DigitRound algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation.
 The actual number of mantissa bits quantized depends on the algorithm.
-Thus all data variables quantized by BitGroom, Granular BitGroom, or DigitRound must have a corresponding attribute **`lossy_compression_nsd`**.
-The value of **`lossy_compression_nsd`** is an integer with **`1 \<= NSD \<= 7`** for data type **`float`** or **`real`**, and **`1 \<= NSD \<= 15`** for data type **`double`**.
+Thus all data variables quantized by BitGroom, Granular BitGroom, or DigitRound must have a corresponding attribute **`quantization_nsd`**.
+The value of **`quantization_nsd`** is an integer with **`1 \<= NSD \<= 7`** for data type **`float`** or **`real`**, and **`1 \<= NSD \<= 15`** for data type **`double`**.
 
-[[example-lossy-compression-nsb-libnetcdf]]
+[[example-quantization-nsb-libnetcdf]]
 [caption="Example 8.8. "]
-.Lossy compression performed by BitRound algorithm in libnetcdf
+.Quantization performed by BitRound algorithm in libnetcdf
 ====
 ----
   variables:
-    char compression_info ;
-      compression_info:family = "quantize" ;
-      compression_info:algorithm = "bitround" ;
-      compression_info:implementation = "libnetcdf version 4.9.3-development" ;
+    char quantization ;
+      quantization:algorithm = "bitround" ;
+      quantization:implementation = "libnetcdf version 4.9.3-development" ;
 
     float ps(time,lat,lon) ;
       ps:_QuantizeBitRoundNumberOfSignificantBits = 9 ;
-      ps:lossy_compression = "compression_info" ;
-      ps:lossy_compression_nsb = 9 ;
+      ps:quantization = "quantization" ;
+      ps:quantization_nsb = 9 ;
       ps:standard_name = "surface_air_pressure" ;
       ps:units = "Pa" ;
 ----
-Note how the same NSB is reported in two attributes of the data variable **`ps`**. The **`lossy_compression`** container variable (**`compression_info`**) **`implementation`** attribute reveals that the netCDF library applied the BitRound algorithm. The netCDF library wrote the system-defined **`_QuantizeBitRoundNumberOfSignificantBits`** attribute [<<NetCDF>>] which contains the same parameter value as the CF **`lossy_compression_nsb`** attribute.
+Note how the same NSB is reported in two attributes of the data variable **`ps`**. The **`quantization`** container variable (**`quantization`**) **`implementation`** attribute reveals that the netCDF library applied the BitRound algorithm. The netCDF library wrote the system-defined **`_QuantizeBitRoundNumberOfSignificantBits`** attribute [<<NetCDF>>] which contains the same parameter value as the CF **`quantization_nsb`** attribute.
 ====
 
-[[example-lossy-compression-nsd-multiple-variables-nco]]
+[[example-quantization-nsd-multiple-variables-nco]]
 [caption="Example 8.9. "]
-.Lossy compression performed by Granular BitGroom algorithm in NCO
+.Quantization performed by Granular BitGroom algorithm in NCO
 ====
 Quantization of different variables to different levels often makes good scientific sense. Here the pressure variable **`ps`** has four significant digits of precision while the temperature variable **`ts`** retains only three significant digits. 
 ----
   variables:
-    char compression_info ;
-      compression_info:family = "quantize" ;
-      compression_info:algorithm = "granular_bitround" ;
-      compression_info:implementation = "NCO version 5.2.5-alpha01" ;
+    char quantization ;
+      quantization:algorithm = "granular_bitround" ;
+      quantization:implementation = "NCO version 5.2.5-alpha01" ;
 
     float ps(time,lat,lon) ;
       ps:standard_name = "surface_air_pressure" ;
       ps:units = "Pa" ;
-      ps:lossy_compression = "compression_info" ;
-      ps:lossy_compression_nsd = 4 ;
+      ps:quantization = "quantization" ;
+      ps:quantization_nsd = 4 ;
 
     float ts(time) ;
       ts:standard_name = "surface_temperature" ;
       ts:units = "K" ;
-      ts:lossy_compression = "compression_info" ;
-      ts:lossy_compression_nsd = 3 ;
+      ts:quantization = "quantization" ;
+      ts:quantization_nsd = 3 ;
 ----
-Both variables were quantized by the same algorithm and so utilize the same **`lossy_compression`** variable. **`compression_info`** reveals that the Granular BitRound algorithm in NCO performed the quantization. Since the netCDF library did not perform the quantization, there is no system-defined long quantization attribute.
+Both variables were quantized by the same algorithm and so utilize the same **`quantization`** variable. **`quantization`** reveals that the Granular BitRound algorithm in NCO performed the quantization. Since the netCDF library did not perform the quantization, there is no system-defined long quantization attribute.
 ====
 
 [[quantization-algorithms-description, Section 8.4.3, "Description of Quantization Algorithms"]]
