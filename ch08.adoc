@@ -724,7 +724,7 @@ Each variable that has been quantized must include at least two attributes.
 Data variables use the **`quantization`** attribute to associate themselves with a **`quantization`** container variable.
 This attribute is attached to data variables so that variables compressed with different algorithms may be present in a single file.
 
-Data variables that have been quantized must also record the specific parameter value(s) used in the quantization algorithm.
+Data variables that have been quantized must also record the specific parameter value used in the quantization algorithm.
 The input parameter for all quantization algorithms determines the precision preserved by the algorithm.
 BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantizes the trailing bits.
 All data variables quantized by BitRound must record the NSB in the **`quantization_nsb`** attribute.
@@ -732,7 +732,7 @@ Note that BitRound __counts only explicitly represented mantissa bits__.
 It does not include the most-significant-bit with value 1 that implicitly begins all [<<IEEE_754>>] mantissas.
 Thus **`quantization_nsb`** is an integer type attribute with **`1 \<= NSB \<= 23`** for data type **`float`** or **`real`**, and **`1 \<= NSB \<= 52`** for data type **`double`**.
 
-The Bitgroom, Granular Bitgroom, and DigitRound algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation.
+The BitGroom, Granular BitGroom, and DigitRound algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation.
 The actual number of mantissa bits quantized depends on the algorithm.
 Thus all data variables quantized by BitGroom, Granular BitGroom, or DigitRound must have a corresponding attribute **`quantization_nsd`**.
 The value of **`quantization_nsd`** is an integer with **`1 \<= NSD \<= 7`** for data type **`float`** or **`real`**, and **`1 \<= NSD \<= 15`** for data type **`double`**.
@@ -743,13 +743,13 @@ The value of **`quantization_nsd`** is an integer with **`1 \<= NSD \<= 7`** for
 ====
 ----
   variables:
-    char quantization ;
-      quantization:algorithm = "bitround" ;
-      quantization:implementation = "libnetcdf version 4.9.3-development" ;
+    char quantization_info ;
+      quantization_info:algorithm = "bitround" ;
+      quantization_info:implementation = "libnetcdf version 4.9.3-development" ;
 
     float ps(time,lat,lon) ;
       ps:_QuantizeBitRoundNumberOfSignificantBits = 9 ;
-      ps:quantization = "quantization" ;
+      ps:quantization = "quantization_info" ;
       ps:quantization_nsb = 9 ;
       ps:standard_name = "surface_air_pressure" ;
       ps:units = "Pa" ;
@@ -764,20 +764,20 @@ Note how the same NSB is reported in two attributes of the data variable **`ps`*
 Quantization of different variables to different levels often makes good scientific sense. Here the pressure variable **`ps`** has four significant digits of precision while the temperature variable **`ts`** retains only three significant digits. 
 ----
   variables:
-    char quantization ;
-      quantization:algorithm = "granular_bitround" ;
-      quantization:implementation = "NCO version 5.2.5-alpha01" ;
+    char quantization_info ;
+      quantization_info:algorithm = "granular_bitround" ;
+      quantization_info:implementation = "NCO version 5.2.5-alpha01" ;
 
     float ps(time,lat,lon) ;
       ps:standard_name = "surface_air_pressure" ;
       ps:units = "Pa" ;
-      ps:quantization = "quantization" ;
+      ps:quantization = "quantization_info" ;
       ps:quantization_nsd = 4 ;
 
     float ts(time) ;
       ts:standard_name = "surface_temperature" ;
       ts:units = "K" ;
-      ts:quantization = "quantization" ;
+      ts:quantization = "quantization_info" ;
       ts:quantization_nsd = 3 ;
 ----
 Both variables were quantized by the same algorithm and so utilize the same **`quantization`** variable. **`quantization`** reveals that the Granular BitRound algorithm in NCO performed the quantization. Since the netCDF library did not perform the quantization, there is no system-defined long quantization attribute.
