@@ -680,52 +680,53 @@ For instance, a **`computational_precision**` value of **`"64"**` would specify 
 
 Geoscientific models and measurements generate false floating-point precision (scientifically meaningless data bits) that wastes storage space.
 False precision can mislead (by implying noise is signal) and is scientifically pointless.
-The quantization technique can eliminate false precision, usually by rounding the least significant bits of [<<IEEE_754>>] floating-point mantissas to zeros.
+Quantization algorithms can eliminate false precision, usually by rounding the least significant bits of [<<IEEE_754>>] floating-point mantissas to zeros.
 (Quantization of integer types, although theoretically allowed, is not covered by this convention.)
 The quantized results are valid [<<IEEE_754>>] values---no special software or decoder is necessary to read them.
 Importantly, the quantized bits compress more efficiently than random bits.
-Thus quantization is sometimes referred to as a form of lossy compression though, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent codec.
+Thus quantization is sometimes referred to as a form of lossy compression although, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent compressor.
 
-These CF conventions define a metadata framework to provide quantization properties alongside quantized data.
+These CF conventions define a metadata framework to record quantization properties alongside quantized data variables.
 The goals are twofold.
 First, to inform interested users how, and to what degree, the quantized data differ from the original unquantized data, which are not stored in the dataset and may no longer exist.
 Second, to provide the necessary provenance metadata for users to reproduce the data transformations on the same or other raw data.
-These conventions also allow users to better understand the precision that data producers expect from source models or measurements. 
+These conventions also allow users to better understand the precision that data producers expect from source models or measurements.
+These conventions are intended to apply only to floating-point data variables.
 
-Quantization is irreversible so data providers must exercise judgement about which fields to quantize, and to what level. Observed and simulated geophysical fields always have finite accuracy and precision. Domain specialists are best qualified to suggest appropriate quantization levels. However, fields that describe idealized or reference coordinate grids, or grid transformations, are often known to the highest precision possible. These fields can include spatial and temporal coordinate variables (e.g., **`latitude`**, **`longitude`**, **`time`**) and properties derived from these coordinates (e.g., **`area`**, **`volume`**). Degrading the precision of such grid properties may have unintended side effects on the accuracy of subsequent operations such regridding, interpolation, and conservation checks which should generally be performed with the highest precision possible. In general, we recommend against quantizing any **`coordinate variable`**, **`bounds`** variable, **`cell_measures`** variables, and any variables employed in **`formula_terms`**. Use of these conventions ensures that all quantized variables are clearly marked as such, and thus alerts users to cases where these guidelines have not been followed. 
-
-Software can use a variety of algorithms to quantize data and to write it in netCDF format.
-In practice, data purveyors are likely to employ the same quantization algorithm to multiple variables in a single file, possibly with variable-specific levels of quantization.
-This suggests the use of a hybrid version of the container variable model for each quantization algorithm employed on variables in a given file.
-The **`quantization`** container variable records the generic properties of the algorithm, while the algorithm parameters are stored as attributes of the specific data variables to which they were applied.
-Keeping with CF precedents, quantization attributes that make use of controlled vocabularies are case-insensitive, with white space replaced by underscores.
+Quantization is irreversible so data providers must exercise judgement about which fields to quantize, and to what level.
+Observed and simulated geophysical fields always have finite accuracy and precision.
+Domain specialists are best qualified to suggest appropriate quantization levels.
+However, fields that describe idealized or reference coordinate grids, or grid transformations, are often known to the highest precision possible.
+These fields can include spatial and temporal coordinate variables (e.g., **`latitude`**, **`longitude`**, **`time`**) and properties derived from these coordinates (e.g., **`area`**, **`volume`**).
+Degrading the precision of such grid properties may have unintended side effects on the accuracy of subsequent operations such regridding, interpolation, and conservation checks which should generally be performed with the highest precision possible.
+In general, we recommend against quantizing any **`coordinate variable`**, **`bounds`** variable, **`cell_measures`** variables, and any variables employed in **`formula_terms`**.
+Use of these conventions ensures that all quantized variables are clearly marked as such, and thus alerts users to cases where these guidelines have not been followed. 
 
 [[quantization-variable, Section 8.4.1, "Quantization Variable"]]
 ==== Quantization variable
 
-A **`quantization`** variable describes a quantization algorithm via a collection of attached attributes.
+A quantization variable describes a quantization algorithm via a collection of attached attributes.
 It is of arbitrary type since it contains no data.
-Its purpose is to act as a container for the generic attributes of an algorithm.
-Quantization variables are recommended to have at least two attributes: **`algorithm`**, and **`implementation`**.
+Its purpose is to act as a container for the generic attributes of a quantization algorithm.
+Quantization variables are required to have at least two attributes: **`algorithm`**, and **`implementation`**.
 
 The **`algorithm`** attribute names a specific quantization algorithm.
 Four quantization algorithms are currently recognized: BitRound, BitGroom, DigitRound, and Granular BitRound.
 The controlled vocabulary these algorithms thus consists of **`bitround`**, **`bitgroom`**, **`digitround`**, and **`granular_bitround`**.
 See <<quantization-algorithms-description>> for a brief summary of these algorithms.
 
-The second attribute in a quantization variable is **`implementation`**.
-This required attribute contains free-form text that concisely conveys the algorithm provenance, including the name of the library or client that performed the quantization, and the software version.
+The second attribute required in a quantization variable is **`implementation`**.
+This attribute contains free-form, unstandardized text that concisely conveys the algorithm provenance, including the name of the library or client that performed the quantization, and the software version.
 **`implementation`** should include any other information required to disambiguate the source of the algorithm employed.
 
 [[per-variable-quantization-attributes, Section 8.4.2, "Per-variable quantization attributes"]]
 ==== Per-variable quantization attributes
 
-Each variable that has been quantized must include at least two attributes.
-Data variables use the **`quantization`** attribute to associate themselves with a **`quantization`** container variable.
-This attribute is attached to data variables so that variables compressed with different algorithms may be present in a single file.
-
-Data variables that have been quantized must also record the specific parameter value used in the quantization algorithm.
+Each data variable that has been quantized must include at least two attributes to describe the quantization.
+First, all such data variables must have a `**quantization**` attribute containing the name of the quantization variable describing the algorithm.
+Second, all such variables must record the specific parameter value used in the quantization algorithm.
 The input parameter for all quantization algorithms determines the precision preserved by the algorithm.
+
 BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantizes the trailing bits.
 All data variables quantized by BitRound must record the NSB in the **`quantization_nsb`** attribute.
 Note that BitRound __counts only explicitly represented mantissa bits__.
@@ -788,7 +789,7 @@ Both variables were quantized by the same algorithm and so utilize the same **`q
 
 This section briefly describes and contrasts each recognized **`quantize`** algorithm and points to further documentation.
 BitRound is also called the "round-to-nearest" method [<<KRD21>>] and the "half-to-even" method [<<Kou21>>].
-This is the default [<<IEEE_754>>] rounding method and is thus bias-free and conservative for random distributions of numbers.
+This is the default [<<IEEE_754>>] rounding method and is bias-free and conservative for random distributions of numbers.
 BitRound is preferred when the number of significant bits (NSB) to retain is known.
 
 The other **`quantize`** algorithms guarantee to preserve a given number of significant (base-10 representation) digits (NSD).
