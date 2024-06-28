@@ -686,24 +686,20 @@ The quantized results are valid [<<IEEE_754>>] values---no special software or d
 Importantly, the quantized bits compress more efficiently than random bits.
 Thus quantization is sometimes referred to as a form of lossy compression although, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent compressor.
 
-These CF conventions define a metadata framework to record quantization properties alongside quantized data variables.
+The CF conventions of this section define a metadata framework to record quantization properties alongside quantized floating-point data variables.
 The goals are twofold.
 First, to inform interested users how, and to what degree, the quantized data differ from the original unquantized data, which are not stored in the dataset and may no longer exist.
 Second, to provide the necessary provenance metadata for users to reproduce the data transformations on the same or other raw data.
 These conventions also allow users to better understand the precision that data producers expect from source models or measurements.
-These conventions are intended to apply only to floating-point data variables.
+Use of these conventions ensures that all quantized variables are clearly marked as such, and thus alerts users to cases where these guidelines have not been followed.
 
-Quantization is irreversible so data providers must exercise judgement about which fields to quantize, and to what level.
-Observed and simulated geophysical fields always have finite accuracy and precision.
-Domain specialists are best qualified to suggest appropriate quantization levels.
-However, fields that describe idealized or reference coordinate grids, or grid transformations, are often known to the highest precision possible.
-These fields can include spatial and temporal coordinate variables (e.g., **`latitude`**, **`longitude`**, **`time`**) and properties derived from these coordinates (e.g., **`area`**, **`volume`**).
+These conventions must not be used with data variables of integer type, or any other kind of CF variable.
+This is because fields that describe idealized or reference coordinate grids, or grid transformations, are often known to the highest precision possible.
+These fields can include spatial and temporal coordinate variables (e.g., **`latitude`**, **`longitude`**, **`level`**, **`time`**) and properties derived from these coordinates (e.g., **`area`**, **`volume`**).
 Degrading the precision of such grid properties may have unintended side effects on the accuracy of subsequent operations such regridding, interpolation, and conservation checks which should generally be performed with the highest precision possible.
-In general, we recommend against quantizing any **`coordinate variable`**, **`bounds`** variable, **`cell_measures`** variables, and any variables employed in **`formula_terms`**.
-Use of these conventions ensures that all quantized variables are clearly marked as such, and thus alerts users to cases where these guidelines have not been followed. 
 
-[[quantization-variable, Section 8.4.1, "Quantization Variable"]]
-==== Quantization variable
+[[quantization-variables, Section 8.4.1, "Quantization Variables"]]
+==== Quantization variables
 
 A quantization variable describes a quantization algorithm via a collection of attached attributes.
 It is of arbitrary type since it contains no data.
@@ -719,7 +715,7 @@ The second attribute required in a quantization variable is **`implementation`**
 This attribute contains free-form, unstandardized text that concisely conveys the algorithm provenance, including the name of the library or client that performed the quantization, and the software version.
 **`implementation`** should include any other information required to disambiguate the source of the algorithm employed.
 
-[[per-variable-quantization-attributes, Section 8.4.2, "Per-variable quantization attributes"]]
+[[per-variable-quantization-attributes, Section 8.4.2, "Per-variable Quantization Attributes"]]
 ==== Per-variable quantization attributes
 
 Each data variable that has been quantized must include at least two attributes to describe the quantization.
@@ -785,7 +781,7 @@ Both variables were quantized by the same algorithm and so utilize the same quan
 ====
 
 [[quantization-algorithms-description, Section 8.4.3, "Description of Quantization Algorithms"]]
-==== Description of Quantization Algorithms
+==== Description of quantization algorithms
 
 This section briefly describes and contrasts each recognized **`quantize`** algorithm and points to further documentation.
 BitRound is also called the "round-to-nearest" method [<<KRD21>>] and the "half-to-even" method [<<Kou21>>].
