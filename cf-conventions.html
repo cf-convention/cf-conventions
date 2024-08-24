@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.12 draft,</span>
-<span id="revdate">&#160;&#160;01&#160;August,&#160;2024&#160;07:35:52Z</span>
+<span id="revdate">&#160;&#160;24&#160;August,&#160;2024&#160;22:25:29Z</span>
 <br><span id="revremark">See&#160;<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>&#160;for&#160;further&#160;information.</span>
 </div>
 </div>
@@ -1183,6 +1183,10 @@ The word "apex" refers to position of this group at the vertex of the tree of gr
 <dd>
 <p>A dimension of a netCDF variable that has an associated longitude coordinate variable.</p>
 </dd>
+<dt class="hdlist1">most rapidly varying dimension</dt>
+<dd>
+<p>The dimension of a multidimensional variable for which elements are adjacent in storage. When netCDF is represented in CDL, the most rapidly varying dimension is the last one e.g. <strong><code>x</code></strong> in <strong><code>float data(z,y,x)</code></strong>. C and Python NumPy use the same order as C, also called "column-major order", but Fortran uses the opposite convention, also called "row-major order", so that when netCDF variables are accessed in Fortran the most rapidly varying dimension is the first one.</p>
+</dd>
 <dt class="hdlist1">multidimensional coordinate variable</dt>
 <dd>
 <p>An auxiliary coordinate variable that is multidimensional.</p>
@@ -1322,7 +1326,7 @@ The features of these conventions that allow writing netCDF files that are not C
 </div>
 <div class="paragraph">
 <p>COARDS standardizes the description of grids composed of independent latitude, longitude, vertical, and time axes.
-In addition to standardizing the metadata required to identify each of these axis types COARDS restricts the axis (equivalently dimension) ordering to be longitude, latitude, vertical, and time (with longitude being the most rapidly varying dimension).
+In addition to standardizing the metadata required to identify each of these axis types, COARDS requires (<em>time</em>, <em>vertical</em>, <em>latitude</em>, <em>longitude</em>) as the CDL order for the dimensions of a variable, with longitude being the most rapidly varying dimension (the last dimension in CDL order).
 Because of I/O performance considerations it may not be possible for models to output their data in conformance with the COARDS requirement.
 The CF convention places no rigid restrictions on the order of dimensions, however we encourage data producers to make the extra effort to stay within the COARDS standard order.
 The use of non-COARDS axis ordering will render files inaccessible to some applications and limit interoperability.
@@ -1412,7 +1416,7 @@ When the phrase "integer type" is used in this document, it should be understood
 </div>
 <div class="paragraph">
 <p>Strings in variables may be represented one of two ways - as atomic strings or as character arrays.
-An n-dimensional array of strings may be implemented as a variable of type <strong><code>string</code></strong> with n dimensions, or as a variable of type <strong><code>char</code></strong> with n+1 dimensions where the last (most rapidly varying) dimension is large enough to contain the longest string in the variable.
+An n-dimensional array of strings may be implemented as a variable of type <strong><code>string</code></strong> with <em>n</em> dimensions, or as a variable of type <strong><code>char</code></strong> with <em>n</em>+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
 For example, a character array variable of strings containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
 The other strings, such as "May", should be padded with trailing NULL or space characters so that every array element is filled.
 If the atomic string option is chosen, each element of the variable can be assigned a string with a different length.
@@ -4108,7 +4112,7 @@ The value of <strong><code>bounds</code></strong> is the name of the variable th
 We refer to this type of variable as a "boundary variable."
 <em>A boundary variable must have one more dimension than its associated coordinate or auxiliary coordinate variable.</em>
 We refer to the additional dimension as the "vertex dimension".
-The vertex dimension must be the last dimension in CDL order (the most rapidly varying dimension), and its size is the maximum number of cell vertices.
+The vertex dimension must be the most rapidly varying dimension (the last dimension in CDL order), and its size is the maximum number of cell vertices.
 The vertex dimension must be of size two if the associated variable is one-dimensional, and of size greater than two if the associated variable has more than one dimension.
 For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices.
 For cells with fewer vertices than the size of vertex dimension, the unneeded elements must appear as the last elements in the vertex dimension and must be assigned the <strong><code>_FillValue</code></strong>.</p>
@@ -12228,6 +12232,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/530{Issue" class="bare">https://github.com/cf-convention/cf-conventions/issues/530{Issue</a> #530]: Define "the most rapidly varying dimension", and use this phrase consistently with the clarification "(the last dimension in CDL order)".</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/163">Issue #163</a>: Provide a convention for boundary variables for grids whose cells do not all have the same number of sides.</p>
 </li>
 <li>
@@ -12880,7 +12887,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.12 draft<br>
-Last updated 2024-08-01 07:35:52 UTC
+Last updated 2024-08-24 22:25:29 UTC
 </div>
 </div>
 </body>
