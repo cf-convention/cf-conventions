@@ -341,15 +341,15 @@ The **`standard`**, **`proleptic_gregorian`**, and **`julian`** calendars are sp
 For these calendars, there are the following cases:
 
 1. **The calendar is being used for a timeline in which leap seconds do not exist.**
-   For instance, this is the case for a model simulation that defines every day as having a constant length of 86400 seconds.
-   In this case, the difference between two time coordinates is always equal to the length of time between the instants they represent.
+   This is the case for a model simulation that defines every day as having a constant length of 86400 seconds.
+   
 
 2. **The calendar is being used for a timeline in which leap seconds exist, and are correctly accounted for.**
    This could be the case for observations from a platform whose time recording equipment has prior knowledge of when new leap seconds are to be introduced and is able to apply a new leap second at the appropriate time.
    It could equally be the case for model whose timesteps include leap seconds.
 
 3. **The calendar is being used for a timeline in which leap seconds exist, but some or all leap seconds might not have not been correctly accounted for.**
-   For instance, this could be the case for observations from a platform whose time recording equipment has a delay in applying a new leap second.
+   This could be the case for observations from a platform whose time recording equipment has a delay in applying a new leap second.
 
 4. **It may be unknown whether leap seconds exist in the timeline.**
 
@@ -366,12 +366,13 @@ When the **`standard`**, **`proleptic_gregorian`**, and **`julian`** calendars a
   In particular, the difference between two time coordinates does __not__ include any leap seconds which occurred between the instants they represent.
   It is important to be aware of this disadvantage of the **`standard`**, **`proleptic_gregorian`** and **`proleptic_julian`** calendars.
   If it is essential for leap seconds to be counted in time intervals, you must use the **`utc`** calendar instead.
+  Compare this with case 1 (i.e. a timeline without leap seconds), in which the difference between two time coordinates is always equal to the length of time between the instants they represent.
 
 For many applications, any inaccuracies introduced by incorrectly assuming which of these cases applies to the **`standard`**, **`proleptic_gregorian`**, and **`julian`** calendars are likely to be negligible, but there are some applications where they are important.
 Therefore it is recommended that for each of these three calendars the distinction should be made by giving the time coordinate variable a **`units_metadata`** attribute containing a **`leap_seconds`** keyword with one of the permitted values **`none`**, **`utc**` or **`unknown`**.
 **`none`** means that leap seconds do not exist in the timeline (i.e. case 1), **`utc`** means that leap seconds exist in the timeline and are correctly accounted for (i.e. case 2), and **`unknown`** means that the data-writer did not know or did not record whether the leap seconds exist in the timeline, nor how they are treated if they did exist (i.e. cases 3 and 4).
 If the **`units_metadata`** attribute is not present, or does not contain the `leap_seconds` keyword, the data-reader should assume **`leap_seconds: unknown`**.
-A variable's **`units_metadata`** attribute may only contain the **`leap_seconds`** keyword if the variable's calendar is one of **`standard`**, `proleptic_gregorian`, or **`julian`**.
+A variable's **`units_metadata`** attribute may only contain the **`leap_seconds`** keyword if the variable's calendar is one of **`standard`** , `proleptic_gregorian`, or **`julian`**.
 
 [[units-metadata-leap-seconds-ex]]
 [caption="Example 4.7. "]
@@ -383,7 +384,7 @@ variables:
   float time1 ;
     time1:standard_name = "time" ;
     time1:long_name = "Simulated model data" ;
-    time1:calendar = "standard" ;
+    time1:calendar = "proleptic_gregorian" ;
     time1:units = "seconds since 2016-12-31 23:59:59" ;
     time1:units_metadata = "leap_seconds: none" ;
   float time2 ;
