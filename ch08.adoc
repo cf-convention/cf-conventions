@@ -5,7 +5,7 @@
 There are three methods for reducing dataset size: packing, lossless compression, and lossy compression.
 By packing we mean altering the data in a way that reduces its precision (but has no other effect on accuracy).
 By lossless compression we mean techniques that store the data more efficiently and result in no loss of precision or accuracy.
-By lossy compression we mean techniques that store the data more efficiently and retain its precision but result in some loss in accuracy.
+By lossy compression we mean techniques that either store the data more efficiently and retain its precision but result in some loss in accuracy, or techniques that intentionally reduce data precision to improve the efficiency of subsequent lossless compression.
 
 Lossless compression only works in certain circumstances, e.g., when a variable contains a significant amount of missing or repeated data values.
 In this case it is possible to make use of standard utilities, e.g., UNIX **`compress`** or GNU **`gzip`**, to compress the entire file after it has been written.
@@ -675,3 +675,133 @@ The data creator shall specify the floating-point arithmetic precision used duri
 Using the given computational precision in the interpolation computations is a necessary, but not sufficient, condition for the data user to be able to reconstitute the coordinates to an accuracy comparable to that intended by the data creator.
 For instance, a **`computational_precision**` value of **`"64"**` would specify that, using the same implementation and hardware as the creator of the compressed dataset, sufficient accuracy could not be reached when using a floating-point precision lower than 64-bit floating-point arithmetic in the interpolation computations required to reconstitute the coordinates.
 
+[[lossy-compression-via-quantization, Section 8.4, "Lossy Compression via Quantization"]]
+=== Lossy Compression via Quantization
+
+Geoscientific models and measurements generate false floating-point precision (scientifically meaningless data bits) that wastes storage space.
+False precision can mislead (by implying noise is signal) and is scientifically pointless.
+Quantization algorithms can eliminate false precision, usually by rounding the least significant bits of <<IEEE_754>> floating-point mantissas to zeros.
+(Quantization of integer types, although theoretically allowed, is not covered by this convention.)
+The quantized results are valid <<IEEE_754>> values---no special software or decoder is necessary to read them.
+Importantly, the quantized bits compress more efficiently than random bits.
+Thus quantization is sometimes referred to as a form of lossy compression although, strictly speaking, quantization only pre-conditions data for more efficient compression by a subsequent compressor.
+
+The CF conventions of this section define a metadata framework to record quantization properties alongside quantized floating-point data variables.
+The goals are twofold.
+First, to inform interested users how, and to what degree, the quantized data differ from the original unquantized data, which are not stored in the dataset and may no longer exist.
+Second, to provide the necessary provenance metadata for users to reproduce the data transformations on the same or other raw data.
+These conventions also allow users to better understand the precision that data producers expect from source models or measurements.
+
+These conventions must not be used with data variables of integer type.
+They must not be used with any variable, even if it is also a data variable, that serves as a coordinate variable, or is named by a **`coordinates`**, **`formula_terms`** or **`cell_measures`** attribute of any other variable.
+This is because variables that provide metadata or are used in computation of domain metrics are often known to the highest precision possible, and degrading the precision of metadata properties may have unintended side effects on the accuracy of subsequent operations such as regridding, interpolation, and conservation checks.
+These variables can include spatial and temporal coordinate variables (e.g., **`latitude`**, **`longitude`**, **`level`**, **`time`**), properties derived from these coordinates (e.g., **`area`**, **`volume`**), and variables referenced by the **`formula_terms`** attribute of a coordinate variable.
+
+[[quantization-variables, Section 8.4.1, "Quantization Variables"]]
+==== Quantization variables
+
+A quantization variable describes a quantization algorithm via a collection of attached attributes.
+It is of arbitrary type since it contains no data.
+Its purpose is to act as a container for the generic attributes of a quantization algorithm.
+Quantization variables are required to have at least two attributes: **`algorithm`** and **`implementation`**.
+
+The **`algorithm`** attribute names a specific quantization algorithm.
+Four quantization algorithms are currently recognized: BitRound, BitGroom, DigitRound, and Granular BitRound.
+The controlled vocabulary for these algorithms thus consists of **`bitround`**, **`bitgroom`**, **`digitround`**, and **`granular_bitround`**.
+See <<quantization-algorithms-description>> for a brief summary of these algorithms.
+
+The second attribute required in a quantization variable is **`implementation`**.
+This attribute contains unstandardized text that concisely conveys the algorithm provenance including the name of the library or client that performed the quantization, the software version, and any other information required to disambiguate the source of the algorithm employed.
+The text must take the form "_software-name_ version _version-string_ [( _optional-information_ )]" such as
+**`libnetcdf version 4.9.2`** in <<example-quantization-nsb-libnetcdf>>.
+
+[[per-variable-quantization-attributes, Section 8.4.2, "Per-variable Quantization Attributes"]]
+==== Per-variable quantization attributes
+
+Each data variable that has been quantized must include at least two attributes to describe the quantization.
+First, all such data variables must have a **`quantization`** attribute containing the name of the quantization variable describing the algorithm.
+Second, all such variables must record the specific parameter value used in the quantization algorithm.
+The input parameter for all quantization algorithms determines the precision preserved by the algorithm.
+
+BitRound retains the specified number of significant bits (NSB) in the IEEE mantissa, and quantizes the trailing bits.
+All data variables quantized by BitRound must record the NSB in the **`quantization_nsb`** attribute.
+Note that BitRound __counts only explicitly represented mantissa bits__.
+It does not include the most-significant-bit with value 1 that implicitly begins all <<IEEE_754>> mantissas.
+Thus **`quantization_nsb`** is an integer type attribute with **`1 \<= NSB \<= 23`** for data type **`float`** or **`real`**, and **`1 \<= NSB \<= 52`** for data type **`double`**.
+
+The BitGroom, Granular BitRound, and DigitRound algorithms guarantee preservation of a specified number of significant digits (NSD) in base 10 representation.
+The actual number of mantissa bits quantized depends on the algorithm.
+Thus all data variables quantized by BitGroom, Granular BitRound, or DigitRound must have a corresponding attribute **`quantization_nsd`**.
+The value of **`quantization_nsd`** is an integer with **`1 \<= NSD \<= 7`** for data type **`float`** or **`real`**, and **`1 \<= NSD \<= 15`** for data type **`double`**.
+
+[[example-quantization-nsb-libnetcdf]]
+[caption="Example 8.8. "]
+.Quantization performed by BitRound algorithm in libnetcdf
+====
+----
+  variables:
+    char quantization_info ;
+      quantization_info:algorithm = "bitround" ;
+      quantization_info:implementation = "libnetcdf version 4.9.2" ;
+
+    float ps(time,lat,lon) ;
+      ps:_QuantizeBitRoundNumberOfSignificantBits = 9 ;
+      ps:quantization = "quantization_info" ;
+      ps:quantization_nsb = 9 ;
+      ps:standard_name = "surface_air_pressure" ;
+      ps:units = "Pa" ;
+----
+Note how the same NSB is reported in two attributes of the data variable **`ps`**.
+The quantization variable (**`quantization_info`**) **`implementation`** attribute reveals that the netCDF library applied the BitRound algorithm.
+The netCDF library wrote the system-defined **`_QuantizeBitRoundNumberOfSignificantBits`** attribute <<NetCDF>> which contains the same parameter value as the CF **`quantization_nsb`** attribute (see the main text for further details).
+====
+
+[[example-quantization-nsd-multiple-variables-nco]]
+[caption="Example 8.9. "]
+.Quantization performed by Granular BitRound algorithm in NCO
+====
+Quantization of different variables to different levels often makes good scientific sense. Here the pressure variable **`ps`** has four significant digits of precision while the temperature variable **`ts`** retains only three significant digits. 
+----
+  variables:
+    char quantization_info ;
+      quantization_info:algorithm = "granular_bitround" ;
+      quantization_info:implementation = "NCO version 5.2.7" ;
+
+    float ps(time,lat,lon) ;
+      ps:standard_name = "surface_air_pressure" ;
+      ps:units = "Pa" ;
+      ps:quantization = "quantization_info" ;
+      ps:quantization_nsd = 4 ;
+
+    float ts(time) ;
+      ts:standard_name = "surface_temperature" ;
+      ts:units = "K" ;
+      ts:quantization = "quantization_info" ;
+      ts:quantization_nsd = 3 ;
+----
+Both variables were quantized by the same algorithm and so utilize the same quantization variable.
+**`quantization_info`** reveals that the Granular BitRound algorithm in NCO performed the quantization.
+Since the netCDF library did not perform the quantization, there is no system-defined underscored quantization attribute.
+====
+
+[[quantization-algorithms-description, Section 8.4.3, "Description of Quantization Algorithms"]]
+==== Description of quantization algorithms
+
+This section briefly describes and contrasts each recognized **`quantize`** algorithm and points to further documentation.
+BitRound is also called the "round-to-nearest" method <<KRD21>> and the "half-to-even" method <<Kou21>>.
+This is the default <<IEEE_754>> rounding method and is bias-free and conservative for random distributions of numbers.
+BitRound is preferred when the number of significant bits (NSB) to retain is known.
+
+The other **`quantize`** algorithms guarantee to preserve a given number of significant (base-10 representation) digits (NSD).
+Their quantization errors never exceed half of the unit value at the NSD decimal place <<Zen16>>.
+BitGroom <<Zen16>> appeared first, though is now known to be suboptimal in accuracy <<Kou21>> and in compressibility compared to later methods.
+DigitRound <<DCG19>> has superior compressibility for a given NSD compared to BitGroom.
+Granular BitRound combines the DigitRound approach for compressibility with the BitRound approach for quantization.
+Granular BitRound and DigitRound are both good choices when the NSD to retain is known.
+
+The netCDF C and Fortran libraries can directly invoke BitRound, BitGroom, and Granular BitRound [<<NetCDF>>].
+The netCDF library attaches a long, system-defined attribute to every data variable that it quantizes, such as 
+**`_QuantizeBitRoundNumberOfSignificantBits = 9`** in <<example-quantization-nsb-libnetcdf>>.
+The leading underscore indicates that the netCDF library wrote this attribute <<NUG>>.
+Any variable that has the library-defined attribute must, in addition, contain the corresponding CF metadata.
+Example 8.9 shows how the CF metadata might appear for other (non-netCDF library) implementations of **`quantize`** algorithms.
