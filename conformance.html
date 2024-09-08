@@ -717,7 +717,7 @@ Exceptions are the units <strong><code>level</code></strong>, <strong><code>laye
 <p>Dimensionless units for volume fractions defined by UDUNITS (<strong><code>ppv</code></strong>, <strong><code>ppmv</code></strong>, <strong><code>ppbv</code></strong>, <strong><code>pptv</code></strong>, <strong><code>ppqv</code></strong>) are not allowed in the <strong><code>units</code></strong> attribute of any variable which also has a <strong><code>standard_name</code></strong> attribute.</p>
 </li>
 <li>
-<p>If present, the <strong><code>units_metadata</code></strong> attribute must have one of these values: <code>temperature: on_scale</code>, <code>temperature: difference</code>, <code>temperature: unknown</code>.</p>
+<p>If present, the <strong><code>units_metadata</code></strong> attribute must have one of these values: <code>temperature: on_scale</code>, <code>temperature: difference</code>, <code>temperature: unknown</code>, <code>leap_seconds: none</code>, <code>leap_seconds: utc</code>, or <code>leap_seconds: unknown</code>.</p>
 </li>
 <li>
 <p>The <strong><code>units</code></strong> of a variable that specifies a <strong><code>standard_name</code></strong> must be physically equivalent to the canonical units given in the standard name table, as modified by the <strong><code>standard_name</code></strong> modifier, if there is one, according to Appendix C, and then modified by all the methods listed in order by the <strong><code>cell_methods</code></strong> attribute, if one is present, according to Appendix E.</p>
@@ -726,10 +726,10 @@ Exceptions are the units <strong><code>level</code></strong>, <strong><code>laye
 <p>If the <strong><code>standard_name</code></strong> attribute includes the <code>standard_error</code> modifier, the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>.</p>
 </li>
 <li>
-<p>If the <strong><code>cell_methods</code></strong> attribute includes any entry with any of the methods <code>range</code>, <code>standard_deviation</code> or <code>variance</code>, the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>.</p>
+<p>If a variable has a <strong><code>units</code></strong> attribute that involves a temperature unit, and has a <strong><code>cell_methods</code></strong> attribute includes any entry with any of the methods <code>range</code>, <code>standard_deviation</code> or <code>variance</code>, then the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>.</p>
 </li>
 <li>
-<p>A variable must not have a <strong><code>units_metadata</code></strong> attribute if it has no <strong><code>units</code></strong> attribute or if its <strong><code>units</code></strong> do not involve a temperature unit.</p>
+<p>A variable must not have a <strong><code>units_metadata</code></strong> attribute if it has no <strong><code>units</code></strong> attribute, or if its <strong><code>units</code></strong> do not involve a temperature unit or a reference time unit.</p>
 </li>
 </ul>
 </div>
@@ -990,6 +990,32 @@ If the <strong><code>calendar</code></strong> attribute is given a non-standard 
 </li>
 <li>
 <p>The time coordinate should not cross the date 1582-10-15 when the default mixed Gregorian/Julian calendar is in use.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="leap-seconds">4.4.2 Leap Seconds</h3>
+<div class="paragraph">
+<p><strong>Requirements:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A time coordinate variable must not have a <strong><code>units_metadata</code></strong> attribute if it has a <strong><code>calendar</code></strong> attribute with a value <em>other than</em> one of the following values: <code>standard</code>, <code>gregorian</code> (deprecated), <code>proleptic_gregorian</code>, <code>julian</code>.</p>
+</li>
+<li>
+<p>If a time coordinate variable has a <strong><code>units_metadata</code></strong> attribute then it must have one of these values: <code>leap_seconds: none</code>, <code>leap_seconds: utc</code>, or <code>leap_seconds: unknown</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Recommendations:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A time coordinate variable should have a <strong><code>units_metadata</code></strong>  attribute when it has no <strong><code>calendar</code></strong> attribute, or has a <strong><code>calendar</code></strong> attribute with one of the following values: <code>standard</code>, <code>gregorian</code> (deprecated), <code>proleptic_gregorian</code>, <code>julian</code>.</p>
 </li>
 </ul>
 </div>
@@ -1577,7 +1603,7 @@ If the optional formula term <code><strong>nsigma</strong></code> is supplied, i
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-09-06 06:45:05 UTC
+Last updated 2024-09-08 11:35:07 UTC
 </div>
 </div>
 </body>
