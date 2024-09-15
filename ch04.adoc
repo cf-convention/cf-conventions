@@ -211,8 +211,8 @@ double time(time) ;
 ====
 
 
-[[time-coordinate-units, Section 4.4.1, "Time coordinate units"]]
-==== Time coordinate units
+[[time-coordinate-units, Section 4.4.1, "Time Coordinate Units"]]
+==== Time Coordinate Units
 
 The **`units`** attribute of a time coordinate variable takes a string value that follows the formatting requirements of the <<UDUNITS>> package.
 It must comprise a unit of measure that is physically equivalent to the SI base unit of time (i.e. the second), followed by the word **`since`** and a reference date/time.
@@ -233,7 +233,7 @@ Its format is __y__-__m__-__d__ [__H__:__M__:__S__ [__Z__]], where [...] indicat
 
 * _y_ is year, _m_ month, _d_ day, _H_ hour and _M_ minute, which are all integers of one or more digits, and _y_ may be prefixed with a sign (but note that some CF calendars do not permit negative years; see <<calendar>>),
 
-* _S_ is second, which may be integer or floating point,
+* _S_ is second, which may be integer or floating point (see <<leap-seconds>> regarding __S__>59),
 
 * _Z_ is the time zone.
 
@@ -260,16 +260,20 @@ Subtracting the time zone from the date/time specified converts it to the defaul
 In order to calculate a time coordinate value from a date/time, or the reverse, one must know the **`units`** attribute of the time coordinate variable (containing the time unit of the coordinate values and the reference date/time, see <<time-coordinate-units>>) and the calendar, indicated by the **`calendar`** attribute.
 The choice of calendar defines the set of dates (year-month-day combinations) which are permitted, and therefore it specifies the number of days between the times of **`0:0:0`** (midnight) on any two dates.
 Date/times which are not permitted in a given calendar are prohibited both in the time coordinate values, and in the reference date/time string.
+
 A given time coordinate value can represent different date/times in different calendars; conversely, a given date/time is represented by different time coordinate values in different calendars.
+Moreover, in different calendars a given date/time can identify a different instant in the continuous physical dimension of time.
+Examples of these points are shown in the table of *Appendix ???*.
 
 It is recommended that the calendar be specified by the **`calendar`** attribute of the time coordinate variable.
 The values currently defined for **`calendar`** are listed below.
 The lengths of the months in the Gregorian calendar are used in all calendars except **`360_day`**, **`none`** (see <<none-calendar>>) and explicitly defined calendars (see <<explicit-calendar>>).
-The calendars differ in their treatment of leap years (when there are 29 days in February instead of 28) and leap seconds (see <<leap-seconds>>).
+The calendars differ in their treatment of leap years (when there are 29 days in February instead of 28).
 
 Leap seconds are adjustments occasionally made in Coordinated Universal Time (UTC).
 When a positive leap second is introduced at the end of a minute, that minute contains 61 seconds.
 If a negative leap second were introduced (there have been none up to now), the minute would contain 59 seconds.
+The calendars differ in their treatment of leap seconds (see <<leap-seconds>>).
 
 In the **`julian`** and the default **`standard`** calendar, dates in years before year 0 (i.e. before 0-1-1 0:0:0) are not allowed, and the year in the reference date/time of the units must not be negative.
 In these calendars, year zero has a special use to indicate a climatology (see <<climatological-statistics>>), but this use of year zero is deprecated.
@@ -282,8 +286,9 @@ The Gregorian and Julian calendars have the same lengths of their months; they d
 In the **`standard`** calendar, date/times after and including 1582-10-15 0:0:0 are in the Gregorian calendar, in which a year is a leap year if either (i) it is divisible by 4 but not by 100 or (ii) it is divisible by 400.
 Date/times before (and excluding) 1582-10-5 0:0:0 are in the Julian calendar, in which any year that is divisible by 4 is a leap year.
 Year 1 AD or CE in the **`standard`** calendar is also year 1 of the **`julian`** calendar.
-In the **`standard`** calendar, 1582-10-15 0:0:0 is exactly 1 day later than 1582-10-4 0:0:0 and the intervening dates are undefined.
-Therefore date/times in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 must not be used as reference in **`units`**.
+Negative years are invalid in time coordinates and reference date/times in the **`standard`** calendar.
+In the **`standard`** calendar, 1582-10-15 0:0:0 is exactly 1 day later than 1582-10-4 0:0:0.
+Therefore date/times in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 are invalid, and must not be used as reference in **`units`**.
 It is recommended that a reference date/time before the discontinuity should not be used for date/times after the discontinuity, and vice-versa.
 See also <<leap-seconds>>.
 
@@ -292,6 +297,8 @@ All dates consistent with these rules are allowed, both before and after 1582-10
 See also <<leap-seconds>>.
 
 **`julian`**:: Julian calendar, in which a year is a leap year if it is divisible by 4, even if it is also divisible by 100.
+Year 1 AD or CE in the **`julian`** calendar is also year 1 of the **`standard`** calendar.
+Negative years are invalid in time coordinates and reference date/times in the **`julian`** calendar.
 See also <<leap-seconds>>.
 
 **`utc`**:: A Gregorian calendar __with__ leap seconds as prescribed by UTC.
@@ -335,6 +342,7 @@ This paragraph may appear to be excessively elaborate in describing a usually ob
 
 The **`utc`** calendar is the _only_ calendar which includes leap seconds in its set of date/times.
 In all other calendars, date/times within leap seconds are not valid.
+Therefore reference date/times in the **`units`** attribute must not contain seconds equal to or greater than 60 unless the **`calendar`** is **`utc`**.
 
 The **`standard`**, **`proleptic_gregorian`**, and **`julian`** calendars each have two variants.
 In one variant the timeline does not include leap seconds.
@@ -432,12 +440,12 @@ In the case of **`time1`**, we cannot convert the time coordinate to a date/time
 [[leap-second-timelines]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
 [.text-center]
-.Illustration of the equivalence between date/times and time coordinate values with **`units="seconds since 2016-12-31 23:59:58"`** for various choices of the **`calendar`** attribute and **`leap_seconds`** keyword The slanting lines depict the continuous physical dimension of time as represented in each calendar. Along each line, a filled circle marks each valid date/time with an integer second in the set allowed by the calendar. The time coordinate corresponding to each date/time is shown in column of numbers below the filled circle. This illustration shows that a given time coordinate value can represent different date/times in different calendars; conversely, a given date/time is represented by different time coordinate values in different calendars. As explained in the text of this section, the time coordinate in seconds is the count of valid date/times (= the number of filled circles) that occur along the timeline _after_ the reference date/time (which is the first circle on the line in every case), up to and including the date/time represented. A leap second was added to the UTC calendar at the end of 2016. The duration of the leap second is shown by the shading, and its start by the black filled circle for **`2016-12-31 23:59:60`**, which is counted in the **`utc`** coordinate values for subsequent date/times. The leap second appears in the timeline of the **`utc`** variant of the **`standard`** calendar, but the leap second is not a valid date/time in that calendar, so there is no filled circle for it, and it is _not_ counted in the coordinate values for subsequent date/times. The leap second does not appear in the timelines of the **`tai`** calendar and the *`none`* variant of the *`standard`* calendar. These timelines skip past the shaded interval indicating the leap second's duration, and they have no filled circle for it.
-image::images/leap-second-timelines.png[,50%,pdfwidth=50vw,align="center"]
+.Illustration of the equivalence between date/times and time coordinate values with **`units="seconds since 2016-12-31 23:59:58"`** for various choices of the **`calendar`** attribute and **`leap_seconds`** keyword. This illustration shows that a given time coordinate value (the numbers in columns at the bottom right) can represent different date/times in different calendars. However, the illustration cannot show another important point to keep in mind, that a given date/time may identify different instants in different calendars. The diagonal lines depict the timelines of the calendars. Along each line, a filled circle marks each integer-second date/time in the set allowed by the calendar. There is no meaning in the slight left-right displacement of the circles at each second, which is done only so they can all be seen; they are supposed to be exactly coincident. As explained in the text of this section, the time coordinate in seconds is the count of valid date/times (= the number of circles) that occur along the timeline _after_ the reference date/time **`2016-12-31 23:59:58`** (which is the first circle on the line in every case, hence with a count of zero as shown in the column below its group of circles), up to and including the date/time represented. A leap second was added to the UTC calendar at the end of 2016. The duration of the leap second is shown by the shading. The **`utc`** calendar is the only one in which date/times in the leap second are valid; hence the black circle is the only marker of **`2016-12-31 23:59:60`**. The grey timeline of the **`utc`** variant of the **`standard`** calendar includes the the leap second as well, but date/times in the leap second are not valid in that calendar, so there is no grey circle for it. The leap second does not appear in the timelines of the **`tai`** calendar and the *`none`* variant of the *`standard`* calendar. Their timelines (red and purple) skip over the leap second, and they have no circle for it.
+image::images/leap-second-timelines.svg[,70%,pdfwidth=50vw,align="center"]
 
 
-[[none-calendar, Section 4.4.4, "Time coordinates with no annual cycle"]]
-==== Time coordinates with no annual cycle
+[[none-calendar, Section 4.4.4, "Time Coordinates with no Annual Cycle"]]
+==== Time Coordinates with no Annual Cycle
 
 The **`calendar`** attribute may be set to **`none`** in climate experiments that simulate a fixed time of year.
 The time of year is indicated by the date in the reference time of the **`units`** attribute.
@@ -464,8 +472,8 @@ Here, all days simulate the conditions of 15th July, so it does not make sense t
 The time coordinates are interpreted as 0, 1, 2, etc. days since the start of the experiment.
 
 
-[[explicit-calendar, Section 4.4.5, "Explicitly defined calendar"]]
-==== Explicitly defined calendar
+[[explicit-calendar, Section 4.4.5, "Explicitly Defined Calendar"]]
+==== Explicitly Defined Calendar
 
 If none of the calendars defined in <<calendar>> applies (e.g., calendars appropriate to a different paleoclimate era), a calendar can be explicitly defined, in terms of permissible year-month-day combinations.
 To do this, the lengths of each month are explicitly defined with the **`month_lengths`** attribute of the time axis:
