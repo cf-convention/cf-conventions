@@ -19,14 +19,11 @@ __A boundary variable must have one more dimension than its associated coordinat
 We refer to the additional dimension as the "vertex dimension".
 The vertex dimension must be the most rapidly varying dimension (the last dimension in CDL order), and its size is the maximum number of cell vertices.
 
-The vertex dimension must be of size two if the associated variable is one-dimensional, and of size greater than two if the associated variable has more than one dimension.
-For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices.
+The vertex dimension must be of size two if the associated variable is one-dimensional (<<bounds-one-d>>), and of size greater than two if the associated variable has more than one dimension (<<bounds-lat-lon>>).
+For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices (<<bounds-two-d>>).
 For cells with fewer vertices than the size of vertex dimension, the unneeded elements must appear as the last elements in the vertex dimension and must be assigned the **`_FillValue`**.
-CF can currently describe boundaries for cells which have one or two spatial dimensions, and does not provide conventions to describe the boundaries of cells with three spatial dimensions.
+CF can currently describe boundaries for cells which have one or two spatial dimensions, but does not provide conventions to describe the boundaries of cells with three spatial dimensions.
 Please refer to <<UGRID>> for development of such conventions.
-
-[[boundaries-and-formula-terms, Section 7.1.1, "Boundaries and Formula Terms"]]
-==== Boundaries and Formula Terms
 
 A boundary variable inherits the values of some attributes from its parent coordinate variable.
 If a coordinate variable has any of the attributes marked "BI" (for "inherit") in the "Use" column of <<attribute-appendix>>, they are assumed to apply to its bounds variable as well.
@@ -36,6 +33,9 @@ A boundary variable can only have inheritable attributes if they are also presen
 A bounds variable may have any of the attributes marked "BO" for ("own") in the "Use" column of <<attribute-appendix>>.
 These attributes take precedence over any corresponding attributes of the parent variable.
 In these cases, the parent variable's attribute does not apply to the bounds variable, regardless of whether the latter has its own attribute.
+
+[[boundaries-and-formula-terms, Section 7.1.1, "Boundaries and Formula Terms"]]
+==== Boundaries and Formula Terms
 
 If a parametric coordinate variable with a **`formula_terms`** attribute (section 4.3.2) also has a **`bounds`** attribute, its boundary variable must have a **`formula_terms`** attribute too.
 In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula.
@@ -86,11 +86,6 @@ Although in this case there will be a duplication of the boundary coordinates be
 [[bounds-one-d, Section 7.1.2, "Bounds for one-dimensional coordinate variables"]]
 ==== Bounds for one-dimensional coordinate variables
 
-For a coordinate variable such as **`lat(lat)`** with associated boundary variable **`latbnd(x,2)`**, the interval endpoints must be ordered consistently with the associated coordinate, e.g., for an increasing coordinate, **`lat(1)`** &gt; **`lat(0)`** implies **`latbnd(i,1)`** &gt;= **`latbnd(i,0)`** for all **`i`** (<<img-bnd_1d_coords>>).
-
-If adjacent intervals are contiguous, the shared endpoint must be represented identically in each instance where it occurs in the boundary variable.
-For example, if the intervals that contain grid points **`lat(i)`** and **`lat(i+1)`** are contiguous, then **`latbnd(i+1,0)`** = **`latbnd(i,1)`**.
-
 [[cells-on-a-latitude-axis-ex]]
 [caption="Example 7.2. "]
 .Cells on a latitude axis
@@ -109,6 +104,11 @@ variables:
 The boundary variable `lat_bnds` associates a latitude gridpoint `i` with the interval whose boundaries are `lat_bnds(i,0)` and `lat_bnds(i,1)`.
 The gridpoint location, `lat(i)`, should be contained within this interval.
 ====
+
+For a coordinate variable such as **`lat(lat)`** with associated boundary variable **`latbnd(lat,2)`**, the interval endpoints must be ordered consistently with the associated coordinate, e.g., for an increasing coordinate, **`lat(1)`** &gt; **`lat(0)`** implies **`latbnd(i,1)`** &gt;= **`latbnd(i,0)`** for all **`i`** (<<img-bnd_1d_coords>>).
+
+If adjacent intervals are contiguous, the shared endpoint must be represented identically in each instance where it occurs in the boundary variable.
+For example, if the intervals that contain grid points **`lat(i)`** and **`lat(i+1)`** are contiguous, then **`latbnd(i+1,0)`** = **`latbnd(i,1)`**.
 
 [[img-bnd_1d_coords, figure 1]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
@@ -150,11 +150,11 @@ The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` w
 The gridpoint location, `(lat(j,i),lon(j,i))`, should be contained within this region.
 ====
 
+The vertices must be ordered such that, when visiting the vertices in order, the four-sided perimeter of the cell is traversed anticlockwise on the lon-lat surface as seen from above.
+If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this can be arranged as in <<img-bnd_2d_coords>>.
 Let us call the side of cell **`(j,i)`** facing cell **`(j,i-1)`** the "**`i-1`**" side, the side facing cell **`(j,i+1)`** the "**`i+1`**" side, and similarly for "**`j-1`**" and "**`j+1`**".
 Then we can refer to the vertex formed by sides **`i-1`** and **`j-1`** as **`(j-1,i-1)`**.
 With this notation, the four vertices are indexed as follows: **`0=(j-1,i-1)`**, **`1=(j-1,i+1)`**, **`2=(j+1,i+1)`**, **`3=(j+1,i-1)`**.
-If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this ordering means the vertices will be traversed anticlockwise on the lon-lat surface seen from above (<<img-bnd_2d_coords>>).
-If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat surface.
 
 [[img-bnd_2d_coords, figure 2]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
@@ -178,7 +178,7 @@ For 0 < j < n and 0 < i < m,
 [[bounds-two-d, Section 7.1.4, "Bounds for coordinate variables with p-sided cells in two spatial dimensions"]]
 ==== Bounds for coordinate variables with p-sided cells in two spatial dimensions
 
-The general case of a grid composed of polygonal cells in two spatial dimensions with **`p`** sides and vertices, or a mixture of polygons where **`p`** is the maximum number of sides and vertices, the grid could have one, two or more dimensions, depending on how it is organised logically (e.g. as a 1-D list or a 2-D rectangular arrangement).
+In the general case of a grid composed of polygonal cells in two spatial dimensions with **`p`** sides and vertices, or a mixture of polygons where **`p`** is the maximum number of sides and vertices, the grid could have one, two or more dimensions, depending on how it is organised logically (e.g. as a 1-D list or a 2-D rectangular arrangement).
 The boundary variables for the auxiliary coordinate variables are dimensioned **`(...,m,p)`**, giving coordinates for the **`p`** vertices of each cell, where **`(...,m)`** are the dimensions of the auxiliary coordinate variables.
  If the cells are in a horizontal plane, the vertices must be traversed anticlockwise in the lon-lat plane as viewed from above.
 The starting vertex is not specified.
