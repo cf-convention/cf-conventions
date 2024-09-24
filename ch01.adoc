@@ -74,10 +74,12 @@ All examples in this document use CDL syntax.
 cell:: A region in one or more dimensions whose boundary can be described by a set of vertices.
 The term __interval__ is sometimes used for one-dimensional cells.
 
-coordinate variable:: We use this term precisely as it is defined in the
-link:$$https://docs.unidata.ucar.edu/nug/current/best_practices.html#bp_Coordinate-Systems$$[NUG section on coordinate variables].
-It is a one-dimensional variable with the same name as its dimension [e.g., **`time(time)`**], and it is defined as a numeric data type with values in strict monotonic order (all values are different, and they are arranged in either consistently increasing or consistently decreasing order).
+coordinate variable:: A coordinate variable is a one-dimensional variable with the same name as its dimension e.g., **`time(time)`**.
+In CF, a coordinate variable must be of a numeric data type (note that
+link:$$https://docs.unidata.ucar.edu/nug/current/best_practices.html#bp_Coordinate-Systems$$[NUG section on coordinate variables] does not have this requirement).
+The coordinate values must be in strict monotonic order (all values are different, and they are arranged in either consistently increasing or consistently decreasing order).
 Missing values are not allowed in coordinate variables.
+To avoid confusion with coordinate variables, CF does not permit a one-dimensional string-valued variable to have the same name as its dimension.
 
 grid mapping variable:: A variable used as a container for attributes that define a specific grid mapping.
 The type of the variable is arbitrary since it contains no data.
@@ -92,6 +94,8 @@ The word "apex" refers to position of this group at the vertex of the tree of gr
 
 longitude dimension:: A dimension of a netCDF variable that has an associated longitude coordinate variable.
 
+most rapidly varying dimension:: The dimension of a multidimensional variable for which elements are adjacent in storage. When netCDF is represented in CDL, the most rapidly varying dimension is the last one e.g. **`x`** in **`float data(z,y,x)`**. C and Python NumPy use the same order as C, also called "column-major order", but Fortran uses the opposite convention, also called "row-major order", so that when netCDF variables are accessed in Fortran the most rapidly varying dimension is the first one.
+
 multidimensional coordinate variable:: An auxiliary coordinate variable that is multidimensional.
 
 nearest item:: The item (variable or group) that can be reached via the shortest traversal of the file from the referring group following the rules set forth in the <<groups>>.
@@ -99,6 +103,8 @@ nearest item:: The item (variable or group) that can be reached via the shortest
 out-of-group reference:: A reference to a variable or dimension that is not contained in the referring group.
 
 path:: Paths must follow the UNIX style path convention and may begin with either a '/', '..', or a word.
+
+quantization variable:: A variable used as a container for attributes that define a specific quantization algorithm. The type of the variable is arbitrary since it contains no data.
 
 recommendation:: Recommendations in this convention are meant to provide advice that may be helpful for reducing common mistakes.
 In some cases we have recommended rather than required particular attributes in order to maintain backwards compatibility with COARDS.
@@ -117,6 +123,8 @@ tie point variable:: A netCDF variable that contains coordinates that have been 
 There is no relationship between the name of a tie point variable and the name(s) of its dimension(s).
 
 time dimension:: A dimension of a netCDF variable that has an associated time coordinate variable.
+
+vertex dimension:: The dimension of a boundary variable along which the vertices of each cell are ordered.
 
 vertical dimension:: A dimension of a netCDF variable that has an associated vertical coordinate variable.
 
@@ -186,7 +194,7 @@ But because of the extensions that provide new metadata content, and the relaxat
 The features of these conventions that allow writing netCDF files that are not COARDS conforming are summarized below.
 
 COARDS standardizes the description of grids composed of independent latitude, longitude, vertical, and time axes.
-In addition to standardizing the metadata required to identify each of these axis types COARDS restricts the axis (equivalently dimension) ordering to be longitude, latitude, vertical, and time (with longitude being the most rapidly varying dimension).
+In addition to standardizing the metadata required to identify each of these axis types, COARDS requires (_time_, _vertical_, _latitude_, _longitude_) as the CDL order for the dimensions of a variable, with longitude being the most rapidly varying dimension (the last dimension in CDL order).
 Because of I/O performance considerations it may not be possible for models to output their data in conformance with the COARDS requirement.
 The CF convention places no rigid restrictions on the order of dimensions, however we encourage data producers to make the extra effort to stay within the COARDS standard order.
 The use of non-COARDS axis ordering will render files inaccessible to some applications and limit interoperability.

@@ -15,7 +15,12 @@ For cases when data pertain to geospatial features with highly variable geometry
 To represent cells we add the attribute **`bounds`** to the appropriate coordinate variable(s).
 The value of **`bounds`** is the name of the variable that contains the vertices of the cell boundaries.
 We refer to this type of variable as a "boundary variable."
-__A boundary variable will have one more dimension than its associated coordinate or auxiliary coordinate variable.__ The additional dimension should be the most rapidly varying one, and its size is the maximum number of cell vertices.
+__A boundary variable must have one more dimension than its associated coordinate or auxiliary coordinate variable.__ 
+We refer to the additional dimension as the "vertex dimension".
+The vertex dimension must be the most rapidly varying dimension (the last dimension in CDL order), and its size is the maximum number of cell vertices.
+The vertex dimension must be of size two if the associated variable is one-dimensional, and of size greater than two if the associated variable has more than one dimension.
+For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices.
+For cells with fewer vertices than the size of vertex dimension, the unneeded elements must appear as the last elements in the vertex dimension and must be assigned the **`_FillValue`**.
 
 A boundary variable inherits the values of some attributes from its parent coordinate variable.
 If a coordinate variable has any of the attributes marked "BI" (for "inherit") in the "Use" column of <<attribute-appendix>>, they are assumed to apply to its bounds variable as well.
@@ -323,7 +328,7 @@ The horizontal coordinate variables to which "**`area`**" refers are in this cas
 [[recording-spacing-original-data]]
 ==== Recording the spacing of the original data and other information
 
-To indicate more precisely how the cell method was applied, extra information may be included in parentheses () after the identification of the method.
+To indicate more precisely how the cell method was applied, extra information may be included in parentheses **`( )`** at the end of the word list describing the method, after the operation and any **`where`**, **`over`** and **`within`** phrases.
 This information includes standardized and non-standardized parts.
 Currently the only standardized information is to provide the typical interval between the original data values to which the method was applied, in the situation where the present data values are statistically representative of original data values which had a finer spacing.
 The syntax is (**`interval`**: __value unit__), where __value__ is a numerical value and __unit__ is a string that can be recognized by UNIDATA's UDUNITS package <<UDUNITS>>.

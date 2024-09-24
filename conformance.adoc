@@ -56,6 +56,12 @@ See https://github.com/ugrid-conventions/ugrid-conventions for the UGRID conform
 
 [[section-3]]
 
+=== 2.5 Variables
+
+*Requirements:*
+
+* A one-dimensional string-valued variable must not have the same name as its dimension (see "Coordinate variable" in Section 1.3).
+
 [[missing-data-valid-and-actual-range-of-data]]
 === 2.5.1 Missing data, valid and actual range of data
 
@@ -356,6 +362,8 @@ If there are two dimensions, the leading dimension (CDL order) must match one of
 * The type of the **`bounds`** attribute is a string whose value is a single variable name.
 The specified variable must exist in the file.
 * A boundary variable must have the same dimensions as its associated variable, plus have a trailing dimension (CDL order) for the maximum number of vertices in a cell.
+The trailing dimension must be of size two if the associated variable is one-dimensional, and of size greater than two if the associated variable has more than one dimension.
+* Any elements of the boundary variable which contain the **`FillValue`** must form a consecutive block at the end of the trailing dimension.
 * A boundary variable must be a numeric data type.
 * A boundary variable can only have inheritable attributes, i.e. any of those marked "BI" in the "Use" column of http://cfconventions.org/cf-conventions/cf-conventions.html#attribute-appendix[Appendix A], if they are also present on its parent coordinate variable.
 * If a boundary variable has an inheritable attribute then its data type and its value must be exactly the same as the parent variable's attribute.
@@ -528,7 +536,23 @@ The requirements on all other bounds tie point variable attributes are the same 
 * An interpolation variable should have 0 dimensions.
 * The recommendations on bounds tie point variable attributes are the same as for bounds variables described in <<cell-boundaries>>.
 
- 
+[[lossy-compression-via-quantization]]
+=== 8.4 Lossy Compression via Quantization
+
+*Requirements:*
+
+* Quantization container variables must have two string-valued attributes, **`algorithm`** and **`implementation`**.
+* The value of **`algorithm`** must be one of the values permitted by this section.
+* Only floating-point type variables can be quantized. Quantized variables are identified by having a string-valued attribute named **`quantization`**.
+* The value of **`quantization`** must be the name of the quantization container variable which exists in the file.
+* Variables that were quantized must have an integer type attribute named either **`quantization_nsb`** (if the corresponding quantization variable has the **`algorithm`** attribute value **`bitround`**) or **`quantization_nsd`** (if the corresponding quantization variable has one of the **`algorithm`** attribute values **`bitgroom`**, **`digitround`**, or **`granular_bitround`**).
+* The value of **`quantization_nsb`** must be in the range **`1 \<= NSB \<= 23`** for data type **`float`** or **`real`**, and **`1 \<= NSB \<= 52`** for data type **`double`**.
+* The value of **`quantization_nsd`** must be in the range **`1 \<= NSD \<= 7`** for data type **`float`** or **`real`**, and **`1 \<= NSD \<= 15`** for data type **`double`**.
+* Variables that serve as a coordinate variable, or are named by a **`coordinates`**, **`formula_terms`**, or **`cell_measures`** attribute of any other variable must not have a **`quantization`** attribute.
+* The value of **`implementation`** must take the form
+"_software-name_ version _version-string_ [( _optional-information_ )]".
+where brackets indicate optional words.
+
 [[parametric-vertical-coordinates]]
 === Appendix D Parametric Vertical Coordinates
 
