@@ -1,41 +1,70 @@
 MAIN_DOC := cf-conventions
-MAIN_DOC_BUILD_DIR := ./conventions_build
+
+MAIN_DOC_BUILD_DIR := conventions_build
 
 MAIN_DOC_INC := version toc-extra 
 MAIN_DOC_INC += ch01 ch02 ch03 ch04 ch05 ch06 ch07 ch08 ch09
 MAIN_DOC_INC += appa appb appc appd appe appf appg apph appi appj appk
 MAIN_DOC_INC += history bibliography
 
+MAIN_DOC_INC := $(addsuffix .adoc, $(MAIN_DOC_INC))
+
+#These are the static files for the images of the conventions document
 MAIN_DOC_IMG := NFFFFFF-1.0.png
 MAIN_DOC_IMG += ci_1d_interpolation_subarea.svg ci_2d_interpolation_subarea.svg ci_bounds_interpolation.svg
 MAIN_DOC_IMG += ci_dimensions_overview.svg ci_interpolation_coefficients.svg ci_interpolation_subarea_generation_process.svg
 MAIN_DOC_IMG += ci_quadratic1.svg ci_quadratic2.svg ci_quadratic3.svg mesh_figure.svg
 
+#  ... and th list of dynamic files images, with a build rule that appears below
 MAIN_DOC_IMG_BLD := cfdm_cf_concepts.svg cfdm_coordinate_reference.svg cfdm_coordinates.svg cfdm_field.svg
 MAIN_DOC_IMG_BLD += order_horizontal_bounds__1D_coord_variables.png order_horizontal_bounds__2D_coord_variables.png
 
 MAIN_DOC_IMG += $(MAIN_DOC_IMG_BLD)
 
+MAIN_DOC_IMG := $(addprefix images/, $(MAIN_DOC_IMG))
+
 CONF_DOC := conformance
-CONF_DOC_BUILD_DIR := ./conformance_build
-CONF_DOC_INC := version
 
-DATE_DOCPROD != LC_ALL=C date -u "+%d&\#160;%B,&\#160;%Y&\#160;%H:%M:%SZ"
+CONF_DOC_BUILD_DIR := conformance_build
 
-.PHONY: all clean
-all: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html $(addpreffix images/, $(MAIN_DOC_IMG_BLD)) $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
+CONF_DOC_INC := conformance.adoc version.adoc
 
-$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(addprefix images/, $(MAIN_DOC_IMG)) $(addsuffix .adoc, $(MAIN_DOC_INC)) | $(MAIN_DOC_BUILD_DIR)
-	asciidoctor --verbose --trace ${FINAL_TAG} -a data-uri -a docprodtime="$(DATE_DOCPROD)" $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+ifdef CF_FINAL
+DATE_FORMAT := +%d&\#160;%B,&\#160;%Y
+FINAL_TAG := -a final
+else
+DATE_FORMAT ?= +%d&\#160;%B,&\#160;%Y&\#160;%H:%M:%SZ
+FINAL_TAG ?= -a draft
+endif
+
+DATE_DOCPROD != LC_ALL=C date -u "$(DATE_FORMAT)"
+
+.PHONY: all clean images html pdf conventions-html conventions-pdf conventions conformance-html conformance-pdf conformance
+all: images html pdf 
+images: $(addprefix images/, $(MAIN_DOC_IMG_BLD)) 
+
+conventions-html: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
+conventions-pdf: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
+conventions: conventions-html conventions-pdf
+
+conformance-html: $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html
+conformance-pdf: $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf
+conformance: conformance-html conformance-pdf
+
+html: conventions-html conformance-html
+pdf: conventions-pdf conformance-pdf
+
+$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
+	asciidoctor --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 
-$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(MAIN_DOC).adoc $(addprefix images/, $(MAIN_DOC_IMG)) $(addsuffix .adoc, $(MAIN_DOC_INC)) | $(MAIN_DOC_BUILD_DIR)
-	asciidoctor-pdf --verbose --trace ${FINAL_TAG} -a docprodtime="$(DATE_DOCPROD)" -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
+	asciidoctor-pdf --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 
-$(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC).adoc $(addsuffix .adoc, $(CONF_DOC_INC)) | $(CONF_DOC_BUILD_DIR)
+$(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 	asciidoctor --verbose --trace ${FINAL_TAG} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
-$(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC).adoc $(addsuffix .adoc, $(CONF_DOC_INC)) | $(CONF_DOC_BUILD_DIR)
+$(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 	asciidoctor-pdf --verbose --trace ${FINAL_TAG} -d book $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
 $(MAIN_DOC_BUILD_DIR):
@@ -48,6 +77,7 @@ clean:
 	rm -rvf $(MAIN_DOC_BUILD_DIR)
 	rm -rvf $(CONF_DOC_BUILD_DIR)
 
+#Rules to build non-static images. See MAIN_DOC_IMG_BLD above
 images/cfdm_cf_concepts.svg: images/cfdm_cf_concepts.gv
 	dot -Tsvg $< -o $@
 
