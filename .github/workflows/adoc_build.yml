@@ -44,7 +44,7 @@ jobs:
     # Check out PR
     - uses: actions/checkout@v4
     # If it is release event, tag for final
-    - name: Set "final" tag and date timestamp formatting
+    - name: If it is a release add the "final" tag and date timestamp formatting
       if: github.event_name == 'release'
       run: |
         echo "CF_FINAL=True" >> "$GITHUB_ENV"
@@ -57,7 +57,7 @@ jobs:
     - name: Build cf-conventions.pdf
       uses: Analog-inc/asciidoctor-action@v1
       with:
-        shellcommand: 'make conventions-html'
+        shellcommand: 'make conventions-pdf'
     # Upload artifact containing cf-conventions.html, cf-conventions.pdf
     - name: Save cf-conventions doc preview
       uses: actions/upload-artifact@v4
@@ -74,7 +74,7 @@ jobs:
     # Create build directory
     - run: mkdir conformance_build
     # If it is release event, tag for final
-    - name: Set "final" tag and date timestamp formatting
+    - name: If it is a release add the "final" tag and date timestamp formatting
       if: github.event_name == 'release'
       run: |
         echo "CF_FINAL=True" >> "$GITHUB_ENV"
