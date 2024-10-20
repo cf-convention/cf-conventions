@@ -19,15 +19,17 @@ It is possible to treat the **`byte`** and **`short`** types as unsigned by usin
 In many situations, any integer type may be used.
 When the phrase "integer type" is used in this document, it should be understood to mean **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**, **`int64`**, or **`unsigned int64`**.
 
-A text string in a variable or an attribute may be represented either in Unicode characters stored in a **`string`** or encoded as UTF-8 and stored in a **`char`** array.
-Since ASCII 7-bit character codes are a subset of UTF-8, a **`char`** array of _m_ ASCII characters is equivalent to a **`string`** of _m_ ASCII characters.
-Unicode characters which are not in the ASCII character set require more than one byte each to encode in UTF-8.
-Hence a **`string`** of length _m_ generally requires a UTF-8 **`char`** array of size >__m__ to represent it.
+A text string in a variable or an attribute may be represented either as Unicode text in a variable-length **`string`** or encoded as UTF-8 in a fixed-length **`char`** array.
+Note that the ASCII one-byte character codes (hexadecimal `00`-`7F`) are a subset of UTF-8.
 
-An __n__-dimensional array of strings may be implemented as a variable or attribute of type **`string`** with _n_ dimensions (where __n__<2 for an attribute) or as a variable (but not an attribute) of type **`char`** with _n_+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
-For example, a character array variable of strings containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
-The other strings, such as "May", should be padded with trailing NULL or space characters so that every array element is filled.
-If the atomic string option is chosen, each element of the variable can be assigned a string with a different length.
+Before version 1.12, CF did not require text in **`char`** arrays to be encoded with UTF-8, and did not provide or endorse any convention to record what encoding was used.
+If the array is stored in a variable, the encoding might be recorded by the **`_Encoding`** attribute, which is not a CF or NUG convention.
+If the data-user has no information about the encoding, we suggest UTF-8 as a first guess.
+
+An __n__-dimensional array of strings may be implemented as a variable or an attribute of type **`string`** with _n_ dimensions (only one dimension is allowed for an attribute) or as a variable (but not an attribute) of type **`char`** with _n_+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
+For example, a **`char`** array containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
+The other strings, such as "May", would be padded with trailing NULL or space characters so that every array element is filled.
+A **`string`** array to store the same information would be dimensioned (12), with each element of the variable containing a string of the appropriate length.
 The CDL example below shows one variable of each type.
 
 [[char-and-string-variables-ex]]
