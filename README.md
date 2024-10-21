@@ -16,10 +16,33 @@ Their implementation in GitHub is described in this repository's [CONTRIBUTING.m
 
 To convert the AsciiDoc files into the resulting HTML file:
 
-1. Ensure you have [Ruby](https://www.ruby-lang.org/) installed (e.g. `sudo apt-get install ruby`)
-2. Ensure you have a recent version of [Asciidoctor](https://asciidoctor.org/) installed (e.g. `gem install asciidoctor`)
-3. Get hold of the AsciiDoc files in this repo (e.g. `git clone git@github.com:cf-metadata/cf-conventions.git`)
-4. Build the HTML: `asciidoctor cf-conventions.adoc`
+1. Ensure you have [Ruby](https://www.ruby-lang.org/) installed (e.g. `sudo apt install ruby`)
+1. Ensure you have a recent version of [Asciidoctor](https://asciidoctor.org/) installed (e.g. `gem install asciidoctor`)
+1. Ensure you have [Make](https://www.gnu.org/software/make/) installed (e.g. `sudo apt install make`)
+1. Get hold of the AsciiDoc files in this repo (e.g. `git clone git@github.com:cf-convention/cf-conventions.git`)
+1. Therare different options to make the conventions and conformance documents:
+   - (All, the default) HTML and PDF conventions and conformance documents: 
+      `make` or `make all`
+   - HTML conventions and conformance documents: 
+      `make html`
+   - PDF conventions and conformance documents: 
+      `make pdf`
+   - Conventions documents (HTML and PDF): 
+      `make conventions`
+   - Conformance documents (HTML and PDF): 
+      `make conformance`
+   - Delete documents and build directories:
+      `make clean`
+   - Build with FINAL tag and date stamp (remember to update version in `version.adoc` file ):
+      `make CF_FINAL=True`
+
+Both HTML documents are build with images embeded into the `.html` file.
+
+The build documents will be rendered into local paths:
+  - `conventions_build/cf-conventions.html`
+  - `conventions_build/cf-conventions.pdf`
+  - `conformance_build/conformance.html`
+  - `conformance_build/conformance.pdf`
 
 See the [GitHub help](https://help.github.com/) pages and plethora of other git/GitHub guides for more details on how to work with repos, forks, pull requests, etc.
 
