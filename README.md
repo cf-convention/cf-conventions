@@ -1,5 +1,3 @@
-[![Build Status](https://secure.travis-ci.org/cf-convention/cf-conventions.png)](https://travis-ci.org/cf-convention/cf-conventions)
-
 This repository contains the official source of the CF metadata conventions.
 The source files are built into HTML automatically when changes are merged into this repository.
 The latest build of the specification is held in the `gh-pages` branch and can be seen [here](https://cfconventions.org/cf-conventions/cf-conventions.html).
