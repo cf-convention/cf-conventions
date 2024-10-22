@@ -1,5 +1,3 @@
-[![Build Status](https://secure.travis-ci.org/cf-convention/cf-conventions.png)](https://travis-ci.org/cf-convention/cf-conventions)
-
 This repository contains the official source of the CF metadata conventions.
 The source files are built into HTML automatically when changes are merged into this repository.
 The latest build of the specification is held in the `gh-pages` branch and can be seen [here](https://cfconventions.org/cf-conventions/cf-conventions.html).
@@ -20,7 +18,7 @@ To convert the AsciiDoc files into the resulting HTML file:
 1. Ensure you have a recent version of [Asciidoctor](https://asciidoctor.org/) installed (e.g. `gem install asciidoctor`)
 1. Ensure you have [Make](https://www.gnu.org/software/make/) installed (e.g. `sudo apt install make`)
 1. Get hold of the AsciiDoc files in this repo (e.g. `git clone git@github.com:cf-convention/cf-conventions.git`)
-1. Therare different options to make the conventions and conformance documents:
+1. There are different options to make the conventions and conformance documents:
    - (All, the default) HTML and PDF conventions and conformance documents: 
       `make` or `make all`
    - HTML conventions and conformance documents: 
