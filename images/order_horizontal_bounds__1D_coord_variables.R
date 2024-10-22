@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # R version: >= 4.0.0
 # r-svglite version: >= 2.0.0
 library(svglite)

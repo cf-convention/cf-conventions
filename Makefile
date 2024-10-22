@@ -1,6 +1,7 @@
-MAIN_DOC := cf-conventions
+BUILD_DIR := build
 
-MAIN_DOC_BUILD_DIR := conventions_build
+MAIN_DOC := cf-conventions
+MAIN_DOC_BUILD_DIR := $(BUILD_DIR)
 
 MAIN_DOC_INC := version toc-extra 
 MAIN_DOC_INC += ch01 ch02 ch03 ch04 ch05 ch06 ch07 ch08 ch09
@@ -25,7 +26,7 @@ MAIN_DOC_IMG := $(addprefix images/, $(MAIN_DOC_IMG))
 
 CONF_DOC := conformance
 
-CONF_DOC_BUILD_DIR := conformance_build
+CONF_DOC_BUILD_DIR := $(BUILD_DIR)
 
 CONF_DOC_INC := conformance.adoc version.adoc
 
@@ -67,15 +68,19 @@ $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 	asciidoctor-pdf --verbose --trace ${FINAL_TAG} -d book $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
-$(MAIN_DOC_BUILD_DIR):
-	mkdir -vp $(MAIN_DOC_BUILD_DIR)
+#$(MAIN_DOC_BUILD_DIR):
+#	mkdir -vp $(MAIN_DOC_BUILD_DIR)
 
-$(CONF_DOC_BUILD_DIR):
-	mkdir -vp $(CONF_DOC_BUILD_DIR)
+#$(CONF_DOC_BUILD_DIR):
+#	mkdir -vp $(CONF_DOC_BUILD_DIR)
+
+$(BUILD_DIR):
+	mkdir -vp $(BUILD_DIR)
 
 clean:
-	rm -rvf $(MAIN_DOC_BUILD_DIR)
-	rm -rvf $(CONF_DOC_BUILD_DIR)
+#	rm -rvf $(MAIN_DOC_BUILD_DIR)
+#	rm -rvf $(CONF_DOC_BUILD_DIR)
+	rm -rvf $(BUILD_DIR)
 
 #Rules to build non-static images. See MAIN_DOC_IMG_BLD above
 images/cfdm_cf_concepts.svg: images/cfdm_cf_concepts.gv
