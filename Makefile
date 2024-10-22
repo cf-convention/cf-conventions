@@ -14,10 +14,10 @@ MAIN_DOC_IMG := NFFFFFF-1.0.png
 MAIN_DOC_IMG += ci_1d_interpolation_subarea.svg ci_2d_interpolation_subarea.svg ci_bounds_interpolation.svg
 MAIN_DOC_IMG += ci_dimensions_overview.svg ci_interpolation_coefficients.svg ci_interpolation_subarea_generation_process.svg
 MAIN_DOC_IMG += ci_quadratic1.svg ci_quadratic2.svg ci_quadratic3.svg mesh_figure.svg
+MAIN_DOC_IMG += order_horizontal_bounds__1D_coord_variables.svg order_horizontal_bounds__2D_coord_variables.svg
 
 #  ... and th list of dynamic files images, with a build rule that appears below
 MAIN_DOC_IMG_BLD := cfdm_cf_concepts.svg cfdm_coordinate_reference.svg cfdm_coordinates.svg cfdm_field.svg
-MAIN_DOC_IMG_BLD += order_horizontal_bounds__1D_coord_variables.png order_horizontal_bounds__2D_coord_variables.png
 
 MAIN_DOC_IMG += $(MAIN_DOC_IMG_BLD)
 
@@ -89,9 +89,3 @@ images/cfdm_coordinates.svg: images/cfdm_coordinates.gv
 
 images/cfdm_field.svg: images/cfdm_field.gv
 	dot -Tsvg $< -o $@
-
-images/order_horizontal_bounds__1D_coord_variables.png: images/order_horizontal_bounds__1D_coord_variables.pdf
-	pdftoppm -progress -singlefile -r 300 -png $< $(basename $@)
-
-images/order_horizontal_bounds__2D_coord_variables.png: images/order_horizontal_bounds__2D_coord_variables.pdf
-	pdftoppm -progress -singlefile -r 300 -png $< $(basename $@)
