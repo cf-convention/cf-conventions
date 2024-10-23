@@ -19,22 +19,38 @@
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
 #
+#   Custom workflow for pages deployment
+#     
 name: Asciidoctor Build Workflow
 on:
   # manually run workflow
   workflow_dispatch:
-  # trigger on PR event against main (will not run publish job)
+  
+  # trigger on PR event against default branch (i.e. main) (will not run publish job)
   pull_request:
-    branches: [ main ]
-  # Trigger on a push to main (a PR is merged), or when a release is
+    branches: [ $default-branch ]
+  # Trigger on a push to default branch (i.e. main) (a PR is merged), or when a release is
+  
   # published on github. These will run the publish job.
   push:
-    branches:
-      - main
+    branches: [ $default-branch ]
   # Trigger when a GitHub release is published.
   release:
     types:
       - published
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   # Job to build cf-conventions.html, cf-conventions.pdf
   build_conventions_and_conformance:
@@ -75,6 +91,17 @@ jobs:
     if: github.event_name != 'pull_request'
     # Wait for the build artifacts to become available
     needs: [build_conventions_and_conformance]
+    
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: ubuntu-latest
     steps:
       # Checkout gh-pages branch
