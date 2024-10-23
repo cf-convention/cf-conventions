@@ -19,13 +19,13 @@ It is possible to treat the **`byte`** and **`short`** types as unsigned by usin
 In many situations, any integer type may be used.
 When the phrase "integer type" is used in this document, it should be understood to mean **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**, **`int64`**, or **`unsigned int64`**.
 
-Text strings must be represented in Unicode. Any composite characters must be link:$$https://unicode.org/reports/tr15$$[NFC-normalized].
-A Unicode text string can be stored in netCDF either in a variable-length **`string`** or encoded as UTF-8 in a fixed-length **`char`** array.
-Note that the ASCII characters are a subset of Unicode, and their UTF-8 encodings are the same as their ASCII codes (decimal 0-127, hexadecimal `00`-`7F`).
+A text string can be stored either in a variable-length **`string`** or in a fixed-length **`char`** array.
+In both cases, text strings must be represented in Unicode and encoded according to UTF-8.
+A text string consisting only of ASCII characters is guaranteed to conform with this requirement, because the ASCII characters are a subset of Unicode, and their UTF-8 encodings are the same as their one-byte ASCII codes (decimal 0-127, hexadecimal `00`-`7F`).
+Any Unicode composite characters must be link:$$https://unicode.org/reports/tr15$$[NFC-normalized].
 
-Before version 1.12, CF did not require text in **`char`** arrays to be encoded with UTF-8, and did not provide or endorse any convention to record what encoding was used.
-If the array is stored in a variable, the encoding might be recorded by the **`_Encoding`** attribute, although this is not a CF or NUG convention.
-If the data-user has no information about the encoding, we suggest UTF-8 as a first guess.
+Before version 1.12, CF did not require UTF-8 encoding, and did not provide or endorse any convention to record what encoding was used.
+However, if the text string is stored in a **`char`** variable, the encoding might be recorded by the **`_Encoding`** attribute, although this is not a CF or NUG convention.
 
 An __n__-dimensional array of strings may be implemented as a variable or an attribute of type **`string`** with _n_ dimensions (only _n_=1 is allowed for an attribute) or as a variable of type **`char`** with _n_+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
 For example, a **`char`** variable containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
