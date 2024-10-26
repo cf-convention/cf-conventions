@@ -193,7 +193,6 @@ The time coordinate and the datetime are interconvertible given the **`calendar`
 
 Variables containing time coordinates must always explicitly include the **`units`** attribute, formatted as described in <<time-coordinate-units>>.
 There is no default value for the **`units`**.
-
 A coordinate variable is identifiable as a time coordinate variable from its **`units`** alone.
 Optionally, a time coordinate variable may be indicated additionally by providing the **`standard_name`** attribute with an appropriate value, and/or the **`axis`** attribute with the value **`T`**.
 
@@ -272,21 +271,21 @@ Subtracting the time zone offset from a given datetime converts it to the equiva
 [[calendar, Section 4.4.2, "Calendar"]]
 ==== Calendar
 
-The calendar defines the set of dates (year-month-day combinations) which are permitted, and therefore it specifies the number of days between the times of **`0:0:0`** (midnight at 0 `degrees_east`) on any two dates.
-Note that the CF meaning of "calendar" is more general than the <<ISO_8601>> definition, because the latter considers only the real-world Gregorian calendar.
+The calendar defines the set of valid datetimes and their order.
+Note that the CF meaning of "calendar" refers to datetimes, whereas the <<ISO_8601>> definition refers only to dates.
 Datetimes which are not permitted in a given calendar are prohibited both in the time coordinate values and in the reference datetime string in the **`units`**.
+It is recommended that the calendar be specified by the **`calendar`** attribute of the time coordinate variable.
+The values currently defined for **`calendar`** are listed below.
 
-A given time coordinate value can represent different datetimes in different calendars; conversely, a given datetime is represented by different time coordinate values in different calendars.
+Because the calendars have different sets of valid dates, and different treatments of leap seconds (see below in this section, and <<leap-seconds>>), a given time coordinate value with given **`units`** can represent different datetimes in different calendars; conversely, a given datetime is represented by different time coordinate values in different calendars.
 Moreover, in different calendars a given datetime can identify a different instant in the continuous physical dimension of time.
 // Examples of these situations are shown in the table of *Appendix ???*.
 
-It is recommended that the calendar be specified by the **`calendar`** attribute of the time coordinate variable.
-The values currently defined for **`calendar`** are listed below.
 The lengths of the months in the Gregorian calendar are used in all calendars except **`360_day`**, **`none`** (see <<none-calendar>>) and explicitly defined calendars (see <<explicit-calendar>>).
 The calendars differ in their treatment of leap years (when there are 29 days in February instead of 28).
 
-In the real world, the international basis of civil timekeeping is Coordinated Universal Time (UTC).
-Leap seconds are adjustments made to UTC at irregular and unpredictable intervals in response to slight variations in the Earth's rotation speed, in order to keep UTC close to mean solar time at 0 `degrees_east` i.e. the time zone with the default (zero) time zone offset in UDUNITS and CF (see <<time-coordinate-units>>).
+Leap seconds are adjustments made at irregular and unpredictable intervals in Coordinated Universal Time (UTC), the international basis of civil timekeeping in he real world.
+In response to slight variations in the Earth's rotation speed, positive or negative leap seconds are inserted in order to keep UTC close to mean solar time at 0 `degrees_east` i.e. the time zone with the default (zero) time zone offset in UDUNITS and CF (see <<time-coordinate-units>>).
 When a positive leap second is introduced at the end of a minute, that minute contains 61 seconds; 27 leap seconds have been added to UTC since 1958, most recently at the end of 2016.
 A minute would contain 59 seconds if it contained a negative leap second, but none have been introduced up to now.
 It has been decided that after 2035 no further leap seconds will be added.
