@@ -21,6 +21,8 @@
 #
 name: Asciidoctor Build Workflow
 on:
+  # manually run workflow
+  workflow_dispatch:
   # trigger on PR event against main (will not run publish job)
   pull_request:
     branches: [ main ]
@@ -35,86 +37,32 @@ on:
       - published
 jobs:
   # Job to build cf-conventions.html, cf-conventions.pdf
-  build_conventions:
-    name: Build cf-conventions html and pdf
+  build_conventions_and_conformance:
+    name: Build cf-conventions and conformance html and pdf
     runs-on: ubuntu-latest
     steps:
     # Check out PR
-    - uses: actions/checkout@v3
-    # Create build directory
-    - run: mkdir conventions_build
-    - name: Set draft date-time formatting
-      if: github.event_name != 'release'
-      run: |
-        echo "DATE_FMT=+%d&#160;%B,&#160;%Y&#160;%H:%M:%SZ" >> "$GITHUB_ENV"
-    - name: Set "final" tag and date-time formatting
+    - uses: actions/checkout@v4
+    # If it is release event, tag for final
+    - name: If it is a release add the "final" tag and date timestamp formatting
       if: github.event_name == 'release'
       run: |
-        echo "FINAL_TAG=-a final" >> "$GITHUB_ENV"; echo "DATE_FMT=+%d&#160;%B,&#160;%Y" >> "$GITHUB_ENV"
+        echo "CF_FINAL=True" >> "$GITHUB_ENV"
     # Build cf-conventions.html using the Analog-inc asciidoctor-action
-    - name: Build cf-conventions.html
-      uses: Analog-inc/asciidoctor-action@v1.2
+    - name: Make ALL
+      uses: Analog-inc/asciidoctor-action@v1
       with:
-        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) cf-conventions.adoc -D conventions_build; cp -r images conventions_build'
-    # Patch the cfconventions.org link
-    - run: sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' ./conventions_build/cf-conventions.html
-    # Build cf-conventions.pdf using the Analog-inc asciidoctor-action
-    - name: Build cf-conventions.pdf
-      uses: Analog-inc/asciidoctor-action@v1.2
-      with:
-        shellcommand: 'asciidoctor-pdf --verbose ${FINAL_TAG} -a docprodtime=$(date -u ${DATE_FMT}) -d book -a pdf-theme=default-theme-CF-version.yml --trace cf-conventions.adoc -D conventions_build'
-    # Upload artifact containing cf-conventions.html, cf-conventions.pdf
-    - name: Upload cf-conventions doc preview
-      uses: actions/upload-artifact@v3
-      with:
-        name: conventions_docs
-        path: conventions_build/
-  # Job to build conformance.html, conformance.pdf
-  build_conformance:
-    name: Build conformance html and pdf
-    runs-on: ubuntu-latest
-    steps:
-    # Checkout PR
-    - uses: actions/checkout@v3
-    # Create build directory
-    - run: mkdir conformance_build
-    - name: Set "final" tag
-      if: github.event_name == 'release'
+        shellcommand: 'make all'
+    - name: Copy index.html
       run: |
-        echo "FINAL_TAG=-a final" >> "$GITHUB_ENV"
-    # Build conformance.html using the Analog-inc asciidoctor-action
-    - name: Build conformance.html
-      uses: Analog-inc/asciidoctor-action@v1.2
-      with:
-        shellcommand: 'asciidoctor --verbose ${FINAL_TAG} conformance.adoc -D conformance_build'
-    # Build conformance.pdf using the Analog-inc asciidoctor-action
-    - name: Build conformance.pdf
-      uses: Analog-inc/asciidoctor-action@v1.2
-      with:
-        shellcommand: 'asciidoctor-pdf --verbose ${FINAL_TAG} -d book conformance.adoc -D conformance_build'
-    # Upload artifact containing conformance.html, conformance.pdf
-    - name: Upload conformance doc preview
-      uses: actions/upload-artifact@v3
-      with:
-        name: conformance_docs
-        path: conformance_build/
+        sudo cp -p .github/gh-pages/index.html build/
 
-  # Job to an artifact of the images/ directory.
-  # Only needed if we are going to run the publish job.
-  images_artifact:
-    name: Create artifact of image directory
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-    # Checkout ref
-    - uses: actions/checkout@v3
-    # Create the image_directory artifact
-    - name: Upload images directory
-      uses: actions/upload-artifact@v3
+    # Upload artifact containing cf-conventions.html, cf-conventions.pdf
+    - name: Save cf-conventions and conformance docs
+      uses: actions/upload-artifact@v4
       with:
-        name: image_directory
-        path: images/
-
+        name: convention_and_conformance_docs
+        path: build/
   # Use artifacts from the build_conventions, build_conformance, and
   # images_artifact jobs to update the gh-pages branch. The location of the
   # files to be updated depend on whether the job it triggered from a PR merge
@@ -122,15 +70,15 @@ jobs:
   # triggered by the publication of a release on github (new files are created
   # in a directory named after the release name).
   publish:
-    name: Release cf-conventions html and pdf
+    name: Release cf-conventions and conformance html and pdf
     # Do not run on pull requests
     if: github.event_name != 'pull_request'
     # Wait for the build artifacts to become available
-    needs: [build_conventions, build_conformance, images_artifact]
+    needs: [build_conventions_and_conformance]
     runs-on: ubuntu-latest
     steps:
       # Checkout gh-pages branch
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: 'gh-pages'
       # Will new docs go into root, or into a directory named after the
@@ -145,8 +93,9 @@ jobs:
           fi
       # Obtain the build artifacts from the previous jobs and place them in the
       # build/ directory
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
+          name: convention_and_conformance_docs
           path: build/
       # If we are doing a release, we need to create the release directory
       - name: Make release directory
@@ -157,14 +106,13 @@ jobs:
       - name: Remove old images directory
         if: github.event_name != 'release'
         run: rm -rf ${{ env.TARGET_DIR }}/images
-      - name: Move images directory to target directory
-        run: mv build/image_directory ${{ env.TARGET_DIR }}/images
       - name: Copy conventions and conformance documents
         run: |
-          cp build/conventions_docs/cf-conventions.html ${{ env.TARGET_DIR }}/
-          cp build/conventions_docs/cf-conventions.pdf ${{ env.TARGET_DIR }}/
-          cp build/conformance_docs/conformance.html ${{ env.TARGET_DIR }}/
-          cp build/conformance_docs/conformance.pdf ${{ env.TARGET_DIR }}/
+          cp -p build/cf-conventions.html ${{ env.TARGET_DIR }}/
+          cp -p build/cf-conventions.pdf ${{ env.TARGET_DIR }}/
+          cp -p build/conformance.html ${{ env.TARGET_DIR }}/
+          cp -p build/conformance.pdf ${{ env.TARGET_DIR }}/
+          cp -p build/index.html ${{ env.TARGET_DIR }}/
       # Remove the directory that held the artifacts so that it does not get
       # committed to the gh-pages branch
       - name: Remove artifact directory
@@ -174,7 +122,7 @@ jobs:
       - name: Update release index.html to point to new release
         if: github.event_name == 'release'
         run: |
-          sed s/Latest/"${GITHUB_REF##*/}"/ index.html > ${{ env.TARGET_DIR }}/index.html;
+          sed -i s/Latest/"${GITHUB_REF##*/}"/ ${{ env.TARGET_DIR }}/index.html;
       # Stage all changed files to git
       - name: Add all changes to git
         run: git add --all
