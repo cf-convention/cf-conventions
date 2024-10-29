@@ -130,36 +130,38 @@ References can be absolute, relative or with no path, in which case, the variabl
 *Requirements:*
 
 * An aggregation variable has an **`aggregated_dimensions`** attribute whose string value is a blank-separated list of zero or more aggregated dimension names.
-Each aggregated dimension must name a dimension in the file.
+
+* Each aggregated dimension must name a dimension in the file.
 
 * An aggregation variable must be a scalar.
 
 * An aggregation variable must have an **`aggregated_data`** attribute whose string value comprises blank-separated elements of the form __feature: variable__.
   Each __variable__ must be the name of a variable in the file.
-  The __feature__ keywords must comprise either all three of the `map`, `location`, and `identifier` keyords; or else both of the `map` and `unique_value` keywords.
+  The feature keywords must comprise either `map`, `location`, and `identifier`, or else `map` and `unique_value`.
 
-  ** The `location` variable must have a string data type.
+* A `location` variable must have a string data type.
 
   ** The `location` variable must have the same number of dimensions as there are aggregated dimensions, with the optional addition of one extra trailing dimension.
-
+  ** The size of each dimension, except the optional extra trailing dimension, must be the equal to number of valid values in the corresponding row of the `map` variable.
+    *** If there is no extra trailing dimension then the variable must have no missing values.
+    *** If there is an extra trailing dimension and the variable contains missing values, then those missing values must all be at the end of the extra trailing dimension.
   ** The `location` variable's **`substitutions`** attribute, if it exists, must be a string whose value is list of blank-separated word pairs in the form __substitution: replacement__.
   Each __substitution__ keyword must have the form `${\*}`, where `*` represents any number of any characters.
-
   ** A data value of a `location` variable, after any string substitutions defined by the **`substitutions`** attribute have been applied, must be either an absolute URI or else a relative-path URI reference.
+  ** A data value of a `location` variable must be independent of the order in which string substitutions are applied.
 
-  ** The `identifier` variable must be either a scalar, or else have the same dimensions in the same order as the `location` variable.
+* An `identifier` variable must be either a scalar, or else have the same dimensions in the same order as the `location` variable.
+ ** When the `identifier` variable is a scalar it must not contain a missing value.
+ ** When the `identifier` variable has the same dimensions as the `location` variable it must have the same distribution of missing values as the `location` variable.
 
-  ** The `unique_value` variable must have the same number of dimensions as there are aggregated dimensions.
-
-  ** The `map` variable must have an integer data type.
-
+* The `unique_value` variable must have the same number of dimensions as there are aggregated dimensions.
+  ** The size of each dimension must be equal to the number of valid values in the corresponding row of the `map` variable.
+  
+* The `map` variable must have an integer data type.
   ** If there are zero aggregated dimensions then the `map` variable must a be scalar and contain the value `1`.
-
   ** If there are one or more aggregated dimensions then the `map` variable must be two-dimensional.
-    *** The size of the slower-varying dimension (i.e. the first dimension in CDL order, representing rows) must be the number of aggregated dimensions.
-    *** The size of the more rapidly-varying dimension (i.e. the second dimension in CDL order) must either be equal the size of the largest of the `unique_value` variable dimensions, or else be equal to size of the largest of the `location` variable dimensions, excluding the extra trailing dimension if the `location` variable has one.
-
-  *** The rows correspond to the aggregated dimensions in the order in which they are defined by the **`aggregated_dimensions`** attribute, and the sum of each row's non-missing values must equal the size of its corresponding aggregated dimension.
+  *** The size of the slower-varying dimension (i.e. the first dimension in CDL order, representing rows) must be the number of aggregated dimensions.
+  *** The sum of the valie values in a row must equal the size of the corresponding aggregated dimension.
 
 *Recommendations:*
 
