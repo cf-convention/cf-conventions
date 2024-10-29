@@ -230,8 +230,8 @@ The CF standard follows UDUNITS in the definition of units, but we recommend tha
 
 UDUNITS defines a **`minute`** as 60 **`seconds`**, an **`hour`** as 3600 **`seconds`** and a **`day`** as 86400 **`seconds`**.
 These are not calendar units.
-When civil clock time changes at the start and end of summer in many countries, the day according to its calendar date lasts for 23 or 25 hours, but the UDUNITS and CF **`day`** is always 24 **`hours`**.
 When a leap second is inserted into UTC, the minute, hour and day affected differ by one second from their usual durations according to clock time, but the UDUNITS and CF **`minute`**, **`hour`** and **`day`** do not; they are fixed units of measure.
+See also <<leap-seconds>>.
 
 UDUNITS permits a number of alternatives to the word **`since`** in the units of time coordinates.
 All the alternatives have exactly the same meaning in UDUNITS.
@@ -246,6 +246,8 @@ Its format is __y__-__m__-__d__ [__H__:__M__:__S__ [__Z__]], where [...] indicat
 * _S_ is second, which may be integer or floating point (see <<leap-seconds>> regarding __S__>59),
 
 * _Z_ is the time zone offset.
+This is an interval of time, specified in one of the formats described below.
+Time zone names or acronyms are not allowed.
 
 The default time zone offset is zero.
 In a time zone with zero offset, time (approximately) equals mean solar time for 0 `degrees_east` of longitude.
@@ -254,7 +256,7 @@ If both time and time zone offset are omitted the time is 00:00:00 (the beginnin
 Thus, **`units = "days since 1990-1-1"`** means the same as **`units = "days since 1990-1-1 0:0:0"`**.
 Note that this interpretation of omitted time, which is an aspect of UDUNITS syntax, is different from <<ISO_8601>>, in which omitted time implies lack of precision.
 
-The time zone offset _Z_ has four possible formats, any of which may be prefixed with a sign:
+The time zone offset _Z_ must be in one of the following four formats, any of which may be prefixed with a sign:
 
 ** _H_, the hour alone, of one or two digits e.g. **`-6`**, **`2`**, **`+11`**, which is sufficient for many time zones.
 
@@ -284,11 +286,10 @@ Moreover, in different calendars a given datetime can identify a different insta
 The lengths of the months in the Gregorian calendar are used in all calendars except **`360_day`**, **`none`** (see <<none-calendar>>) and explicitly defined calendars (see <<explicit-calendar>>).
 The calendars differ in their treatment of leap years (when there are 29 days in February instead of 28).
 
-Leap seconds are adjustments made at irregular and unpredictable intervals in Coordinated Universal Time (UTC), the international basis of civil timekeeping in the real world.
+Leap seconds are adjustments made at irregular and unpredictable intervals in Coordinated Universal Time (link:$$https://en.wikipedia.org/wiki/Coordinated_Universal_Time$$[UTC]).
 In response to slight variations in the Earth's rotation speed, positive or negative leap seconds are inserted in order to keep UTC close to mean solar time at 0 `degrees_east` i.e. the time zone with the default (zero) time zone offset in UDUNITS and CF (see <<time-coordinate-units>>).
-When a positive leap second is introduced at the end of a minute, that minute contains 61 seconds; 27 leap seconds have been added to UTC since 1958, most recently at the end of 2016.
-A minute would contain 59 seconds if it included a negative leap second, but none have been introduced up to now.
-It has been decided that after 2035 no further leap seconds will be added.
+When a single positive leap second is introduced at the end of a minute, that minute contains 61 seconds.
+The net number of leap seconds added to UTC between 1958-1-1 and 2025-1-1 is 37.
 The CF calendars differ in their treatment of leap seconds (see <<leap-seconds>>).
 
 In the **`julian`** and the default **`standard`** calendar, dates in years before year 0 (i.e. before 0-1-1 0:0:0) are not allowed, and the year in the reference datetime of the units must not be negative.
@@ -321,12 +322,18 @@ See also <<leap-seconds>>.
 Datetimes before 1958-01-01 0:0:0 are not allowed in this calendar.
 Datetimes in the future are not allowed in this calendar, because it is unknown when future leap seconds will occur.
 When a datetime is converted to a time coordinate value or vice-versa in this calendar, any leap seconds (positive or negative) must be counted that occurred in the interval between the datetime and the reference datetime in the **`units`**.
-A datetime in the **`utc`** calendar represents an instant that is earlier than the same datetime in the **`tai`** calendar, by the net number of leap seconds introduced since 1958-01-01, which is the same instant in **`utc`** and **`tai`**, when both of them began.
+For any given instant, the **`utc`** datetime is behind the **`tai`** datetime, where "behind" means the same as it does when describing a timezone to the west as being behind one to the east.
+The difference between the two datetimes for a given instant of time is the net number of leap seconds introduced since 1958-01-01.
+The difference was zero on that instant, when both calendars began.
+This means that a given datetime in the **`utc`** calendar represents an instant that is earlier than the same datetime in the **`tai`** calendar.
 See also <<leap-seconds>>.
 
 **`tai`**:: A Gregorian calendar __without__ leap seconds that is based on International Atomic Time (TAI).
 Datetimes before 1958-01-01 0:0:0 are not allowed in this calendar.
-A datetime in the **`tai`** calendar represents an instant that is later than the same datetime in the **`utc`** calendar, by the net number of leap seconds introduced since 1958-01-01, which is the same instant in **`utc`** and **`tai`**, when both of them began.
+For any given instant, the **`tai`** datetime is ahead of the **`utc`** datetime, where "ahead" means the same as it does when describing a timezone to the east as being ahead of one to the west.
+The difference between the two datetimes for a given instant of time is the net number of leap seconds introduced since 1958-01-01.
+The difference was zero on that instant, when both calendars began.
+This means that a given datetime in the **`tai`** calendar represents an instant that is later than the same datetime in the **`utc`** calendar.
 See also <<leap-seconds>>.
 
 **`noleap`** or **`365_day`**:: A calendar with no leap years, i.e., all years are 365 days long, and there are no leap seconds.
@@ -345,9 +352,9 @@ Any other value may be given to the **`calendar`** attribute to describe an expl
 
 This section describes how to deal properly with leap seconds.
 Most people ignore the existence of leap seconds, including many data producers and the CF standard before version 1.12.
-As a result, the time coordinates of two real-world observational datasets could disagree by up to 27 seconds if one has taken leap seconds into account and the other has not.
+As a result, the time coordinates of two real-world observational datasets could disagree by some number of seconds if one has taken leap seconds into account and the other has not.
 Practically speaking, this means that if you are working with real-world data, and if it's important for your time coordinates to be accurate to the second, you need to care about leap seconds.
-Otherwise, you need only to be aware that the difference between two time coordinates might not exactly equal the duration of the time interval between the two instants, but could be inaccurate by up to 27 seconds, if leap seconds are involved.
+Otherwise, you need only to be aware that the difference between two time coordinates might not exactly equal the duration of the time interval between the two instants, but could be inaccurate by a number of seconds, if leap seconds are involved.
 Relatedly, two instants with the same time of day on different days, which would always be separated by a multiple of 86400 seconds if there were no leap seconds, will have a few more seconds between them if leap seconds intervene.
 
 Each calendar defines a set of valid combinations of the six numbers year-month-day-hour-minute-second.
