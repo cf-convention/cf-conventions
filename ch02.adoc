@@ -396,7 +396,7 @@ Each of these rows contains the sizes of the fragments along that dimension, pad
  90  45  45
 180 180   _
 ```
-We can see that the shape of the fragment (in its canonical form, see <<fragment-interpretation>>) at position `[0, 1, 1]` of the array of fragments is `(17, 45, 180)`; and this fragment occupies zero-based indices 0 to 16 of the Z aggregated dimension, 90 to 134 of the Y aggregated dimension, and 180 to 359 of the X aggregated dimension.
+It follows that the shape of the fragment (in its canonical form, see <<fragment-interpretation>>) at position `[0, 1, 1]` of the array of fragments is `(17, 45, 180)`; and this fragment occupies zero-based indices 0 to 16 of the Z aggregated dimension, 90 to 134 of the Y aggregated dimension, and 180 to 359 of the X aggregated dimension.
 
 In the special case that aggregated data is scalar, the `map` variable must also be scalar and contain the value `1`.
 See <<example-L.7>>.
@@ -441,7 +441,7 @@ See <<example-L.1>> and <<example-L.5>>.
 
 When the data values within each fragment are all identical, the `unique_value` variable allows these unique values to be explicitly stored in the aggregation file, rather than by reference to external fragment datasets via the `location` and `identifier` variables.
 The `unique_value` variable dimensions are those of the array of fragments, and the data provide the unique value for each fragment.
-The fragment implied by a unique value has dimensions corresponding to the aggregated dimensions, and the implied fragment shape is defined by the `map` variable.
+The fragment implied by a unique value has dimensions corresponding to the aggregated dimensions, and the fragment shape is defined by the `map` variable.
 When a fragment contains wholly missing data, its unique value is specified as any missing value defined by the aggregation variable.
 See <<example-L.6>>, which uses an ancillary aggregation variable to make global attributes from the fragment datasets available in the aggregation file.
 
@@ -529,7 +529,8 @@ The canonical form of a fragment's data is such that:
 
 5. The fragment's data are unpacked (as described in <<packed-data>>).
 
-It is allowed for a fragment to have a different number of data dimensions than the aggregated data, as well as different units, data type and missing values, provided that is is possible to transform the fragment to its canonical form without loss of information.
+A fragment dataset can deviate from any of these requirements, provided that it is possible to convert the fragment to its canonical form without changing the meaning of the data.
+For instance, if the aggregation variable had units of `kg m-2`, then the fragment data could have any of the equivalent units `kg m-2`, `g cm-2`, etc., but it would be an error if the fragment had any other unit for which its values can not be converted to `kg m-2` (such `K`).
 
 The conversion of the fragment's data to its canonical form is carried out by the application program which is creating the aggregated data in memory. The application program can ignore any metadata and variables in a fragment dataset that are not needed for the conversion to the canonical form.
 When transforming a fragment's data to its canonical form, note that:
