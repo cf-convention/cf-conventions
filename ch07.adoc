@@ -24,7 +24,7 @@ If cell boundaries are not provided (using the **`bounds`** attribute), an appli
 Without a boundary variable, it is unknown whether adjacent cells are contiguous, separated by a gap, or overlapping.
 If the data value pertains to the gridpoint alone, rather than to an interval, area or _n_-dimensional volume of non-zero size, it is recommended to indicate this with a **`cell_methods`** entry of **`point`** (<<cell-methods>>).
 In that case, the cell is irrelevant to the data and the bounds are arbitrary.
-Nonetheless, the bounds may still be present, for instance if the grid is shared by other data variables that pertain to cells, and it may be useful for generic applications to be given some indication of cells for graphical purposes.
+Nonetheless, the bounds may still be included, for instance because the grid is shared by other data variables that pertain to cells, or to provide some indication of cells to generic applications for graphical purposes.
 A cell of truly zero size can be indicated by giving it coincident boundaries.
 
 A boundary variable must have one more dimension than its associated coordinate or auxiliary coordinate variable.
@@ -75,12 +75,12 @@ variables:
     time:bounds = "time_bnds";
   float time_bnds(time,nv);
 ----
-The boundary variable **`time_bnds`** associates an time point **`i`** with the time interval whose boundaries are **`time_bnds(i,0)`** and **`time_bnds(i,1)`**.
+The boundary variable **`time_bnds`** associates a time point **`i`** with the time interval whose boundaries are **`time_bnds(i,0)`** and **`time_bnds(i,1)`**.
 The instant **`time(i)`** should be contained within the interval, or be at one end of it.
-For instance, for some **`i`** we might have **`time(i)=10.5`**, **`time_bnds(i,0)=10.0`**, **`time_bnds(i,1)=11.0`**.
-Since the coordinate variables are increasing e.g. **`time(1)`** &gt; **`time(0)`**, so must the bounds i.e. **`timebnd(i,1)`** &gt;= **`timebnd(i,0)`** for all **`i`** (<<img-bnd_1d_coords>>).
+For instance, with **`i=2`** we might have **`time(2)=10.5`**, **`time_bnds(2,0)=10.0`**, **`time_bnds(2,1)=11.0`**.
+If the times are increasing e.g. **`time(3)`** = **`11.5`** &gt; **`10.5`** = **`time(2)`**, which implies **`time(i+1)`** &gt; **`time(i)`** for all **`i`** because coordinates must be monotonic, the bounds must also be increasing for all **`i`**, e.g. **`timebnd(2,1)`** &gt;= **`timebnd(2,0)`**.
 If adjacent intervals are contiguous, the shared endpoint must be identical.
-For example, if the intervals that contain grid points **`time(i)`** and **`time(i+1)`** are contiguous, it is required that **`timebnd(i+1,0)`** = **`timebnd(i,1)`**.
+For example, if the interval **`i=3`** begins at **`11.0`** days, when interval **`i=2`** ends, the values in **`timebnd(3,0)`** and **`timebnd(2,1)`** must be _exactly_ the same.
 ====
 
 
