@@ -71,8 +71,9 @@ The netCDF utilities ncdump and ncgen use this format (see
 link:$$https://docs.unidata.ucar.edu/nug/current/_c_d_l.html$$[NUG section on CDL syntax]).
 All examples in this document use CDL syntax.
 
-cell:: A region in one or more dimensions whose boundary can be described by a set of vertices.
+cell:: A region in one or more dimensions whose boundary can be described by a set of vertices recorded in boundary variables.
 The term __interval__ is sometimes used for one-dimensional cells.
+A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept (see <<overview>>).
 
 coordinate variable:: A coordinate variable is a one-dimensional variable with the same name as its dimension e.g., **`time(time)`**.
 In CF, a coordinate variable must be of a numeric data type (note that
@@ -128,6 +129,7 @@ vertex dimension:: The dimension of a boundary variable along which the vertices
 
 vertical dimension:: A dimension of a netCDF variable that has an associated vertical coordinate variable.
 
+[[overview, Section 1.4, "Overview"]]
 === Overview
 
 No variable or dimension names are standardized by this convention.
@@ -172,9 +174,17 @@ On the other hand identifying the vertical coordinate is not necessarily suffici
 In particular a model may output data on the parametric (usually dimensionless) vertical coordinate used in its mathematical formulation.
 To achieve the goal of being able to spatially locate all data values, this convention provides a mapping, via the **`standard_name`** and **`formula_terms`** attributes of a parametric vertical coordinate variable, between its values and dimensional vertical coordinate values that can be uniquely located with respect to a point on the earth's surface (<<parametric-vertical-coordinate>>; <<parametric-v-coord>>).
 
-It is often the case that data values are not representative of single points in time and/or space, but rather of intervals or multidimensional cells.
-This convention defines a **`bounds`** attribute to specify the extent of intervals or cells.
-When data that is representative of cells can be described by simple statistical methods, those methods can be indicated using the **`cell_methods`** attribute.
+It is often the case that data values are not representative of single points in time, space and other dimensions, but rather of intervals or multidimensional cells.
+CF defines a **`bounds`** attribute to specify the extent of intervals or cells.
+Because both the <<NUG>> and <<COARDS>> define coordinate variables but not cells or bounds, many applications assume that gridpoints are always located at the centers of their cells.
+This assumption does not hold in CF. If bounds are not provided, the location of the gridpoint within the cell is undefined, and nothing can assumed about the location and extent of the cell.
+
+A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept.
+Pixels in a raster are rectangular, all of the same size, and arranged in a logically rectangular array with their nominal point locations at their centers.
+By contrast, two-dimensional cells in a CF field do not necessarily satisfy any of those conditions, though they commonly do.
+Furthermore, as an alternative to cells in two dimensions, CF defines a convention for the case where each data value is associated with a geographical feature that is described by one or more points, lines or polygons.
+
+When data that is representative of cells can be described by simple statistical methods (for instance, mean or maximum), those methods can be indicated using the **`cell_methods`** attribute.
 An important application of this attribute is to describe climatological and diurnal statistics.
 
 Methods for reducing the total volume of data include both packing and compression.
