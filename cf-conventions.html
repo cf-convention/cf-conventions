@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.12 draft,</span>
-<span id="revdate">&#160;&#160;30&#160;October,&#160;2024&#160;15:21:44Z</span>
+<span id="revdate">&#160;&#160;23&#160;November,&#160;2024&#160;10:06:54Z</span>
 <br><span id="revremark">See&#160;<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>&#160;for&#160;further&#160;information.</span>
 </div>
 </div>
@@ -1420,7 +1420,7 @@ We also introduce new attributes for describing the contents of a file.</p>
 <h3 id="_data_types"><a class="anchor" href="#_data_types"></a>2.2. Data Types</h3>
 <div class="paragraph">
 <p>Data variables must be one of the following data types: <strong><code>string</code></strong>, <strong><code>char</code></strong>, <strong><code>byte</code></strong>, <strong><code>unsigned byte</code></strong>, <strong><code>short</code></strong>, <strong><code>unsigned short</code></strong>, <strong><code>int</code></strong>, <strong><code>unsigned int</code></strong>, <strong><code>int64</code></strong>, <strong><code>unsigned int64</code></strong>, <strong><code>float</code></strong> or <strong><code>real</code></strong>, and <strong><code>double</code></strong> (which are all the <a href="https://docs.unidata.ucar.edu/nug/current/md_types.html">netCDF external data types</a> supported by netCDF-4).
-The <strong><code>string</code></strong> type is only available in files using the netCDF version 4 (netCDF-4) format.
+The <strong><code>string</code></strong> type, which has variable length, is only available in files using the netCDF version 4 (netCDF-4) format.
 The <strong><code>char</code></strong> and <strong><code>string</code></strong> types are not intended for numeric data.
 One byte numeric data should be stored using the <strong><code>byte</code></strong> or <strong><code>unsigned byte</code></strong> data types.
 It is possible to treat the <strong><code>byte</code></strong> and <strong><code>short</code></strong> types as unsigned by using the NUG convention of indicating the unsigned range using the <strong><code>valid_min</code></strong>, <strong><code>valid_max</code></strong>, or <strong><code>valid_range</code></strong> attributes.
@@ -1428,11 +1428,19 @@ In many situations, any integer type may be used.
 When the phrase "integer type" is used in this document, it should be understood to mean <strong><code>byte</code></strong>, <strong><code>unsigned byte</code></strong>, <strong><code>short</code></strong>, <strong><code>unsigned short</code></strong>, <strong><code>int</code></strong>, <strong><code>unsigned int</code></strong>, <strong><code>int64</code></strong>, or <strong><code>unsigned int64</code></strong>.</p>
 </div>
 <div class="paragraph">
-<p>Strings in variables may be represented one of two ways - as atomic strings or as character arrays.
-An n-dimensional array of strings may be implemented as a variable of type <strong><code>string</code></strong> with <em>n</em> dimensions, or as a variable of type <strong><code>char</code></strong> with <em>n</em>+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
-For example, a character array variable of strings containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
-The other strings, such as "May", should be padded with trailing NULL or space characters so that every array element is filled.
-If the atomic string option is chosen, each element of the variable can be assigned a string with a different length.
+<p>A text string can be stored either in a variable-length <strong><code>string</code></strong> or in a fixed-length <strong><code>char</code></strong> array.
+In both cases, text strings must be represented in Unicode Normalization Form C (NFC, <a href="https://www.unicode.org/versions/Unicode16.0.0/UnicodeStandard-16.0.pdf">section 3.11</a> and <a href="https://unicode.org/reports/tr15">Annex 15</a> of the Unicode standard) and encoded according to UTF-8.
+A text string consisting only of ASCII characters is guaranteed to conform with this requirement, because the ASCII characters are a subset of Unicode, and their NFC UTF-8 encodings are the same as their one-byte ASCII codes (decimal 0-127, hexadecimal <code>00</code>-<code>7F</code>).</p>
+</div>
+<div class="paragraph">
+<p>Before version 1.12, CF did not require UTF-8 encoding, and did not provide or endorse any convention to record what encoding was used.
+However, if the text string is stored in a <strong><code>char</code></strong> variable, the encoding might be recorded by the <strong><code>_Encoding</code></strong> attribute, although this is not a CF or NUG convention.</p>
+</div>
+<div class="paragraph">
+<p>An <em>n</em>-dimensional array of strings may be implemented as a variable or an attribute of type <strong><code>string</code></strong> with <em>n</em> dimensions (only <em>n</em>=1 is allowed for an attribute) or as a variable of type <strong><code>char</code></strong> with <em>n</em>+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
+For example, a <strong><code>char</code></strong> variable containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
+The other strings, such as "May", would be padded with trailing NULL or space characters so that every array element is filled.
+A <strong><code>string</code></strong> variable to store the same information would be dimensioned (12), with each element of the array containing a string of the appropriate length.
 The CDL example below shows one variable of each type.</p>
 </div>
 <div id="char-and-string-variables-ex" class="exampleblock">
@@ -12414,6 +12422,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/141">Issue #141</a>: Clarification that text may be stored in variables and attributes as either vlen strings or char arrays, and must be represented in Unicode Normalization Form C and encoded according to UTF-8.</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/367">Issue #367</a>: Remove the AMIP and GRIB columns from the standard name table format defined by Appendix B.</p>
 </li>
 <li>
@@ -13087,7 +13098,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.12 draft<br>
-Last updated 2024-10-30 15:21:44 UTC
+Last updated 2024-11-23 10:06:54 UTC
 </div>
 </div>
 </body>
