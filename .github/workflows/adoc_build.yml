@@ -18,24 +18,18 @@
 #   https://github.com/Analog-inc/asciidoctor-action
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
-#   https://github.com/action-badges/create-orphan-branch
-#
-#   Custom workflow for pages deployment
-#     
+
 name: Asciidoctor Build Workflow
 on:
-  # manually run workflow
-  workflow_dispatch:
-  # trigger on PR event against main branch
-  pull_request:
-    branches: [ main ]
-  # Trigger on a push on branch except gh-pages branch
-  push:
-    branches-ignore: [ gh-pages ]
-  # Trigger when a GitHub release is published.
-  release:
+  workflow_dispatch:  # Manual trigger
+  pull_request:       # On pull request to main
+    branches: [main]
+  push:               # On push any branch (excluding gh-pages)
+    branches-ignore: [gh-pages]
+  release:            # On release published
     types:
       - published
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: write
@@ -48,123 +42,145 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-jobs: 
-  # Job to build cf-conventions.html, cf-conventions.pdf
-  build_conventions_and_conformance:
-    name: Build cf-conventions and conformance html and pdf
-    runs-on: ubuntu-latest
-    steps:
-    # Check out PR
-    - uses: actions/checkout@v4
-    # If it is release event, tag for final
-    - name: If it is a release add the "final" tag and date timestamp formatting
-      if: github.event_name == 'release'
-      run: |
-        echo "CF_FINAL=True" >> "$GITHUB_ENV"
-    # Build cf-conventions.html using the Analog-inc asciidoctor-action
-    - name: Make ALL
-      uses: Analog-inc/asciidoctor-action@v1
-      with:
-        shellcommand: 'make all'
-    - name: Copy index.html
-      run: |
-        sudo cp -p .github/gh-pages/index.html build/
-    # Update H1 header
-    - name: Update H1 header
-      run: |
-        PATH_REVISION="${GITHUB_REPOSITORY}/${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}@${GITHUB_SHA:0:7}"
-        sudo sed -i s/Latest/"${PATH_REVISION//\//\\/}"/ build/index.html;
-    # Upload artifact containing cf-conventions.html, cf-conventions.pdf
-    - name: Save cf-conventions and conformance docs
-      uses: actions/upload-artifact@v4
-      with:
-        name: convention_and_conformance_docs
-        path: build/
-  # Use artifacts from the build_conventions, build_conformance, and
-  # images_artifact jobs to update the gh-pages branch. The location of the
-  # files to be updated depend on whether the job it triggered from a PR merge
-  # into main (files in the base directory are updated), or if the job is
-  # triggered by the publication of a release on github (new files are created
-  # in a directory named after the release name).
-  publish:
-    name: Release cf-conventions and conformance html and pdf
-    # Do not run on pull requests
-    if: github.event_name != 'pull_request'
-    # Wait for the build artifacts to become available
-    needs: [build_conventions_and_conformance]
-    
-#    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-#    permissions:
-#      pages: write      # to deploy to Pages
-#      id-token: write   # to verify the deployment originates from an appropriate source
+env:
+DESIRED_BRANCH: "gh-pages"       # Branch to use for GitHub Pages
+DESIRED_PATH: "/"               # Path to use for GitHub Pages
+DESIRED_BUILD_TYPE: "legacy"    # Build type for GitHub Pages
 
-#    # Deploy to the github-pages environment
-#    environment:
-#      name: github-pages
-#      url: ${{ steps.deployment.outputs.page_url }}
-    
+jobs: 
+  # Job to build documents
+  build_docs:
+    name: Build Documentation
     runs-on: ubuntu-latest
+    
     steps:
-      # Checkout repo
-      - uses: actions/checkout@v4
-      # create a new orphan branch if a branch with the given name does not already exist
-      - name: Create Orphan Branch
-        uses: action-badges/create-orphan-branch@0.1.1
-        with:
-          branch-name: 'gh-pages'
-      # Checkout gh-pages branch
-      - uses: actions/checkout@v4
-        with:
-          ref: 'gh-pages'
-      - name: Add .nojekyll file if it doesn't exist
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+  
+      - name: Set Release Tag and Date
+        if: github.event_name == 'release'
         run: |
-          if [ ! -f .nojekyll ]; then
-            touch .nojekyll
-          fi
-      # Will new docs go into root, or into a directory named after the
-      # release?
-      - name: Determine where the new documents should live
-        run: |
-          if [[ ${{ github.event_name }} == 'release' ]]; then
-            echo "TARGET_DIR=releases/${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
-          else
-            echo "TARGET_DIR=${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
-          fi
-      # Obtain the build artifacts from the previous jobs and place them in the
-      # build/ directory
-      - uses: actions/download-artifact@v4
+          echo "CF_FINAL=True" >> $GITHUB_ENV
+  
+      - name: Build Documentation
+        uses: Analog-inc/asciidoctor-action@v1
         with:
-          name: convention_and_conformance_docs
+          shellcommand: 'make all'
+  
+      - name: Prepare and Update Index Page
+        run: |
+          cp -p .github/gh-pages/index.html build/
+          PATH_REVISION="${GITHUB_REPOSITORY}/${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}@${GITHUB_SHA:0:7}"
+          sed -i "s/Latest/${PATH_REVISION//\//\\/}/" build/index.html
+  
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation_artifacts
           path: build/
-      # If we are doing a release, we need to create the release directory
-      - name: Make release directory
-        run: mkdir -p ${{ env.TARGET_DIR }}
-      # If we are not doing a release, let's clean out the previous images
-      # directory in the root directory (OLD TO BE DEPRECATED)
-      - name: Remove old images directory
-        run: sudo rm -rf ${{ env.TARGET_DIR }}/images
-      - name: Copy conventions and conformance documents
+          
+
+  # Job to publish documentation to GitHub Pages
+  publish_docs:
+    name: Publish Documentation
+    runs-on: ubuntu-latest
+    needs: build_docs
+    if: github.event_name != 'pull_request'
+   
+    steps:
+      - name: Verify Pre-installed Tools
         run: |
-          cp -p build/cf-conventions.html ${{ env.TARGET_DIR }}/
-          cp -p build/cf-conventions.pdf ${{ env.TARGET_DIR }}/
-          cp -p build/conformance.html ${{ env.TARGET_DIR }}/
-          cp -p build/conformance.pdf ${{ env.TARGET_DIR }}/
-          cp -p build/index.html ${{ env.TARGET_DIR }}/
-      # Remove the directory that held the artifacts so that it does not get
-      # committed to the gh-pages branch
-      - name: Remove artifact directory
-        run: rm -rf build/
-      # Update root index.html: tree directories, excluding empty ones 
-      - name: Update root index.html
-        run: tree -T ${GITHUB_REPOSITORY} --dirsfirst --prune --noreport -I index.html -I README.md -H . -o index.html
-      # Stage all changed files to git
-      - name: Add all changes to git
-        run: git add --all
-      # Configure git to use the built-in repo credentials, commit changes, and
-      # push to the gh-pages branch
-      - name: Commit changes and push to gh-pages branch
+          jq --version
+          tree --version
+          gh --version
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+ 
+      - name: Check and Create GH Pages Branch
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git commit -m "Auto-generated from ${GITHUB_REPOSITORY}@${GITHUB_SHA}"
+          if ! git ls-remote --exit-code origin gh-pages > /dev/null; then
+            echo "Creating the $DESIRED_BRANCH branch..."
+            git checkout --orphan $DESIRED_BRANCH
+            git rm -rf . || true
+            echo "# GitHub Pages" > index.html
+            git add index.html
+            git commit -m "Initialize $DESIRED_BRANCH branch"
+            git push origin $DESIRED_BRANCH
+          else
+            echo "The $DESIRED_BRANCH branch already exists."
+          fi
+
+      - name: Enforce GitHub Pages Configuration
+        run: |
+          # Fetch current GitHub Pages configuration
+          API_RESPONSE=$(gh api repos/${{ github.repository }}/pages || echo "{}")
+      
+          # Extract current configuration
+          IS_ENABLED=$(echo "$API_RESPONSE" | jq -r '.source // empty')
+          BUILD_TYPE=$(echo "$API_RESPONSE" | jq -r '.build_type // empty')
+          SOURCE_BRANCH=$(echo "$API_RESPONSE" | jq -r '.source.branch // empty')
+          SOURCE_PATH=$(echo "$API_RESPONSE" | jq -r '.source.path // empty')
+      
+          # Enforce configuration if any setting is incorrect or GitHub Pages is not enabled
+          if [[ -z "$IS_ENABLED" ]] || [[ "$BUILD_TYPE" != "$DESIRED_BUILD_TYPE" ]] || [[ "$SOURCE_BRANCH" != "$DESIRED_BRANCH" ]] || [[ "$SOURCE_PATH" != "$DESIRED_PATH" ]]; then
+            echo "Enforcing GitHub Pages configuration..."
+            gh api repos/${{ github.repository }}/pages \
+              --method POST \
+               --input - <<< "{\"source\":{\"branch\":\"$DESIRED_BRANCH\",\"path\":\"$DESIRED_PATH\"}, \"build_type\":\"$DESIRED_BUILD_TYPE\"}"
+            echo "GitHub Pages has been configured: Branch='${DESIRED_BRANCH}', Path='${DESIRED_PATH}', Build Type='${DESIRED_BUILD_TYPE}'."
+          else
+            echo "GitHub Pages is already configured correctly: Branch='${DESIRED_BRANCH}', Path='${DESIRED_PATH}', Build Type='${DESIRED_BUILD_TYPE}'."
+          fi
+          
+      - name: Checkout gh-pages Branch into Subdirectory
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref:  ${{ env.DESIRED_BRANCH }}
+          path: gh-pages
+      
+      - name: Determine Target Directory and Add .nojekyll
+        run: |
+          cd gh-pages
+          # Ensure .nojekyll exists
+          [ ! -f .nojekyll ] && touch .nojekyll
+          # Determine target directory based on the event type
+          if [[ ${{ github.event_name }} == 'release' ]]; then
+            echo "TARGET_DIR=releases/${GITHUB_REF_NAME}" | sed 's/[^a-zA-Z0-9._-]/_/g' >> $GITHUB_ENV
+          else
+            echo "TARGET_DIR=${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}" | sed 's/[^a-zA-Z0-9._-]/_/g' >> $GITHUB_ENV
+          fi
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: documentation_artifacts
+          path: gh-pages/build/
+
+      - name: Verify Build Artifacts
+        run: |
+          cd gh-pages
+          if [ ! "$(ls -A build)" ]; then
+            echo "Build artifacts are missing!" >&2
+            exit 1
+          fi
+        
+      - name: Publish Documentation
+        run: |
+          cd gh-pages
+          mkdir -p ${{ env.TARGET_DIR }}
+          cp -p build/*.html ${{ env.TARGET_DIR }}/
+          cp -p build/*.pdf ${{ env.TARGET_DIR }}/
+          rm -rf build/ 
+          tree -T "${GITHUB_REPOSITORY}" --dirsfirst --prune --noreport \
+            -I "index.html|README.md" -H . -o index.html
+
+      - name: Commit and Push Changes
+        run: |
+          cd gh-pages
+          git add --all
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update documentation from ${GITHUB_REPOSITORY}@${GITHUB_SHA}" || echo "No changes to commit; skipping push."
           git push
