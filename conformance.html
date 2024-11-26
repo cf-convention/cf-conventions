@@ -720,7 +720,7 @@ Exceptions are the units <strong><code>level</code></strong>, <strong><code>laye
 <p>Dimensionless units for volume fractions defined by UDUNITS (<strong><code>ppv</code></strong>, <strong><code>ppmv</code></strong>, <strong><code>ppbv</code></strong>, <strong><code>pptv</code></strong>, <strong><code>ppqv</code></strong>) are not allowed in the <strong><code>units</code></strong> attribute of any variable which also has a <strong><code>standard_name</code></strong> attribute.</p>
 </li>
 <li>
-<p>If present, the <strong><code>units_metadata</code></strong> attribute must have one of these values: <code>temperature: on_scale</code>, <code>temperature: difference</code>, <code>temperature: unknown</code>.</p>
+<p>If present, the <strong><code>units_metadata</code></strong> attribute must have one of these values: <code>temperature: on_scale</code>, <code>temperature: difference</code>, <code>temperature: unknown</code>, <code>leap_seconds: none</code>, <code>leap_seconds: utc</code>, or <code>leap_seconds: unknown</code>.</p>
 </li>
 <li>
 <p>The <strong><code>units</code></strong> of a variable that specifies a <strong><code>standard_name</code></strong> must be physically equivalent to the canonical units given in the standard name table, as modified by the <strong><code>standard_name</code></strong> modifier, if there is one, according to Appendix C, and then modified by all the methods listed in order by the <strong><code>cell_methods</code></strong> attribute, if one is present, according to Appendix E.</p>
@@ -729,10 +729,10 @@ Exceptions are the units <strong><code>level</code></strong>, <strong><code>laye
 <p>If the <strong><code>standard_name</code></strong> attribute includes the <code>standard_error</code> modifier, the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>.</p>
 </li>
 <li>
-<p>If the <strong><code>cell_methods</code></strong> attribute includes any entry with any of the methods <code>range</code>, <code>standard_deviation</code> or <code>variance</code>, the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>.</p>
+<p>If a variable has a <strong><code>units</code></strong> attribute that involves a temperature unit, and has a <strong><code>cell_methods</code></strong> attribute includes any entry with any of the methods <code>range</code>, <code>standard_deviation</code> or <code>variance</code>, then the <strong><code>units_metadata</code></strong> attribute, if present, must have the value <code>temperature: difference</code>.</p>
 </li>
 <li>
-<p>A variable must not have a <strong><code>units_metadata</code></strong> attribute if it has no <strong><code>units</code></strong> attribute or if its <strong><code>units</code></strong> do not involve a temperature unit.</p>
+<p>A variable must not have a <strong><code>units_metadata</code></strong> attribute if it has no <strong><code>units</code></strong> attribute, or if its <strong><code>units</code></strong> do not involve a temperature unit or a reference time unit.</p>
 </li>
 </ul>
 </div>
@@ -918,20 +918,14 @@ The values of <strong><code>var</code></strong> must be variables that exist in 
 </div>
 </div>
 <div class="sect2">
-<h3 id="time-coordinate">4.4 Time Coordinate</h3>
+<h3 id="time-coordinate">4.4.1 Time Coordinate Units</h3>
 <div class="paragraph">
 <p><strong>Requirements:</strong></p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>The time <strong><code>units</code></strong> of a time coordinate variable must contain a reference date/time.</p>
-</li>
-<li>
-<p>The reference date/time of a time coordinate variable must be a legal date/time in the specified calendar.</p>
-</li>
-<li>
-<p>The reference date/time in time <strong><code>units</code></strong> is not allowed to contain seconds equal to or greater than 60.</p>
+<p>The time <strong><code>units</code></strong> of a time coordinate variable must contain a reference datetime.</p>
 </li>
 </ul>
 </div>
@@ -940,9 +934,6 @@ The values of <strong><code>var</code></strong> must be variables that exist in 
 </div>
 <div class="ulist">
 <ul>
-<li>
-<p>The use of time coordinates in year 0 and reference date/times in year 0 to indicate climatological time is deprecated.</p>
-</li>
 <li>
 <p>Units of <strong><code>year</code></strong> and <strong><code>month</code></strong> and any equivalent units should be used with caution.</p>
 </li>
@@ -953,18 +944,81 @@ The values of <strong><code>var</code></strong> must be variables that exist in 
 </div>
 </div>
 <div class="sect2">
-<h3 id="calendar">4.4.1 Calendar</h3>
+<h3 id="calendar">4.4.2 Calendar</h3>
 <div class="paragraph">
 <p><strong>Requirements:</strong></p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>The attributes <strong><code>calendar</code></strong>, <strong><code>month_lengths</code></strong>, <strong><code>leap_year</code></strong>, and <strong><code>leap_month</code></strong> may only be attached to time coordinate variables.</p>
+<p>The <strong><code>calendar</code></strong> attribute may only be attached to time coordinate variables.</p>
 </li>
 <li>
-<p>The standardized values (case insensitive) of the <strong><code>calendar</code></strong> attribute are <strong><code>standard</code></strong>, <strong><code>gregorian</code></strong> (deprecated), <strong><code>proleptic_gregorian</code></strong>, <strong><code>noleap</code></strong>, <strong><code>365_day</code></strong>, <strong><code>all_leap</code></strong>, <strong><code>366_day</code></strong>, <strong><code>360_day</code></strong>, <strong><code>julian</code></strong>, and <strong><code>none</code></strong>.
-If the <strong><code>calendar</code></strong> attribute is given a non-standard value, then the attribute <strong><code>month_lengths</code></strong> is required, along with <strong><code>leap_year</code></strong> and <strong><code>leap_month</code></strong> as appropriate.</p>
+<p>If present, the value of the <strong><code>calendar</code></strong> attribute must be one of the standardized values (case insensitive) detailed in this section, unless the <strong><code>month_length</code></strong> attribute is present, in which case the <strong><code>calendar</code></strong> attribute must <em>not</em> take one of the standardized values.</p>
+</li>
+<li>
+<p>The reference datetime of a time coordinate variable must be a legal datetime in the specified calendar.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Recommendations:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A time coordinate variable should have a <strong><code>calendar</code></strong> attribute.</p>
+</li>
+<li>
+<p>If the <strong><code>calendar</code></strong> attribute is <strong><code>standard</code></strong>, <strong><code>gregorian</strong></code> (deprecated) or <strong><code>julian</code></strong> or absent, the use of time coordinates in year 0 and reference datetimes in year 0 is deprecated.</p>
+</li>
+<li>
+<p>The value <strong><code>standard</code></strong> should be used instead of <strong><code>gregorian</code></strong> in the <strong><code>calendar</code></strong> attribute.</p>
+</li>
+<li>
+<p>The time coordinate should not cross the date 1582-10-15 when the default mixed Gregorian/Julian calendar is in use.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="leap-seconds">4.4.3 Leap Seconds</h3>
+<div class="paragraph">
+<p><strong>Requirements:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The reference datetime in time <strong><code>units</code></strong> is not allowed to contain seconds equal to or greater than 60, except for valid leap seconds if the <strong><code>calendar</code></strong> is <strong><code>utc</code></strong>.</p>
+</li>
+<li>
+<p>A time coordinate variable must not have a <strong><code>units_metadata</code></strong> attribute if it has a <strong><code>calendar</code></strong> attribute with a value <em>other than</em> one of the following values: <code>standard</code>, <code>gregorian</code> (deprecated), <code>proleptic_gregorian</code>, <code>julian</code>.</p>
+</li>
+<li>
+<p>If a time coordinate variable has a <strong><code>units_metadata</code></strong> attribute then it must have one of these values: <code>leap_seconds: none</code>, <code>leap_seconds: utc</code>, or <code>leap_seconds: unknown</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Recommendations:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A time coordinate variable should have a <strong><code>units_metadata</code></strong>  attribute if it has no <strong><code>calendar</code></strong> attribute, or if it has a <strong><code>calendar</code></strong> attribute with one of the following values: <code>standard</code>, <code>gregorian</code> (deprecated), <code>proleptic_gregorian</code>, <code>julian</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="explicitly-defined-calendar">4.4.5 Explicitly Defined Calendar</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>The <strong><code>month_lengths</code></strong>, <strong><code>leap_year</code></strong>, and <strong><code>leap_month</code></strong> attributes may only be attached to time coordinate variables.</p>
+</li>
+<li>
+<p>If the <strong><code>calendar</code></strong> attribute of a time coordinate variable is given a non-standard value, then the attribute <strong><code>month_lengths</code></strong> is required, along with <strong><code>leap_year</code></strong> and <strong><code>leap_month</code></strong> as appropriate.</p>
 </li>
 <li>
 <p>The type of the <strong><code>month_lengths</code></strong> attribute must be an integer array of size 12.</p>
@@ -983,16 +1037,7 @@ If the <strong><code>calendar</code></strong> attribute is given a non-standard 
 <div class="ulist">
 <ul>
 <li>
-<p>A time coordinate variable should have a <strong><code>calendar</code></strong> attribute.</p>
-</li>
-<li>
-<p>The value <strong><code>standard</code></strong> should be used instead of <strong><code>gregorian</code></strong> in the <strong><code>calendar</code></strong> attribute.</p>
-</li>
-<li>
 <p>The attribute <strong><code>leap_month</code></strong> should not appear unless the attribute <strong><code>leap_year</code></strong> is present.</p>
-</li>
-<li>
-<p>The time coordinate should not cross the date 1582-10-15 when the default mixed Gregorian/Julian calendar is in use.</p>
 </li>
 </ul>
 </div>
@@ -1580,7 +1625,7 @@ If the optional formula term <code><strong>nsigma</strong></code> is supplied, i
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2024-11-23 10:06:54 UTC
+Last updated 2024-11-26 14:06:24 UTC
 </div>
 </div>
 </body>
