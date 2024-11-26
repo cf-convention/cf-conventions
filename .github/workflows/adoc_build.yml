@@ -18,24 +18,41 @@
 #   https://github.com/Analog-inc/asciidoctor-action
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
+#   https://github.com/action-badges/create-orphan-branch
 #
+#   Custom workflow for pages deployment
+#     
 name: Asciidoctor Build Workflow
 on:
   # manually run workflow
   workflow_dispatch:
-  # trigger on PR event against main (will not run publish job)
+  
+  # trigger on PR event against default branch (i.e. main) (will not run publish job)
   pull_request:
     branches: [ main ]
-  # Trigger on a push to main (a PR is merged), or when a release is
+  # Trigger on a push to default branch (i.e. main) (a PR is merged), or when a release is
+  
   # published on github. These will run the publish job.
   push:
-    branches:
-      - main
+    branches: [ main ]
   # Trigger when a GitHub release is published.
   release:
     types:
       - published
-jobs:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs: 
   # Job to build cf-conventions.html, cf-conventions.pdf
   build_conventions_and_conformance:
     name: Build cf-conventions and conformance html and pdf
@@ -75,12 +92,35 @@ jobs:
     if: github.event_name != 'pull_request'
     # Wait for the build artifacts to become available
     needs: [build_conventions_and_conformance]
+    
+#    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+#    permissions:
+#      pages: write      # to deploy to Pages
+#      id-token: write   # to verify the deployment originates from an appropriate source
+
+#    # Deploy to the github-pages environment
+#    environment:
+#      name: github-pages
+#      url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: ubuntu-latest
     steps:
+      # Checkout repo
+      - uses: actions/checkout@v4
+      # create a new orphan branch if a branch with the given name does not already exist
+      - name: Create Orphan Branch
+        uses: action-badges/create-orphan-branch@0.1.1
+        with:
+          branch-name: 'gh-pages'
       # Checkout gh-pages branch
       - uses: actions/checkout@v4
         with:
           ref: 'gh-pages'
+      - name: Add .nojekyll file if it doesn't exist
+        run: |
+          if [ ! -f .nojekyll ]; then
+            touch .nojekyll
+          fi
       # Will new docs go into root, or into a directory named after the
       # release?
       - name: Determine where the new documents should live
@@ -102,10 +142,10 @@ jobs:
         if: github.event_name == 'release'
         run: mkdir -p ${{ env.TARGET_DIR }}
       # If we are not doing a release, let's clean out the previous images
-      # directory in the root directory
+      # directory in the root directory (OLD TO BE DEPRECATED)
       - name: Remove old images directory
         if: github.event_name != 'release'
-        run: rm -rf ${{ env.TARGET_DIR }}/images
+        run: sudo rm -rf ${{ env.TARGET_DIR }}/images
       - name: Copy conventions and conformance documents
         run: |
           cp -p build/cf-conventions.html ${{ env.TARGET_DIR }}/
