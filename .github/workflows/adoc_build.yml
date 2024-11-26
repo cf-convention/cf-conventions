@@ -43,7 +43,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  DESIRED_BRANCH: "gh-pages"       # Branch to use for GitHub Pages
+  DESIRED_BRANCH: "gh-pages"      # Branch to use for GitHub Pages
   DESIRED_PATH: "/"               # Path to use for GitHub Pages
   DESIRED_BUILD_TYPE: "legacy"    # Build type for GitHub Pages
   GH_TOKEN: ${{ github.token }}
@@ -148,7 +148,7 @@ jobs:
           [ ! -f .nojekyll ] && touch .nojekyll
           # Determine target directory based on the event type
           if [[ ${{ github.event_name }} == 'release' ]]; then
-            echo "TARGET_DIR=releases/${GITHUB_REF_NAME}" >> $GITHUB_ENV
+            echo "TARGET_DIR=release/${GITHUB_REF_NAME}" >> $GITHUB_ENV
           else
             echo "TARGET_DIR=${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}" >> $GITHUB_ENV
           fi
@@ -171,8 +171,7 @@ jobs:
         run: |
           cd gh-pages
           mkdir -p ${{ env.TARGET_DIR }}
-          cp -p build/*.html ${{ env.TARGET_DIR }}/
-          cp -p build/*.pdf ${{ env.TARGET_DIR }}/
+          cp -p build/* ${{ env.TARGET_DIR }}/
           rm -rf build/ 
           tree -T "${GITHUB_REPOSITORY}" --dirsfirst --prune --noreport \
             -I "index.html|README.md" -H . -o index.html
@@ -185,3 +184,14 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Update documentation from ${GITHUB_REPOSITORY}@${GITHUB_SHA}" || echo "No changes to commit; skipping push."
           git push
+      
+      - name: Upload Documentation files as Release Asset
+        if: github.event_name == 'release'
+        run: |
+          export TARGET_DIR=${{ env.TARGET_DIR }}
+          gh release upload ${{ github.event.release.tag_name }} \
+            gh-pages/${TARGET_DIR}/cf-conventions.html \
+            gh-pages/${TARGET_DIR}/cf-conventions.pdf  \
+            gh-pages/${TARGET_DIR}/conformance.html    \
+            gh-pages/${TARGET_DIR}/conformance.pdf     \
+            --clobber
