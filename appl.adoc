@@ -8,7 +8,7 @@ Details of how to encode and decode aggregation variables are found in <<aggrega
 
 [[example-L.1]]
 [caption="Example L.1 "]
-.Aggregation example 1
+.Aggregation variable with relative-path URI reference fragment file locations
 ====
 ----
 dimensions:
@@ -68,88 +68,14 @@ data:
 ----
 In this example, the `temperature` data variable is an aggregation variable.
 Its four-dimensional aggregated data with shape `(12, 1, 73, 144)` is constructed from two non-overlapping fragments, with data shapes `(3, 1, 73, 144)` and `(9, 1, 73, 144)`, which span the first 3 and last 9 elements respectively of the `time` aggregated dimension.
-The fragment dataset locations are relative-path URI references, and so in this case are assumed to be in the same location as the aggregation file.
+The fragment dataset locations are relative-path URI references, and so are assumed to be in the same directory as the aggregation file.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
 ====
-
 
 [[example-L.2]]
 [caption="Example L.2 "]
-.Aggregation example 2
-====
-----
-dimensions:
-  time = 12 ;
-  level = 1 ;
-  latitude = 73 ;
-  longitude = 144 ;
-  // Array of fragments dimensions
-  f_time = 2 ;
-  f_level = 1 ;
-  f_latitude = 1 ;
-  f_longitude = 1 ;
-  // Map variable dimensions
-  j = 4 ;        // Number of aggregated dimensions
-  i = 2 ;        // Largest number of fragments along any aggregated dimension
-  // Location variable dimension
-  versions = 2 ; // The maximum number of locations per fragment
-
-variables:
-  // Data aggregation variable
-  double temperature ;
-    temperature:standard_name = "air_temperature" ;
-    temperature:units = "K" ;
-    temperature:cell_methods = "time: mean" ;
-    temperature:aggregated_dimensions = "time level latitude longitude" ;
-    temperature:aggregated_data = "location: fragment_location
-                                   identifier: fragment_identifier
-                                   map: fragment_map" ;
-  // Coordinate variables
-  double time ;
-    time:standard_name = "time" ;
-    time:units = "days since 2001-01-01" ;
-  double level(level) ;
-    level:standard_name = "height_above_mean_sea_level" ;
-    level:units = "m" ;
-  double latitude(latitude) ;
-    latitude:standard_name = "latitude" ;
-    latitude:units = "degrees_north" ;
-  double longitude(longitude) ;
-    longitude:standard_name = "longitude" ;
-    longitude:units = "degrees_east" ;
-  // Array of fragments feature variables
-  int fragment_map(j, i) ;
-  string fragment_location(f_time, f_level, f_latitude, f_longitude, versions) ;
-  string fragment_identifier ;
-
-data:
-  temperature = _ ;
-  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
-  level = ... ;
-  latitude = ... ;
-  longitude = ... ;
-  fragment_map = 3, 9,
-                 1, _,
-                 73, _,
-                 144, _ ;
-  fragment_location = "file://data/January-March.nc",
-                      _,
-                      "file://data/April-December.nc",
-                      "https://remote.host/data/April-December.nc" ;
-  fragment_identifier = "temperature" ;
-  fragment_identifier_time = "time" ;
-----
-This example is similar to <<example-L.1, Example L.1>>, but now the fragment dataset locations are absolute URIs, and two versions of the second fragment have been provided.
-The `fragment_location` variable has the extra trailing dimension `versions` to accommodate the extra fragment version.
-There is only one version of the first fragment, so its trailing dimension is padded with missing data.
-
-The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
-====
-
-[[example-L.3]]
-[caption="Example L.3 "]
-.Aggregation example 3
+.Aggregation variable with absolute URI fragment file locations
 ====
 ----
 dimensions:
@@ -166,8 +92,6 @@ dimensions:
   j = 4 ;        // Number of aggregated dimensions for temperature
   j_time = 1 ;   // Number of aggregated dimensions for time
   i = 2 ;        // Largest number of fragments along any aggregated dimension
-  // Location variable dimension
-  versions = 2 ; // The maximum number of locations per fragment
 
 variables:
   // Data aggregation variable
@@ -199,14 +123,10 @@ variables:
     longitude:units = "degrees_east" ;
   // Array of fragments feature variables
   int fragment_map(j, i) ;
-  string fragment_location(f_time, f_level, f_latitude, f_longitude, versions) ;
-    fragment_location:substitutions = "${local}: file://data/
-                                       ${remote}: https://remote.host/data/" ;
+  string fragment_location(f_time, f_level, f_latitude, f_longitude) ;
   string fragment_identifier ;
   int fragment_map_time(j_time, i) ;
-  string fragment_location_time(f_time, versions) ;
-    fragment_location:substitutions = "${local}: file://data/
-                                       ${remote}: https://remote.host/data/" ;
+  string fragment_location_time(f_time) ;
   string fragment_identifier_time ;
 
 data:
@@ -219,23 +139,22 @@ data:
                  1, _,
                  73, _,
                  144, _ ;
-  fragment_location = "${local}January-March.nc", _,
-                      "${local}April-December.nc", "${remote}April-December.nc" ;
+  fragment_location = "file:///data/January-March.nc",
+                      "https:///remote.host/data/April-December.nc" ;
   fragment_identifier = "temperature" ;
   fragment_map_time = 3, 9 ;
-  fragment_location_time = "${local}January-March.nc", _,
-                           "${local}April-December.nc", "${remote}April-December.nc" ;
+  fragment_location_time = "file:///data/January-March.nc",
+                           "https:///remote.host/data/April-December.nc" ;
   fragment_identifier_time = "time" ;
 ----
-This example is similar to <<example-L.2, Example L.2>>, but now the fragment dataset locations have been defined using the string substitutions given by the **`substitutions`** attribute of the `fragment_location` variable.
-In addition, `time` is now an aggregation coordinate variable, with its aggregated data being derived from the same fragment datasets as `temperature`.
+This example is similar to <<example-L.1, Example L.1>>, but now the fragment dataset locations are absolute URIs (one local, one remote), and `time` is now also an aggregation coordinate variable, with its aggregated data being derived from the same fragment datasets as `temperature`.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
 ====
 
-[[example-L.4]]
-[caption="Example L.4 "]
-.Aggregation example 4
+[[example-L.3]]
+[caption="Example L.3 "]
+.Aggregation variable with multiple aggregated dimensions
 ====
 ----
 dimensions:
@@ -306,9 +225,9 @@ The `pressure` data variable is not an aggregation variable.
 The data for the `pressure`, `level`, `latitude` and  `longitude` variables, and the `fragment_location` variable, are omitted for clarity.
 ====
 
-[[example-L.5]]
-[caption="Example L.5 "]
-.Aggregation example 5
+[[example-L.4]]
+[caption="Example L.4 "]
+.Aggregation discrete sampling geometry variable
 ====
 ----
 dimensions:
@@ -385,17 +304,17 @@ data:
   fragment_identifier_lat = "lat" ;
   fragment_identifier_lon = "lon" ;
 ----
-In this example, three fragments are aggregated into a collection of DSG timeseries feature types with contiguous ragged array representation.
+In this example, three fragments are aggregated into a collection of discrete sampling geometry (DSG) timeseries feature types with contiguous ragged array representation.
 The auxiliary coordinate variables `time`, `lon`, and `lat` are also aggregation variables.
-The time variables in the fragment datasets all have different netCDF variables names, which differ from the netCDF name of the `time` aggregation variable.
-The fragments for all aggregation variables come from the same three fragment datasets, in this case.
+The time variables in the fragment datasets all have different netCDF variable names, which differ from the netCDF name of the `time` aggregation variable.
+The fragments for all aggregation variables, in this case, come from the same three fragment datasets.
 
 No data have been omitted from the CDL.
 ====
 
-[[example-L.6]]
-[caption="Example L.6 "]
-.Aggregation example 6
+[[example-L.5]]
+[caption="Example L.5 "]
+.Aggregation variable with unique fragment values
 ====
 ----
 dimensions:
@@ -427,9 +346,9 @@ variables:
   // Ancillary aggregation variable
   string uid ;
     uid:long_name = "Fragment dataset unique identifiers" ;
-    uid:missing_value = "N/A" ;
+    uid:missing_value = "" ;
     uid:aggregated_dimensions = "time" ;
-    uid:aggregated_data = "value: fragment_unique_value
+    uid:aggregated_data = "unique_value: fragment_unique_value
                            map: fragment_map_uid";
   // Coordinate variables
   double time(time) ;
@@ -467,14 +386,14 @@ data:
   fragment_map_uid = 3, 9 ;
   fragment_unique_value = "04b9-7eb5-4046-97b-0bf8", "05ee0-a183-43b3-a67-1eca" ;
 ----
-This example is similar to <<example-L.1, Example L.1>>, but now there is the aggregation ancillary variable `uid` which defines its fragments from the constant values stored in the `fragment_unique_value` variable, that are intended to be broadcast across the `time` aggregated dimension.
+This example is similar to <<example-L.1, Example L.1>>, but now there is an additional aggregation ancillary variable `uid` which defines its fragments from the unique values stored in the `fragment_unique_value` variable, that are intended to be broadcast across the `time` aggregated dimension.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
 ====
 
-[[example-L.7]]
-[caption="Example L.7 "]
-.Aggregation example 7
+[[example-L.6]]
+[caption="Example L.6 "]
+.Aggregation variable with a scalar map variable
 ====
 ----
 dimensions:
@@ -517,5 +436,5 @@ data:
   fragment_location = "file.nc" ;
   fragment_identifier = "tas" ;
 ----
-An example of an aggregation variable with scalar aggregated data.
+An example of an aggregation variable with scalar aggregated data, for which the map variable `fragment_map` is a scalar with the value `1`. 
 ====
