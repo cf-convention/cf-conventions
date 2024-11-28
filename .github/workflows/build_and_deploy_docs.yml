@@ -7,12 +7,12 @@
 #   https://github.com/Analog-inc/asciidoctor-action
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
+#   https://github.com/marocchino/sticky-pull-request-comment
 
 name: Asciidoctor Build Workflow
 on:
   workflow_dispatch:  # Manual trigger
-  pull_request:       # On pull request to main
-    branches: [main]
+  pull_request:       # On pull request
   push:               # On push any branch (excluding gh-pages)
     branches-ignore: [gh-pages]
   release:            # On release published
@@ -166,8 +166,6 @@ jobs:
           mkdir -p ${{ env.TARGET_DIR }}
           cp -p build/* ${{ env.TARGET_DIR }}/
           rm -rf build/ 
-          tree -T "${GITHUB_REPOSITORY}" --dirsfirst --prune --noreport \
-            -I "index.html|README.md" -H . -o index.html
 
       - name: Cleanup PR Artifacts
         if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
