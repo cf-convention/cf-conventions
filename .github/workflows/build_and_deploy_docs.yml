@@ -58,12 +58,6 @@ jobs:
         with:
           shellcommand: 'make all'
   
-      - name: Prepare and Update Index Page
-        run: |
-          sudo cp -p .github/gh-pages/index.html build/
-          PATH_REVISION="${GITHUB_REPOSITORY}/${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}@${GITHUB_SHA:0:7}"
-          sudo sed -i "s/Latest/${PATH_REVISION//\//\\/}/" build/index.html
-  
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -138,9 +132,10 @@ jobs:
           if [[ ${{ github.event_name }} == 'release' ]]; then
             echo "TARGET_DIR=release/${GITHUB_REF_NAME}" >> $GITHUB_ENV
           elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            BASE_REPO_FULL_NAME=${{ github.event.pull_request.base.repo.full_name }}
             PR_NUMBER=${{ github.event.pull_request.number }}
-            echo "TARGET_DIR=pr-preview/${BASE_REPO_FULL_NAME}/${PR_NUMBER}" >> $GITHUB_ENV
+            echo "TARGET_DIR=pr-preview/${PR_NUMBER}" >> $GITHUB_ENV
+          elif [[ ${{ github.ref_name }} == '${{ github.event.repository.default_branch }}' ]]; then
+            echo "TARGET_DIR=./" >> $GITHUB_ENV
           else
             echo "TARGET_DIR=${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}" >> $GITHUB_ENV
           fi
@@ -167,6 +162,21 @@ jobs:
           cp -p build/* ${{ env.TARGET_DIR }}/
           rm -rf build/ 
 
+      - name: Prepare and Update Index Page
+        run: |
+          cd gh-pages
+          sudo cp -p ../.github/gh-pages/index.html ${{ env.TARGET_DIR }}/
+          
+          COMMIT_DATE=$(git show -s --format=%cd --date=format:'%Y-%m-%dT%H:%M:%SZ')
+          
+          if [[ "${GITHUB_REF_NAME}" != "${{ github.event.repository.default_branch }}" ]]; then
+            PATH_REVISION="${GITHUB_REPOSITORY}/${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}@${GITHUB_SHA:0:7}"
+            sudo sed -i "s/Latest/${PATH_REVISION//\//\\/}/" ${{ env.TARGET_DIR }}/index.html
+          else
+            echo "Push is to the default branch; Latest build"
+          fi
+    
+  
       - name: Cleanup PR Artifacts
         if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
         run: |
