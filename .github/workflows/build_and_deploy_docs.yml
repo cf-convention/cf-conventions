@@ -7,12 +7,12 @@
 #   https://github.com/Analog-inc/asciidoctor-action
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
+#   https://github.com/marocchino/sticky-pull-request-comment
 
 name: Asciidoctor Build Workflow
 on:
   workflow_dispatch:  # Manual trigger
-  pull_request:       # On pull request to main
-    branches: [main]
+  pull_request:       # On pull request
   push:               # On push any branch (excluding gh-pages)
     branches-ignore: [gh-pages]
   release:            # On release published
@@ -42,7 +42,8 @@ jobs:
   build_docs:
     name: Build Documentation
     runs-on: ubuntu-latest
-    
+    if: ${{ !(github.event_name == 'pull_request' && github.event.action == 'closed') }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -57,26 +58,25 @@ jobs:
         with:
           shellcommand: 'make all'
   
-      - name: Prepare and Update Index Page
-        run: |
-          sudo cp -p .github/gh-pages/index.html build/
-          PATH_REVISION="${GITHUB_REPOSITORY}/${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}@${GITHUB_SHA:0:7}"
-          sudo sed -i "s/Latest/${PATH_REVISION//\//\\/}/" build/index.html
-  
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: documentation_artifacts
           path: build/
-          
 
-  # Job to publish documentation to GitHub Pages
+      - name: Output Artifact Link for PR
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          echo "Artifacts for this PR can be downloaded from the following link:"
+          echo "https://${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
+          echo "::notice::[Download Artifacts](https://${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/)"
+
+  # Job to publish documentation to GitHub Pages and as assests on release page
   publish_docs:
     name: Publish Documentation
     runs-on: ubuntu-latest
     needs: build_docs
-    if: github.event_name != 'pull_request'
-   
+    if: ${{ github.event_name != 'pull_request' }} # Skip this job if the event is a PR
     steps:
       - name: Verify Pre-installed Tools
         run: |
@@ -138,6 +138,11 @@ jobs:
           # Determine target directory based on the event type
           if [[ ${{ github.event_name }} == 'release' ]]; then
             echo "TARGET_DIR=release/${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
+            PR_NUMBER=${{ github.event.pull_request.number }}
+            echo "TARGET_DIR=pr-preview/${PR_NUMBER}" >> $GITHUB_ENV
+          elif [[ ${{ github.ref_name }} == '${{ github.event.repository.default_branch }}' ]]; then
+            echo "TARGET_DIR=./" >> $GITHUB_ENV
           else
             echo "TARGET_DIR=${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}" >> $GITHUB_ENV
           fi
@@ -157,14 +162,39 @@ jobs:
           fi
         
       - name: Publish Documentation
+        if: ${{ !(github.event_name == 'pull_request' && github.event.action == 'closed') }}
         run: |
           cd gh-pages
           mkdir -p ${{ env.TARGET_DIR }}
           cp -p build/* ${{ env.TARGET_DIR }}/
           rm -rf build/ 
-          tree -T "${GITHUB_REPOSITORY}" --dirsfirst --prune --noreport \
-            -I "index.html|README.md" -H . -o index.html
 
+      - name: Prepare and Update Index Page
+        run: |
+          cd gh-pages
+          sudo cp -p ../.github/gh-pages/index.html ${{ env.TARGET_DIR }}/
+          
+          COMMIT_DATE=$(git show -s --format=%cd --date=format:'%Y-%m-%dT%H:%M:%SZ')
+
+          if [[ "${GITHUB_REF_NAME}" != "${{ github.event.repository.default_branch }}" ]]; then
+            PATH_REVISION="${GITHUB_REPOSITORY}/${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}@${GITHUB_SHA:0:7}"
+            sudo sed -i "s/Latest/${PATH_REVISION//\//\\/}/" ${{ env.TARGET_DIR }}/index.html
+          else
+            echo "Push is to the default branch; Latest build"
+          fi
+  
+      - name: Cleanup PR Artifacts
+        if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
+        run: |
+          cd gh-pages
+          rm -rf ${{ env.TARGET_DIR }}
+
+      - name: Build Index Tree
+        run: |
+            cd gh-pages
+            tree -T "${GITHUB_REPOSITORY}" --dirsfirst --prune --noreport \
+              -I "index.html|README.md" -H . -o index.html
+  
       - name: Commit and Push Changes
         run: |
           cd gh-pages
@@ -173,7 +203,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Update documentation from ${GITHUB_REPOSITORY}@${GITHUB_SHA}" || echo "No changes to commit; skipping push."
           git push
-      
+
       - name: Upload Documentation files as Release Asset
         if: github.event_name == 'release'
         run: |
