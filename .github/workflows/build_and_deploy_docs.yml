@@ -64,22 +64,12 @@ jobs:
           name: documentation_artifacts
           path: build/
 
-      - name: Generate Artifact URL
+      - name: Output Artifact Link for PR
         if: ${{ github.event_name == 'pull_request' }}
-        id: artifact_url
         run: |
-          echo "artifact_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
-
-      - name: Post PR Comment with Artifact Link
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: ":package: Documentation Artifacts"
-          message: |
-            The documentation build was successful! 🎉
-            
-            You can download the artifacts built during this workflow from the following link:
-            [Download Artifacts](${{ env.artifact_url }})  
+          echo "Artifacts for this PR can be downloaded from the following link:"
+          echo "https://${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
+          echo "::notice::[Download Artifacts](https://${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/)"
 
   # Job to publish documentation to GitHub Pages and as assests on release page
   publish_docs:
@@ -192,7 +182,6 @@ jobs:
           else
             echo "Push is to the default branch; Latest build"
           fi
-    
   
       - name: Cleanup PR Artifacts
         if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
@@ -214,19 +203,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "Update documentation from ${GITHUB_REPOSITORY}@${GITHUB_SHA}" || echo "No changes to commit; skipping push."
           git push
-      
-      - name: Post PR Comment with Preview Link
-        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          header: ":page_facing_up: CF Preview"
-          hide_and_recreate: true
-          hide_classify: "OUTDATED"
-          message: |
-              The documentation build was successful! 🎉
-  
-              You can view the updated documentation here:
-              [View Documentation Preview](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ env.TARGET_DIR }}/index.html)      
 
       - name: Upload Documentation files as Release Asset
         if: github.event_name == 'release'
