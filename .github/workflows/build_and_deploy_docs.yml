@@ -63,13 +63,30 @@ jobs:
         with:
           name: documentation_artifacts
           path: build/
-          
 
-  # Job to publish documentation to GitHub Pages
+      - name: Generate Artifact URL
+        if: ${{ github.event_name == 'pull_request' }}
+        id: artifact_url
+        run: |
+          echo "artifact_url=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+
+      - name: Post PR Comment with Artifact Link
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ":package: Documentation Artifacts"
+          message: |
+            The documentation build was successful! 🎉
+            
+            You can download the artifacts built during this workflow from the following link:
+            [Download Artifacts](${{ env.artifact_url }})  
+
+  # Job to publish documentation to GitHub Pages and as assests on release page
   publish_docs:
     name: Publish Documentation
     runs-on: ubuntu-latest
     needs: build_docs
+    if: ${{ github.event_name != 'pull_request' }} # Skip this job if the event is a PR
     steps:
       - name: Verify Pre-installed Tools
         run: |
@@ -168,7 +185,7 @@ jobs:
           sudo cp -p ../.github/gh-pages/index.html ${{ env.TARGET_DIR }}/
           
           COMMIT_DATE=$(git show -s --format=%cd --date=format:'%Y-%m-%dT%H:%M:%SZ')
-          
+
           if [[ "${GITHUB_REF_NAME}" != "${{ github.event.repository.default_branch }}" ]]; then
             PATH_REVISION="${GITHUB_REPOSITORY}/${GITHUB_REF_TYPE}/${GITHUB_REF_NAME}@${GITHUB_SHA:0:7}"
             sudo sed -i "s/Latest/${PATH_REVISION//\//\\/}/" ${{ env.TARGET_DIR }}/index.html
