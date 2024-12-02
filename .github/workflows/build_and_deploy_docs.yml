@@ -140,12 +140,16 @@ jobs:
           cd gh-pages
           # Ensure .nojekyll exists
           [ ! -f .nojekyll ] && touch .nojekyll
+          
+          FINAL_TAG_INPUT="${{ github.event.inputs.set_final_tag || 'false' }}"
+          EVENT_NAME="${{ github.event_name }}" 
+
           # Determine target directory based on the event type
-          if [[ ${{ github.event_name }} == 'workflow_dispatch' && ${{ github.event.inputs.set_final_tag }} == 'true' ]]; then
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && "$FINAL_TAG_INPUT" == "true" ]]; then
             echo "TARGET_DIR=final-preview/${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          elif [[ ${{ github.event_name }} == 'release' ]]; then
+          elif [[ "$EVENT_NAME" == 'release' ]]; then
             echo "TARGET_DIR=release/${GITHUB_REF_NAME}" >> $GITHUB_ENV
-          elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
+          elif [[ "$EVENT_NAME" == 'pull_request' ]]; then
             PR_NUMBER=${{ github.event.pull_request.number }}
             echo "TARGET_DIR=pr-preview/${PR_NUMBER}" >> $GITHUB_ENV
           elif [[ ${{ github.ref_name }} == '${{ github.event.repository.default_branch }}' ]]; then
