@@ -141,7 +141,9 @@ jobs:
           # Ensure .nojekyll exists
           [ ! -f .nojekyll ] && touch .nojekyll
           # Determine target directory based on the event type
-          if [[ ${{ github.event_name }} == 'release' ]]; then
+          if [[ ${{ github.event_name }} == 'workflow_dispatch' && ${{ github.event.inputs.set_final_tag }} == 'true' ]]; then
+            echo "TARGET_DIR=final-preview/${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          elif [[ ${{ github.event_name }} == 'release' ]]; then
             echo "TARGET_DIR=release/${GITHUB_REF_NAME}" >> $GITHUB_ENV
           elif [[ ${{ github.event_name }} == 'pull_request' ]]; then
             PR_NUMBER=${{ github.event.pull_request.number }}
