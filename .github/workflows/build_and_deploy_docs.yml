@@ -11,8 +11,13 @@
 
 name: Asciidoctor Build Workflow
 on:
-  workflow_dispatch:  # Manual trigger
   pull_request:       # On pull request
+  workflow_dispatch:
+    inputs:
+      set_final_tag:
+        description: "Set Final Tag"
+        required: false
+        default: "false"
   push:               # On push any branch (excluding gh-pages)
     branches-ignore: [gh-pages]
   release:            # On release published
@@ -48,8 +53,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
   
-      - name: Set Release Tag and Date
-        if: github.event_name == 'release'
+      - name: Set Final Tag
+        if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' && inputs.set_final_tag == 'true' }}
         run: |
           echo "CF_FINAL=True" >> $GITHUB_ENV
   
