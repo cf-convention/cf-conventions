@@ -27,7 +27,9 @@ See https://github.com/ugrid-conventions/ugrid-conventions for the UGRID conform
 
 *Requirements:*
 
-* CF attributes that take string values must be 1D character arrays or single atomic strings.
+* Any text stored in a CF attribute or variable must be represented in Unicode Normalization Form C and encoded in UTF-8.
+
+* Any attribute of variable-length string type must be a scalar (not an array).
 
 [[section-1]]
 
@@ -144,11 +146,11 @@ References can be absolute, relative or with no path, in which case, the variabl
 * The type of the **`units`** attribute is a string that must be recognizable by the UDUNITS package.
 Exceptions are the units **`level`**, **`layer`**, and **`sigma_level`**.
 * Dimensionless units for volume fractions defined by UDUNITS (**`ppv`**, **`ppmv`**, **`ppbv`**, **`pptv`**, **`ppqv`**) are not allowed in the **`units`** attribute of any variable which also has a **`standard_name`** attribute.
-* If present, the **`units_metadata`** attribute must have one of these values: `temperature: on_scale`, `temperature: difference`, `temperature: unknown`.
+* If present, the **`units_metadata`** attribute must have one of these values: `temperature: on_scale`, `temperature: difference`, `temperature: unknown`, `leap_seconds: none`, `leap_seconds: utc`, or `leap_seconds: unknown`.
 * The **`units`** of a variable that specifies a **`standard_name`** must be physically equivalent to the canonical units given in the standard name table, as modified by the **`standard_name`** modifier, if there is one, according to Appendix C, and then modified by all the methods listed in order by the **`cell_methods`** attribute, if one is present, according to Appendix E.
 * If the **`standard_name`** attribute includes the `standard_error` modifier, the **`units_metadata`** attribute, if present, must have the value `temperature: difference`.
-* If the **`cell_methods`** attribute includes any entry with any of the methods `range`, `standard_deviation` or `variance`, the **`units_metadata`** attribute, if present, must have the value `temperature: difference`.
-* A variable must not have a **`units_metadata`** attribute if it has no **`units`** attribute or if its **`units`** do not involve a temperature unit.
+* If a variable has a **`units`** attribute that involves a temperature unit, and has a **`cell_methods`** attribute includes any entry with any of the methods `range`, `standard_deviation` or `variance`, then the **`units_metadata`** attribute, if present, must have the value `temperature: difference`.
+* A variable must not have a **`units_metadata`** attribute if it has no **`units`** attribute, or if its **`units`** do not involve a temperature unit or a reference time unit.
 
 *Recommendations:*
 
@@ -237,39 +239,59 @@ The values of **`var`** must be variables that exist in the file.
 
 [[section-13]]
 [[time-coordinate]]
-=== 4.4 Time Coordinate
+=== 4.4.1 Time Coordinate Units
 
 *Requirements:*
 
-* The time **`units`** of a time coordinate variable must contain a reference date/time.
-* The reference date/time of a time coordinate variable must be a legal date/time in the specified calendar.
-* The reference date/time in time **`units`** is not allowed to contain seconds equal to or greater than 60.
+* The time **`units`** of a time coordinate variable must contain a reference datetime.
 
 *Recommendations:*
 
-* The use of time coordinates in year 0 and reference date/times in year 0 to indicate climatological time is deprecated.
 * Units of **`year`** and **`month`** and any equivalent units should be used with caution.
 * UDUNITS permits a number of alternatives to the word **`since`** in the units of time coordinates. All the alternatives have exactly the same meaning in UDUNITS. For compatibility with other software, CF strongly recommends that **`since`** should be used.
 
 [[section-14]]
 [[calendar]]
-=== 4.4.1 Calendar
+=== 4.4.2 Calendar
 
 *Requirements:*
 
-* The attributes **`calendar`**, **`month_lengths`**, **`leap_year`**, and **`leap_month`** may only be attached to time coordinate variables.
-* The standardized values (case insensitive) of the **`calendar`** attribute are **`standard`**, **`gregorian`** (deprecated), **`proleptic_gregorian`**, **`noleap`**, **`365_day`**, **`all_leap`**, **`366_day`**, **`360_day`**, **`julian`**, and **`none`**.
-If the **`calendar`** attribute is given a non-standard value, then the attribute **`month_lengths`** is required, along with **`leap_year`** and **`leap_month`** as appropriate.
+* The **`calendar`** attribute may only be attached to time coordinate variables.
+* If present, the value of the **`calendar`** attribute must be one of the standardized values (case insensitive) detailed in this section, unless the **`month_length`** attribute is present, in which case the **`calendar`** attribute must _not_ take one of the standardized values.
+* The reference datetime of a time coordinate variable must be a legal datetime in the specified calendar.
+
+*Recommendations:*
+
+* A time coordinate variable should have a **`calendar`** attribute.
+* If the **`calendar`** attribute is **`standard`**, **`gregorian**` (deprecated) or **`julian`** or absent, the use of time coordinates in year 0 and reference datetimes in year 0 is deprecated.
+* The value **`standard`** should be used instead of **`gregorian`** in the **`calendar`** attribute.
+* The time coordinate should not cross the date 1582-10-15 when the default mixed Gregorian/Julian calendar is in use.
+
+[[leap-seconds]]
+=== 4.4.3 Leap Seconds
+
+*Requirements:*
+
+* The reference datetime in time **`units`** is not allowed to contain seconds equal to or greater than 60, except for valid leap seconds if the **`calendar`** is **`utc`**.
+* A time coordinate variable must not have a **`units_metadata`** attribute if it has a **`calendar`** attribute with a value _other than_ one of the following values: `standard`, `gregorian` (deprecated), `proleptic_gregorian`, `julian`.
+* If a time coordinate variable has a **`units_metadata`** attribute then it must have one of these values: `leap_seconds: none`, `leap_seconds: utc`, or `leap_seconds: unknown`.
+
+*Recommendations:*
+
+* A time coordinate variable should have a **`units_metadata`**  attribute if it has no **`calendar`** attribute, or if it has a **`calendar`** attribute with one of the following values: `standard`, `gregorian` (deprecated), `proleptic_gregorian`, `julian`.
+
+[[explicitly-defined-calendar]]
+=== 4.4.5 Explicitly Defined Calendar
+
+* The **`month_lengths`**, **`leap_year`**, and **`leap_month`** attributes may only be attached to time coordinate variables.
+* If the **`calendar`** attribute of a time coordinate variable is given a non-standard value, then the attribute **`month_lengths`** is required, along with **`leap_year`** and **`leap_month`** as appropriate.
 * The type of the **`month_lengths`** attribute must be an integer array of size 12.
 * The values of the **`leap_month`** attribute must be in the range 1-12.
 * The values of the **`leap_year`** and **`leap_month`** attributes are integer scalars.
 
 *Recommendations:*
 
-* A time coordinate variable should have a **`calendar`** attribute.
-* The value **`standard`** should be used instead of **`gregorian`** in the **`calendar`** attribute.
 * The attribute **`leap_month`** should not appear unless the attribute **`leap_year`** is present.
-* The time coordinate should not cross the date 1582-10-15 when the default mixed Gregorian/Julian calendar is in use.
 
 [[section-15]]
 [[coordinate-systems]]
