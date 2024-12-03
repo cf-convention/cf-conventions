@@ -2,25 +2,40 @@
 :doc-part: 7
 :figure: 0
 
-When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.
-It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells.
-This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000.
-The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells.
-However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.
-For cases when data pertain to geospatial features with highly variable geometry node counts such as river lines or watershed boundaries, we provide <<geometries> as an alternative to bounds.
+When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of non-zero size, a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.
+The commonest cases are one-dimensional cells along spatiotemporal axes, for instance cells along a time axis for consecutive months whose values contain monthly means.
+The methods presented in <<cell-boundaries>> and <<cell-methods>> describe cases in which each grid point is associated with a cell consisting of a single one-dimensional interval, a single two-dimensional polygonal area, or in general a single _n_-dimensional volume in the _n_-dimensional space described by its coordinate variables.
+
+It is possible for a single data value to be the result of an operation whose domain is a disjoint set of intervals or areas.
+This is true for many types of climatological statistic; for example, the mean January temperature for the years 1971-2000 is computed from the 30 individual months of January, which are a set of discontiguous time-intervals.
+Climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.
+As an alternative to _n_-dimensional volumes with bounds, we provide <<geometries>>, for the case of geospatial applications in which each data value pertains to a single real-world feature, such as a river, watershed or country, represented by one or more points, lines or polygons.
+
 
 [[cell-boundaries, Section 7.1, "Cell Boundaries"]]
 === Cell Boundaries
 
-To represent cells we add the attribute **`bounds`** to the appropriate coordinate variable(s).
+To delimit the cells, the **`bounds`** attribute may be added to the appropriate coordinate variable(s).
 The value of **`bounds`** is the name of the variable that contains the vertices of the cell boundaries.
 We refer to this type of variable as a "boundary variable."
-__A boundary variable must have one more dimension than its associated coordinate or auxiliary coordinate variable.__ 
+If cell boundaries are provided, it is recommended that each gridpoint should lie somewhere within or upon the boundaries of its own cell.
+
+If cell boundaries are not provided (using the **`bounds`** attribute), an application can make no assumption about the location or extent of the cells.
+Without a boundary variable, it is unknown whether adjacent cells are contiguous, separated by a gap, or overlapping.
+If the data value pertains to the gridpoint alone, rather than to an interval, area or _n_-dimensional volume of non-zero size, it is recommended to indicate this with a **`cell_methods`** entry of **`point`** (<<cell-methods>>).
+In that case, the cell is irrelevant to the data and the bounds are arbitrary.
+Nonetheless, the bounds may still be included, for instance because the grid is shared by other data variables that pertain to cells, or to provide some indication of cells to generic applications for graphical purposes.
+A cell of truly zero size can be indicated by giving it coincident boundaries.
+
+A boundary variable must have one more dimension than its associated coordinate or auxiliary coordinate variable.
 We refer to the additional dimension as the "vertex dimension".
 The vertex dimension must be the most rapidly varying dimension (the last dimension in CDL order), and its size is the maximum number of cell vertices.
-The vertex dimension must be of size two if the associated variable is one-dimensional, and of size greater than two if the associated variable has more than one dimension.
-For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices.
+
+The vertex dimension must be of size two if the associated variable is one-dimensional (<<bounds-one-d>>), and of size greater than two if the associated variable has more than one dimension (<<bounds-lat-lon>>).
+For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices (<<bounds-two-d>>).
 For cells with fewer vertices than the size of vertex dimension, the unneeded elements must appear as the last elements in the vertex dimension and must be assigned the **`_FillValue`**.
+CF can currently describe boundaries for cells which have one or two spatial dimensions, but does not provide conventions to describe the boundaries of cells with three spatial dimensions.
+Such conventions are under consideration in <<UGRID>>.
 
 A boundary variable inherits the values of some attributes from its parent coordinate variable.
 If a coordinate variable has any of the attributes marked "BI" (for "inherit") in the "Use" column of <<attribute-appendix>>, they are assumed to apply to its bounds variable as well.
@@ -30,6 +45,125 @@ A boundary variable can only have inheritable attributes if they are also presen
 A bounds variable may have any of the attributes marked "BO" for ("own") in the "Use" column of <<attribute-appendix>>.
 These attributes take precedence over any corresponding attributes of the parent variable.
 In these cases, the parent variable's attribute does not apply to the bounds variable, regardless of whether the latter has its own attribute.
+
+
+[[bounds-one-d, Section 7.1.2, "Bounds for one-dimensional coordinate variables"]]
+==== Bounds for one-dimensional coordinate variables
+
+For a one-dimensional coordinate variable of size _N_, the boundary variable is an array of shape (_N_,2).
+The bounds for cell _i_ are the elements _B_(_i_,0) and _B_(_i_,1) of the boundary variable _B_.
+Element _C_(_i_) of the coordinate variable _C_ should lie between the boundaries of the cell, or upon one of them i.e. _B_(_i_,0) - _C_(_i_) and _B_(_i_,1) - _C_(_i_) should not have the same sign, though one of them could be zero.
+
+If _N_ &gt; 1, the bounds of each cell must be ordered consistently with the coordinates i.e. _B_(_i_,0) &lt; _B_(_i_,1) for all _i_ if _C_(_i_) &lt; _C_(_i_ + 1), and _B_(_i_,0) &gt; _B_(_i_,1) for all _i_ if _C_(_i_) &gt; _C_(_i_ + 1).
+
+If any two cells are contiguous, their shared boundary must be represented identically in each instance where it occurs in the boundary variable.
+This means that in the common case of _N_ non-overlapping contiguous intervals, _N_ - 1 of the boundaries are duplicated, because they are shared by adjacent intervals.
+This representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.
+
+[[cells-on-a-time-axis-ex]]
+[caption="Example 7.1. "]
+.Cells on a time axis
+====
+----
+dimensions:
+  time = 60;
+  nv = 2;    // number of vertices
+variables:
+  float time(time);
+    time:standard_name = "time";
+    time:units = "days since 2024-11-8 09:00:00";
+    time:bounds = "time_bnds";
+  float time_bnds(time,nv);
+----
+The boundary variable **`time_bnds`** associates a time point **`i`** with the time interval whose boundaries are **`time_bnds(i,0)`** and **`time_bnds(i,1)`**.
+The instant **`time(i)`** should be contained within the interval, or be at one end of it.
+For instance, with **`i=2`** we might have **`time(2)=10.5`**, **`time_bnds(2,0)=10.0`**, **`time_bnds(2,1)=11.0`**.
+If the times are increasing e.g. **`time(3)`** = **`11.5`** &gt; **`10.5`** = **`time(2)`**, which implies **`time(i+1)`** &gt; **`time(i)`** for all **`i`** because coordinates must be monotonic, the bounds must also be increasing for all **`i`**, e.g. **`timebnd(2,1)`** &gt;= **`timebnd(2,0)`**.
+If adjacent intervals are contiguous, the shared endpoint must be identical.
+For example, if the interval **`i=3`** begins at **`11.0`** days, when interval **`i=2`** ends, the values in **`timebnd(3,0)`** and **`timebnd(2,1)`** must be _exactly_ the same.
+====
+
+
+
+[[img-bnd_1d_coords, figure 1]]
+[caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
+[.text-center]
+.Order of **`lonbnd(i,0)`** and **`lonbnd(i,1)`** as well as of **`latbnd(i,0)`** and **`latbnd(i,1)`** in the case of one-dimensional horizontal coordinate axes. Tuples **`(lon(i),lat(j))`** locate the gridpoints. The four grid cell vertices are given by **`(lonbnd(i,0),latbnd(j,0))`**, **`(lonbnd(i,1),latbnd(j,0))`**, **`(lonbnd(i,1),latbnd(j,1))`** and **`(lonbnd(i,0),latbnd(j,1))`**.
+image::images/order_horizontal_bounds__1D_coord_variables.png[,50%,pdfwidth=50vw,align="center"]
+
+
+[[bounds-lat-lon, Section 7.1.1, "Bounds for horizontal coordinate variables with four-sided cells"]]
+==== Bounds for horizontal coordinate variables with four-sided cells
+
+There is a common case of a rectangular horizontal grid, with four-sided cells, whose two axes are not latitude and longitude (e.g. it uses a map projection from <<grid-mappings-and-projections>> or a curvilinear grid, such as the tripolar ocean grid).
+In that case, two-dimensional auxiliary coordinate variables in latitude **`lat(n,m)`** and longitude **`lon(n,m)`** may be provided as well.
+Since the sides of the cells do not generally have constant latitude or longitude, all four vertices must be specified individually.
+Therefore the boundary variables for the two-dimensional auxiliary coordinate variables are given in the form **`latbnd(n,m,4)`** and **`lonbnd(n,m,4)`**, where the trailing index runs over the four vertices of the cells.
+
+[[cells-in-a-non-rectangular-grid-ex]]
+[caption="Example 7.2. "]
+.Cells in a non-latitude-longitude horizontal grid
+====
+----
+dimensions:
+  imax = 128;
+  jmax = 64;
+  nv = 4;
+variables:
+  float lat(jmax,imax);
+    lat:long_name = "latitude";
+    lat:units = "degrees_north";
+    lat:bounds = "lat_bnds";
+  float lon(jmax,imax);
+    lon:long_name = "longitude";
+    lon:units = "degrees_east";
+    lon:bounds = "lon_bnds";
+  float lat_bnds(jmax,imax,nv);
+  float lon_bnds(jmax,imax,nv);
+----
+The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` with the cell determined by the vertices `(lat_bnds(j,i,n),lon_bnds(j,i,n))`, `n=0,..,3`.
+The gridpoint location, `(lat(j,i),lon(j,i))`, should be contained within this region.
+====
+
+The vertices must be ordered such that, when visiting the vertices in order, the four-sided perimeter of the cell is traversed anticlockwise on the lon-lat surface as seen from above.
+If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this can be arranged as in <<img-bnd_2d_coords>>.
+Let us call the side of cell **`(j,i)`** facing cell **`(j,i-1)`** the "**`i-1`**" side, the side facing cell **`(j,i+1)`** the "**`i+1`**" side, and similarly for "**`j-1`**" and "**`j+1`**".
+Then we can refer to the vertex formed by sides **`i-1`** and **`j-1`** as **`(j-1,i-1)`**.
+With this notation, the four vertices are indexed as follows: **`0=(j-1,i-1)`**, **`1=(j-1,i+1)`**, **`2=(j+1,i+1)`**, **`3=(j+1,i-1)`**.
+
+[[img-bnd_2d_coords, figure 2]]
+[caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
+[.text-center]
+.Order of **`lonbnd(j,i,0)`** to **`lonbnd(j,i,3)`** and of **`latbnd(j,i,0)`** and **`latbnd(j,i,3)`** in the case of two-dimensional horizontal coordinate axes. Tuples **`(lon(j,i),lat(j,i))`** locate the gridpoints and tuples **`(lonbnd(j,i,n),latbnd(j,i,n))`** locate the grid cell vertices.
+image::images/order_horizontal_bounds__2D_coord_variables.png[,50%,pdfwidth=50vw,align="center"]
+
+The bounds can be used to decide whether cells are contiguous via the following relationships.
+In these equations the variable **`bnd`** is used generically to represent either the latitude or longitude boundary variable. 
+
+----
+For 0 < j < n and 0 < i < m,
+	If cells (j,i) and (j,i+1) are contiguous, then
+		bnd(j,i,1)=bnd(j,i+1,0) 
+		bnd(j,i,2)=bnd(j,i+1,3)
+	If cells (j,i) and (j+1,i) are contiguous, then	
+		bnd(j,i,3)=bnd(j+1,i,0) and bnd(j,i,2)=bnd(j+1,i,1)
+----
+
+
+[[bounds-two-d, Section 7.1.3, "Bounds for coordinate variables with p-sided cells in two spatial dimensions"]]
+==== Bounds for coordinate variables with p-sided cells in two spatial dimensions
+
+In the general case of a grid composed of polygonal cells in two spatial dimensions with **`p`** sides and vertices, or a mixture of polygons where **`p`** is the maximum number of sides and vertices, the grid could have one, two or more dimensions, depending on how it is organised logically (e.g. as a 1-D list or a 2-D rectangular arrangement).
+The boundary variables for the auxiliary coordinate variables are dimensioned **`(...,m,p)`**, giving coordinates for the **`p`** vertices of each cell, where **`(...,m)`** are the dimensions of the auxiliary coordinate variables.
+ If the cells are in a horizontal plane, the vertices must be traversed anticlockwise in the lon-lat plane as viewed from above.
+The starting vertex is not specified.
+
+The case of a 2-D horizontal coordinate variables with 4-sided cells (<<bounds-lat-lon>>) is a particular case, with **`p=4`** for boundary variables dimensioned **`(n,m,p)**`, where **`n`** and **`m`** are horizontal dimensions.
+See also <<geometries>> for conventions describing horizontal cells with more complicated geometry and topology.
+
+
+[[boundaries-and-formula-terms, Section 7.1.4, "Boundaries and Formula Terms"]]
+==== Boundaries and Formula Terms
 
 If a parametric coordinate variable with a **`formula_terms`** attribute (section 4.3.2) also has a **`bounds`** attribute, its boundary variable must have a **`formula_terms`** attribute too.
 In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula.
@@ -41,7 +175,7 @@ Software digesting legacy datasets (constructed prior to version 1.7 of this sta
 Starting from version 1.7, however, the first method will be sufficient.
 
 [[specifying-formula_terms-ex]]
-[caption="Example 7.1. "]
+[caption="Example 7.3. "]
 .Specifying **`formula_terms`** when a parametric coordinate variable has bounds.
 ====
 ----
@@ -74,99 +208,6 @@ float eta(eta) ;
 ----
 ====
 
-Note that the boundary variable for a set of N contiguous intervals is an array of shape (N,2).
-Although in this case there will be a duplication of the boundary coordinates between adjacent intervals, this representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.
-
-Applications that process cell boundary data often times need to determine whether or not adjacent cells share an edge.
-In order to facilitate this type of processing the following restrictions are placed on the data in boundary variables.
-
-Bounds for 1-D coordinate variables:: For a coordinate variable such as **`lat(lat)`** with associated boundary variable **`latbnd(x,2)`**, the interval endpoints must be ordered consistently with the associated coordinate, e.g., for an increasing coordinate, **`lat(1)`** &gt; **`lat(0)`** implies **`latbnd(i,1)`** &gt;= **`latbnd(i,0)`** for all **`i`** (<<img-bnd_1d_coords>>).
-+
-If adjacent intervals are contiguous, the shared endpoint must be represented indentically in each instance where it occurs in the boundary variable.
-For example, if the intervals that contain grid points **`lat(i)`** and **`lat(i+1)`** are contiguous, then **`latbnd(i+1,0)`** = **`latbnd(i,1)`**.
-+
-[[img-bnd_1d_coords, figure 1]]
-[caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
-[.text-center]
-.Order of **`lonbnd(i,0)`** and **`lonbnd(i,1)`** as well as of **`latbnd(i,0)`** and **`latbnd(i,1)`** in the case of one-dimensional horizontal coordinate axes. Tuples **`(lon(i),lat(j))`** represent grid cell centers. The four grid cell vertices are given by **`(lonbnd(i,0),latbnd(j,0))`**, **`(lonbnd(i,1),latbnd(j,0))`**, **`(lonbnd(i,1),latbnd(j,1))`** and **`(lonbnd(i,0),latbnd(j,1))`**.
-image::images/order_horizontal_bounds__1D_coord_variables.svg[,50%,pdfwidth=50vw,align="center"]
-
-Bounds for 2-D coordinate variables with 4-sided cells:: In the case where the horizontal grid is described by two-dimensional auxiliary coordinate variables in latitude **`lat(n,m)`** and longitude **`lon(n,m)`**, and the associated cells are four-sided, then the boundary variables are given in the form **`latbnd(n,m,4)`** and **`lonbnd(n,m,4)`**, where the trailing index runs over the four vertices of the cells.
-Let us call the side of cell **`(j,i)`** facing cell **`(j,i-1)`** the "**`i-1`**" side, the side facing cell **`(j,i+1)`** the "**`i+1`**" side, and similarly for "**`j-1`**" and "**`j+1`**".
-Then we can refer to the vertex formed by sides **`i-1`** and **`j-1`** as **`(j-1,i-1)`**.
-With this notation, the four vertices are indexed as follows: **`0=(j-1,i-1)`**, **`1=(j-1,i+1)`**, **`2=(j+1,i+1)`**, **`3=(j+1,i-1)`**.
-+
-[[img-bnd_2d_coords, figure 2]]
-[caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
-[.text-center]
-.Order of **`lonbnd(j,i,0)`** to **`lonbnd(j,i,3)`** and of **`latbnd(j,i,0)`** and **`latbnd(j,i,3)`** in the case of two-dimensional horizontal coordinate axes. Tuples **`(lon(j,i),lat(j,i))`** represent grid cell centers and tuples **`(lonbnd(j,i,n),latbnd(j,i,n))`** represent the grid cell vertices.
-image::images/order_horizontal_bounds__2D_coord_variables.svg[,50%,pdfwidth=50vw,align="center"]
-+
-If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this ordering means the vertices will be traversed anticlockwise on the lon-lat surface seen from above (<<img-bnd_2d_coords>>).
-If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat surface.
-+
-The bounds can be used to decide whether cells are contiguous via the following relationships.
-In these equations the variable **`bnd`** is used generically to represent either the latitude or longitude boundary variable. 
-
-----
-For 0 < j < n and 0 < i < m,
-	If cells (j,i) and (j,i+1) are contiguous, then
-		bnd(j,i,1)=bnd(j,i+1,0) 
-		bnd(j,i,2)=bnd(j,i+1,3)
-	If cells (j,i) and (j+1,i) are contiguous, then	
-		bnd(j,i,3)=bnd(j+1,i,0) and bnd(j,i,2)=bnd(j+1,i,1)
-----
-
-Bounds for multi-dimensional coordinate variables with p-sided cells:: In all other cases, the bounds should be dimensioned **`(...,n,p)`**, where **`(...,n)`** are the dimensions of the auxiliary coordinate variables, and **`p`** the number of vertices of the cells.
-The vertices must be traversed anticlockwise in the lon-lat plane as viewed from above.
-The starting vertex is not specified.
-
-[[cells-on-a-latitude-axis-ex]]
-[caption="Example 7.2. "]
-.Cells on a latitude axis
-====
-----
-dimensions:
-  lat = 64;
-  nv = 2;    // number of vertices
-variables:
-  float lat(lat);
-    lat:long_name = "latitude";
-    lat:units = "degrees_north";
-    lat:bounds = "lat_bnds";
-  float lat_bnds(lat,nv);
-----
-The boundary variable `lat_bnds` associates a latitude gridpoint `i` with the interval whose boundaries are `lat_bnds(i,0)` and `lat_bnds(i,1)`.
-The gridpoint location, `lat(i)`, should be contained within this interval.
-====
-
-For rectangular grids, two-dimensional cells can be expressed as Cartesian products of one-dimensional cells of the type in the preceding example.
-However for non-rectangular grids a "rectangular" cell will in general require specifying all four vertices for each cell.
-
-[[cells-in-a-non-rectangular-grid-ex]]
-[caption="Example 7.3. "]
-.Cells in a non-rectangular grid
-====
-----
-dimensions:
-  imax = 128;
-  jmax = 64;
-  nv = 4;
-variables:
-  float lat(jmax,imax);
-    lat:long_name = "latitude";
-    lat:units = "degrees_north";
-    lat:bounds = "lat_bnds";
-  float lon(jmax,imax);
-    lon:long_name = "longitude";
-    lon:units = "degrees_east";
-    lon:bounds = "lon_bnds";
-  float lat_bnds(jmax,imax,nv);
-  float lon_bnds(jmax,imax,nv);
-----
-The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` with the cell determined by the vertices `(lat_bnds(j,i,n),lon_bnds(j,i,n))`, `n=0,..,3`.
-The gridpoint location, `(lat(j,i),lon(j,i))`, should be contained within this region.
-====
 
 [[cell-measures, Section 7.2, "Cell Measures"]]
 === Cell Measures
@@ -379,11 +420,11 @@ Notice that a parenthesized comment in the `cell_methods` attribute provides the
 
 By default, the statistical method indicated by **`cell_methods`** is assumed to have been evaluated over the entire horizontal area of the cell.
 Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area).
-To indicate this, one of two conventions may be used.
+Cell portions are referred to by means of standardised **`area_type`** strings, maintained in the link:$$https://cfconventions.org/Data/area-type-table/current/build/area-type-table.html$$[area-type table], using one of two conventions.
 
 The first convention is a method that can be used for the common case of a single area-type.
 In this case, the **`cell_methods`** attribute may include a string of the form "__name: method__  **`where`**  __type__".
-Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** of **`area_type`**.
+Here __name__ could, for example, be **`area`** and __type__ may be any of the standardised **`area_type`** strings.
 As an example, if the method were **`mean`** and the **`area_type`** were **`sea_ice`**, then the data would represent a mean over only the sea ice portion of the grid cell.
 If the data writer expects __type__ to be interpreted as one of the standard **`area_type`** strings, then none of the variables in the netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, takes precedence).
 
@@ -391,6 +432,7 @@ The second convention is the more general.
 In this case, the **`cell_methods`** entry is of the form "__name: method__  **`where`**  __typevar__".
 Here __typevar__ is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see <<labels>>) with a **`standard_name`** of **`area_type`**.
 The variable __typevar__ contains the name(s) of the selected portion(s) of the grid cell to which the __method__ is applied.
+These name(s) must be a subset of the standardised **`area_type`** strings.
 This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types).
 It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., **`vegetation`**, **`bare_ground`**, **`snow`**, etc.).
 
@@ -488,7 +530,7 @@ Instead, it has a **`climatology`** attribute, which names a variable with dimen
 Using the units and calendar of the time coordinate variable, element (i,0) of the climatology variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension.
 The time coordinates should be values that are representative of the climatological time intervals, such that an application which does not recognise climatological time will nonetheless be able to make a reasonable interpretation.
 
-For compatibility with the COARDS standard, a climatological time coordinate in the default **`standard`** and **`julian`** calendars may be indicated by setting the date/time reference string in the time coordinate's **`units`** attribute to midnight on 1 January in year 0 (i.e., **`since 0-1-1`**).
+For compatibility with the COARDS standard, a climatological time coordinate in the default **`standard`** and **`julian`** calendars may be indicated by setting the datetime reference string in the time coordinate's **`units`** attribute to midnight at 0 `degrees_east` on 1 January in year 0 (i.e., **`since 0-1-1`**).
 This convention is deprecated because it does not provide any information about the intervals used to compute the climatology, and there may be inconsistencies among software packages in the interpretation of the time coordinates with a reference time of year 0.
 Use of year 0 for this purpose is impossible in all other calendars, because year 0 is a valid year.
 
@@ -539,7 +581,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 1960-1-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1960-4-16", "1960-7-16", "1960-10-16", "1961-1-16" ;
   climatology_bounds="1960-3-1",  "1990-6-1",
                      "1960-6-1",  "1990-9-1",
@@ -565,7 +607,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 1901-1-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1965-1-15", "1975-1-15", "1985-1-15" ;
   climatology_bounds="1961-1-1", "1970-2-1",
                      "1971-1-1", "1980-2-1",
@@ -591,7 +633,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="hours since 1997-4-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1997-4-1 0:30", "1997-4-1 1:30", ... "1997-4-1 23:30" ;
   climatology_bounds="1997-4-1 0:00",  "1997-4-30 1:00",
                      "1997-4-1 1:00",  "1997-4-30 2:00",
@@ -625,7 +667,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 2000-6-1";
   double climatology_bounds(time,nv);
-data: // time coordinates translated to date/time format
+data: // time coordinates translated to datetime format
   time="2008-1-16 6:00";
   climatology_bounds="2007-12-1 6:00", "2008-3-1 6:00";
   threshold=0.;
@@ -649,7 +691,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 1961-1-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1961-4-1 0:30", "1961-4-1 1:30", ..., "1961-4-1 23:30" ;
   climatology_bounds="1961-4-1 0:00", "1990-4-30 1:00",
                      "1961-4-1 1:00", "1990-4-30 2:00",
@@ -678,7 +720,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 2000-6-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="2000-6-16", "2000-7-16", "2000-8-16" ;
   climatology_bounds="2000-6-1 6:00:00", "2000-7-1 6:00:00",
                      "2000-7-1 6:00:00", "2000-8-1 6:00:00",
