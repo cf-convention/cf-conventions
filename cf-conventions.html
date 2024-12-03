@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.12 draft,</span>
-<span id="revdate">&#160;&#160;03&#160;December,&#160;2024&#160;14:55:47Z</span>
+<span id="revdate">&#160;&#160;03&#160;December,&#160;2024&#160;14:58:27Z</span>
 <br><span id="revremark">See&#160;<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>&#160;for&#160;further&#160;information.</span>
 </div>
 </div>
@@ -488,7 +488,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_goals">1.1. Goals</a></li>
 <li><a href="#design">1.2. Principles for design</a></li>
 <li><a href="#terminology">1.3. Terminology</a></li>
-<li><a href="#_overview">1.4. Overview</a></li>
+<li><a href="#overview">1.4. Overview</a></li>
 <li><a href="#coards-relationship">1.5. Relationship to the COARDS Conventions</a></li>
 <li><a href="#ugrid-conventions">1.6. UGRID Conventions</a></li>
 </ul>
@@ -587,7 +587,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_data_representative_of_cells">7. Data Representative of Cells</a>
 <ul class="sectlevel2">
-<li><a href="#cell-boundaries">7.1. Cell Boundaries</a></li>
+<li><a href="#cell-boundaries">7.1. Cell Boundaries</a>
+<ul class="sectlevel3">
+<li><a href="#bounds-one-d">7.1.1. Bounds for one-dimensional coordinate variables</a></li>
+<li><a href="#bounds-lat-lon">7.1.2. Bounds for horizontal coordinate variables with four-sided cells</a></li>
+<li><a href="#bounds-two-d">7.1.3. Bounds for coordinate variables with p-sided cells in two spatial dimensions</a></li>
+<li><a href="#boundaries-and-formula-terms">7.1.4. Boundaries and Formula Terms</a></li>
+</ul>
+</li>
 <li><a href="#cell-measures">7.2. Cell Measures</a></li>
 <li><a href="#cell-methods">7.3. Cell Methods</a>
 <ul class="sectlevel3">
@@ -877,9 +884,9 @@ J.5. <a href="#quadratic3">Figure J.5</a></p>
 6.1. <a href="#northward-heat-transport-in-atlantic-ocean-ex">Northward heat transport in Atlantic Ocean</a><br>
 6.1.2. <a href="#taxa-ex">Taxon names and identifiers</a><br>
 6.2. <a href="#model-level-numbers-ex">Model level numbers</a><br>
-7.1. <a href="#specifying-formula_terms-ex">Specifying <strong><code>formula_terms</code></strong> when a parametric coordinate variable has bounds.</a><br>
-7.2. <a href="#cells-on-a-latitude-axis-ex">Cells on a latitude axis</a><br>
-7.3. <a href="#cells-in-a-non-rectangular-grid-ex">Cells in a non-rectangular grid</a><br>
+7.1. <a href="#cells-on-a-time-axis-ex">Cells on a time axis</a><br>
+7.2. <a href="#cells-in-a-non-rectangular-grid-ex">Cells in a non-latitude-longitude horizontal grid</a><br>
+7.3. <a href="#specifying-formula_terms-ex">Specifying <strong><code>formula_terms</code></strong> when a parametric coordinate variable has bounds.</a><br>
 7.4. <a href="#cell-areas-for-a-spherical-geodesic-grid">Cell areas for a spherical geodesic grid</a><br>
 7.5. <a href="#methods-applied-to-a-timeseries-ex">Methods applied to a timeseries</a><br>
 7.6. <a href="#surface-air-temperature-variance-ex">Surface air temperature variance</a><br>
@@ -1161,14 +1168,15 @@ The netCDF utilities ncdump and ncgen use this format (see
 <a href="https://docs.unidata.ucar.edu/nug/current/_c_d_l.html">NUG section on CDL syntax</a>).
 All examples in this document use CDL syntax.</p>
 </dd>
+<dt class="hdlist1">cell</dt>
+<dd>
+<p>A region in one or more dimensions whose boundary can be described by a set of vertices recorded in boundary variables.
+The term <em>interval</em> is sometimes used for one-dimensional cells.
+A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept (see <a href="#overview">Section 1.4, "Overview"</a>).</p>
+</dd>
 <dt class="hdlist1">calendar</dt>
 <dd>
 <p>A CF calendar defines an ordered set of valid datetimes with integer seconds.</p>
-</dd>
-<dt class="hdlist1">cell</dt>
-<dd>
-<p>A region in one or more dimensions whose boundary can be described by a set of vertices.
-The term <em>interval</em> is sometimes used for one-dimensional cells.</p>
 </dd>
 <dt class="hdlist1">coordinate variable</dt>
 <dd>
@@ -1274,7 +1282,7 @@ There is no relationship between the name of a tie point variable and the name(s
 </div>
 </div>
 <div class="sect2">
-<h3 id="_overview"><a class="anchor" href="#_overview"></a>1.4. Overview</h3>
+<h3 id="overview"><a class="anchor" href="#overview"></a>1.4. Overview</h3>
 <div class="paragraph">
 <p>No variable or dimension names are standardized by this convention.
 Instead we follow the lead of the NUG and standardize only the names of attributes and some of the values taken by those attributes.
@@ -1328,9 +1336,19 @@ In particular a model may output data on the parametric (usually dimensionless) 
 To achieve the goal of being able to spatially locate all data values, this convention provides a mapping, via the <strong><code>standard_name</code></strong> and <strong><code>formula_terms</code></strong> attributes of a parametric vertical coordinate variable, between its values and dimensional vertical coordinate values that can be uniquely located with respect to a point on the earth&#8217;s surface (<a href="#parametric-vertical-coordinate">Section 4.3.3, "Parametric Vertical Coordinate"</a>; <a href="#parametric-v-coord">Appendix D, Parametric Vertical Coordinates</a>).</p>
 </div>
 <div class="paragraph">
-<p>It is often the case that data values are not representative of single points in time and/or space, but rather of intervals or multidimensional cells.
-This convention defines a <strong><code>bounds</code></strong> attribute to specify the extent of intervals or cells.
-When data that is representative of cells can be described by simple statistical methods, those methods can be indicated using the <strong><code>cell_methods</code></strong> attribute.
+<p>It is often the case that data values are not representative of single points in time, space and other dimensions, but rather of intervals or multidimensional cells.
+CF defines a <strong><code>bounds</code></strong> attribute to specify the extent of intervals or cells.
+Because both the <a href="#NUG">[NUG]</a> and <a href="#COARDS">[COARDS]</a> define coordinate variables but not cells or bounds, many applications assume that gridpoints are always located at the centers of their cells.
+This assumption does not hold in CF. If bounds are not provided, the location of the gridpoint within the cell is undefined, and nothing can be assumed about the location and extent of the cell.</p>
+</div>
+<div class="paragraph">
+<p>A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept.
+Pixels in a raster are evenly spaced in each dimension and arranged in a logically rectangular array.
+Two-dimensional cells in a CF field do not necessarily satisfy either of those conditions, though they commonly do.
+Furthermore, as an alternative to cells in two dimensions, CF defines a convention for the case where each data value is associated with a geographical feature that is described by one or more points, lines or polygons.</p>
+</div>
+<div class="paragraph">
+<p>When data that is representative of cells can be described by simple statistical methods (for instance, mean or maximum), those methods can be indicated using the <strong><code>cell_methods</code></strong> attribute.
 An important application of this attribute is to describe climatological and diurnal statistics.</p>
 </div>
 <div class="paragraph">
@@ -2446,8 +2464,7 @@ We strongly recommend that coordinate variables be used for all coordinate types
 </div>
 <div class="paragraph">
 <p>The values of a coordinate variable or auxiliary coordinate variable indicate the locations of the gridpoints.
-The locations of the boundaries between cells are indicated by bounds variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>).
-If bounds are not provided, an application might reasonably assume the gridpoints to be at the centers of the cells, but we do not require that in this standard.</p>
+The locations of the boundaries between cells are indicated by bounds variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>).</p>
 </div>
 <div class="sect2">
 <h3 id="latitude-coordinate"><a class="anchor" href="#latitude-coordinate"></a>4.1. Latitude Coordinate</h3>
@@ -4411,25 +4428,43 @@ int model_level(sigma); // model level number at each height
 <h2 id="_data_representative_of_cells"><a class="anchor" href="#_data_representative_of_cells"></a>7. Data Representative of Cells</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of finite "volume," a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.
-It is possible for a single data value to be the result of an operation whose domain is a disjoint set of cells.
-This is true for many types of climatological averages, for example, the mean January temperature for the years 1970-2000.
-The methods that we present below for describing cells only provides an association of a grid point with a single cell, not with a collection of cells.
-However, climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>.
-For cases when data pertain to geospatial features with highly variable geometry node counts such as river lines or watershed boundaries, we provide &lt;&lt;geometries&gt; as an alternative to bounds.</p>
+<p>When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of non-zero size, a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.
+The commonest cases are one-dimensional cells along spatiotemporal axes, for instance cells along a time axis for consecutive months whose values contain monthly means.
+The methods presented in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> and <a href="#cell-methods">Section 7.3, "Cell Methods"</a> describe cases in which each grid point is associated with a cell consisting of a single one-dimensional interval, a single two-dimensional polygonal area, or in general a single <em>n</em>-dimensional volume in the <em>n</em>-dimensional space described by its coordinate variables.</p>
+</div>
+<div class="paragraph">
+<p>It is possible for a single data value to be the result of an operation whose domain is a disjoint set of intervals or areas.
+This is true for many types of climatological statistic; for example, the mean January temperature for the years 1971-2000 is computed from the 30 individual months of January, which are a set of discontiguous time-intervals.
+Climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>.
+As an alternative to <em>n</em>-dimensional volumes with bounds, we provide <a href="#geometries">Section 7.5, "Geometries"</a>, for the case of geospatial applications in which each data value pertains to a single real-world feature, such as a river, watershed or country, represented by one or more points, lines or polygons.</p>
 </div>
 <div class="sect2">
 <h3 id="cell-boundaries"><a class="anchor" href="#cell-boundaries"></a>7.1. Cell Boundaries</h3>
 <div class="paragraph">
-<p>To represent cells we add the attribute <strong><code>bounds</code></strong> to the appropriate coordinate variable(s).
+<p>To delimit the cells, the <strong><code>bounds</code></strong> attribute may be added to the appropriate coordinate variable(s).
 The value of <strong><code>bounds</code></strong> is the name of the variable that contains the vertices of the cell boundaries.
 We refer to this type of variable as a "boundary variable."
-<em>A boundary variable must have one more dimension than its associated coordinate or auxiliary coordinate variable.</em>
+If cell boundaries are provided, it is recommended that each gridpoint should lie somewhere within or upon the boundaries of its own cell.</p>
+</div>
+<div class="paragraph">
+<p>If cell boundaries are not provided (using the <strong><code>bounds</code></strong> attribute), an application can make no assumption about the location or extent of the cells.
+Without a boundary variable, it is unknown whether adjacent cells are contiguous, separated by a gap, or overlapping.
+If the data value pertains to the gridpoint alone, rather than to an interval, area or <em>n</em>-dimensional volume of non-zero size, it is recommended to indicate this with a <strong><code>cell_methods</code></strong> entry of <strong><code>point</code></strong> (<a href="#cell-methods">Section 7.3, "Cell Methods"</a>).
+In that case, the cell is irrelevant to the data and the bounds are arbitrary.
+Nonetheless, the bounds may still be included, for instance because the grid is shared by other data variables that pertain to cells, or to provide some indication of cells to generic applications for graphical purposes.
+A cell of truly zero size can be indicated by giving it coincident boundaries.</p>
+</div>
+<div class="paragraph">
+<p>A boundary variable must have one more dimension than its associated coordinate or auxiliary coordinate variable.
 We refer to the additional dimension as the "vertex dimension".
-The vertex dimension must be the most rapidly varying dimension (the last dimension in CDL order), and its size is the maximum number of cell vertices.
-The vertex dimension must be of size two if the associated variable is one-dimensional, and of size greater than two if the associated variable has more than one dimension.
-For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices.
-For cells with fewer vertices than the size of vertex dimension, the unneeded elements must appear as the last elements in the vertex dimension and must be assigned the <strong><code>_FillValue</code></strong>.</p>
+The vertex dimension must be the most rapidly varying dimension (the last dimension in CDL order), and its size is the maximum number of cell vertices.</p>
+</div>
+<div class="paragraph">
+<p>The vertex dimension must be of size two if the associated variable is one-dimensional (<a href="#bounds-one-d">Section 7.1.2, "Bounds for one-dimensional coordinate variables"</a>), and of size greater than two if the associated variable has more than one dimension (<a href="#bounds-lat-lon">Section 7.1.1, "Bounds for horizontal coordinate variables with four-sided cells"</a>).
+For grids constructed from cells that do not all have the same number of sides (e.g., a grid with some rectangular cells and some triangular cells), the vertex dimension must be at least as large as the maximum number of cell vertices (<a href="#bounds-two-d">Section 7.1.3, "Bounds for coordinate variables with p-sided cells in two spatial dimensions"</a>).
+For cells with fewer vertices than the size of vertex dimension, the unneeded elements must appear as the last elements in the vertex dimension and must be assigned the <strong><code>_FillValue</code></strong>.
+CF can currently describe boundaries for cells which have one or two spatial dimensions, but does not provide conventions to describe the boundaries of cells with three spatial dimensions.
+Such conventions are under consideration in <a href="#UGRID">[UGRID]</a>.</p>
 </div>
 <div class="paragraph">
 <p>A boundary variable inherits the values of some attributes from its parent coordinate variable.
@@ -4441,6 +4476,133 @@ A bounds variable may have any of the attributes marked "BO" for ("own") in the 
 These attributes take precedence over any corresponding attributes of the parent variable.
 In these cases, the parent variable&#8217;s attribute does not apply to the bounds variable, regardless of whether the latter has its own attribute.</p>
 </div>
+<div class="sect3">
+<h4 id="bounds-one-d"><a class="anchor" href="#bounds-one-d"></a>7.1.1. Bounds for one-dimensional coordinate variables</h4>
+<div class="paragraph">
+<p>For a one-dimensional coordinate variable of size <em>N</em>, the boundary variable is an array of shape (<em>N</em>,2).
+The bounds for cell <em>i</em> are the elements <em>B</em>(<em>i</em>,0) and <em>B</em>(<em>i</em>,1) of the boundary variable <em>B</em>.
+Element <em>C</em>(<em>i</em>) of the coordinate variable <em>C</em> should lie between the boundaries of the cell, or upon one of them i.e. <em>B</em>(<em>i</em>,0) - <em>C</em>(<em>i</em>) and <em>B</em>(<em>i</em>,1) - <em>C</em>(<em>i</em>) should not have the same sign, though one of them could be zero.</p>
+</div>
+<div class="paragraph">
+<p>If <em>N</em> &gt; 1, the bounds of each cell must be ordered consistently with the coordinates i.e. <em>B</em>(<em>i</em>,0) &lt; <em>B</em>(<em>i</em>,1) for all <em>i</em> if <em>C</em>(<em>i</em>) &lt; <em>C</em>(<em>i</em> + 1), and <em>B</em>(<em>i</em>,0) &gt; <em>B</em>(<em>i</em>,1) for all <em>i</em> if <em>C</em>(<em>i</em>) &gt; <em>C</em>(<em>i</em> + 1).</p>
+</div>
+<div class="paragraph">
+<p>If any two cells are contiguous, their shared boundary must be represented identically in each instance where it occurs in the boundary variable.
+This means that in the common case of <em>N</em> non-overlapping contiguous intervals, <em>N</em> - 1 of the boundaries are duplicated, because they are shared by adjacent intervals.
+This representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.</p>
+</div>
+<div id="cells-on-a-time-axis-ex" class="exampleblock">
+<div class="title">Example 7.1. Cells on a time axis</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time = 60;
+  nv = 2;    // number of vertices
+variables:
+  float time(time);
+    time:standard_name = "time";
+    time:units = "days since 2024-11-8 09:00:00";
+    time:bounds = "time_bnds";
+  float time_bnds(time,nv);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The boundary variable <strong><code>time_bnds</code></strong> associates a time point <strong><code>i</code></strong> with the time interval whose boundaries are <strong><code>time_bnds(i,0)</code></strong> and <strong><code>time_bnds(i,1)</code></strong>.
+The instant <strong><code>time(i)</code></strong> should be contained within the interval, or be at one end of it.
+For instance, with <strong><code>i=2</code></strong> we might have <strong><code>time(2)=10.5</code></strong>, <strong><code>time_bnds(2,0)=10.0</code></strong>, <strong><code>time_bnds(2,1)=11.0</code></strong>.
+If the times are increasing e.g. <strong><code>time(3)</code></strong> = <strong><code>11.5</code></strong> &gt; <strong><code>10.5</code></strong> = <strong><code>time(2)</code></strong>, which implies <strong><code>time(i+1)</code></strong> &gt; <strong><code>time(i)</code></strong> for all <strong><code>i</code></strong> because coordinates must be monotonic, the bounds must also be increasing for all <strong><code>i</code></strong>, e.g. <strong><code>timebnd(2,1)</code></strong> &gt;= <strong><code>timebnd(2,0)</code></strong>.
+If adjacent intervals are contiguous, the shared endpoint must be identical.
+For example, if the interval <strong><code>i=3</code></strong> begins at <strong><code>11.0</code></strong> days, when interval <strong><code>i=2</code></strong> ends, the values in <strong><code>timebnd(3,0)</code></strong> and <strong><code>timebnd(2,1)</code></strong> must be <em>exactly</em> the same.</p>
+</div>
+</div>
+</div>
+<div id="img-bnd_1d_coords" class="imageblock text-center text-center">
+<div class="content">
+<img src="data:image/png;base64," alt="order horizontal bounds  1D coord variables" width="50%">
+</div>
+<div class="title">Figure 7.1. Order of <strong><code>lonbnd(i,0)</code></strong> and <strong><code>lonbnd(i,1)</code></strong> as well as of <strong><code>latbnd(i,0)</code></strong> and <strong><code>latbnd(i,1)</code></strong> in the case of one-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(i),lat(j))</code></strong> locate the gridpoints. The four grid cell vertices are given by <strong><code>(lonbnd(i,0),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,1))</code></strong> and <strong><code>(lonbnd(i,0),latbnd(j,1))</code></strong>.</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bounds-lat-lon"><a class="anchor" href="#bounds-lat-lon"></a>7.1.2. Bounds for horizontal coordinate variables with four-sided cells</h4>
+<div class="paragraph">
+<p>There is a common case of a rectangular horizontal grid, with four-sided cells, whose two axes are not latitude and longitude (e.g. it uses a map projection from <a href="#grid-mappings-and-projections">Section 5.6, "Horizontal Coordinate Reference Systems, Grid Mappings, and Projections"</a> or a curvilinear grid, such as the tripolar ocean grid).
+In that case, two-dimensional auxiliary coordinate variables in latitude <strong><code>lat(n,m)</code></strong> and longitude <strong><code>lon(n,m)</code></strong> may be provided as well.
+Since the sides of the cells do not generally have constant latitude or longitude, all four vertices must be specified individually.
+Therefore the boundary variables for the two-dimensional auxiliary coordinate variables are given in the form <strong><code>latbnd(n,m,4)</code></strong> and <strong><code>lonbnd(n,m,4)</code></strong>, where the trailing index runs over the four vertices of the cells.</p>
+</div>
+<div id="cells-in-a-non-rectangular-grid-ex" class="exampleblock">
+<div class="title">Example 7.2. Cells in a non-latitude-longitude horizontal grid</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  imax = 128;
+  jmax = 64;
+  nv = 4;
+variables:
+  float lat(jmax,imax);
+    lat:long_name = "latitude";
+    lat:units = "degrees_north";
+    lat:bounds = "lat_bnds";
+  float lon(jmax,imax);
+    lon:long_name = "longitude";
+    lon:units = "degrees_east";
+    lon:bounds = "lon_bnds";
+  float lat_bnds(jmax,imax,nv);
+  float lon_bnds(jmax,imax,nv);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The boundary variables <code>lat_bnds</code> and <code>lon_bnds</code> associate a gridpoint <code>(j,i)</code> with the cell determined by the vertices <code>(lat_bnds(j,i,n),lon_bnds(j,i,n))</code>, <code>n=0,..,3</code>.
+The gridpoint location, <code>(lat(j,i),lon(j,i))</code>, should be contained within this region.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The vertices must be ordered such that, when visiting the vertices in order, the four-sided perimeter of the cell is traversed anticlockwise on the lon-lat surface as seen from above.
+If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this can be arranged as in <a href="#img-bnd_2d_coords">Figure 7.2</a>.
+Let us call the side of cell <strong><code>(j,i)</code></strong> facing cell <strong><code>(j,i-1)</code></strong> the "<strong><code>i-1</code></strong>" side, the side facing cell <strong><code>(j,i+1)</code></strong> the "<strong><code>i+1</code></strong>" side, and similarly for "<strong><code>j-1</code></strong>" and "<strong><code>j+1</code></strong>".
+Then we can refer to the vertex formed by sides <strong><code>i-1</code></strong> and <strong><code>j-1</code></strong> as <strong><code>(j-1,i-1)</code></strong>.
+With this notation, the four vertices are indexed as follows: <strong><code>0=(j-1,i-1)</code></strong>, <strong><code>1=(j-1,i+1)</code></strong>, <strong><code>2=(j+1,i+1)</code></strong>, <strong><code>3=(j+1,i-1)</code></strong>.</p>
+</div>
+<div id="img-bnd_2d_coords" class="imageblock text-center text-center">
+<div class="content">
+<img src="data:image/png;base64," alt="order horizontal bounds  2D coord variables" width="50%">
+</div>
+<div class="title">Figure 7.2. Order of <strong><code>lonbnd(j,i,0)</code></strong> to <strong><code>lonbnd(j,i,3)</code></strong> and of <strong><code>latbnd(j,i,0)</code></strong> and <strong><code>latbnd(j,i,3)</code></strong> in the case of two-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(j,i),lat(j,i))</code></strong> locate the gridpoints and tuples <strong><code>(lonbnd(j,i,n),latbnd(j,i,n))</code></strong> locate the grid cell vertices.</div>
+</div>
+<div class="paragraph">
+<p>The bounds can be used to decide whether cells are contiguous via the following relationships.
+In these equations the variable <strong><code>bnd</code></strong> is used generically to represent either the latitude or longitude boundary variable.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>For 0 &lt; j &lt; n and 0 &lt; i &lt; m,
+	If cells (j,i) and (j,i+1) are contiguous, then
+		bnd(j,i,1)=bnd(j,i+1,0)
+		bnd(j,i,2)=bnd(j,i+1,3)
+	If cells (j,i) and (j+1,i) are contiguous, then
+		bnd(j,i,3)=bnd(j+1,i,0) and bnd(j,i,2)=bnd(j+1,i,1)</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="bounds-two-d"><a class="anchor" href="#bounds-two-d"></a>7.1.3. Bounds for coordinate variables with p-sided cells in two spatial dimensions</h4>
+<div class="paragraph">
+<p>In the general case of a grid composed of polygonal cells in two spatial dimensions with <strong><code>p</code></strong> sides and vertices, or a mixture of polygons where <strong><code>p</code></strong> is the maximum number of sides and vertices, the grid could have one, two or more dimensions, depending on how it is organised logically (e.g. as a 1-D list or a 2-D rectangular arrangement).
+The boundary variables for the auxiliary coordinate variables are dimensioned <strong><code>(&#8230;&#8203;,m,p)</code></strong>, giving coordinates for the <strong><code>p</code></strong> vertices of each cell, where <strong><code>(&#8230;&#8203;,m)</code></strong> are the dimensions of the auxiliary coordinate variables.
+ If the cells are in a horizontal plane, the vertices must be traversed anticlockwise in the lon-lat plane as viewed from above.
+The starting vertex is not specified.</p>
+</div>
+<div class="paragraph">
+<p>The case of a 2-D horizontal coordinate variables with 4-sided cells (<a href="#bounds-lat-lon">Section 7.1.1, "Bounds for horizontal coordinate variables with four-sided cells"</a>) is a particular case, with <strong><code>p=4</code></strong> for boundary variables dimensioned <strong><code>(n,m,p)</strong></code>, where <strong><code>n</code></strong> and <strong><code>m</code></strong> are horizontal dimensions.
+See also <a href="#geometries">Section 7.5, "Geometries"</a> for conventions describing horizontal cells with more complicated geometry and topology.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="boundaries-and-formula-terms"><a class="anchor" href="#boundaries-and-formula-terms"></a>7.1.4. Boundaries and Formula Terms</h4>
 <div class="paragraph">
 <p>If a parametric coordinate variable with a <strong><code>formula_terms</code></strong> attribute (section 4.3.2) also has a <strong><code>bounds</code></strong> attribute, its boundary variable must have a <strong><code>formula_terms</code></strong> attribute too.
 In this case the same terms would appear in both (as specified in Appendix D), since the transformation from the parametric coordinate values to physical space is realized through the same formula.
@@ -4453,7 +4615,7 @@ Software digesting legacy datasets (constructed prior to version 1.7 of this sta
 Starting from version 1.7, however, the first method will be sufficient.</p>
 </div>
 <div id="specifying-formula_terms-ex" class="exampleblock">
-<div class="title">Example 7.1. Specifying <strong><code>formula_terms</code></strong> when a parametric coordinate variable has bounds.</div>
+<div class="title">Example 7.3. Specifying <strong><code>formula_terms</code></strong> when a parametric coordinate variable has bounds.</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -4485,126 +4647,6 @@ Starting from version 1.7, however, the first method will be sufficient.</p>
    temp:coordinates = "A B" ; // This attribute is included for the optional second method</pre>
 </div>
 </div>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that the boundary variable for a set of N contiguous intervals is an array of shape (N,2).
-Although in this case there will be a duplication of the boundary coordinates between adjacent intervals, this representation has the advantage that it is general enough to handle, without modification, non-contiguous intervals, as well as intervals on an axis using the unlimited dimension.</p>
-</div>
-<div class="paragraph">
-<p>Applications that process cell boundary data often times need to determine whether or not adjacent cells share an edge.
-In order to facilitate this type of processing the following restrictions are placed on the data in boundary variables.</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">Bounds for 1-D coordinate variables</dt>
-<dd>
-<p>For a coordinate variable such as <strong><code>lat(lat)</code></strong> with associated boundary variable <strong><code>latbnd(x,2)</code></strong>, the interval endpoints must be ordered consistently with the associated coordinate, e.g., for an increasing coordinate, <strong><code>lat(1)</code></strong> &gt; <strong><code>lat(0)</code></strong> implies <strong><code>latbnd(i,1)</code></strong> &gt;= <strong><code>latbnd(i,0)</code></strong> for all <strong><code>i</code></strong> (<a href="#img-bnd_1d_coords">Figure 7.1</a>).</p>
-<div class="paragraph">
-<p>If adjacent intervals are contiguous, the shared endpoint must be represented indentically in each instance where it occurs in the boundary variable.
-For example, if the intervals that contain grid points <strong><code>lat(i)</code></strong> and <strong><code>lat(i+1)</code></strong> are contiguous, then <strong><code>latbnd(i+1,0)</code></strong> = <strong><code>latbnd(i,1)</code></strong>.</p>
-</div>
-<div id="img-bnd_1d_coords" class="imageblock text-center text-center">
-<div class="content">
-<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0nVVRGLTgnID8+CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB4bWxuczp4bGluaz0naHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluaycgY2xhc3M9J3N2Z2xpdGUnIHdpZHRoPSc1NDAuMDBwdCcgaGVpZ2h0PSczNzQuNDBwdCcgdmlld0JveD0nMCAwIDU0MC4wMCAzNzQuNDAnPgo8ZGVmcz4KICA8c3R5bGUgdHlwZT0ndGV4dC9jc3MnPjwhW0NEQVRBWwogICAgLnN2Z2xpdGUgbGluZSwgLnN2Z2xpdGUgcG9seWxpbmUsIC5zdmdsaXRlIHBvbHlnb24sIC5zdmdsaXRlIHBhdGgsIC5zdmdsaXRlIHJlY3QsIC5zdmdsaXRlIGNpcmNsZSB7CiAgICAgIGZpbGw6IG5vbmU7CiAgICAgIHN0cm9rZTogIzAwMDAwMDsKICAgICAgc3Ryb2tlLWxpbmVjYXA6IHJvdW5kOwogICAgICBzdHJva2UtbGluZWpvaW46IHJvdW5kOwogICAgICBzdHJva2UtbWl0ZXJsaW1pdDogMTAuMDA7CiAgICB9CiAgXV0+PC9zdHlsZT4KPC9kZWZzPgo8cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBzdHlsZT0nc3Ryb2tlOiBub25lOyBmaWxsOiAjRkZGRkZGOycvPgo8ZGVmcz4KICA8Y2xpcFBhdGggaWQ9J2NwTUM0d01IdzFOREF1TURCOE1DNHdNSHd6TnpRdU5EQT0nPgogICAgPHJlY3QgeD0nMC4wMCcgeT0nMC4wMCcgd2lkdGg9JzU0MC4wMCcgaGVpZ2h0PSczNzQuNDAnIC8+CiAgPC9jbGlwUGF0aD4KPC9kZWZzPgo8ZyBjbGlwLXBhdGg9J3VybCgjY3BNQzR3TUh3MU5EQXVNREI4TUM0d01Id3pOelF1TkRBPSknPgo8dGV4dCB4PScyNTkuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTIuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSczLjMzcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+IDwvdGV4dD4KPGxpbmUgeDE9JzY1LjcwJyB5MT0nMzEyLjMzJyB4Mj0nNDM5LjIwJyB5Mj0nMzEyLjMzJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOycgLz4KPGxpbmUgeDE9JzY1LjcwJyB5MT0nMzEyLjMzJyB4Mj0nNjUuNzAnIHkyPScyNS4zMycgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsnIC8+Cjx0ZXh0IHg9JzI1OS4yMCcgeT0nMzM4LjQwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAyNC4wMHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzk3LjM4cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uZ2l0dWRlPC90ZXh0Pgo8dGV4dCB4PScyNTkuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTUuNjBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPScxMjcuMzhweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz4tLSZndDsgIGluY3JlYXNpbmcgIC0tJmd0OzwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSd0cmFuc2xhdGUoMjUuOTIsMTYyLjAwKSByb3RhdGUoLTkwKScgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMjQuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc3Ny4zN3B4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGl0dWRlPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09J3RyYW5zbGF0ZSg1MC40MCwxNjIuMDApIHJvdGF0ZSgtOTApJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAxNS42MHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzEyNy4zOHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPi0tJmd0OyAgaW5jcmVhc2luZyAgLS0mZ3Q7PC90ZXh0Pgo8cG9seWxpbmUgcG9pbnRzPScxNDYuNzAsMjk4LjY3IDE0Ni43MCw0OC4xMSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMjU5LjIwLDI5OC42NyAyNTkuMjAsNDguMTEgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9Jzc5LjIwLDIzMC4zMyAzMjYuNzAsMjMwLjMzICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSc3OS4yMCwxMTYuNDQgMzI2LjcwLDExNi40NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMTQ2LjcwLDI3NS44OSAxNDYuNzAsNzAuODkgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyNTkuMjAsMjc1Ljg5IDI1OS4yMCw3MC44OSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzEwMS43MCwyMzAuMzMgMzA0LjIwLDIzMC4zMyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzEwMS43MCwxMTYuNDQgMzA0LjIwLDExNi40NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMTQxLjMwLDIzMC4zMyAxNDYuNzAsMjI0LjkzIDE1Mi4xMCwyMzAuMzMgMTQ2LjcwLDIzNS43MyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMTQxLjMwLDExNi40NCAxNDYuNzAsMTExLjA0IDE1Mi4xMCwxMTYuNDQgMTQ2LjcwLDEyMS44NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjUzLjgwLDIzMC4zMyAyNTkuMjAsMjI0LjkzIDI2NC42MCwyMzAuMzMgMjU5LjIwLDIzNS43MyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjUzLjgwLDExNi40NCAyNTkuMjAsMTExLjA0IDI2NC42MCwxMTYuNDQgMjU5LjIwLDEyMS44NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzIwMi45NSwxODUuOTIgMjAyLjk1LDE2MC44NiAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzE5MS43MCwxNzMuMzkgMjE0LjIwLDE3My4zOSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMTk3LjU1LDE3My4zOSAyMDIuOTUsMTY3Ljk5IDIwOC4zNSwxNzMuMzkgMjAyLjk1LDE3OC43OSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzhBRDY0NzsnIC8+Cjx0ZXh0IHg9JzE0Ni43MCcgeT0nNDAuOTEnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nODUuMDRweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb25ibmQoaSwwKTwvdGV4dD4KPHRleHQgeD0nMjU5LjIwJyB5PSc0MC45MScgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc4NS4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChpLDEpPC90ZXh0Pgo8dGV4dCB4PSczMzMuOTAnIHk9JzIzNC42Nycgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc4MC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGJuZChqLDApPC90ZXh0Pgo8dGV4dCB4PSczMzMuOTAnIHk9JzEyMC43OCcgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc4MC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGJuZChqLDEpPC90ZXh0Pgo8dGV4dCB4PScyMDIuOTUnIHk9JzIwNC4wOCcgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM4QUQ2NDc7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc0MC4wMHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbihpKTwvdGV4dD4KPHRleHQgeD0nMjM2LjcwJyB5PScxNzguNDgnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nMzUuMDBweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sYXQoaik8L3RleHQ+CjxyZWN0IHg9JzMyNi43MCcgeT0nMTMuMjYnIHdpZHRoPScyMDIuNTAnIGhlaWdodD0nNjkuMDInIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7JyAvPgo8dGV4dCB4PSczMzMuOTAnIHk9JzMxLjM3JyBzdHlsZT0nZm9udC1zaXplOiAxNS42MHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzM2LjM3cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+d2l0aDo8L3RleHQ+Cjx0ZXh0IHg9JzMzMy45MCcgeT0nNTEuODcnIHN0eWxlPSdmb250LXNpemU6IDE1LjYwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nMTc0LjIwcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uYm5kKGksMCkgJmx0Oz0gbG9uYm5kKGksMSk8L3RleHQ+Cjx0ZXh0IHg9JzMzMy45MCcgeT0nNzIuMzcnIHN0eWxlPSdmb250LXNpemU6IDE1LjYwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nMTY1LjUzcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosMCkgJmx0Oz0gbGF0Ym5kKGosMSk8L3RleHQ+CjwvZz4KPC9zdmc+Cg==" alt="order horizontal bounds  1D coord variables" width="50%">
-</div>
-<div class="title">Figure 7.1. Order of <strong><code>lonbnd(i,0)</code></strong> and <strong><code>lonbnd(i,1)</code></strong> as well as of <strong><code>latbnd(i,0)</code></strong> and <strong><code>latbnd(i,1)</code></strong> in the case of one-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(i),lat(j))</code></strong> represent grid cell centers. The four grid cell vertices are given by <strong><code>(lonbnd(i,0),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,1))</code></strong> and <strong><code>(lonbnd(i,0),latbnd(j,1))</code></strong>.</div>
-</div>
-</dd>
-<dt class="hdlist1">Bounds for 2-D coordinate variables with 4-sided cells</dt>
-<dd>
-<p>In the case where the horizontal grid is described by two-dimensional auxiliary coordinate variables in latitude <strong><code>lat(n,m)</code></strong> and longitude <strong><code>lon(n,m)</code></strong>, and the associated cells are four-sided, then the boundary variables are given in the form <strong><code>latbnd(n,m,4)</code></strong> and <strong><code>lonbnd(n,m,4)</code></strong>, where the trailing index runs over the four vertices of the cells.
-Let us call the side of cell <strong><code>(j,i)</code></strong> facing cell <strong><code>(j,i-1)</code></strong> the "<strong><code>i-1</code></strong>" side, the side facing cell <strong><code>(j,i+1)</code></strong> the "<strong><code>i+1</code></strong>" side, and similarly for "<strong><code>j-1</code></strong>" and "<strong><code>j+1</code></strong>".
-Then we can refer to the vertex formed by sides <strong><code>i-1</code></strong> and <strong><code>j-1</code></strong> as <strong><code>(j-1,i-1)</code></strong>.
-With this notation, the four vertices are indexed as follows: <strong><code>0=(j-1,i-1)</code></strong>, <strong><code>1=(j-1,i+1)</code></strong>, <strong><code>2=(j+1,i+1)</code></strong>, <strong><code>3=(j+1,i-1)</code></strong>.</p>
-<div id="img-bnd_2d_coords" class="imageblock text-center text-center">
-<div class="content">
-<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0nVVRGLTgnID8+CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB4bWxuczp4bGluaz0naHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluaycgY2xhc3M9J3N2Z2xpdGUnIHdpZHRoPSc1MDQuMDBwdCcgaGVpZ2h0PSczNzQuNDBwdCcgdmlld0JveD0nMCAwIDUwNC4wMCAzNzQuNDAnPgo8ZGVmcz4KICA8c3R5bGUgdHlwZT0ndGV4dC9jc3MnPjwhW0NEQVRBWwogICAgLnN2Z2xpdGUgbGluZSwgLnN2Z2xpdGUgcG9seWxpbmUsIC5zdmdsaXRlIHBvbHlnb24sIC5zdmdsaXRlIHBhdGgsIC5zdmdsaXRlIHJlY3QsIC5zdmdsaXRlIGNpcmNsZSB7CiAgICAgIGZpbGw6IG5vbmU7CiAgICAgIHN0cm9rZTogIzAwMDAwMDsKICAgICAgc3Ryb2tlLWxpbmVjYXA6IHJvdW5kOwogICAgICBzdHJva2UtbGluZWpvaW46IHJvdW5kOwogICAgICBzdHJva2UtbWl0ZXJsaW1pdDogMTAuMDA7CiAgICB9CiAgXV0+PC9zdHlsZT4KPC9kZWZzPgo8cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBzdHlsZT0nc3Ryb2tlOiBub25lOyBmaWxsOiAjRkZGRkZGOycvPgo8ZGVmcz4KICA8Y2xpcFBhdGggaWQ9J2NwTUM0d01IdzFNRFF1TURCOE1DNHdNSHd6TnpRdU5EQT0nPgogICAgPHJlY3QgeD0nMC4wMCcgeT0nMC4wMCcgd2lkdGg9JzUwNC4wMCcgaGVpZ2h0PSczNzQuNDAnIC8+CiAgPC9jbGlwUGF0aD4KPC9kZWZzPgo8ZyBjbGlwLXBhdGg9J3VybCgjY3BNQzR3TUh3MU1EUXVNREI4TUM0d01Id3pOelF1TkRBPSknPgo8dGV4dCB4PScyNzcuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTIuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSczLjMzcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+IDwvdGV4dD4KPGxpbmUgeDE9JzY0LjgwJyB5MT0nMzA5LjYwJyB4Mj0nNDg5LjYwJyB5Mj0nMzA5LjYwJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OycgLz4KPGxpbmUgeDE9JzY0LjgwJyB5MT0nMzA5LjYwJyB4Mj0nNjQuODAnIHkyPScxNC40MCcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsnIC8+Cjx0ZXh0IHg9JzI3Ny4yMCcgeT0nMzM4LjQwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAyNC4wMHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzk3LjM4cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uZ2l0dWRlPC90ZXh0Pgo8dGV4dCB4PScyNzcuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTUuNjBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPScxMjcuMzhweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz4tLSZndDsgIGluY3JlYXNpbmcgIC0tJmd0OzwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSd0cmFuc2xhdGUoMjUuOTIsMTYyLjAwKSByb3RhdGUoLTkwKScgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMjQuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc3Ny4zN3B4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGl0dWRlPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09J3RyYW5zbGF0ZSg1MC40MCwxNjIuMDApIHJvdGF0ZSgtOTApJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAxNS42MHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzEyNy4zOHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPi0tJmd0OyAgaW5jcmVhc2luZyAgLS0mZ3Q7PC90ZXh0Pgo8L2c+CjxkZWZzPgogIDxjbGlwUGF0aCBpZD0nY3BOalF1T0RCOE5EZzVMall3ZkRFMExqUXdmRE13T1M0Mk1BPT0nPgogICAgPHJlY3QgeD0nNjQuODAnIHk9JzE0LjQwJyB3aWR0aD0nNDI0LjgwJyBoZWlnaHQ9JzI5NS4yMCcgLz4KICA8L2NsaXBQYXRoPgo8L2RlZnM+CjxnIGNsaXAtcGF0aD0ndXJsKCNjcE5qUXVPREI4TkRnNUxqWXdmREUwTGpRd2ZETXdPUzQyTUE9PSknPgo8cG9seWxpbmUgcG9pbnRzPSc0NjEuMDEsNDIwLjg1IDM4NS44NCwzMzUuNTQgMzAwLjYzLDI2NS41NyAyMDcuNDgsMjEyLjY2IDEwOC42NiwxNzguMTIgNi42MiwxNjIuNzkgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzUzMC4wOCwzNDMuOTQgNDQ0LjE4LDI0Ni40NCAzNDYuNzksMTY2LjQ3IDI0MC4zMywxMDYuMDEgMTI3LjQwLDY2LjUzIDEwLjc4LDQ5LjAxICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSc1OTkuMTUsMjY3LjAzIDUwMi41MSwxNTcuMzQgMzkyLjk1LDY3LjM4IDI3My4xOCwtMC42NSAxNDYuMTMsLTQ1LjA2IDE0LjkzLC02NC43NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMzkxLjk0LDQ5Ny43NiA0NjEuMDEsNDIwLjg1IDUzMC4wOCwzNDMuOTQgNTk5LjE1LDI2Ny4wMyA2NjguMjIsMTkwLjEyICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMjcuNTEsNDI0LjYzIDM4NS44NCwzMzUuNTQgNDQ0LjE4LDI0Ni40NCA1MDIuNTEsMTU3LjM0IDU2MC44NCw2OC4yNCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMjU0LjQ3LDM2NC42NiAzMDAuNjMsMjY1LjU3IDM0Ni43OSwxNjYuNDcgMzkyLjk1LDY3LjM4IDQzOS4xMSwtMzEuNzIgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzE3NC42MiwzMTkuMzEgMjA3LjQ4LDIxMi42NiAyNDAuMzMsMTA2LjAxIDI3My4xOCwtMC42NSAzMDYuMDMsLTEwNy4zMCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nODkuOTMsMjg5LjcwIDEwOC42NiwxNzguMTIgMTI3LjQwLDY2LjUzIDE0Ni4xMywtNDUuMDYgMTY0Ljg2LC0xNTYuNjUgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzIuNDYsMjc2LjU2IDYuNjIsMTYyLjc5IDEwLjc4LDQ5LjAxIDE0LjkzLC02NC43NyAxOS4wOSwtMTc4LjU0ICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDAuNjMsMjY1LjU3IDIwNy40OCwyMTIuNjYgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczNDYuNzksMTY2LjQ3IDI0MC4zMywxMDYuMDEgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDAuNjMsMjY1LjU3IDM0Ni43OSwxNjYuNDcgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyMDcuNDgsMjEyLjY2IDI0MC4zMywxMDYuMDEgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDAuNjMsMjc0LjY4IDMwMC42MywyNTYuNDUgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyMDcuNDgsMjIxLjc3IDIwNy40OCwyMDMuNTUgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyOTEuMjcsMjY1LjU3IDMxMC4wMCwyNjUuNTcgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScxOTguMTEsMjEyLjY2IDIxNi44NCwyMTIuNjYgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczNDYuNzksMTc1LjU4IDM0Ni43OSwxNTcuMzYgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyNDAuMzMsMTE1LjEyIDI0MC4zMyw5Ni45MCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzMzNy40MywxNjYuNDcgMzU2LjE2LDE2Ni40NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzIzMC45NiwxMDYuMDEgMjQ5LjY5LDEwNi4wMSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjk1LjIzLDI2NS41NyAzMDAuNjMsMjYwLjE3IDMwNi4wMywyNjUuNTcgMzAwLjYzLDI3MC45NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjAyLjA4LDIxMi42NiAyMDcuNDgsMjA3LjI2IDIxMi44OCwyMTIuNjYgMjA3LjQ4LDIxOC4wNiAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMzQxLjM5LDE2Ni40NyAzNDYuNzksMTYxLjA3IDM1Mi4xOSwxNjYuNDcgMzQ2Ljc5LDE3MS44NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjM0LjkzLDEwNi4wMSAyNDAuMzMsMTAwLjYxIDI0NS43MywxMDYuMDEgMjQwLjMzLDExMS40MSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzI3NC43MiwxOTQuNDAgMjc0LjcyLDE3Ni4xOCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzI2NS4zNiwxODUuMjkgMjg0LjA5LDE4NS4yOSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzM3MC41NywyNjAuNDMgMzcwLjU3LDI0Mi4yMSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzM2MS4yMSwyNTEuMzIgMzc5Ljk0LDI1MS4zMiAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzMxNC4zNSw5MS4yMSAzMTQuMzUsNzIuOTkgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICM4QUQ2NDc7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDQuOTgsODIuMTAgMzIzLjcxLDgyLjEwICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsgc3Ryb2tlOiAjOEFENjQ3OycgLz4KPHBvbHlnb24gcG9pbnRzPSczNjUuMTcsMjUxLjMyIDM3MC41NywyNDUuOTIgMzc1Ljk3LDI1MS4zMiAzNzAuNTcsMjU2LjcyICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsgc3Ryb2tlOiBub25lOyBmaWxsOiAjOEFENjQ3OycgLz4KPHBvbHlnb24gcG9pbnRzPScyNjkuMzIsMTg1LjI5IDI3NC43MiwxNzkuODkgMjgwLjEyLDE4NS4yOSAyNzQuNzIsMTkwLjY5ICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsgc3Ryb2tlOiBub25lOyBmaWxsOiAjOEFENjQ3OycgLz4KPHBvbHlnb24gcG9pbnRzPSczMDguOTUsODIuMTAgMzE0LjM1LDc2LjcwIDMxOS43NSw4Mi4xMCAzMTQuMzUsODcuNTAgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6IG5vbmU7IGZpbGw6ICM4QUQ2NDc7JyAvPgo8dGV4dCB4PScyMDcuNDgnIHk9JzIzOS44MicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc5NC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChqLGksMCk8L3RleHQ+Cjx0ZXh0IHg9JzE5MC45MScgeT0nMjE3LjAwJyB0ZXh0LWFuY2hvcj0nZW5kJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzg5LjA0cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosaSwwKTwvdGV4dD4KPHRleHQgeD0nMzAwLjYzJyB5PScyOTIuNzInIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nOTQuMDRweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb25ibmQoaixpLDEpPC90ZXh0Pgo8dGV4dCB4PSczNDYuNzknIHk9JzE1MC4xNicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc5NC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChqLGksMik8L3RleHQ+Cjx0ZXh0IHg9JzM2My4zNicgeT0nMTcwLjgxJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzg5LjA0cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosaSwyKTwvdGV4dD4KPHRleHQgeD0nMjQwLjMzJyB5PSc4OS43MCcgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc5NC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChqLGksMyk8L3RleHQ+Cjx0ZXh0IHg9JzIyMy43NicgeT0nMTEwLjM0JyB0ZXh0LWFuY2hvcj0nZW5kJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzg5LjA0cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosaSwzKTwvdGV4dD4KPHRleHQgeD0nMjc0LjcyJyB5PScyMTIuNDUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nNDkuMDBweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb24oaixpKTwvdGV4dD4KPHRleHQgeD0nMjkxLjI5JyB5PScxODkuNjMnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nNDQuMDBweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sYXQoaixpKTwvdGV4dD4KPHRleHQgeD0nMzcwLjU3JyB5PScyNzguNDgnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nNjkuNTJweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb24oaixpKzEpPC90ZXh0Pgo8dGV4dCB4PSczODcuMTQnIHk9JzI1NS42Nicgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM4QUQ2NDc7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc2NC41MnB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdChqLGkrMSk8L3RleHQ+Cjx0ZXh0IHg9JzMxNC4zNScgeT0nMTA5LjI2JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzhBRDY0NzsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzY5LjUycHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uKGorMSxpKTwvdGV4dD4KPHRleHQgeD0nMzMwLjkxJyB5PSc4Ni40NCcgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM4QUQ2NDc7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc2NC41MnB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdChqKzEsaSk8L3RleHQ+CjwvZz4KPC9zdmc+Cg==" alt="order horizontal bounds  2D coord variables" width="50%">
-</div>
-<div class="title">Figure 7.2. Order of <strong><code>lonbnd(j,i,0)</code></strong> to <strong><code>lonbnd(j,i,3)</code></strong> and of <strong><code>latbnd(j,i,0)</code></strong> and <strong><code>latbnd(j,i,3)</code></strong> in the case of two-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(j,i),lat(j,i))</code></strong> represent grid cell centers and tuples <strong><code>(lonbnd(j,i,n),latbnd(j,i,n))</code></strong> represent the grid cell vertices.</div>
-</div>
-<div class="paragraph">
-<p>If i-j-upward is a right-handed coordinate system (like lon-lat-upward), this ordering means the vertices will be traversed anticlockwise on the lon-lat surface seen from above (<a href="#img-bnd_2d_coords">Figure 7.2</a>).
-If i-j-upward is left-handed, they will be traversed clockwise on the lon-lat surface.</p>
-</div>
-<div class="paragraph">
-<p>The bounds can be used to decide whether cells are contiguous via the following relationships.
-In these equations the variable <strong><code>bnd</code></strong> is used generically to represent either the latitude or longitude boundary variable.</p>
-</div>
-</dd>
-</dl>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>For 0 &lt; j &lt; n and 0 &lt; i &lt; m,
-	If cells (j,i) and (j,i+1) are contiguous, then
-		bnd(j,i,1)=bnd(j,i+1,0)
-		bnd(j,i,2)=bnd(j,i+1,3)
-	If cells (j,i) and (j+1,i) are contiguous, then
-		bnd(j,i,3)=bnd(j+1,i,0) and bnd(j,i,2)=bnd(j+1,i,1)</pre>
-</div>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">Bounds for multi-dimensional coordinate variables with p-sided cells</dt>
-<dd>
-<p>In all other cases, the bounds should be dimensioned <strong><code>(&#8230;&#8203;,n,p)</code></strong>, where <strong><code>(&#8230;&#8203;,n)</code></strong> are the dimensions of the auxiliary coordinate variables, and <strong><code>p</code></strong> the number of vertices of the cells.
-The vertices must be traversed anticlockwise in the lon-lat plane as viewed from above.
-The starting vertex is not specified.</p>
-</dd>
-</dl>
-</div>
-<div id="cells-on-a-latitude-axis-ex" class="exampleblock">
-<div class="title">Example 7.2. Cells on a latitude axis</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre>dimensions:
-  lat = 64;
-  nv = 2;    // number of vertices
-variables:
-  float lat(lat);
-    lat:long_name = "latitude";
-    lat:units = "degrees_north";
-    lat:bounds = "lat_bnds";
-  float lat_bnds(lat,nv);</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The boundary variable <code>lat_bnds</code> associates a latitude gridpoint <code>i</code> with the interval whose boundaries are <code>lat_bnds(i,0)</code> and <code>lat_bnds(i,1)</code>.
-The gridpoint location, <code>lat(i)</code>, should be contained within this interval.</p>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>For rectangular grids, two-dimensional cells can be expressed as Cartesian products of one-dimensional cells of the type in the preceding example.
-However for non-rectangular grids a "rectangular" cell will in general require specifying all four vertices for each cell.</p>
-</div>
-<div id="cells-in-a-non-rectangular-grid-ex" class="exampleblock">
-<div class="title">Example 7.3. Cells in a non-rectangular grid</div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre>dimensions:
-  imax = 128;
-  jmax = 64;
-  nv = 4;
-variables:
-  float lat(jmax,imax);
-    lat:long_name = "latitude";
-    lat:units = "degrees_north";
-    lat:bounds = "lat_bnds";
-  float lon(jmax,imax);
-    lon:long_name = "longitude";
-    lon:units = "degrees_east";
-    lon:bounds = "lon_bnds";
-  float lat_bnds(jmax,imax,nv);
-  float lon_bnds(jmax,imax,nv);</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The boundary variables <code>lat_bnds</code> and <code>lon_bnds</code> associate a gridpoint <code>(j,i)</code> with the cell determined by the vertices <code>(lat_bnds(j,i,n),lon_bnds(j,i,n))</code>, <code>n=0,..,3</code>.
-The gridpoint location, <code>(lat(j,i),lon(j,i))</code>, should be contained within this region.</p>
 </div>
 </div>
 </div>
@@ -12717,6 +12759,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/527">Issue #527</a>: Clarify the conventions for boundary variables, especially for auxiliary coordinate variables of more than one dimension, state that there is no default for boundaries, add more information about bounds in section 1.</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/550">Issue #550</a>: Include a link to CF area-type table and make explicit the need to use standardized area-type strings in Section 7.3.3.</p>
 </li>
 <li>
@@ -13402,7 +13447,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.12 draft<br>
-Last updated 2024-12-03 14:55:47 UTC
+Last updated 2024-12-03 14:58:27 UTC
 </div>
 </div>
 </body>
