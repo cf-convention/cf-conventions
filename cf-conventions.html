@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version &#160;1.12 draft,</span>
-<span id="revdate">&#160;&#160;03&#160;December,&#160;2024&#160;14:50:34Z</span>
+<span id="revdate">&#160;&#160;03&#160;December,&#160;2024&#160;14:55:47Z</span>
 <br><span id="revremark">See&#160;<a href="https://cfconventions.org" target="_blank">https://cfconventions.org</a>&#160;for&#160;further&#160;information.</span>
 </div>
 </div>
@@ -2116,7 +2116,7 @@ Knowledge of the XML format is only necessary for application writers who plan t
 A formatted text version of the table is provided at
 <a href="https://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html"><a href="https://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html" class="bare">https://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html</a></a>,
 and this table may be consulted in order to find the standard name that should be assigned to a variable.
-Some standard names (e.g. <strong><code>region</code></strong> and <strong><code>area_type</code></strong>) are used to indicate quantities which are permitted to take only certain standard values.
+Some standard names (e.g. <strong><code>region</code></strong>, <a href="#geographic-regions">Section 6.1.1, "Geographic Regions"</a>, and <strong><code>area_type</code></strong>, <a href="#statistics-applying-portions">Statistics applying to portions of cells</a>) are used to indicate quantities which are permitted to take only certain standard values.
 This is indicated in the definition of the quantity in the standard name table, accompanied by a list or a link to a list of the permitted values.</p>
 </div>
 <div class="paragraph">
@@ -4847,12 +4847,12 @@ data:
 <div class="paragraph">
 <p>By default, the statistical method indicated by <strong><code>cell_methods</code></strong> is assumed to have been evaluated over the entire horizontal area of the cell.
 Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area).
-To indicate this, one of two conventions may be used.</p>
+Cell portions are referred to by means of standardised <strong><code>area_type</code></strong> strings, maintained in the <a href="https://cfconventions.org/Data/area-type-table/current/build/area-type-table.html">area-type table</a>, using one of two conventions.</p>
 </div>
 <div class="paragraph">
 <p>The first convention is a method that can be used for the common case of a single area-type.
 In this case, the <strong><code>cell_methods</code></strong> attribute may include a string of the form "<em>name: method</em>  <strong><code>where</code></strong>  <em>type</em>".
-Here <em>name</em> could, for example, be <strong><code>area</code></strong> and <em>type</em> may be any of the strings permitted for a variable with a <strong><code>standard_name</code></strong> of <strong><code>area_type</code></strong>.
+Here <em>name</em> could, for example, be <strong><code>area</code></strong> and <em>type</em> may be any of the standardised <strong><code>area_type</code></strong> strings.
 As an example, if the method were <strong><code>mean</code></strong> and the <strong><code>area_type</code></strong> were <strong><code>sea_ice</code></strong>, then the data would represent a mean over only the sea ice portion of the grid cell.
 If the data writer expects <em>type</em> to be interpreted as one of the standard <strong><code>area_type</code></strong> strings, then none of the variables in the netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, takes precedence).</p>
 </div>
@@ -4861,6 +4861,7 @@ If the data writer expects <em>type</em> to be interpreted as one of the standar
 In this case, the <strong><code>cell_methods</code></strong> entry is of the form "<em>name: method</em>  <strong><code>where</code></strong>  <em>typevar</em>".
 Here <em>typevar</em> is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see <a href="#labels">Section 6.1, "Labels"</a>) with a <strong><code>standard_name</code></strong> of <strong><code>area_type</code></strong>.
 The variable <em>typevar</em> contains the name(s) of the selected portion(s) of the grid cell to which the <em>method</em> is applied.
+These name(s) must be a subset of the standardised <strong><code>area_type</code></strong> strings.
 This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types).
 It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., <strong><code>vegetation</code></strong>, <strong><code>bare_ground</code></strong>, <strong><code>snow</code></strong>, etc.).</p>
 </div>
@@ -12716,6 +12717,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/550">Issue #550</a>: Include a link to CF area-type table and make explicit the need to use standardized area-type strings in Section 7.3.3.</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/542">Issue #542</a>: Clarify and rearrange text of section 4.4 about time coordinate units and calendars; introduce new text and a diagram explaining leap-seconds in existing calendars; define leap_second keyword of units_metadata attribute; define utc and tai calendars; define "datetime" in section 1.3.</p>
 </li>
 <li>
@@ -13398,7 +13402,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version &#160;1.12 draft<br>
-Last updated 2024-12-03 14:50:34 UTC
+Last updated 2024-12-03 14:55:47 UTC
 </div>
 </div>
 </body>
