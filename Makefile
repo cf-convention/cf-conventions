@@ -35,7 +35,13 @@ DATE_FORMAT := +%d&\#160;%B,&\#160;%Y
 FINAL_TAG := -a final
 else
 DATE_FORMAT ?= +%d&\#160;%B,&\#160;%Y&\#160;%H:%M:%SZ
-FINAL_TAG ?= -a draft
+LOCAL_BRANCH=`git name-rev --name-only HEAD`
+TRACKING_BRANCH=`git config branch.$LOCAL_BRANCH.merge`
+TRACKING_REMOTE=`git config branch.$LOCAL_BRANCH.remote`
+REMOTE_URL=`git config remote.$TRACKING_REMOTE.url`
+#git config branch.$(git name-rev --name-only HEAD).remote
+#git name-rev --name-only HEAD
+FINAL_TAG ?= -a draft -a revnumber=v1.12.0-rc7-24-gb724218 -a revremark=${LOCAL_BRANCH}
 endif
 
 DATE_DOCPROD != LC_ALL=C date -u "$(DATE_FORMAT)"
