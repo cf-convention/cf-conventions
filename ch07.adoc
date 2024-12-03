@@ -420,11 +420,11 @@ Notice that a parenthesized comment in the `cell_methods` attribute provides the
 
 By default, the statistical method indicated by **`cell_methods`** is assumed to have been evaluated over the entire horizontal area of the cell.
 Sometimes, however, it is useful to limit consideration to only a portion of a cell (e.g. a mean over the sea-ice area).
-To indicate this, one of two conventions may be used.
+Cell portions are referred to by means of standardised **`area_type`** strings, maintained in the link:$$https://cfconventions.org/Data/area-type-table/current/build/area-type-table.html$$[area-type table], using one of two conventions.
 
 The first convention is a method that can be used for the common case of a single area-type.
 In this case, the **`cell_methods`** attribute may include a string of the form "__name: method__  **`where`**  __type__".
-Here __name__ could, for example, be **`area`** and __type__ may be any of the strings permitted for a variable with a **`standard_name`** of **`area_type`**.
+Here __name__ could, for example, be **`area`** and __type__ may be any of the standardised **`area_type`** strings.
 As an example, if the method were **`mean`** and the **`area_type`** were **`sea_ice`**, then the data would represent a mean over only the sea ice portion of the grid cell.
 If the data writer expects __type__ to be interpreted as one of the standard **`area_type`** strings, then none of the variables in the netCDF file should be given a name identical to that of the string (because the second convention, described in the next paragraph, takes precedence).
 
@@ -432,6 +432,7 @@ The second convention is the more general.
 In this case, the **`cell_methods`** entry is of the form "__name: method__  **`where`**  __typevar__".
 Here __typevar__ is a string-valued auxiliary coordinate variable or string-valued scalar coordinate variable (see <<labels>>) with a **`standard_name`** of **`area_type`**.
 The variable __typevar__ contains the name(s) of the selected portion(s) of the grid cell to which the __method__ is applied.
+These name(s) must be a subset of the standardised **`area_type`** strings.
 This convention can accommodate cases in which a method is applied to more than one area type and the result is stored in a single data variable (with a dimension which ranges across the various area types).
 It provides a convenient way to store output from land surface models, for example, since they deal with many area types within each surface gridbox (e.g., **`vegetation`**, **`bare_ground`**, **`snow`**, etc.).
 
@@ -529,7 +530,7 @@ Instead, it has a **`climatology`** attribute, which names a variable with dimen
 Using the units and calendar of the time coordinate variable, element (i,0) of the climatology variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension.
 The time coordinates should be values that are representative of the climatological time intervals, such that an application which does not recognise climatological time will nonetheless be able to make a reasonable interpretation.
 
-For compatibility with the COARDS standard, a climatological time coordinate in the default **`standard`** and **`julian`** calendars may be indicated by setting the date/time reference string in the time coordinate's **`units`** attribute to midnight on 1 January in year 0 (i.e., **`since 0-1-1`**).
+For compatibility with the COARDS standard, a climatological time coordinate in the default **`standard`** and **`julian`** calendars may be indicated by setting the datetime reference string in the time coordinate's **`units`** attribute to midnight at 0 `degrees_east` on 1 January in year 0 (i.e., **`since 0-1-1`**).
 This convention is deprecated because it does not provide any information about the intervals used to compute the climatology, and there may be inconsistencies among software packages in the interpretation of the time coordinates with a reference time of year 0.
 Use of year 0 for this purpose is impossible in all other calendars, because year 0 is a valid year.
 
@@ -580,7 +581,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 1960-1-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1960-4-16", "1960-7-16", "1960-10-16", "1961-1-16" ;
   climatology_bounds="1960-3-1",  "1990-6-1",
                      "1960-6-1",  "1990-9-1",
@@ -606,7 +607,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 1901-1-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1965-1-15", "1975-1-15", "1985-1-15" ;
   climatology_bounds="1961-1-1", "1970-2-1",
                      "1971-1-1", "1980-2-1",
@@ -632,7 +633,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="hours since 1997-4-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1997-4-1 0:30", "1997-4-1 1:30", ... "1997-4-1 23:30" ;
   climatology_bounds="1997-4-1 0:00",  "1997-4-30 1:00",
                      "1997-4-1 1:00",  "1997-4-30 2:00",
@@ -666,7 +667,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 2000-6-1";
   double climatology_bounds(time,nv);
-data: // time coordinates translated to date/time format
+data: // time coordinates translated to datetime format
   time="2008-1-16 6:00";
   climatology_bounds="2007-12-1 6:00", "2008-3-1 6:00";
   threshold=0.;
@@ -690,7 +691,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 1961-1-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="1961-4-1 0:30", "1961-4-1 1:30", ..., "1961-4-1 23:30" ;
   climatology_bounds="1961-4-1 0:00", "1990-4-30 1:00",
                      "1961-4-1 1:00", "1990-4-30 2:00",
@@ -719,7 +720,7 @@ variables:
     time:climatology="climatology_bounds";
     time:units="days since 2000-6-1";
   double climatology_bounds(time,nv);
-data:  // time coordinates translated to date/time format
+data:  // time coordinates translated to datetime format
   time="2000-6-16", "2000-7-16", "2000-8-16" ;
   climatology_bounds="2000-6-1 6:00:00", "2000-7-1 6:00:00",
                      "2000-7-1 6:00:00", "2000-8-1 6:00:00",
