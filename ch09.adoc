@@ -13,10 +13,12 @@ The representation of such features in a CF dataset was supported previous to th
 This chapter describes further conventions which offer advantages of efficiency and clarity for storing a collection of features in a single file.
 When using these new conventions, __the features contained within a collection must always be of the same type; and all the collections in a CF file must be of the same feature type__.
 (Future versions of CF may allow mixing of multiple feature types within a file.)
-Table 9.1 presents the feature types covered by this chapter.
+<<table-feature-types, Table 9.1>> presents the feature types covered by this chapter.
 Details and examples of storage of each of these feature types are provided in Appendix H, as indicated in the table.
 
-[cols="4"]
+[[table-feature-types]]
+.Logical structure and mandatory coordinates for discrete sampling geometry featureTypes
+[options="header",caption="Table 9.1. "]
 |===============
 | featureType 2+| Description of a single feature with this discrete sampling geometry | Link
 
@@ -41,10 +43,7 @@ Details and examples of storage of each of these feature types are provided in A
 |||       data(i,p,o)          | x(i,p) y(i,p) z(i,p,o) t(i,p) | <<trajectory-profiles>>
 |===============
 
-**Table 9.1.** Logical structure and mandatory coordinates for discrete sampling geometry featureTypes.
-Other space-time coordinates may be included which are not mandatory.
-
-In Table 9.1 the spatial coordinates x and y typically refer to longitude and latitude but other horizontal coordinates could also be used (see sections 4 and 5.6).  
+In <<table-feature-types, Table 9.1>> the spatial coordinates x and y typically refer to longitude and latitude but other horizontal coordinates could also be used (see sections 4 and 5.6).  
 The spatial coordinate z refers to vertical position.
 The time coordinate is indicated as t.
 The space-time coordinates that are indicated for each feature are mandatory.
@@ -115,13 +114,15 @@ The **orthogonal multidimensional array representation**, the simplest represent
 For example, for a collection of the timeSeries that share a common set of times, or a collection of profiles that share a common set of vertical levels, this is likely to be the natural representation to use. 
 In both examples, there will be longitude and latitude coordinate variables, x(i), y(i), that are one-dimensional and defined along the instance dimension.
 
-Table 9.2 illustrates the storage of a data variable using the orthogonal multidimensional array representation.
+<<table-orthogonal-array, Table 9.2>> illustrates the storage of a data variable using the orthogonal multidimensional array representation.
 The data variable holds a collection of 4 features.
 The individual features, distinguished by color, are sequenced along the horizontal axis by the instance dimension indices, i1, i2, i3, i4.
 Each instance contains three elements, sequenced along the vertical with element dimension indices, o1, o2, o3.
-The i and o subscripts would be interchanged (i.e. Table 9.2 would be transposed) if the element dimension were the netCDF unlimited dimension.
+The i and o subscripts would be interchanged (i.e. <<table-orthogonal-array, Table 9.2>> would be transposed) if the element dimension were the netCDF unlimited dimension.
 
-[cols="4"]
+[[table-orthogonal-array]]
+.The storage of a data variable using the orthogonal multidimensional array representation (subscripts in CDL order)
+[cols="4", options="header",caption="Table 9.2. "]
 |===============
 |(i1, o1){set:cellbgcolor:#99dddd}
 |(i2, o1){set:cellbgcolor:#f6c682}
@@ -141,8 +142,6 @@ The i and o subscripts would be interchanged (i.e. Table 9.2 would be transposed
 |(i4, o3)
 {set:cellbgcolor:#ddaaaa}
 |===============
-
-Table 9.2  The storage of a data variable using the orthogonal multidimensional array representation (subscripts in CDL order).
 
 The instance variables of a dataset corresponding to Table 9.2 will be one-dimensional with size 4 (for example, the latitude locations of timeSeries),
 
@@ -178,15 +177,17 @@ The **incomplete multidimensional array representation** can used if the feature
 That is, features that are shorter than the longest feature must be padded with missing values to bring all instances to the same storage size.
 This representation sacrifices storage space to achieve simplicity for reading and writing.  
 
-Table 9.3 illustrates the storage of a data variable using the orthogonal multidimensional array representation.  
+<<table-incomplete-array, Table 9.3>> illustrates the storage of a data variable using the orthogonal multidimensional array representation.  
 The data variable holds a collection of 4 features.
 The individual features, distinguished by color, are sequenced by the instance dimension indices, i1, i2, i3, i4.
 The instances contain respectively 2, 4, 3 and 6 elements, sequenced by the element dimension index with values of o1, o2, o3, ... .
-The i and o subscripts would be interchanged (i.e. Table 9.3 would be transposed) if the element dimension were the netCDF unlimited dimension.
+The i and o subscripts would be interchanged (i.e. <<table-incomplete-array, Table 9.3>> would be transposed) if the element dimension were the netCDF unlimited dimension.
 
-[cols="4"]
+[[table-incomplete-array]]
+.The storage of data using the incomplete multidimensional array representation (subscripts in CDL order)
+[cols="4"", options="header", caption="Table 9.3. "]
 |===============
-| (i1, o1){set:cellbgcolor:#99dddd}
+| (i1, o1){set:cellbgcolor:#99dddd}
 |(i2, o1){set:cellbgcolor:#f6c682}
 |(i3, o1){set:cellbgcolor:#d4b4de}
 |(i4, o1)
@@ -232,14 +233,14 @@ The i and o subscripts would be interchanged (i.e. Table 9.3 would be transposed
 {set:cellbgcolor:#ddaaaa}
 |===============
 
-Table 9.3.   The storage of data using the incomplete multidimensional array representation (subscripts in CDL order).
-
 ====  Contiguous ragged array representation
 
 The **contiguous ragged array representation** can be used only if the size of each feature is known at the time that it is created. 
-In this representation the data for each feature will be contiguous on disk, as shown in Table 9.4.
+In this representation the data for each feature will be contiguous on disk, as shown in <<table-contiguous-array, Table 9.4>>.
 
-[cols="1",width="25%"]
+[[table-contiguous-array]]
+.The storage of data using the contiguous ragged representation (subscripts in CDL order)
+[cols="1",width="25%", caption="Table 9.4. "]
 |===============
 |(i1, o1)
 {set:cellbgcolor:#99dddd}
@@ -287,8 +288,6 @@ In this representation the data for each feature will be contiguous on disk, as 
 {set:cellbgcolor:#ddaaaa}
 |===============
 
-Table 9.4. The storage of data using the contiguous ragged representation (subscripts in CDL order).
-
 In this representation, the file contains a **count variable**, which must be an integer type and
 
 [cols="4"]
@@ -316,11 +315,20 @@ For indices that correspond to features, whose data have not yet been written, t
 
 ==== Indexed ragged array representation
 
-The **indexed ragged array representation** stores the features interleaved along the sample dimension in the data variable as shown in Table 9.4.
+The **indexed ragged array representation** stores the features interleaved along the sample dimension in the data variable as shown in <<table-indexed-array, Table 9.5>>.
 The canonical use case for this representation is the storage of real-time data streams that contain reports from many sources; the data can be written as it arrives.
 
-[cols="3",width="75"]
+[[table-indexed-array]]
+.The storage of data using the indexed ragged representation (subscripts in CDL order)
+[cols="3",width="75", options="header",caption="Table 9.5. "]
 |===============
+|{set:cellbgcolor!}
+Data variable indices
+|{set:cellbgcolor!}
+
+|{set:cellbgcolor!}
+Index variable values
+
 |(i1, o1){set:cellbgcolor:#99dddd}
 |{set:cellbgcolor!}
        
@@ -411,9 +419,6 @@ The canonical use case for this representation is the storage of real-time data 
 |3
 {set:cellbgcolor:#ddaaaa}
 |===============
-
-Table 9.4 The storage of data using the indexed ragged representation (subscripts in CDL order). 
-The left hand side of the table illustrates a data variable; the right hand side of the table contains the values of the index variable.
 
 In this representation, the file contains an **index variable**, which must be an integer type, and must have the sample dimension as its single dimension. 
 The index variable contains the zero-based index of the feature to which each element belongs. 
