@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">03&#160;December,&#160;2024&#160;17:00:46Z</span>
+<span id="revdate">04&#160;December,&#160;2024&#160;08:35:36Z</span>
 <br><span id="revremark"></span>
 </div>
 </div>
@@ -827,13 +827,20 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2024). NetCDF 
 <p>3.1. <a href="#table-supported-units">Prefixes for decimal multiples and submultiples of units</a><br>
 3.2. <a href="#table-flag-variable-bits">Flag Variable Bits (from Example)</a><br>
 3.3. <a href="#table-flag-variable-bit-2-and-3">Flag Variable Bit 2 and Bit 3 (from Example)</a><br>
+7.1. <a href="#table-geometry-types">Dimensionality, description, and additional required attributes for geometry_types.</a><br>
+9.1. <a href="#table-feature-types">Logical structure and mandatory coordinates for discrete sampling geometry featureTypes</a><br>
+9.2. <a href="#table-orthogonal-array">The storage of a data variable using the orthogonal multidimensional array representation (subscripts in CDL order)</a><br>
+9.3. <a href="#table-incomplete-array">The storage of data using the incomplete multidimensional array representation (subscripts in CDL order)</a><br>
+9.4. <a href="#table-contiguous-array">The storage of data using the contiguous ragged representation (subscripts in CDL order)</a><br>
+9.5. <a href="#table-indexed-array">The storage of data using the indexed ragged representation (subscripts in CDL order)</a><br>
 A.1. <a href="#table-attributes">Attributes</a><br>
 C.1. <a href="#table-standard-name-modifiers">Standard Name Modifiers</a><br>
-D.1. <a href="#table-computed-standard-names">Consistent sets of values for the standard_names of formula terms and the computed_standard_name needed in defining the ocean sigma coordinate, the ocean s-coordinate, the ocean_sigma over z coordinate, and the ocean double sigma coordinate.</a><br>
+D.1. <a href="#table-computed-standard-names">Consistent sets of values for the standard_names of formula terms and the computed_standard_name</a><br>
 E.1. <a href="#table-cell-methods">Cell Methods</a><br>
 F.1. <a href="#table-grid-mapping-attributes">Grid Mapping Attributes</a><br>
-I.1. <a href="#table-cf-concepts">The elements of the CF-netCDF conventions. The relationships to netCDF elements are shown in [figure-cf-concepts].</a><br>
-I.2. <a href="#table-cf-constructs">The constructs of the CF data model. The relationships between the constructs and CF-netCDF elements are shown in in [figure-field], [figure-dim-aux] and [figure-coordinate-reference].</a><br>
+I.1. <a href="#table-cf-concepts">The elements of the CF-netCDF conventions</a><br>
+I.2. <a href="#table-cf-constructs">The constructs of the CF data model</a><br>
+J.1. <a href="#table-subsampling-formulas">Conversions and formulas used in the definitions of subsampling interpolation methods</a><br>
 K.2. <a href="#table-mesh-topology-attributes">Mesh topology attributes</a></p>
 </div>
 <div class="paragraph">
@@ -922,7 +929,7 @@ J.5. <a href="#quadratic3">Figure J.5</a></p>
 8.4. <a href="#example-1d-interpolation-of-2d-domain">One-dimensional tie point interpolation of two-dimensional domain.</a><br>
 8.5. <a href="#example-VIIRS">Multiple interpolation variables with interpolation parameter attributes.</a><br>
 8.6. <a href="#example-grid-mapping-and-interpolation-with-time-not-interpolated">Combining a grid mapping and coordinate interpolation, with time as a non-interpolated dimension.</a><br>
-8.7. <a href="#example-interpolation-of-cell-boundaries">Interpolation of 2D Cell Boundaries corresponding to Figure 8.4</a><br>
+8.7. <a href="#example-interpolation-of-cell-boundaries">Interpolation of the 2D cell boundaries corresponding to Figure 8.4</a><br>
 8.8. <a href="#example-quantization-nsb-libnetcdf">Quantization performed by BitRound algorithm in libnetcdf</a><br>
 8.9. <a href="#example-quantization-nsd-multiple-variables-nco">Quantization performed by Granular BitRound algorithm in NCO</a><br>
 B.1. <a href="#name-table-three-entries-ex">A name table containing three entries</a><br>
@@ -1157,7 +1164,7 @@ Therefore CF-netCDF does not use codes, but instead relies on controlled vocabul
 <div class="sect2">
 <h3 id="terminology"><a class="anchor" href="#terminology"></a>1.3. Terminology</h3>
 <div class="paragraph">
-<p>The terms in this document that refer to components of a netCDF file are defined in the NetCDF User&#8217;s Guide (NUG) <a href="#NUG">[NUG]</a> NUG.
+<p>The terms in this document that refer to components of a netCDF file are defined in the NetCDF User&#8217;s Guide (NUG) <a href="#NUG">[NUG]</a>.
 Some of those definitions are repeated below for convenience.</p>
 </div>
 <div class="dlist">
@@ -1168,7 +1175,7 @@ Some of those definitions are repeated below for convenience.</p>
 </dd>
 <dt class="hdlist1">auxiliary coordinate variable</dt>
 <dd>
-<p>Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the NUG and used by this standard - see below).
+<p>Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the <a href="#NUG">[NUG]</a> and used by this standard - see below).
 Unlike coordinate variables, there is no relationship between the name of an auxiliary coordinate variable and the name(s) of its dimension(s).</p>
 </dd>
 <dt class="hdlist1">boundary variable</dt>
@@ -1301,13 +1308,13 @@ There is no relationship between the name of a tie point variable and the name(s
 <h3 id="overview"><a class="anchor" href="#overview"></a>1.4. Overview</h3>
 <div class="paragraph">
 <p>No variable or dimension names are standardized by this convention.
-Instead we follow the lead of the NUG and standardize only the names of attributes and some of the values taken by those attributes.
+Instead we follow the lead of the <a href="#NUG">[NUG]</a> and standardize only the names of attributes and some of the values taken by those attributes.
 Variable or dimension names can either be a single variable name or a path to a variable.
 The overview provided in this section will be followed with more complete descriptions in following sections.
 <a href="#attribute-appendix">Appendix A, Attributes</a> contains a summary of all the attributes used in this convention.</p>
 </div>
 <div class="paragraph">
-<p>Files using this version of the CF Conventions must set the NUG defined attribute <strong><code>Conventions</code></strong> to contain the string value "<strong><code>CF-1.12-draft</code></strong>" to identify datasets that conform to these conventions.</p>
+<p>Files using this version of the CF Conventions must set the <a href="#NUG">[NUG]</a> defined attribute <strong><code>Conventions</code></strong> to contain the string value "<strong><code>CF-1.12-draft</code></strong>" to identify datasets that conform to these conventions.</p>
 </div>
 <div class="paragraph">
 <p>The general description of a file&#8217;s contents should be contained in the following attributes: <strong><code>title</code></strong>, <strong><code>history</code></strong>, <strong><code>institution</code></strong>, <strong><code>source</code></strong>, <strong><code>comment</code></strong> and <strong><code>references</code></strong> (<a href="#description-of-file-contents">Section 2.6.2, "Description of file contents"</a>).
@@ -1315,7 +1322,7 @@ For backwards compatibility with COARDS none of these attributes is required, bu
 </div>
 <div class="paragraph">
 <p>Each variable in a netCDF file has an associated description which is provided by the attributes <strong><code>units</code></strong>, <strong><code>long_name</code></strong>, and <strong><code>standard_name</code></strong>.
-The <strong><code>units</code></strong>, and <strong><code>long_name</code></strong> attributes are defined in the NUG and the <strong><code>standard_name</code></strong> attribute is defined in this document.</p>
+The <strong><code>units</code></strong>, and <strong><code>long_name</code></strong> attributes are defined in the <a href="#NUG">[NUG]</a> and the <strong><code>standard_name</code></strong> attribute is defined in this document.</p>
 </div>
 <div class="paragraph">
 <p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>).
@@ -1334,7 +1341,7 @@ There are conventions that identify the variables that contain the coordinate da
 </div>
 <div class="paragraph">
 <p>There are two methods used to identify variables that contain coordinate data.
-The first is to use the NUG-defined "coordinate variables."
+The first is to use the <a href="#NUG">[NUG]</a>-defined "coordinate variables."
 <em>The use of coordinate variables is required for all dimensions that correspond to one dimensional space or time coordinates</em>.
 In cases where coordinate variables are not applicable, the variables containing coordinate data are identified by the <strong><code>coordinates</code></strong> attribute.</p>
 </div>
@@ -1370,7 +1377,7 @@ An important application of this attribute is to describe climatological and diu
 <div class="paragraph">
 <p>Methods for reducing the total volume of data include both packing and compression.
 Packing reduces the data volume by reducing the precision of the stored numbers.
-It is implemented using the attributes <strong><code>add_offset</code></strong> and <strong><code>scale_factor</code></strong> which are defined in the NUG.
+It is implemented using the attributes <strong><code>add_offset</code></strong> and <strong><code>scale_factor</code></strong> which are defined in the <a href="#NUG">[NUG]</a>.
 Compression on the other hand loses no precision, but reduces the volume by not storing missing data.
 The attribute <strong><code>compress</code></strong> is defined for this purpose.</p>
 </div>
@@ -1454,7 +1461,7 @@ To reduce the chance of ambiguities arising from their accidental re-use, all of
 <h2 id="_netcdf_files_and_components"><a class="anchor" href="#_netcdf_files_and_components"></a>2. NetCDF Files and Components</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The components of a netCDF file are described in section 2 of the NUG <a href="#NUG">[NUG]</a>.
+<p>The components of a netCDF file are described in section 2 of the <a href="#NUG">[NUG]</a>.
 In this section we describe conventions associated with filenames and the basic components of a netCDF file.
 We also introduce new attributes for describing the contents of a file.</p>
 </div>
@@ -1471,7 +1478,7 @@ We also introduce new attributes for describing the contents of a file.</p>
 The <strong><code>string</code></strong> type, which has variable length, is only available in files using the netCDF version 4 (netCDF-4) format.
 The <strong><code>char</code></strong> and <strong><code>string</code></strong> types are not intended for numeric data.
 One byte numeric data should be stored using the <strong><code>byte</code></strong> or <strong><code>unsigned byte</code></strong> data types.
-It is possible to treat the <strong><code>byte</code></strong> and <strong><code>short</code></strong> types as unsigned by using the NUG convention of indicating the unsigned range using the <strong><code>valid_min</code></strong>, <strong><code>valid_max</code></strong>, or <strong><code>valid_range</code></strong> attributes.
+It is possible to treat the <strong><code>byte</code></strong> and <strong><code>short</code></strong> types as unsigned by using the <a href="#NUG">[NUG]</a> convention of indicating the unsigned range using the <strong><code>valid_min</code></strong>, <strong><code>valid_max</code></strong>, or <strong><code>valid_range</code></strong> attributes.
 In many situations, any integer type may be used.
 When the phrase "integer type" is used in this document, it should be understood to mean <strong><code>byte</code></strong>, <strong><code>unsigned byte</code></strong>, <strong><code>short</code></strong>, <strong><code>unsigned short</code></strong>, <strong><code>int</code></strong>, <strong><code>unsigned int</code></strong>, <strong><code>int64</code></strong>, or <strong><code>unsigned int64</code></strong>.</p>
 </div>
@@ -1567,8 +1574,7 @@ For example, a variable containing data for temperature at 1.5 m above the groun
 <div class="sect3">
 <h4 id="missing-data"><a class="anchor" href="#missing-data"></a>2.5.1. Missing data, valid and actual range of data</h4>
 <div class="paragraph">
-<p>The NUG conventions
-(<a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, Attribute Conventions</a>)
+<p><a href="https://www.unidata.ucar.edu/software/netcdf/docs/attribute_conventions.html">NUG Appendix A, Attribute Conventions</a>
 provide the <strong><code>_FillValue</code></strong>, <strong><code>missing_value</code></strong>, <strong><code>valid_min</code></strong>, <strong><code>valid_max</code></strong>, and <strong><code>valid_range</code></strong> attributes to indicate missing data.
 Missing data is allowed in data variables and auxiliary coordinate variables.
 Generic applications should treat the data as missing where any auxiliary coordinate variables have missing values; special-purpose applications might be able to make use of the data.
@@ -1621,7 +1627,7 @@ See <a href="#attribute-appendix">Appendix A, Attributes</a> for a list of attri
 <div class="sect3">
 <h4 id="identification-of-conventions"><a class="anchor" href="#identification-of-conventions"></a>2.6.1. Identification of Conventions</h4>
 <div class="paragraph">
-<p>Files that follow this version of the CF Conventions must indicate this by setting the NUG defined global attribute <strong><code>Conventions</code></strong> to a string value that contains "<strong><code>CF-1.12-draft</code></strong>".
+<p>Files that follow this version of the CF Conventions must indicate this by setting the <a href="#NUG">[NUG]</a> defined global attribute <strong><code>Conventions</code></strong> to a string value that contains "<strong><code>CF-1.12-draft</code></strong>".
 The Conventions version number contained in that string can be used to find the web based versions of this document are from the <a href="https://cfconventions.org/">netCDF Conventions web page</a>.
 Subsequent versions of the CF Conventions will not make invalid a compliant usage of this or earlier versions of the CF terms and forms.</p>
 </div>
@@ -1649,7 +1655,7 @@ For readability in ncdump outputs it is recommended to embed newline characters 
 For backwards compatibility with COARDS none of these global attributes is required.</p>
 </div>
 <div class="paragraph">
-<p>The NUG defines <strong><code>title</code></strong> and <strong><code>history</code></strong> to be global attributes.
+<p>The <a href="#NUG">[NUG]</a> defines <strong><code>title</code></strong> and <strong><code>history</code></strong> to be global attributes.
 We wish to allow the newly defined attributes, i.e., <strong><code>institution</code></strong>, <strong><code>source</code></strong>, <strong><code>references</code></strong>, and <strong><code>comment</code></strong>, to be either global or assigned to individual variables.
 When an attribute appears both globally and as a variable attribute, the variable&#8217;s version has precedence.</p>
 </div>
@@ -1767,7 +1773,7 @@ If not, the ancestors of the referring group are searched for it, starting from 
 Because coordinate variables must share dimensions with the variables that reference them, the ancestor search is executed only until the local apex group is reached.
 For coordinate variables that are not found in the referring group or its ancestors, a further strategy is provided, called lateral search.
 The lateral search proceeds downwards from the local apex group width-wise through each level of groups until the sought coordinate is found.
-The lateral search algorithm may only be used for NUG coordinate variables; it shall not be used for auxiliary coordinate variables.</p>
+The lateral search algorithm may only be used for <a href="#NUG">[NUG]</a> coordinate variables; it shall not be used for auxiliary coordinate variables.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -2085,7 +2091,7 @@ Use of these attributes for data packing, which is their most important applicat
 <div class="sect2">
 <h3 id="long-name"><a class="anchor" href="#long-name"></a>3.2. Long Name</h3>
 <div class="paragraph">
-<p>The <strong><code>long_name</code></strong> attribute is defined by the NUG to contain a long descriptive name which may, for example, be used for labeling plots.
+<p>The <strong><code>long_name</code></strong> attribute is defined by the <a href="#NUG">[NUG]</a> to contain a long descriptive name which may, for example, be used for labeling plots.
 For backwards compatibility with COARDS this attribute is optional.
 But it is highly recommended that either this or the <strong><code>standard_name</code></strong> attribute defined in the next section be provided for all data variables and variables containing coordinate data, in order to make the file self-describing.
 If a variable has no <strong><code>long_name</code></strong> attribute then an application may use, as a default, the <strong><code>standard_name</code></strong> if it exists, or the variable name itself.</p>
@@ -2095,7 +2101,7 @@ If a variable has no <strong><code>long_name</code></strong> attribute then an a
 <h3 id="standard-name"><a class="anchor" href="#standard-name"></a>3.3. Standard Name</h3>
 <div class="paragraph">
 <p>A fundamental requirement for exchange of scientific data is the ability to describe precisely the physical quantities being represented.
-To some extent this is the role of the <strong><code>long_name</code></strong> attribute as defined in the NUG.
+To some extent this is the role of the <strong><code>long_name</code></strong> attribute as defined in the <a href="#NUG">[NUG]</a>.
 However, usage of <strong><code>long_name</code></strong> is completely ad-hoc.
 For many applications it is desirable to have a more definitive description of the quantity, which allows users of data from different sources (some of which might be models and others observational) to determine whether quantities are in fact comparable.
 For this reason each variable may optionally be given a "standard name", whose meaning is defined by this convention.
@@ -2594,7 +2600,7 @@ If an application detects such an inconsistency, the user should be warned, and 
 <div class="sect3">
 <h4 id="_dimensional_vertical_coordinate"><a class="anchor" href="#_dimensional_vertical_coordinate"></a>4.3.1. Dimensional Vertical Coordinate</h4>
 <div class="paragraph">
-<p>Variables representing dimensional vertical coordinates for or height must always explicitly include the  <strong><code>units</code></strong> attribute.
+<p>Variables representing dimensional vertical coordinates for depth or height must always explicitly include the  <strong><code>units</code></strong> attribute.
 The acceptable units for a vertical (depth or height) coordinate variable must a UDUNITS <a href="#UDUNITS">[UDUNITS]</a> representation of one of the following:</p>
 </div>
 <div class="ulist">
@@ -3183,7 +3189,7 @@ This practice also avoids potential bugs in applications that determine coordina
 </div>
 <div class="paragraph">
 <p>If the longitude, latitude, vertical or time coordinate is multi-valued, varies in only one dimension, and varies independently of other spatiotemporal coordinates, it is not permitted to store it as an auxiliary coordinate variable.
-This is both to enhance conformance to COARDS and to facilitate the use of generic applications that recognize the NUG convention for coordinate variables.
+This is both to enhance conformance to COARDS and to facilitate the use of generic applications that recognize the <a href="#NUG">[NUG]</a> convention for coordinate variables.
 An application that is trying to find the latitude coordinate of a variable should always look first to see if any of the variable&#8217;s dimensions correspond to a latitude coordinate variable.
 If the latitude coordinate is not found this way, then the auxiliary coordinate variables listed by the <code>coordinates</code> attribute should be checked.
 Note that it is permissible, but optional, to list coordinate variables as well as auxiliary coordinate variables in the <code>coordinates</code> attribute.
@@ -4497,7 +4503,7 @@ In these cases, the parent variable&#8217;s attribute does not apply to the boun
 <div class="paragraph">
 <p>For a one-dimensional coordinate variable of size <em>N</em>, the boundary variable is an array of shape (<em>N</em>,2).
 The bounds for cell <em>i</em> are the elements <em>B</em>(<em>i</em>,0) and <em>B</em>(<em>i</em>,1) of the boundary variable <em>B</em>.
-Element <em>C</em>(<em>i</em>) of the coordinate variable <em>C</em> should lie between the boundaries of the cell, or upon one of them i.e. <em>B</em>(<em>i</em>,0) - <em>C</em>(<em>i</em>) and <em>B</em>(<em>i</em>,1) - <em>C</em>(<em>i</em>) should not have the same sign, though one of them could be zero.</p>
+Element <em>C</em>(<em>i</em>) of the coordinate variable <em>C</em> should lie between the boundaries of the cell, or upon one of them i.e. <em>B</em>(<em>i</em>,0) - <em>C</em>(<em>i</em>) and <em>B</em>(<em>i</em>,1) - <em>C</em>(<em>i</em>) should not have the same sign, though one of them could be zero (<a href="#img-bnd_1d_coords">Figure 7.1</a>).</p>
 </div>
 <div class="paragraph">
 <p>If <em>N</em> &gt; 1, the bounds of each cell must be ordered consistently with the coordinates i.e. <em>B</em>(<em>i</em>,0) &lt; <em>B</em>(<em>i</em>,1) for all <em>i</em> if <em>C</em>(<em>i</em>) &lt; <em>C</em>(<em>i</em> + 1), and <em>B</em>(<em>i</em>,0) &gt; <em>B</em>(<em>i</em>,1) for all <em>i</em> if <em>C</em>(<em>i</em>) &gt; <em>C</em>(<em>i</em> + 1).</p>
@@ -4535,9 +4541,9 @@ For example, if the interval <strong><code>i=3</code></strong> begins at <strong
 </div>
 <div id="img-bnd_1d_coords" class="imageblock text-center text-center">
 <div class="content">
-<img src="data:image/png;base64," alt="order horizontal bounds  1D coord variables" width="50%">
+<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0nVVRGLTgnID8+CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB4bWxuczp4bGluaz0naHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluaycgY2xhc3M9J3N2Z2xpdGUnIHdpZHRoPSc1NDAuMDBwdCcgaGVpZ2h0PSczNzQuNDBwdCcgdmlld0JveD0nMCAwIDU0MC4wMCAzNzQuNDAnPgo8ZGVmcz4KICA8c3R5bGUgdHlwZT0ndGV4dC9jc3MnPjwhW0NEQVRBWwogICAgLnN2Z2xpdGUgbGluZSwgLnN2Z2xpdGUgcG9seWxpbmUsIC5zdmdsaXRlIHBvbHlnb24sIC5zdmdsaXRlIHBhdGgsIC5zdmdsaXRlIHJlY3QsIC5zdmdsaXRlIGNpcmNsZSB7CiAgICAgIGZpbGw6IG5vbmU7CiAgICAgIHN0cm9rZTogIzAwMDAwMDsKICAgICAgc3Ryb2tlLWxpbmVjYXA6IHJvdW5kOwogICAgICBzdHJva2UtbGluZWpvaW46IHJvdW5kOwogICAgICBzdHJva2UtbWl0ZXJsaW1pdDogMTAuMDA7CiAgICB9CiAgXV0+PC9zdHlsZT4KPC9kZWZzPgo8cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBzdHlsZT0nc3Ryb2tlOiBub25lOyBmaWxsOiAjRkZGRkZGOycvPgo8ZGVmcz4KICA8Y2xpcFBhdGggaWQ9J2NwTUM0d01IdzFOREF1TURCOE1DNHdNSHd6TnpRdU5EQT0nPgogICAgPHJlY3QgeD0nMC4wMCcgeT0nMC4wMCcgd2lkdGg9JzU0MC4wMCcgaGVpZ2h0PSczNzQuNDAnIC8+CiAgPC9jbGlwUGF0aD4KPC9kZWZzPgo8ZyBjbGlwLXBhdGg9J3VybCgjY3BNQzR3TUh3MU5EQXVNREI4TUM0d01Id3pOelF1TkRBPSknPgo8dGV4dCB4PScyNTkuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTIuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSczLjMzcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+IDwvdGV4dD4KPGxpbmUgeDE9JzY1LjcwJyB5MT0nMzEyLjMzJyB4Mj0nNDM5LjIwJyB5Mj0nMzEyLjMzJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOycgLz4KPGxpbmUgeDE9JzY1LjcwJyB5MT0nMzEyLjMzJyB4Mj0nNjUuNzAnIHkyPScyNS4zMycgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsnIC8+Cjx0ZXh0IHg9JzI1OS4yMCcgeT0nMzM4LjQwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAyNC4wMHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzk3LjM4cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uZ2l0dWRlPC90ZXh0Pgo8dGV4dCB4PScyNTkuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTUuNjBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPScxMjcuMzhweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz4tLSZndDsgIGluY3JlYXNpbmcgIC0tJmd0OzwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSd0cmFuc2xhdGUoMjUuOTIsMTYyLjAwKSByb3RhdGUoLTkwKScgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMjQuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc3Ny4zN3B4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGl0dWRlPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09J3RyYW5zbGF0ZSg1MC40MCwxNjIuMDApIHJvdGF0ZSgtOTApJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAxNS42MHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzEyNy4zOHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPi0tJmd0OyAgaW5jcmVhc2luZyAgLS0mZ3Q7PC90ZXh0Pgo8cG9seWxpbmUgcG9pbnRzPScxNDYuNzAsMjk4LjY3IDE0Ni43MCw0OC4xMSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMjU5LjIwLDI5OC42NyAyNTkuMjAsNDguMTEgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9Jzc5LjIwLDIzMC4zMyAzMjYuNzAsMjMwLjMzICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSc3OS4yMCwxMTYuNDQgMzI2LjcwLDExNi40NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMTQ2LjcwLDI3NS44OSAxNDYuNzAsNzAuODkgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyNTkuMjAsMjc1Ljg5IDI1OS4yMCw3MC44OSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzEwMS43MCwyMzAuMzMgMzA0LjIwLDIzMC4zMyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzEwMS43MCwxMTYuNDQgMzA0LjIwLDExNi40NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMTQxLjMwLDIzMC4zMyAxNDYuNzAsMjI0LjkzIDE1Mi4xMCwyMzAuMzMgMTQ2LjcwLDIzNS43MyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMTQxLjMwLDExNi40NCAxNDYuNzAsMTExLjA0IDE1Mi4xMCwxMTYuNDQgMTQ2LjcwLDEyMS44NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjUzLjgwLDIzMC4zMyAyNTkuMjAsMjI0LjkzIDI2NC42MCwyMzAuMzMgMjU5LjIwLDIzNS43MyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjUzLjgwLDExNi40NCAyNTkuMjAsMTExLjA0IDI2NC42MCwxMTYuNDQgMjU5LjIwLDEyMS44NCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzIwMi45NSwxODUuOTIgMjAyLjk1LDE2MC44NiAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzE5MS43MCwxNzMuMzkgMjE0LjIwLDE3My4zOSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMTk3LjU1LDE3My4zOSAyMDIuOTUsMTY3Ljk5IDIwOC4zNSwxNzMuMzkgMjAyLjk1LDE3OC43OSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzhBRDY0NzsnIC8+Cjx0ZXh0IHg9JzE0Ni43MCcgeT0nNDAuOTEnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nODUuMDRweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb25ibmQoaSwwKTwvdGV4dD4KPHRleHQgeD0nMjU5LjIwJyB5PSc0MC45MScgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc4NS4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChpLDEpPC90ZXh0Pgo8dGV4dCB4PSczMzMuOTAnIHk9JzIzNC42Nycgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc4MC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGJuZChqLDApPC90ZXh0Pgo8dGV4dCB4PSczMzMuOTAnIHk9JzEyMC43OCcgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc4MC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGJuZChqLDEpPC90ZXh0Pgo8dGV4dCB4PScyMDIuOTUnIHk9JzIwNC4wOCcgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM4QUQ2NDc7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc0MC4wMHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbihpKTwvdGV4dD4KPHRleHQgeD0nMjM2LjcwJyB5PScxNzguNDgnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nMzUuMDBweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sYXQoaik8L3RleHQ+CjxyZWN0IHg9JzMyNi43MCcgeT0nMTMuMjYnIHdpZHRoPScyMDIuNTAnIGhlaWdodD0nNjkuMDInIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7JyAvPgo8dGV4dCB4PSczMzMuOTAnIHk9JzMxLjM3JyBzdHlsZT0nZm9udC1zaXplOiAxNS42MHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzM2LjM3cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+d2l0aDo8L3RleHQ+Cjx0ZXh0IHg9JzMzMy45MCcgeT0nNTEuODcnIHN0eWxlPSdmb250LXNpemU6IDE1LjYwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nMTc0LjIwcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uYm5kKGksMCkgJmx0Oz0gbG9uYm5kKGksMSk8L3RleHQ+Cjx0ZXh0IHg9JzMzMy45MCcgeT0nNzIuMzcnIHN0eWxlPSdmb250LXNpemU6IDE1LjYwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nMTY1LjUzcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosMCkgJmx0Oz0gbGF0Ym5kKGosMSk8L3RleHQ+CjwvZz4KPC9zdmc+Cg==" alt="order horizontal bounds  1D coord variables" width="50%">
 </div>
-<div class="title">Figure 7.1. Order of <strong><code>lonbnd(i,0)</code></strong> and <strong><code>lonbnd(i,1)</code></strong> as well as of <strong><code>latbnd(i,0)</code></strong> and <strong><code>latbnd(i,1)</code></strong> in the case of one-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(i),lat(j))</code></strong> locate the gridpoints. The four grid cell vertices are given by <strong><code>(lonbnd(i,0),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,1))</code></strong> and <strong><code>(lonbnd(i,0),latbnd(j,1))</code></strong>.</div>
+<div class="title">Figure 7.1. Order of <strong><code>lonbnd(i,0)</code></strong> and <strong><code>lonbnd(i,1)</code></strong> as well as of <strong><code>latbnd(i,0)</code></strong> and <strong><code>latbnd(i,1)</code></strong> in the case of one-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(i),lat(j))</code></strong> represent grid cell centers. The four grid cell vertices are given by <strong><code>(lonbnd(i,0),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,0))</code></strong>, <strong><code>(lonbnd(i,1),latbnd(j,1))</code></strong> and <strong><code>(lonbnd(i,0),latbnd(j,1))</code></strong>.</div>
 </div>
 </div>
 <div class="sect3">
@@ -4585,9 +4591,9 @@ With this notation, the four vertices are indexed as follows: <strong><code>0=(j
 </div>
 <div id="img-bnd_2d_coords" class="imageblock text-center text-center">
 <div class="content">
-<img src="data:image/png;base64," alt="order horizontal bounds  2D coord variables" width="50%">
+<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0nVVRGLTgnID8+CjxzdmcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJyB4bWxuczp4bGluaz0naHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluaycgY2xhc3M9J3N2Z2xpdGUnIHdpZHRoPSc1MDQuMDBwdCcgaGVpZ2h0PSczNzQuNDBwdCcgdmlld0JveD0nMCAwIDUwNC4wMCAzNzQuNDAnPgo8ZGVmcz4KICA8c3R5bGUgdHlwZT0ndGV4dC9jc3MnPjwhW0NEQVRBWwogICAgLnN2Z2xpdGUgbGluZSwgLnN2Z2xpdGUgcG9seWxpbmUsIC5zdmdsaXRlIHBvbHlnb24sIC5zdmdsaXRlIHBhdGgsIC5zdmdsaXRlIHJlY3QsIC5zdmdsaXRlIGNpcmNsZSB7CiAgICAgIGZpbGw6IG5vbmU7CiAgICAgIHN0cm9rZTogIzAwMDAwMDsKICAgICAgc3Ryb2tlLWxpbmVjYXA6IHJvdW5kOwogICAgICBzdHJva2UtbGluZWpvaW46IHJvdW5kOwogICAgICBzdHJva2UtbWl0ZXJsaW1pdDogMTAuMDA7CiAgICB9CiAgXV0+PC9zdHlsZT4KPC9kZWZzPgo8cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBzdHlsZT0nc3Ryb2tlOiBub25lOyBmaWxsOiAjRkZGRkZGOycvPgo8ZGVmcz4KICA8Y2xpcFBhdGggaWQ9J2NwTUM0d01IdzFNRFF1TURCOE1DNHdNSHd6TnpRdU5EQT0nPgogICAgPHJlY3QgeD0nMC4wMCcgeT0nMC4wMCcgd2lkdGg9JzUwNC4wMCcgaGVpZ2h0PSczNzQuNDAnIC8+CiAgPC9jbGlwUGF0aD4KPC9kZWZzPgo8ZyBjbGlwLXBhdGg9J3VybCgjY3BNQzR3TUh3MU1EUXVNREI4TUM0d01Id3pOelF1TkRBPSknPgo8dGV4dCB4PScyNzcuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTIuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSczLjMzcHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+IDwvdGV4dD4KPGxpbmUgeDE9JzY0LjgwJyB5MT0nMzA5LjYwJyB4Mj0nNDg5LjYwJyB5Mj0nMzA5LjYwJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OycgLz4KPGxpbmUgeDE9JzY0LjgwJyB5MT0nMzA5LjYwJyB4Mj0nNjQuODAnIHkyPScxNC40MCcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsnIC8+Cjx0ZXh0IHg9JzI3Ny4yMCcgeT0nMzM4LjQwJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAyNC4wMHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzk3LjM4cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uZ2l0dWRlPC90ZXh0Pgo8dGV4dCB4PScyNzcuMjAnIHk9JzM2NC4zMicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTUuNjBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPScxMjcuMzhweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz4tLSZndDsgIGluY3JlYXNpbmcgIC0tJmd0OzwvdGV4dD4KPHRleHQgdHJhbnNmb3JtPSd0cmFuc2xhdGUoMjUuOTIsMTYyLjAwKSByb3RhdGUoLTkwKScgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMjQuMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc3Ny4zN3B4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdGl0dWRlPC90ZXh0Pgo8dGV4dCB0cmFuc2Zvcm09J3RyYW5zbGF0ZSg1MC40MCwxNjIuMDApIHJvdGF0ZSgtOTApJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAxNS42MHB4OyBmb250LXdlaWdodDogMDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzEyNy4zOHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPi0tJmd0OyAgaW5jcmVhc2luZyAgLS0mZ3Q7PC90ZXh0Pgo8L2c+CjxkZWZzPgogIDxjbGlwUGF0aCBpZD0nY3BOalF1T0RCOE5EZzVMall3ZkRFMExqUXdmRE13T1M0Mk1BPT0nPgogICAgPHJlY3QgeD0nNjQuODAnIHk9JzE0LjQwJyB3aWR0aD0nNDI0LjgwJyBoZWlnaHQ9JzI5NS4yMCcgLz4KICA8L2NsaXBQYXRoPgo8L2RlZnM+CjxnIGNsaXAtcGF0aD0ndXJsKCNjcE5qUXVPREI4TkRnNUxqWXdmREUwTGpRd2ZETXdPUzQyTUE9PSknPgo8cG9seWxpbmUgcG9pbnRzPSc0NjEuMDEsNDIwLjg1IDM4NS44NCwzMzUuNTQgMzAwLjYzLDI2NS41NyAyMDcuNDgsMjEyLjY2IDEwOC42NiwxNzguMTIgNi42MiwxNjIuNzkgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzUzMC4wOCwzNDMuOTQgNDQ0LjE4LDI0Ni40NCAzNDYuNzksMTY2LjQ3IDI0MC4zMywxMDYuMDEgMTI3LjQwLDY2LjUzIDEwLjc4LDQ5LjAxICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSc1OTkuMTUsMjY3LjAzIDUwMi41MSwxNTcuMzQgMzkyLjk1LDY3LjM4IDI3My4xOCwtMC42NSAxNDYuMTMsLTQ1LjA2IDE0LjkzLC02NC43NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMzkxLjk0LDQ5Ny43NiA0NjEuMDEsNDIwLjg1IDUzMC4wOCwzNDMuOTQgNTk5LjE1LDI2Ny4wMyA2NjguMjIsMTkwLjEyICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMjcuNTEsNDI0LjYzIDM4NS44NCwzMzUuNTQgNDQ0LjE4LDI0Ni40NCA1MDIuNTEsMTU3LjM0IDU2MC44NCw2OC4yNCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nMjU0LjQ3LDM2NC42NiAzMDAuNjMsMjY1LjU3IDM0Ni43OSwxNjYuNDcgMzkyLjk1LDY3LjM4IDQzOS4xMSwtMzEuNzIgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzE3NC42MiwzMTkuMzEgMjA3LjQ4LDIxMi42NiAyNDAuMzMsMTA2LjAxIDI3My4xOCwtMC42NSAzMDYuMDMsLTEwNy4zMCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDEuNTA7IHN0cm9rZTogIzM4NTk4Qzsgc3Ryb2tlLWRhc2hhcnJheTogMi4wMCw2LjAwOycgLz4KPHBvbHlsaW5lIHBvaW50cz0nODkuOTMsMjg5LjcwIDEwOC42NiwxNzguMTIgMTI3LjQwLDY2LjUzIDE0Ni4xMywtNDUuMDYgMTY0Ljg2LC0xNTYuNjUgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7IHN0cm9rZS1kYXNoYXJyYXk6IDIuMDAsNi4wMDsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzIuNDYsMjc2LjU2IDYuNjIsMTYyLjc5IDEwLjc4LDQ5LjAxIDE0LjkzLC02NC43NyAxOS4wOSwtMTc4LjU0ICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMS41MDsgc3Ryb2tlOiAjMzg1OThDOyBzdHJva2UtZGFzaGFycmF5OiAyLjAwLDYuMDA7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDAuNjMsMjY1LjU3IDIwNy40OCwyMTIuNjYgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczNDYuNzksMTY2LjQ3IDI0MC4zMywxMDYuMDEgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDAuNjMsMjY1LjU3IDM0Ni43OSwxNjYuNDcgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyMDcuNDgsMjEyLjY2IDI0MC4zMywxMDYuMDEgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAxLjUwOyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDAuNjMsMjc0LjY4IDMwMC42MywyNTYuNDUgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyMDcuNDgsMjIxLjc3IDIwNy40OCwyMDMuNTUgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyOTEuMjcsMjY1LjU3IDMxMC4wMCwyNjUuNTcgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScxOTguMTEsMjEyLjY2IDIxNi44NCwyMTIuNjYgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczNDYuNzksMTc1LjU4IDM0Ni43OSwxNTcuMzYgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICMzODU5OEM7JyAvPgo8cG9seWxpbmUgcG9pbnRzPScyNDAuMzMsMTE1LjEyIDI0MC4zMyw5Ni45MCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzMzNy40MywxNjYuNDcgMzU2LjE2LDE2Ni40NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzIzMC45NiwxMDYuMDEgMjQ5LjY5LDEwNi4wMSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjk1LjIzLDI2NS41NyAzMDAuNjMsMjYwLjE3IDMwNi4wMywyNjUuNTcgMzAwLjYzLDI3MC45NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjAyLjA4LDIxMi42NiAyMDcuNDgsMjA3LjI2IDIxMi44OCwyMTIuNjYgMjA3LjQ4LDIxOC4wNiAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMzQxLjM5LDE2Ni40NyAzNDYuNzksMTYxLjA3IDM1Mi4xOSwxNjYuNDcgMzQ2Ljc5LDE3MS44NyAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5Z29uIHBvaW50cz0nMjM0LjkzLDEwNi4wMSAyNDAuMzMsMTAwLjYxIDI0NS43MywxMDYuMDEgMjQwLjMzLDExMS40MSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogbm9uZTsgZmlsbDogIzM4NTk4QzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzI3NC43MiwxOTQuNDAgMjc0LjcyLDE3Ni4xOCAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzI2NS4zNiwxODUuMjkgMjg0LjA5LDE4NS4yOSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzM3MC41NywyNjAuNDMgMzcwLjU3LDI0Mi4yMSAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzM2MS4yMSwyNTEuMzIgMzc5Ljk0LDI1MS4zMiAnIHN0eWxlPSdzdHJva2Utd2lkdGg6IDAuNzU7IHN0cm9rZTogIzhBRDY0NzsnIC8+Cjxwb2x5bGluZSBwb2ludHM9JzMxNC4zNSw5MS4yMSAzMTQuMzUsNzIuOTkgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6ICM4QUQ2NDc7JyAvPgo8cG9seWxpbmUgcG9pbnRzPSczMDQuOTgsODIuMTAgMzIzLjcxLDgyLjEwICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsgc3Ryb2tlOiAjOEFENjQ3OycgLz4KPHBvbHlnb24gcG9pbnRzPSczNjUuMTcsMjUxLjMyIDM3MC41NywyNDUuOTIgMzc1Ljk3LDI1MS4zMiAzNzAuNTcsMjU2LjcyICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsgc3Ryb2tlOiBub25lOyBmaWxsOiAjOEFENjQ3OycgLz4KPHBvbHlnb24gcG9pbnRzPScyNjkuMzIsMTg1LjI5IDI3NC43MiwxNzkuODkgMjgwLjEyLDE4NS4yOSAyNzQuNzIsMTkwLjY5ICcgc3R5bGU9J3N0cm9rZS13aWR0aDogMC43NTsgc3Ryb2tlOiBub25lOyBmaWxsOiAjOEFENjQ3OycgLz4KPHBvbHlnb24gcG9pbnRzPSczMDguOTUsODIuMTAgMzE0LjM1LDc2LjcwIDMxOS43NSw4Mi4xMCAzMTQuMzUsODcuNTAgJyBzdHlsZT0nc3Ryb2tlLXdpZHRoOiAwLjc1OyBzdHJva2U6IG5vbmU7IGZpbGw6ICM4QUQ2NDc7JyAvPgo8dGV4dCB4PScyMDcuNDgnIHk9JzIzOS44MicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc5NC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChqLGksMCk8L3RleHQ+Cjx0ZXh0IHg9JzE5MC45MScgeT0nMjE3LjAwJyB0ZXh0LWFuY2hvcj0nZW5kJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzg5LjA0cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosaSwwKTwvdGV4dD4KPHRleHQgeD0nMzAwLjYzJyB5PScyOTIuNzInIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjNDQwMTU0OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nOTQuMDRweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb25ibmQoaixpLDEpPC90ZXh0Pgo8dGV4dCB4PSczNDYuNzknIHk9JzE1MC4xNicgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc5NC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChqLGksMik8L3RleHQ+Cjx0ZXh0IHg9JzM2My4zNicgeT0nMTcwLjgxJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzg5LjA0cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosaSwyKTwvdGV4dD4KPHRleHQgeD0nMjQwLjMzJyB5PSc4OS43MCcgdGV4dC1hbmNob3I9J21pZGRsZScgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM0NDAxNTQ7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc5NC4wNHB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxvbmJuZChqLGksMyk8L3RleHQ+Cjx0ZXh0IHg9JzIyMy43NicgeT0nMTEwLjM0JyB0ZXh0LWFuY2hvcj0nZW5kJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzQ0MDE1NDsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9Jzg5LjA0cHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bGF0Ym5kKGosaSwzKTwvdGV4dD4KPHRleHQgeD0nMjc0LjcyJyB5PScyMTIuNDUnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nNDkuMDBweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb24oaixpKTwvdGV4dD4KPHRleHQgeD0nMjkxLjI5JyB5PScxODkuNjMnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nNDQuMDBweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sYXQoaixpKTwvdGV4dD4KPHRleHQgeD0nMzcwLjU3JyB5PScyNzguNDgnIHRleHQtYW5jaG9yPSdtaWRkbGUnIHN0eWxlPSdmb250LXNpemU6IDE4LjAwcHg7IGZvbnQtd2VpZ2h0OiAwOyBmaWxsOiAjOEFENjQ3OyBmb250LWZhbWlseTogSGVsdmV0aWNhOycgdGV4dExlbmd0aD0nNjkuNTJweCcgbGVuZ3RoQWRqdXN0PSdzcGFjaW5nQW5kR2x5cGhzJz5sb24oaixpKzEpPC90ZXh0Pgo8dGV4dCB4PSczODcuMTQnIHk9JzI1NS42Nicgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM4QUQ2NDc7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc2NC41MnB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdChqLGkrMSk8L3RleHQ+Cjx0ZXh0IHg9JzMxNC4zNScgeT0nMTA5LjI2JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBzdHlsZT0nZm9udC1zaXplOiAxOC4wMHB4OyBmb250LXdlaWdodDogMDsgZmlsbDogIzhBRDY0NzsgZm9udC1mYW1pbHk6IEhlbHZldGljYTsnIHRleHRMZW5ndGg9JzY5LjUycHgnIGxlbmd0aEFkanVzdD0nc3BhY2luZ0FuZEdseXBocyc+bG9uKGorMSxpKTwvdGV4dD4KPHRleHQgeD0nMzMwLjkxJyB5PSc4Ni40NCcgc3R5bGU9J2ZvbnQtc2l6ZTogMTguMDBweDsgZm9udC13ZWlnaHQ6IDA7IGZpbGw6ICM4QUQ2NDc7IGZvbnQtZmFtaWx5OiBIZWx2ZXRpY2E7JyB0ZXh0TGVuZ3RoPSc2NC41MnB4JyBsZW5ndGhBZGp1c3Q9J3NwYWNpbmdBbmRHbHlwaHMnPmxhdChqKzEsaSk8L3RleHQ+CjwvZz4KPC9zdmc+Cg==" alt="order horizontal bounds  2D coord variables" width="50%">
 </div>
-<div class="title">Figure 7.2. Order of <strong><code>lonbnd(j,i,0)</code></strong> to <strong><code>lonbnd(j,i,3)</code></strong> and of <strong><code>latbnd(j,i,0)</code></strong> and <strong><code>latbnd(j,i,3)</code></strong> in the case of two-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(j,i),lat(j,i))</code></strong> locate the gridpoints and tuples <strong><code>(lonbnd(j,i,n),latbnd(j,i,n))</code></strong> locate the grid cell vertices.</div>
+<div class="title">Figure 7.2. Order of <strong><code>lonbnd(j,i,0)</code></strong> to <strong><code>lonbnd(j,i,3)</code></strong> and of <strong><code>latbnd(j,i,0)</code></strong> and <strong><code>latbnd(j,i,3)</code></strong> in the case of two-dimensional horizontal coordinate axes. Tuples <strong><code>(lon(j,i),lat(j,i))</code></strong> represent grid cell centers and tuples <strong><code>(lonbnd(j,i,n),latbnd(j,i,n))</code></strong> represent the grid cell vertices.</div>
 </div>
 <div class="paragraph">
 <p>The bounds can be used to decide whether cells are contiguous via the following relationships.
@@ -5401,7 +5407,8 @@ This interior ring variable must contain the value 0 to indicate an exterior rin
 The single dimension of the interior ring variable must be the same dimension as that of the part node count variable.
 The geometry types included in this convention are listed in Table 7.1.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
+<table id="table-geometry-types" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 7.1. Dimensionality, description, and additional required attributes for geometry_types.</caption>
 <colgroup>
 <col style="width: 25%;">
 <col style="width: 25%;">
@@ -5437,9 +5444,6 @@ The geometry types included in this convention are listed in Table 7.1.</p>
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p><strong>Table 7.1.</strong> Dimensionality, description, and additional required attributes for geometry_types.</p>
-</div>
 <div id="complete-multipolygon-example" class="exampleblock">
 <div class="title">Example 7.16. Polygons with holes</div>
 <div class="content">
@@ -5533,14 +5537,14 @@ The disadvantage is that generic utilities that don&#8217;t recognize the CF con
 <h3 id="packed-data"><a class="anchor" href="#packed-data"></a>8.1. Packed Data</h3>
 <div class="paragraph">
 <p>At the current time the netCDF interface does not provide for packing data.
-However a simple packing may be achieved through the use of the optional NUG defined attributes <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong>.
+However a simple packing may be achieved through the use of the optional <a href="#NUG">[NUG]</a> defined attributes <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong>.
 After the data values of a variable have been read, they are to be multiplied by the <strong><code>scale_factor</code></strong>, and have <strong><code>add_offset</code></strong> added to them.
 If both attributes are present, the data are scaled before the offset is added.
 When scaled data are written, the application should first subtract the offset and then divide by the scale factor.
 The units of a variable should be representative of the unpacked data.</p>
 </div>
 <div class="paragraph">
-<p>This standard is more restrictive than the NUG with respect to the use of the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes; ambiguities and precision problems related to data type conversions are resolved by these restrictions.</p>
+<p>This standard is more restrictive than the <a href="#NUG">[NUG]</a> with respect to the use of the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes; ambiguities and precision problems related to data type conversions are resolved by these restrictions.</p>
 </div>
 <div class="paragraph">
 <p>When packed data is written, the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes must be of the same type as the unpacked data, which must be either <strong><code>float</code></strong> or <strong><code>double</code></strong>. Data of type <strong><code>float</code></strong> must be packed into one of these types: <strong><code>byte</code></strong>, <strong><code>unsigned byte</code></strong>, <strong><code>short</code></strong>, <strong><code>unsigned short</code></strong>. Data of type <strong><code>double</code></strong> must be packed into one of these types: <strong><code>byte</code></strong>, <strong><code>unsigned byte</code></strong>, <strong><code>short</code></strong>, <strong><code>unsigned short</code></strong>, <strong><code>int</code></strong>, <strong><code>unsigned int</code></strong>.</p>
@@ -6183,8 +6187,8 @@ The full set of bounds tie points is formed by appending, for each continuous ar
 <div class="paragraph">
 <p><strong>Bounds Tie Point Attribute and Bounds Tie Point Variable</strong><br>
 A <strong><code>bounds_tie_points</code></strong> attribute must be defined for each tie point coordinate variable corresponding to reconstituted coordinates with cell boundaries.
-It is a single word of the form <em>“bounds_tie_point_variable”</em> that identifies a bounds tie point variable, containing a bounds tie point coordinate value for each tie point stored in its tie point coordinate variable, and therefore the bounds tie point variable has the same set of dimensions as its tie point coordinate variable.
-An example of the usage of the <strong><code>bounds_tie_points</code></strong> is shown in <a href="#example-interpolation-of-cell-boundaries">Interpolation of 2D Cell Boundaries corresponding to Figure 8.4</a>.
+Its string value identifies a <em>bounds tie point variable</em> which contains a bounds tie point coordinate value for each tie point stored in its tie point coordinate variable, and therefore the bounds tie point variable has the same set of dimensions as its tie point coordinate variable.
+An example of the usage of the <strong><code>bounds_tie_points</code></strong> is shown in <a href="#example-interpolation-of-cell-boundaries">Example 8.7</a>.
 Since a bounds tie point variable is considered to be part of a tie point coordinate variable’s metadata, it is not necessary to provide it with attributes such as long_name and units, following the same rules as for the bounds of an uncompressed coordinate variable, see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>.</p>
 </div>
 <div class="paragraph">
@@ -6203,7 +6207,7 @@ For one-dimensional coordinate bounds, in the second step of the process, for ea
 For two-dimensional coordinate bounds, in the second step of the process, for each index pair <code>(j, i)</code> of the interpolated dimension, the four bounds of the boundary variable is set to the value of the interpolated bounds point grid at index pairs <code>B0</code>, <code>B1</code>, <code>B2</code> and <code>B3</code>, respectively, where the index pairs are defined above under <a href="#compressing_two_dimensional">"Compressing two-dimensional coordinate bounds"</a>.</p>
 </div>
 <div id="example-interpolation-of-cell-boundaries" class="exampleblock">
-<div class="title">Example 8.7. Interpolation of 2D Cell Boundaries corresponding to <a href="#figure_interpolation_of_cell_boundaries">Figure 8.4</a></div>
+<div class="title">Example 8.7. Interpolation of the 2D cell boundaries corresponding to Figure 8.4</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -6278,11 +6282,11 @@ The data creator shall specify the floating-point arithmetic precision used duri
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"32"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">32-bit floating-point arithmetic, comparable to the binary32 standard in [<a href="#IEEE_754">[IEEE_754]</a>]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">32-bit floating-point arithmetic, comparable to the IEEE binary32 standard <a href="#IEEE_754">[IEEE_754]</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">"64"</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">64-bit floating-point arithmetic, comparable to the binary64 standard in [<a href="#IEEE_754">[IEEE_754]</a>]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-bit floating-point arithmetic, comparable to the IEEE binary64 standard <a href="#IEEE_754">[IEEE_754]</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -6462,10 +6466,11 @@ The representation of such features in a CF dataset was supported previous to th
 This chapter describes further conventions which offer advantages of efficiency and clarity for storing a collection of features in a single file.
 When using these new conventions, <em>the features contained within a collection must always be of the same type; and all the collections in a CF file must be of the same feature type</em>.
 (Future versions of CF may allow mixing of multiple feature types within a file.)
-Table 9.1 presents the feature types covered by this chapter.
+<a href="#table-feature-types">Table 9.1</a> presents the feature types covered by this chapter.
 Details and examples of storage of each of these feature types are provided in Appendix H, as indicated in the table.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
+<table id="table-feature-types" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 9.1. Logical structure and mandatory coordinates for discrete sampling geometry featureTypes</caption>
 <colgroup>
 <col style="width: 25%;">
 <col style="width: 25%;">
@@ -6555,11 +6560,7 @@ Details and examples of storage of each of these feature types are provided in A
 </tbody>
 </table>
 <div class="paragraph">
-<p><strong>Table 9.1.</strong> Logical structure and mandatory coordinates for discrete sampling geometry featureTypes.
-Other space-time coordinates may be included which are not mandatory.</p>
-</div>
-<div class="paragraph">
-<p>In Table 9.1 the spatial coordinates x and y typically refer to longitude and latitude but other horizontal coordinates could also be used (see sections 4 and 5.6).  
+<p>In <a href="#table-feature-types">Table 9.1</a> the spatial coordinates x and y typically refer to longitude and latitude but other horizontal coordinates could also be used (see sections 4 and 5.6).  
 The spatial coordinate z refers to vertical position.
 The time coordinate is indicated as t.
 The space-time coordinates that are indicated for each feature are mandatory.
@@ -6658,26 +6659,29 @@ For example, for a collection of the timeSeries that share a common set of times
 In both examples, there will be longitude and latitude coordinate variables, x(i), y(i), that are one-dimensional and defined along the instance dimension.</p>
 </div>
 <div class="paragraph">
-<p>Table 9.2 illustrates the storage of a data variable using the orthogonal multidimensional array representation.
+<p><a href="#table-orthogonal-array">Table 9.2</a> illustrates the storage of a data variable using the orthogonal multidimensional array representation.
 The data variable holds a collection of 4 features.
 The individual features, distinguished by color, are sequenced along the horizontal axis by the instance dimension indices, i1, i2, i3, i4.
 Each instance contains three elements, sequenced along the vertical with element dimension indices, o1, o2, o3.
-The i and o subscripts would be interchanged (i.e. Table 9.2 would be transposed) if the element dimension were the netCDF unlimited dimension.</p>
+The i and o subscripts would be interchanged (i.e. <a href="#table-orthogonal-array">Table 9.2</a> would be transposed) if the element dimension were the netCDF unlimited dimension.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
+<table id="table-orthogonal-array" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 9.2. The storage of a data variable using the orthogonal multidimensional array representation (subscripts in CDL order)</caption>
 <colgroup>
 <col style="width: 25%;">
 <col style="width: 25%;">
 <col style="width: 25%;">
 <col style="width: 25%;">
 </colgroup>
-<tbody>
+<thead>
 <tr>
-<td class="tableblock halign-left valign-top" style="background-color: #99dddd;"><p class="tableblock">(i1, o1)</p></td>
-<td class="tableblock halign-left valign-top" style="background-color: #f6c682;"><p class="tableblock">(i2, o1)</p></td>
-<td class="tableblock halign-left valign-top" style="background-color: #d4b4de;"><p class="tableblock">(i3, o1)</p></td>
-<td class="tableblock halign-left valign-top" style="background-color: #ddaaaa;"><p class="tableblock">(i4, o1)</p></td>
+<th class="tableblock halign-left valign-top" style="background-color: #99dddd;">(i1, o1)</th>
+<th class="tableblock halign-left valign-top" style="background-color: #f6c682;">(i2, o1)</th>
+<th class="tableblock halign-left valign-top" style="background-color: #d4b4de;">(i3, o1)</th>
+<th class="tableblock halign-left valign-top" style="background-color: #ddaaaa;">(i4, o1)</th>
 </tr>
+</thead>
+<tbody>
 <tr>
 <td class="tableblock halign-left valign-top" style="background-color: #99dddd;"><p class="tableblock">(i1, o2)</p></td>
 <td class="tableblock halign-left valign-top" style="background-color: #f6c682;"><p class="tableblock">(i2, o2)</p></td>
@@ -6692,9 +6696,6 @@ The i and o subscripts would be interchanged (i.e. Table 9.2 would be transposed
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>Table 9.2  The storage of a data variable using the orthogonal multidimensional array representation (subscripts in CDL order).</p>
-</div>
 <div class="paragraph">
 <p>The instance variables of a dataset corresponding to Table 9.2 will be one-dimensional with size 4 (for example, the latitude locations of timeSeries),</p>
 </div>
@@ -6746,13 +6747,14 @@ That is, features that are shorter than the longest feature must be padded with 
 This representation sacrifices storage space to achieve simplicity for reading and writing.  </p>
 </div>
 <div class="paragraph">
-<p>Table 9.3 illustrates the storage of a data variable using the orthogonal multidimensional array representation.  
+<p><a href="#table-incomplete-array">Table 9.3</a> illustrates the storage of a data variable using the orthogonal multidimensional array representation.  
 The data variable holds a collection of 4 features.
 The individual features, distinguished by color, are sequenced by the instance dimension indices, i1, i2, i3, i4.
 The instances contain respectively 2, 4, 3 and 6 elements, sequenced by the element dimension index with values of o1, o2, o3, &#8230;&#8203; .
-The i and o subscripts would be interchanged (i.e. Table 9.3 would be transposed) if the element dimension were the netCDF unlimited dimension.</p>
+The i and o subscripts would be interchanged (i.e. <a href="#table-incomplete-array">Table 9.3</a> would be transposed) if the element dimension were the netCDF unlimited dimension.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch">
+<table id="table-incomplete-array" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 9.3. The storage of data using the incomplete multidimensional array representation (subscripts in CDL order)</caption>
 <colgroup>
 <col style="width: 25%;">
 <col style="width: 25%;">
@@ -6761,7 +6763,7 @@ The i and o subscripts would be interchanged (i.e. Table 9.3 would be transposed
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top" style="background-color: #99dddd;"><p class="tableblock"> (i1, o1)</p></td>
+<td class="tableblock halign-left valign-top" style="background-color: #99dddd;"><p class="tableblock">(i1, o1)</p></td>
 <td class="tableblock halign-left valign-top" style="background-color: #f6c682;"><p class="tableblock">(i2, o1)</p></td>
 <td class="tableblock halign-left valign-top" style="background-color: #d4b4de;"><p class="tableblock">(i3, o1)</p></td>
 <td class="tableblock halign-left valign-top" style="background-color: #ddaaaa;"><p class="tableblock">(i4, o1)</p></td>
@@ -6798,17 +6800,15 @@ The i and o subscripts would be interchanged (i.e. Table 9.3 would be transposed
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>Table 9.3.   The storage of data using the incomplete multidimensional array representation (subscripts in CDL order).</p>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_contiguous_ragged_array_representation"><a class="anchor" href="#_contiguous_ragged_array_representation"></a>9.3.3.  Contiguous ragged array representation</h4>
 <div class="paragraph">
 <p>The <strong>contiguous ragged array representation</strong> can be used only if the size of each feature is known at the time that it is created.
-In this representation the data for each feature will be contiguous on disk, as shown in Table 9.4.</p>
+In this representation the data for each feature will be contiguous on disk, as shown in <a href="#table-contiguous-array">Table 9.4</a>.</p>
 </div>
-<table class="tableblock frame-all grid-all" style="width: 25%;">
+<table id="table-contiguous-array" class="tableblock frame-all grid-all" style="width: 25%;">
+<caption class="title">Table 9.4. The storage of data using the contiguous ragged representation (subscripts in CDL order)</caption>
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -6861,9 +6861,6 @@ In this representation the data for each feature will be contiguous on disk, as 
 </tbody>
 </table>
 <div class="paragraph">
-<p>Table 9.4. The storage of data using the contiguous ragged representation (subscripts in CDL order).</p>
-</div>
-<div class="paragraph">
 <p>In this representation, the file contains a <strong>count variable</strong>, which must be an integer type and</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
@@ -6898,15 +6895,23 @@ For indices that correspond to features, whose data have not yet been written, t
 <div class="sect3">
 <h4 id="_indexed_ragged_array_representation"><a class="anchor" href="#_indexed_ragged_array_representation"></a>9.3.4. Indexed ragged array representation</h4>
 <div class="paragraph">
-<p>The <strong>indexed ragged array representation</strong> stores the features interleaved along the sample dimension in the data variable as shown in Table 9.4.
+<p>The <strong>indexed ragged array representation</strong> stores the features interleaved along the sample dimension in the data variable as shown in <a href="#table-indexed-array">Table 9.5</a>.
 The canonical use case for this representation is the storage of real-time data streams that contain reports from many sources; the data can be written as it arrives.</p>
 </div>
-<table class="tableblock frame-all grid-all" style="width: 75%;">
+<table id="table-indexed-array" class="tableblock frame-all grid-all" style="width: 75%;">
+<caption class="title">Table 9.5. The storage of data using the indexed ragged representation (subscripts in CDL order)</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
 <col style="width: 33.3334%;">
 </colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Data variable indices</th>
+<th class="tableblock halign-left valign-top"></th>
+<th class="tableblock halign-left valign-top">Index variable values</th>
+</tr>
+</thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top" style="background-color: #99dddd;"><p class="tableblock">(i1, o1)</p></td>
@@ -6985,10 +6990,6 @@ The canonical use case for this representation is the storage of real-time data 
 </tr>
 </tbody>
 </table>
-<div class="paragraph">
-<p>Table 9.4 The storage of data using the indexed ragged representation (subscripts in CDL order).
-The left hand side of the table illustrates a data variable; the right hand side of the table contains the values of the index variable.</p>
-</div>
 <div class="paragraph">
 <p>In this representation, the file contains an <strong>index variable</strong>, which must be an integer type, and must have the sample dimension as its single dimension.
 The index variable contains the zero-based index of the feature to which each element belongs.
@@ -8238,13 +8239,8 @@ f(j,i)= 0.5*(z1+ z2) + 0.5*(z1-z2)* tanh(2*a/(z1-z2)*(depth(j,i)-href))</pre>
 <p>The <code>standard_name</code> for <code>depth</code> and the <code>computed_standard_name</code> must be one of the consistent sets shown in <a href="#table-computed-standard-names">Table D.1</a>.
 No <code>standard_name</code> has been defined for <code>z1</code>, <code>z2</code>, <code>a</code>, <code>href</code> or <code>k_c</code>.</p>
 </div>
-<div id="table-computed-standard-names" class="imageblock">
-<div class="content">
-<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg==" alt="NFFFFFF 1.0">
-</div>
-<div class="title">Consistent sets of values for the standard_names of formula terms and the computed_standard_name needed in defining the ocean sigma coordinate, the ocean s-coordinate, the ocean_sigma over z coordinate, and the ocean double sigma coordinate.</div>
-</div>
-<table class="tableblock frame-all grid-all stretch">
+<table id="table-computed-standard-names" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table D.1. Consistent sets of values for the standard_names of formula terms and the computed_standard_name</caption>
 <colgroup>
 <col style="width: 11.1111%;">
 <col style="width: 33.3333%;">
@@ -8991,7 +8987,7 @@ and
 </div>
 <div class="paragraph">
 <p>The standard_parallel variant corresponds to EPSG Polar Stereographic (Variant B) (EPSG dataset coordinate operation method code 9829), while the scale_factor_at_projection_origin variant corresponds to EPSG Polar Stereographic (Variant A) (EPSG dataset coordinate operation method code 9810).
-As PROJ requires the standard parallel, [Snyder] formula 21-7 can be used to compute it from the scale factor if needed.</p>
+As PROJ requires the standard parallel, <a href="#Snyder">[Snyder]</a> formula 21-7 can be used to compute it from the scale factor if needed.</p>
 </div>
 </div>
 <div class="sect2">
@@ -11182,7 +11178,7 @@ The virtue of this is that should netCDF ever fail to meet the community needs, 
 The CF data model has been derived from these CF-netCDF elements and relationships with the aims of removing aspects specific to the netCDF encoding, and reducing the number of elements, whilst retaining the ability to describe the CF conventions fully, in order to meet the design criteria.</p>
 </div>
 <table id="table-cf-concepts" class="tableblock frame-all grid-all stretch">
-<caption class="title">Table I.1. The elements of the CF-netCDF conventions. The relationships to netCDF elements are shown in <a href="#figure-cf-concepts">[figure-cf-concepts]</a>.</caption>
+<caption class="title">Table I.1. The elements of the CF-netCDF conventions</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -11270,7 +11266,7 @@ The CF data model has been derived from these CF-netCDF elements and relationshi
 The constructs, listed in <a href="#table-cf-constructs">Table I.2</a>, are related to CF-netCDF elements (<a href="#figure-cf-concepts">Figure I.1</a>), which in turn relate to the components of netCDF file.</p>
 </div>
 <table id="table-cf-constructs" class="tableblock frame-all grid-all stretch">
-<caption class="title">Table I.2. The constructs of the CF data model. The relationships between the constructs and CF-netCDF elements are shown in in <a href="#figure-field">[figure-field]</a>, <a href="#figure-dim-aux">[figure-dim-aux]</a> and <a href="#figure-coordinate-reference">[figure-coordinate-reference]</a>.</caption>
+<caption class="title">Table I.2. The constructs of the CF data model</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -11871,7 +11867,11 @@ In the two-dimensional case, <code>a = tp(tpi2, tpi1)</code>, <code>b = tp(tpi2,
 </div>
 <div class="sect3">
 <h4 id="common-conversions-and-formulas"><a class="anchor" href="#common-conversions-and-formulas"></a>Common Conversions and Formulas</h4>
-<table class="tableblock frame-all grid-all stretch">
+<div class="paragraph">
+<p><a href="#subsampling-formulas">Table J.1</a> describes conversions and formulas that are used in the descriptions of the interpolation techniques.</p>
+</div>
+<table id="table-subsampling-formulas" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table J.1. Conversions and formulas used in the definitions of subsampling interpolation methods</caption>
 <colgroup>
 <col style="width: 11.1111%;">
 <col style="width: 44.4444%;">
@@ -13466,7 +13466,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2024-12-03 17:00:46 UTC
+Last updated 2024-12-04 08:35:36 UTC
 </div>
 </div>
 </body>
