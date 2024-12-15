@@ -3,7 +3,7 @@ BUILD_DIR := build
 MAIN_DOC := cf-conventions
 MAIN_DOC_BUILD_DIR := $(BUILD_DIR)
 
-MAIN_DOC_INC := version toc-extra 
+MAIN_DOC_INC := version toc-extra authors about-authors
 MAIN_DOC_INC += ch01 ch02 ch03 ch04 ch05 ch06 ch07 ch08 ch09
 MAIN_DOC_INC += appa appb appc appd appe appf appg apph appi appj appk
 MAIN_DOC_INC += history bibliography
@@ -63,7 +63,7 @@ pdf: conventions-pdf conformance-pdf
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
 	asciidoctor --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
-	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
+#	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
 	asciidoctor-pdf --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
@@ -74,18 +74,13 @@ $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 	asciidoctor-pdf --verbose --trace ${FINAL_TAG} -d book $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
-#$(MAIN_DOC_BUILD_DIR):
-#	mkdir -vp $(MAIN_DOC_BUILD_DIR)
-
-#$(CONF_DOC_BUILD_DIR):
-#	mkdir -vp $(CONF_DOC_BUILD_DIR)
+about-authors.adoc: authors.adoc scripts/update_authors.py
+	python3 scripts/update_authors.py --authors-adoc=authors.adoc --write-about-authors=about-authors.adoc
 
 $(BUILD_DIR):
 	mkdir -vp $(BUILD_DIR)
 
 clean:
-#	rm -rvf $(MAIN_DOC_BUILD_DIR)
-#	rm -rvf $(CONF_DOC_BUILD_DIR)
 	rm -rvf $(BUILD_DIR)
 
 #Rules to build non-static images. See MAIN_DOC_IMG_BLD above
