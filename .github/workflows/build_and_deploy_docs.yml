@@ -8,6 +8,7 @@
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
 #   https://github.com/marocchino/sticky-pull-request-comment
+#   https://github.com/conda-incubator/setup-miniconda
 
 name: Asciidoctor Build Workflow
 on:
@@ -53,6 +54,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
   
+      - name: Set up Conda Environment
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: cf-convention-documents
+          environment-file: environment.yml
+
       - name: Set Final Tag
         if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' && inputs.set_final_tag == 'true' }}
         run: |
