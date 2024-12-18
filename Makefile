@@ -80,6 +80,9 @@ about-authors.adoc: authors.adoc scripts/update_authors.py
 
 zenodo.json: authors.adoc scripts/update_authors.py
 	python3 scripts/update_authors.py --authors-adoc=authors.adoc --update-zenodo=zenodo.json
+
+CITATION.cff: authors.adoc scripts/update_authors.py
+	python3 scripts/update_authors.py --authors-adoc=authors.adoc --update-citation=CITATION.cff
   
 $(BUILD_DIR):
 	mkdir -vp $(BUILD_DIR)
