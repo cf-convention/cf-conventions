@@ -4,11 +4,9 @@
 #
 # For more information on the actions used in this workflow, please see:
 #   https://github.com/actions/checkout
-#   https://github.com/Analog-inc/asciidoctor-action
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
 #   https://github.com/marocchino/sticky-pull-request-comment
-#   https://github.com/conda-incubator/setup-miniconda
 
 name: Asciidoctor Build Workflow
 on:
@@ -57,11 +55,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
   
-      - name: Set up Conda Environment
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          activate-environment: cf-convention-documents
-          environment-file: environment.yml
+      - name: APT Install Dependencies
+        run: sudo apt install -y python3-yaml asciidoctor
 
       - name: Set Final Tag
         if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' && inputs.set_final_tag == 'true' }}
@@ -69,9 +64,7 @@ jobs:
           echo "CF_FINAL=True" >> $GITHUB_ENV
   
       - name: Build Documentation
-        uses: Analog-inc/asciidoctor-action@v1
-        with:
-          shellcommand: 'make all'
+        run: make all
   
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
