@@ -46,9 +46,10 @@ endif
 
 DATE_DOCPROD != LC_ALL=C date -u "$(DATE_FORMAT)"
 
-.PHONY: all clean images html pdf conventions-html conventions-pdf conventions conformance-html conformance-pdf conformance
+.PHONY: all clean images authors html pdf conventions-html conventions-pdf conventions conformance-html conformance-pdf conformance
 all: images html pdf 
 images: $(addprefix images/, $(MAIN_DOC_IMG_BLD)) 
+authors: about-authors.adoc zenodo.json CITATION.cff
 
 conventions-html: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 conventions-pdf: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
@@ -77,6 +78,9 @@ $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 about-authors.adoc: authors.adoc scripts/update_authors.py
 	python3 scripts/update_authors.py --authors-adoc=authors.adoc --write-about-authors=about-authors.adoc
 
+zenodo.json: authors.adoc scripts/update_authors.py
+	python3 scripts/update_authors.py --authors-adoc=authors.adoc --update-zenodo=zenodo.json
+  
 $(BUILD_DIR):
 	mkdir -vp $(BUILD_DIR)
 
