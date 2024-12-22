@@ -47,7 +47,7 @@ endif
 DATE_DOCPROD != LC_ALL=C date -u "$(DATE_FORMAT)"
 
 .PHONY: all clean images authors html pdf conventions-html conventions-pdf conventions conformance-html conformance-pdf conformance
-all: images html pdf 
+all: authors images html pdf 
 images: $(addprefix images/, $(MAIN_DOC_IMG_BLD)) 
 authors: about-authors.adoc zenodo.json CITATION.cff
 
