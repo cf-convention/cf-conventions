@@ -54,7 +54,7 @@ Therefore CF-netCDF does not use codes, but instead relies on controlled vocabul
 [[terminology, Section 1.3, "Terminology"]]
 === Terminology
 
-The terms in this document that refer to components of a netCDF file are defined in the NetCDF User's Guide (NUG) <<NUG>> NUG.
+The terms in this document that refer to components of a netCDF file are defined in the NetCDF User's Guide (NUG) <<NUG>>.
 Some of those definitions are repeated below for convenience.
 
 aggregated data:: The data of an aggregation variable, after it has been created in memory by an application program (see <<aggregation-variables>>).
@@ -65,7 +65,7 @@ aggregation variable:: A variable containing no data, but which enables the form
 
 ancestor group:: A group from which the referring group is descended via direct parent-child relationships
 
-auxiliary coordinate variable:: Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the NUG and used by this standard - see below).
+auxiliary coordinate variable:: Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the <<NUG>> and used by this standard - see below).
 Unlike coordinate variables, there is no relationship between the name of an auxiliary coordinate variable and the name(s) of its dimension(s).
 
 boundary variable:: A boundary variable is associated with a variable that contains coordinate data.
@@ -77,8 +77,11 @@ The netCDF utilities ncdump and ncgen use this format (see
 link:$$https://docs.unidata.ucar.edu/nug/current/_c_d_l.html$$[NUG section on CDL syntax]).
 All examples in this document use CDL syntax.
 
-cell:: A region in one or more dimensions whose boundary can be described by a set of vertices.
+cell:: A region in one or more dimensions whose boundary can be described by a set of vertices recorded in boundary variables.
 The term __interval__ is sometimes used for one-dimensional cells.
+A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept (see <<overview>>).
+
+calendar:: A CF calendar defines an ordered set of valid datetimes with integer seconds.
 
 coordinate variable:: A coordinate variable is a one-dimensional variable with the same name as its dimension e.g., **`time(time)`**.
 In CF, a coordinate variable must be of a numeric data type (note that
@@ -90,6 +93,8 @@ Note that an aggregation coordinate variable is stored as a scalar and has the s
 
 fragment:: Data, generally found in an external dataset, that contributes to the formation of the aggregated data of an aggregation variable (see <<aggregation-variables>>).
 
+
+datetime:: The set of numbers which together identify an instant of time, namely its year, month, day, hour, minute and second, where the second may have a fraction but the others are all integer.
 
 grid mapping variable:: A variable used as a container for attributes that define a specific grid mapping.
 The type of the variable is arbitrary since it contains no data.
@@ -138,21 +143,22 @@ vertex dimension:: The dimension of a boundary variable along which the vertices
 
 vertical dimension:: A dimension of a netCDF variable that has an associated vertical coordinate variable.
 
+[[overview, Section 1.4, "Overview"]]
 === Overview
 
 No variable or dimension names are standardized by this convention.
-Instead we follow the lead of the NUG and standardize only the names of attributes and some of the values taken by those attributes.
+Instead we follow the lead of the <<NUG>> and standardize only the names of attributes and some of the values taken by those attributes.
 Variable or dimension names can either be a single variable name or a path to a variable.
 The overview provided in this section will be followed with more complete descriptions in following sections.
 <<attribute-appendix>> contains a summary of all the attributes used in this convention.
 
-Files using this version of the CF Conventions must set the NUG defined attribute **`Conventions`** to contain the string value "**`CF-{current-version-as-attribute}`**" to identify datasets that conform to these conventions.
+Files using this version of the CF Conventions must set the <<NUG>> defined attribute **`Conventions`** to contain the string value "**`CF-{current-version-as-attribute}`**" to identify datasets that conform to these conventions.
 
 The general description of a file's contents should be contained in the following attributes: **`title`**, **`history`**, **`institution`**, **`source`**, **`comment`** and **`references`** (<<description-of-file-contents>>).
 For backwards compatibility with COARDS none of these attributes is required, but their use is recommended to provide human readable documentation of the file contents.
 
 Each variable in a netCDF file has an associated description which is provided by the attributes **`units`**, **`long_name`**, and **`standard_name`**.
-The **`units`**, and **`long_name`** attributes are defined in the NUG and the **`standard_name`** attribute is defined in this document.
+The **`units`**, and **`long_name`** attributes are defined in the <<NUG>> and the **`standard_name`** attribute is defined in this document.
 
 The **`units`** attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <<cell-boundaries>>).
 The values of the **`units`** attributes are character strings that are recognized by UNIDATA's UDUNITS package <<UDUNITS>> (with exceptions allowed as discussed in <<units>>).
@@ -167,7 +173,7 @@ Two independent parts of the convention allow this to be done.
 There are conventions that identify the variables that contain the coordinate data, and there are conventions that identify the type of coordinate represented by that data.
 
 There are two methods used to identify variables that contain coordinate data.
-The first is to use the NUG-defined "coordinate variables."
+The first is to use the <<NUG>>-defined "coordinate variables."
 __The use of coordinate variables is required for all dimensions that correspond to one dimensional space or time coordinates__.
 In cases where coordinate variables are not applicable, the variables containing coordinate data are identified by the **`coordinates`** attribute.
 
@@ -182,14 +188,22 @@ On the other hand identifying the vertical coordinate is not necessarily suffici
 In particular a model may output data on the parametric (usually dimensionless) vertical coordinate used in its mathematical formulation.
 To achieve the goal of being able to spatially locate all data values, this convention provides a mapping, via the **`standard_name`** and **`formula_terms`** attributes of a parametric vertical coordinate variable, between its values and dimensional vertical coordinate values that can be uniquely located with respect to a point on the earth's surface (<<parametric-vertical-coordinate>>; <<parametric-v-coord>>).
 
-It is often the case that data values are not representative of single points in time and/or space, but rather of intervals or multidimensional cells.
-This convention defines a **`bounds`** attribute to specify the extent of intervals or cells.
-When data that is representative of cells can be described by simple statistical methods, those methods can be indicated using the **`cell_methods`** attribute.
+It is often the case that data values are not representative of single points in time, space and other dimensions, but rather of intervals or multidimensional cells.
+CF defines a **`bounds`** attribute to specify the extent of intervals or cells.
+Because both the <<NUG>> and <<COARDS>> define coordinate variables but not cells or bounds, many applications assume that gridpoints are always located at the centers of their cells.
+This assumption does not hold in CF. If bounds are not provided, the location of the gridpoint within the cell is undefined, and nothing can be assumed about the location and extent of the cell.
+
+A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept.
+Pixels in a raster are evenly spaced in each dimension and arranged in a logically rectangular array.
+Two-dimensional cells in a CF field do not necessarily satisfy either of those conditions, though they commonly do.
+Furthermore, as an alternative to cells in two dimensions, CF defines a convention for the case where each data value is associated with a geographical feature that is described by one or more points, lines or polygons.
+
+When data that is representative of cells can be described by simple statistical methods (for instance, mean or maximum), those methods can be indicated using the **`cell_methods`** attribute.
 An important application of this attribute is to describe climatological and diurnal statistics.
 
 Methods for reducing the total volume of data include both packing and compression.
 Packing reduces the data volume by reducing the precision of the stored numbers.
-It is implemented using the attributes **`add_offset`** and **`scale_factor`** which are defined in the NUG.
+It is implemented using the attributes **`add_offset`** and **`scale_factor`** which are defined in the <<NUG>>.
 Compression on the other hand loses no precision, but reduces the volume by not storing missing data.
 The attribute **`compress`** is defined for this purpose.
 

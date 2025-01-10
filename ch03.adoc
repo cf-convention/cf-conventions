@@ -139,7 +139,7 @@ Use of these attributes for data packing, which is their most important applicat
 [[long-name, Section 3.2, "Long Name"]]
 === Long Name
 
-The **`long_name`** attribute is defined by the NUG to contain a long descriptive name which may, for example, be used for labeling plots.
+The **`long_name`** attribute is defined by the <<NUG>> to contain a long descriptive name which may, for example, be used for labeling plots.
 For backwards compatibility with COARDS this attribute is optional.
 But it is highly recommended that either this or the **`standard_name`** attribute defined in the next section be provided for all data variables and variables containing coordinate data, in order to make the file self-describing.
 If a variable has no **`long_name`** attribute then an application may use, as a default, the **`standard_name`** if it exists, or the variable name itself.
@@ -148,7 +148,7 @@ If a variable has no **`long_name`** attribute then an application may use, as a
 === Standard Name
 
 A fundamental requirement for exchange of scientific data is the ability to describe precisely the physical quantities being represented.
-To some extent this is the role of the **`long_name`** attribute as defined in the NUG.
+To some extent this is the role of the **`long_name`** attribute as defined in the <<NUG>>.
 However, usage of **`long_name`** is completely ad-hoc.
 For many applications it is desirable to have a more definitive description of the quantity, which allows users of data from different sources (some of which might be models and others observational) to determine whether quantities are in fact comparable.
 For this reason each variable may optionally be given a "standard name", whose meaning is defined by this convention.
@@ -164,12 +164,17 @@ A standard name contains no whitespace and is case sensitive.
 
 canonical units:: Representative units of the physical quantity.
 Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
+ +
+ +
+Units of time coordinates (<<time-coordinate>>), whose **`units`** attribute includes the word **`since`**, are _not_ physically equivalent to time units that do not include **`since`** in the **`units`**.
+To mark this distinction, the canonical unit given for quantities used for time coordinates is **`s since 1958-1-1`**.
+The reference datetime in the canonical unit (the beginning of the day i.e. midnight on 1st January 1958 at 0 `degrees_east`) is not restrictive; the time coordinate variable's own **`units`** may contain any reference datetime (after **`since`**) that is valid in its calendar.
+(We use `1958-1-1` because it is the beginning of International Atomic Time, and a valid datetime in all CF calendars; see also <<leap-seconds>>.)
+In both kinds of time **`units`** attribute (with or without **`since`**), any unit for measuring time can be used i.e. any unit which is physically equivalent to the SI base unit of time, namely the second.
 
 description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are.
 We don't attempt to provide precise definitions of fundumental physical quantities (e.g., temperature) which may be found in the literature.
 The description may define rules on the variable type, attributes and coordinates which must be complied with by any variable carrying that standard name (such as in Example 3.5).
-
-When appropriate, the table entry also contains the corresponding GRIB parameter code(s) (from ECMWF and NCEP) and AMIP identifiers.
 
 The standard name table is located at
 link:$$https://cfconventions.org/Data/cf-standard-names/current/src/cf-standard-name-table.xml$$[https://cfconventions.org/Data/cf-standard-names/current/src/cf-standard-name-table.xml],
@@ -178,7 +183,7 @@ Knowledge of the XML format is only necessary for application writers who plan t
 A formatted text version of the table is provided at
 link:$$https://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html$$[https://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html],
 and this table may be consulted in order to find the standard name that should be assigned to a variable.
-Some standard names (e.g. **`region`** and **`area_type`**) are used to indicate quantities which are permitted to take only certain standard values.
+Some standard names (e.g. **`region`**, <<geographic-regions>>, and **`area_type`**, <<statistics-applying-portions>>) are used to indicate quantities which are permitted to take only certain standard values.
 This is indicated in the definition of the quantity in the standard name table, accompanied by a list or a link to a list of the permitted values.
 
 Standard names by themselves are not always sufficient to describe a quantity.
