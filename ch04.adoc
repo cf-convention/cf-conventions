@@ -244,9 +244,8 @@ Its format is __y__-__m__-__d__ [__H__:__M__:__S__ [__Z__]], where [...] indicat
 
 * _S_ is second, which may be integer or floating point (see <<leap-seconds>> regarding __S__>59),
 
-* _Z_ is the time zone offset with respect to UTC.
-This is an interval of time, specified in one of the formats described below.
-Only numbers (digits, `+`, `-` and `:`) are allowed in _Z_, not time zone names or acronyms.
+* _Z_ is the time zone offset. This is an interval of time, specified in one of the formats described below.
+Only numbers (digits, `+`, `-` and `:`) or the letter "Z" are allowed in _Z_, not time zone names or acronyms.
 
 The default time zone offset is zero.
 In a time zone with zero offset, time (approximately) equals mean solar time for 0 `degrees_east` of longitude.
@@ -254,7 +253,9 @@ In a time zone with zero offset, time (approximately) equals mean solar time for
 If both time and time zone offset are omitted the time is 00:00:00 (the beginning of the day i.e. midnight at 0 `degrees_east`).
 Thus, **`units = "days since 1990-1-1"`** means the same as **`units = "days since 1990-1-1 0:0:0"`**.
 
-The time zone offset _Z_ must be the letter `Z` or a value in one of the following four formats, any of which may be prefixed with a sign:
+The time zone offset _Z_ must be in one of the following five formats, any of which may be prefixed with a sign:
+
+** The letter `Z` indicating zero offset, sometimes referred to as "Zulu Time".
 
 ** _H_, the hour alone, of one or two digits e.g. **`-6`**, **`2`**, **`+11`**, which is sufficient for many time zones.
 
@@ -264,9 +265,7 @@ The time zone offset _Z_ must be the letter `Z` or a value in one of the followi
 
 ** three digits, of which the first is the hour (0--9) e.g. **`530`**.
 
-A `Z` indicates a zero offset, sometimes referred to as "Zulu time".
-
-While the default (unspecified) is an offset of zero, it is recommended that a zero (or `Z`) be used for zero offset to avoid any ambiguity.
+While the default (unspecified) is an offset of zero, we suggest that a zero offset be explicitly to avoid any confusion where omitting it might be misunderstood as indicating local time.
 
 For example, **`seconds since 1992-10-8 15:15:42.5 -6:00`** indicates seconds since October 8th, 1992 at 3 hours, 15 minutes and 42.5 seconds in the afternoon, in a time zone where the datetime is six hours behind the default.
 Subtracting the time zone offset from a given datetime converts it to the equivalent datetime with zero time zone offset e.g. **`1989-12-31 18:00:00 -6`** identifies the same instant as **`1990-1-1 0:0:0`**.
