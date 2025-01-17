@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">14&#160;January,&#160;2025&#160;00:22:21Z</span>
+<span id="revdate">17&#160;January,&#160;2025&#160;20:26:07Z</span>
 <br><span id="revremark"></span>
 </div>
 </div>
@@ -2728,9 +2728,7 @@ All the alternatives have exactly the same meaning in UDUNITS.
 For compatibility with other software, CF strongly recommends that <code>since</code> should be used.</p>
 </div>
 <div class="paragraph">
-<p>The reference datetime string (appearing after the identifier <strong><code>since</code></strong>) is required.
-It may include date alone, or date and time, or date, time and time zone offset.
-Its format is <em>y</em>-<em>m</em>-<em>d</em> [<em>H</em>:<em>M</em>:<em>S</em> [<em>Z</em>]], where [&#8230;&#8203;] indicates an optional element,</p>
+<p>The reference datetime string (appearing after the identifier <strong><code>since</code></strong>) is required. It must include the date, which may optionally be followed by time or time zone offset or both. Its format is <em>y</em>-<em>m</em>-<em>d</em> [<em>H</em>:<em>M</em>:<em>S</em> [<em>Z</em>]], where [&#8230;&#8203;] indicates an optional element:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -2751,7 +2749,7 @@ Only numbers (digits, <code>+</code>, <code>-</code> and <code>:</code>) or the 
 In a time zone with zero offset, time (approximately) equals mean solar time for 0 <code>degrees_east</code> of longitude.
 (Although this may be exact in a model, in reality the time with zero time zone offset differs by some seconds from mean solar time; see the discussion of UTC and leap seconds in <a href="#calendar">Section 4.4.2, "Calendar"</a>.)
 If both time and time zone offset are omitted the time is 00:00:00 (the beginning of the day i.e. midnight at 0 <code>degrees_east</code>).
-Thus, <strong><code>units = "days since 1990-1-1"</code></strong> means the same as <strong><code>units = "days since 1990-1-1 0:0:0"</code></strong>.</p>
+Thus, <strong><code>units = "days since 1990-1-1"</code></strong> means the same as <strong><code>units = "days since 1990-1-1 00:00:00"</code></strong>.</p>
 </div>
 <div class="paragraph">
 <p>The time zone offset <em>Z</em> must be in one of the following five formats, any of which may be prefixed with a sign:</p>
@@ -2776,7 +2774,10 @@ Thus, <strong><code>units = "days since 1990-1-1"</code></strong> means the same
 </ul>
 </div>
 <div class="paragraph">
-<p>While the default (unspecified) is an offset of zero, we suggest that a zero offset be explicitly to avoid any confusion where omitting it might be misunderstood as indicating local time.</p>
+<p>If the time zone offset is the letter <code>Z</code> or begins with a sign, the space before it may be omitted.</p>
+</div>
+<div class="paragraph">
+<p>While the default of omitting the <em>Z</em> component is an offset of zero, we suggest that a zero offset be specified to avoid any confusion where omitting it might be misunderstood as indicating local time.</p>
 </div>
 <div class="paragraph">
 <p>For example, <strong><code>seconds since 1992-10-8 15:15:42.5 -6:00</code></strong> indicates seconds since October 8th, 1992 at 3 hours, 15 minutes and 42.5 seconds in the afternoon, in a time zone where the datetime is six hours behind the default.
@@ -2960,7 +2961,7 @@ When these calendars are being be used for timelines <em>with</em> leap seconds 
 </li>
 <li>
 <p>The coordinate value does not count any leap seconds which occurred between the reference datetime and the datetime represented by the coordinate.
-For instance, 60 <strong><code>seconds after 23:59:00</code></strong> always means 00:00:00 on the next day, even if there is a leap second at 23:59:60, which makes the actual interval 61 seconds between 23:59:00 and 00:00:00 on the next day.</p>
+For instance, 60 <strong><code>seconds after 23:59:00</code></strong> always means 0:0:0 on the next day, even if there is a leap second at 23:59:60, which makes the actual interval 61 seconds between 23:59:00 and 0:0:0 on the next day.</p>
 </li>
 </ul>
 </div>
@@ -4521,7 +4522,7 @@ This representation has the advantage that it is general enough to handle, witho
 variables:
   float time(time);
     time:standard_name = "time";
-    time:units = "days since 2024-11-8 09:00:00";
+    time:units = "days since 2024-11-8 09:00:00 Z";
     time:bounds = "time_bnds";
   float time_bnds(time,nv);</pre>
 </div>
@@ -4808,7 +4809,7 @@ variables:
     ppn:cell_methods = "time: sum";
   double time(time);
     time:long_name = "time";
-    time:units = "h since 1998-4-19 6:0:0";
+    time:units = "h since 1998-4-19 6:0:0 Z";
     time:bounds = "time_bnds";
   double time_bnds(time,nv);
 data:
@@ -4889,7 +4890,7 @@ variables:
     TS_var:units="K2";
     TS_var:cell_methods="time: variance (interval: 1 hr comment: sampled instantaneously)";
   float time(time);
-    time:units="days since 1990-01-01 00:00:00";
+    time:units="days since 1990-01-01 00:00:00 Z";
     time:bounds="time_bnds";
   float time_bnds(time,nv);
 data:
@@ -13469,7 +13470,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2025-01-14 00:22:21 UTC
+Last updated 2025-01-17 20:26:06 UTC
 </div>
 </div>
 </body>
