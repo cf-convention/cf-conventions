@@ -93,14 +93,14 @@ git push origin HEAD
   - Select "Publish release".
 
 
-## Update the `CITATION.cff`
+## Update file **CITATION.cff**
 
 - Update the _version:_ field with the new version.
 
 - Update the _doi:_ field in with the pre-reserved DOI.
 
 
-## Update `.zenodo.json`
+## Update file **.zenodo.json**
 
 - Update the _version_ field in with the new version.
 
