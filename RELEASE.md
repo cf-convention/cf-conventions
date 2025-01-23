@@ -4,7 +4,7 @@
 ## Update the revision history in file **history.adoc**
 
   - Check that the history is up to date. Every non-trivial issue or merged pull request without an issue should be referenced.
-  - Replace the line _=== Working version (most recent first)_ with the line `=== Version <VN> (<DATE>)`, substituting `<VN>` with the release version and `<DATE>` with the current date (e.g. `Version 1.12 (04 December 2024)`).
+  - Replace the line _`=== Working version (most recent first)`_ with the line `=== Version <VN> (<DATE>)`, substituting `<VN>` with the release version and `<DATE>` with the current date (e.g. `Version 1.12 (04 December 2024)`).
 
 
 ## Create the new documents
@@ -85,8 +85,8 @@ git push origin HEAD
 
 - Follow the instructions at https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes, with the following details:
 
-  - "Choose a tag" for the new version on the  `main` branch: The tag should be called `v<VN>.0`, substituting _<VN>_ with the release version (e.g. `v1.12.0`).
-  - Set the release title to `CF-<VN>`, substituting _<VN>_ the release version (e.g. `CF-1.12`).
+  - "Choose a tag" for the new version on the  `main` branch: The tag should be called `v<VN>.0`, substituting `<VN>` with the release version (e.g. `v1.12.0`).
+  - Set the release title to `CF-<VN>`, substituting `<VN>` the release version (e.g. `CF-1.12`).
   - Click "Generate release notes". This will automatically generate a description of the release.
   - Edit the description to remove the list of contributors, instead adding any new people who have made substantive contributions to the list at http://cfconventions.org/conventions_contributors.html.
   - Select "Set as the latest release".
@@ -104,7 +104,7 @@ git push origin HEAD
 
 - Update the _version_ field in with the new version.
 
-- Update the _publication_date_ field in with the date.
+- Update the *publication_date*_ field in with the date.
 
 - Update the _files_ field with the new PDF file sizes and checksums. These must be the checksums of the actual files uploaded to https://github.com/cf-convention/cf-convention.github.io. MD5 checksums can be calculated with:
 
