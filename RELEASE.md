@@ -110,7 +110,7 @@ git push origin HEAD
 
   ```
   # In the following, substitute <VN> for the release version
-  
+
   cd ~/cf-convention.github.io/Data
   ls -o cf-conventions/cf-conventions-<VN>/cf-conventions.pdf
   ls -o cf-documents/requirements-recommendations/conformance-<VN>.pdf
