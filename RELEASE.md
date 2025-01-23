@@ -85,7 +85,7 @@ git push origin HEAD
 
 - Follow the instructions at https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes, with the following details:
 
-  - "Choose a tag" for the new version on the  `main` branch: The tag should be called `v<VN>.0`, substituting `<VN>` with the release version (e.g. `v1.12.0`).
+  - "Choose a tag" for the new version on the "main" branch: The tag should be called `v<VN>.0`, substituting `<VN>` with the release version (e.g. `v1.12.0`).
   - Set the release title to `CF-<VN>`, substituting `<VN>` the release version (e.g. `CF-1.12`).
   - Click "Generate release notes". This will automatically generate a description of the release.
   - Edit the description to remove the list of contributors, instead adding any new people who have made substantive contributions to the list at http://cfconventions.org/conventions_contributors.html.
@@ -118,7 +118,7 @@ git push origin HEAD
   mdsum --digest md5 cf-documents/requirements-recommendations/conformance-<VN>.pdf
   ```
 
-## Post release
+# Post release
 
 After the release has been completed, make the following changes to re-ininstate the draft status of the conventions for the next version after the release:
 
