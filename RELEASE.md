@@ -69,7 +69,7 @@ git push origin HEAD
   - Add a new HTML entry for the new versions of the conformance document
   - Increment the draft version of the conformance documents to next version after the release.
 
--  In file **faq.md**
+- In file **faq.md**
   - Update CF version numbers to the release version.
 
 - In file **index.md**
