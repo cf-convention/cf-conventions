@@ -3,8 +3,8 @@
 
 ## Update the revision history in file **history.adoc**
 
-  - Check that the history is up to date. Every non-trivial pull request merged to the convention document should be referenced.
-  - Insert a new heading below `Working version (most recent first)`: `Version 1.12 (04 December 2024)`.
+  - Check that the history is up to date. Every non-trivial issue or merged pull request without an issue should be referenced.
+  - Replace the line _=== Working version (most recent first)_ with the line `=== Version <VN> (<DATE>)`, substituting `<VN>` with the release version and `<DATE>` with the current date (e.g. `Version 1.12 (04 December 2024)`).
 
 
 ## Create the new documents
