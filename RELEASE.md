@@ -9,7 +9,7 @@
 
 ## Create the new documents
 
-Go to your fork of https://github.com/cf-convention/cf-conventions and create the new documents
+Go to your fork of https://github.com/cf-convention/cf-conventions and create the new documents:
 ```
 cd ~/cf-conventions
 export CF_FINAL=True
