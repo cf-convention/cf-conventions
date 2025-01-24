@@ -97,14 +97,14 @@ git push origin HEAD
 
 - Update the _version:_ field with the new version.
 
-- Update the _doi:_ field in with the pre-reserved DOI.
+- Update the _doi:_ field with the pre-reserved DOI.
 
 
 ## Update file **.zenodo.json**
 
-- Update the _version_ field in with the new version.
+- Update the _version_ field with the new version.
 
-- Update the *publication_date*_ field in with the date.
+- Update the *publication_date*_ field with the date.
 
 - Update the _files_ field with the new PDF file sizes and checksums. These must be the checksums of the actual files uploaded to https://github.com/cf-convention/cf-convention.github.io. MD5 checksums can be calculated with:
 
