@@ -20,7 +20,7 @@ make all
 
 ## Copy the new documents to the website repository
 
-Go to your fork of https://github.com/cf-convention/cf-convention.github.io, create a new branch from "main", copy the new documents into this branch and submit the changes as a puull request back to https://github.com/cf-convention/cf-convention.github.io. The following is an example of how this may be done, but other git formulations are possible:
+Go to your fork of https://github.com/cf-convention/cf-convention.github.io, create a new branch from "main", copy the new documents into this branch and submit the changes as a pull request back to https://github.com/cf-convention/cf-convention.github.io. The following is an example of how this may be done, but other git formulations are possible:
 
 ```
 # In the following, substitute <VN> for the release version
