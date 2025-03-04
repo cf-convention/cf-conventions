@@ -7,6 +7,10 @@
   - Replace the line _`=== Working version (most recent first)`_ with the line `=== Version <VN> (<DATE>)`, substituting `<VN>` with the release version and `<DATE>` with the current date (e.g. `Version 1.12 (04 December 2024)`).
 
 
+## Update the DOI in file **version.adoc**
+
+- Update the _:doi:_ field with the pre-reserved DOI for the new version.
+
 ## Create the new documents
 
 Go to your fork of https://github.com/cf-convention/cf-conventions and create the new documents:
@@ -102,9 +106,9 @@ git push origin HEAD
 
 ## Update file **.zenodo.json**
 
-- Update the _version_ field with the new version.
+- Update the _"version"_ field with the new version.
 
-- Update the *publication_date*_ field with the date.
+- Update the *"publication_date"* field with the date.
 
 - Update the _files_ field with the new PDF file sizes and checksums. These must be the checksums of the actual files uploaded to https://github.com/cf-convention/cf-convention.github.io. MD5 checksums can be calculated with:
 
@@ -125,3 +129,10 @@ After the release has been completed, make the following changes to re-ininstate
 - In file **version.adoc**, change the value of the the _:version:_ field to be the next version after the release version (e.g. `1.13`)
 
 - In file **history.adoc**, insert a new heading at the top of the section: `=== Working version (most recent first)`
+
+- For any issue which has been incorporated in the new release:
+  - If the issue has a `new contributor` label, add the new contributor(s) to the list at https://cfconventions.org/conventions_contributors.html.
+  - Ensure that the issue is closed.
+
+- For any pull request which has been incorporated in the new release:
+  - Ensure that it has the milestone for the new version (e.g. `1.13`)
