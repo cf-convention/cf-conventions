@@ -471,7 +471,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">24&#160;March,&#160;2025&#160;10:37:00Z</span>
+<span id="revdate">14&#160;April,&#160;2025&#160;12:05:26Z</span>
 <br><span id="revremark"></span>
 </div>
 </div>
@@ -1858,7 +1858,7 @@ But since it is an optional attribute, applications that implement these standar
 <div class="sect2">
 <h3 id="units"><a class="anchor" href="#units"></a>3.1. Units</h3>
 <div class="paragraph">
-<p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> and climatology variables defined in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>).
+<p>The <strong><code>units</code></strong> attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> and climatology boundary variables defined in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>).
 The <strong><code>units</code></strong> attribute is permitted but not required for dimensionless quantities (see <a href="#dimensionless-units">Section 3.1.1, "Dimensionless units"</a>).</p>
 </div>
 <div class="paragraph">
@@ -5035,9 +5035,10 @@ In addition the two concepts may be used at once, for instance to indicate not A
 <p>Climatological variables have a climatological time axis.
 Like an ordinary time axis, a climatological time axis may have a dimension of unity (for example, a variable containing the January average temperatures for 1961-1990), but often it will have several elements (for example, a climatological time axis with a dimension of 12 for the climatological average temperatures in each month for 1961-1990, a dimension of 3 for the January mean temperatures for the three decades 1961-1970, 1971-1980, 1981-1990, or a dimension of 24 for the hours of an average day).
 Intervals of climatological time are conceptually different from ordinary time intervals; a given interval of climatological time represents a set of subintervals which are not necessarily contiguous.
-To indicate this difference, a climatological time coordinate variable does not have a <strong><code>bounds</code></strong> attribute.
-Instead, it has a <strong><code>climatology</code></strong> attribute, which names a variable with dimensions (n,2), n being the dimension of the climatological time axis.
-Using the units and calendar of the time coordinate variable, element (i,0) of the climatology variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension.
+To indicate this difference, a climatological time coordinate variable does not have a <strong><code>bounds</code></strong> attribute, instead it has a <strong><code>climatology</code></strong> attribute which names the climatological boundary variable.
+The climatological boundary variable must have dimensions (n,2), n being the dimension of the climatological time axis.
+The rules and recommendations for attributes of the climatological boundary variable are the same as those for boundary variables in general, as described in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>.
+Using the units and calendar of the time coordinate variable, element (i,0) of the climatology boundary variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension.
 The time coordinates should be values that are representative of the climatological time intervals, such that an application which does not recognise climatological time will nonetheless be able to make a reasonable interpretation.</p>
 </div>
 <div class="paragraph">
@@ -7069,7 +7070,7 @@ See <a href="#appendix-grid-mappings">Appendix F, Grid Mappings</a> for the grid
 <p>The "Type" values are <strong>S</strong> for string, <strong>N</strong> for numeric, and <strong>D</strong> for the type of the data variable.
 Each attribute may be used in any of the ways shown in its "Use" entry.
 <strong>G</strong> indicates it can appear as a global attribute, and <strong>Gr</strong> as a group attribute.
-For variable attributes, the possible values of "Use" are: <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for data variables, <strong>M</strong> for geometry container variables, <strong>Q</strong> for quantization container variables, <strong>Do</strong> for domain variables, <strong>BI</strong> and <strong>BO</strong> for boundary variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> for the distinction between <strong>BI</strong> and <strong>BO</strong>), and <strong>-</strong> for variables with some other purpose.
+For variable attributes, the possible values of "Use" are: <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for data variables, <strong>M</strong> for geometry container variables, <strong>Q</strong> for quantization container variables, <strong>Do</strong> for domain variables, <strong>BI</strong> and <strong>BO</strong> for boundary and climatology boundary variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> for the distinction between <strong>BI</strong> and <strong>BO</strong>), and <strong>-</strong> for variables with some other purpose.
 CF does not prohibit any of these attributes from being attached to variables of different kinds from those listed as their "Use" in this table, but their meanings are not defined by CF if they are used in these other ways.
 "Links" indicates the location of the attribute"s original definition (first link) and sections where the attribute is discussed in this document (additional links as necessary).</p>
 </div>
@@ -7170,7 +7171,7 @@ Identifies the roles of mesh topology and location index set variables (see <a h
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a climatology variable.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a climatology boundary variable.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>comment</code></strong></p></td>
@@ -12777,6 +12778,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/593">Issue #593</a>: Clarify that rules for attributes of boundary variables (including BI and BO) also apply for attributes of climatological boundary variables</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/583">Issue #583</a>: Correct "most rapidly varying dimension" in terminology section.</p>
 </li>
 <li>
@@ -13487,7 +13491,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2025-03-24 10:37:00 UTC
+Last updated 2025-04-14 12:05:26 UTC
 </div>
 </div>
 </body>
