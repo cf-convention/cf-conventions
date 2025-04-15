@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.23">
-<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Jon&#160;Blower, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring, Christopher&#160;Barker, Sadie&#160;Bartholomew">
+<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Jon&#160;Blower, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring, Christopher&#160;Barker, Sadie&#160;Bartholomew, Thomas Lavergne">
 <title>NetCDF Climate and Forecast (CF) Metadata Conventions</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -470,8 +470,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author29" class="author">Lars&#160;Bärring</span><br>
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
+<span id="author32" class="author">Thomas Lavergne</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">14&#160;April,&#160;2025&#160;12:05:26Z</span>
+<span id="revdate">15&#160;April,&#160;2025&#160;14:39:48Z</span>
 <br><span id="revremark"></span>
 </div>
 </div>
@@ -1063,6 +1064,9 @@ I.1. <a href="#cdl-domain-anc-coordinate">A single CF-netCDF variable correspond
 </li>
 <li>
 <p>Sadie Bartholomew, NCAS and University of Reading</p>
+</li>
+<li>
+<p>Thomas Lavergne, MET Norway</p>
 </li>
 </ul>
 </div>
@@ -3381,6 +3385,11 @@ A <em>grid mapping variable</em> provides this information.</p>
 <div class="paragraph">
 <p>If no <em>grid mapping variable</em> is provided and the coordinate variables for a horizontal grid are not longitude and latitude, then it is required that the latitude and longitude coordinates are supplied via the <code>coordinates</code> attribute.
 Such coordinates may be provided in addition to the provision of a <em>grid mapping variable</em>, but that is not required.</p>
+</div>
+<div class="paragraph">
+<p>When a data variable is representative of cells of non-zero size, and the coordinate variables are not longitude and latitude, <em>bounds</em> variables should be provided for vertices of the cell boundaries in the horizontal coordinates of the grid (see  <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>).
+The <em>grid mapping variable</em> provides then the information to convert bounds in latitude and longitude coordinates, and it is optional for the dataset to provide these.
+If no <em>grid mapping variable</em> is provided, then the cell extents in latitude and longitude coordinate system should be provided (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> and especially Example 7.2 for the common case of four-sided cells).</p>
 </div>
 <div class="paragraph">
 <p>A grid mapping variable provides the description of the mapping via a collection of attached attributes.
@@ -12778,13 +12787,16 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/590">Issue #590</a>: Clarify that grid_mapping can also be used for converting spatial bounds</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/593">Issue #593</a>: Clarify that rules for attributes of boundary variables (including BI and BO) also apply for attributes of climatological boundary variables</p>
 </li>
 <li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/583">Issue #583</a>: Correct "most rapidly varying dimension" in terminology section.</p>
 </li>
 <li>
-<p><a href="https://github.com/cf-convention/cf-conventions/issues/584">Issue #584</a>:  Allow <code>Z</code> as time-zone offset, with a couple of examples, and allow time-zone offset with date alone, both being consistent with UDUNITS syntax.</p>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/584">Issue #584</a>: Allow <code>Z</code> as time-zone offset, with a couple of examples, and allow time-zone offset with date alone, both being consistent with UDUNITS syntax.</p>
 </li>
 </ul>
 </div>
@@ -13491,7 +13503,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2025-04-14 12:05:26 UTC
+Last updated 2025-04-15 14:39:48 UTC
 </div>
 </div>
 </body>
