@@ -8,7 +8,7 @@ Details of how to encode and decode aggregation variables are found in <<aggrega
 
 [[example-L.1]]
 [caption="Example L.1 "]
-.Aggregation variable with relative-path URI reference fragment file locations
+.Aggregation variable with fragment datasets defined by relative-path URI references
 ====
 ----
 dimensions:
@@ -32,8 +32,8 @@ variables:
     temperature:units = "K" ;
     temperature:cell_methods = "time: mean" ;
     temperature:aggregated_dimensions = "time level latitude longitude" ;
-    temperature:aggregated_data = "location: fragment_location
-                                   identifier: fragment_identifier
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
                                    map: fragment_map" ;
   // Coordinate variables
   double time(time) ;
@@ -49,8 +49,8 @@ variables:
     longitude:standard_name = "longitude" ;
     longitude:units = "degrees_east" ;
   // Array of fragments feature variables
-  string fragment_location(f_time, f_level, f_latitude, f_longitude) ;
-  string fragment_identifier ;
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
   int fragment_map(j, i) ;
 
 data:
@@ -63,19 +63,19 @@ data:
                  1, _,
                  73, _,
                  144, _ ;
-  fragment_location = "January-March.nc", "April-December.nc" ;
-  fragment_identifier = "temperature" ;
+  fragment_uris = "January-March.nc", "April-December.nc" ;
+  fragment_identifiers = "temperature" ;
 ----
 In this example, the `temperature` data variable is an aggregation variable.
 Its four-dimensional aggregated data with shape `(12, 1, 73, 144)` is constructed from two non-overlapping fragments, with data shapes `(3, 1, 73, 144)` and `(9, 1, 73, 144)`, which span the first 3 and last 9 elements respectively of the `time` aggregated dimension.
-The fragment dataset locations are relative-path URI references, and so are assumed to be in the same directory as the aggregation file.
+The fragment dataset names are relative-path URI references, and so are assumed to be in the same directory as the aggregation file.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
 ====
 
 [[example-L.2]]
 [caption="Example L.2 "]
-.Aggregation variable with absolute URI fragment file locations
+.Aggregation variable with fragment datasets defined by absolute URIs
 ====
 ----
 dimensions:
@@ -100,16 +100,16 @@ variables:
     temperature:units = "K" ;
     temperature:cell_methods = "time: mean" ;
     temperature:aggregated_dimensions = "time level latitude longitude" ;
-    temperature:aggregated_data = "location: fragment_location
-                                   identifier: fragment_identifier
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
                                    map: fragment_map" ;
   // Coordinate aggregation variable
   double time ;
     time:standard_name = "time" ;
     time:units = "days since 2001-01-01" ;
     time:aggregated_dimensions = "time" ;
-    time:aggregated_data = "location: fragment_location
-                            identifier: fragment_identifier_time
+    time:aggregated_data = "uris: fragment_uris
+                            identifiers: fragment_identifiers_time
                             map: fragment_map_time" ;
   // Coordinate variables
   double level(level) ;
@@ -123,11 +123,11 @@ variables:
     longitude:units = "degrees_east" ;
   // Array of fragments feature variables
   int fragment_map(j, i) ;
-  string fragment_location(f_time, f_level, f_latitude, f_longitude) ;
-  string fragment_identifier ;
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
   int fragment_map_time(j_time, i) ;
-  string fragment_location_time(f_time) ;
-  string fragment_identifier_time ;
+  string fragment_uris_time(f_time) ;
+  string fragment_identifiers_time ;
 
 data:
   temperature = _ ;
@@ -139,15 +139,15 @@ data:
                  1, _,
                  73, _,
                  144, _ ;
-  fragment_location = "file:///data/January-March.nc",
-                      "https:///remote.host/data/April-December.nc" ;
-  fragment_identifier = "temperature" ;
+  fragment_uris = "file:///data/January-March.nc",
+                  "https:///remote.host/data/April-December.nc" ;
+  fragment_identifiers = "temperature" ;
   fragment_map_time = 3, 9 ;
-  fragment_location_time = "file:///data/January-March.nc",
-                           "https:///remote.host/data/April-December.nc" ;
-  fragment_identifier_time = "time" ;
+  fragment_uris_time = "file:///data/January-March.nc",
+                       "https:///remote.host/data/April-December.nc" ;
+  fragment_identifiers_time = "time" ;
 ----
-This example is similar to <<example-L.1, Example L.1>>, but now the fragment dataset locations are absolute URIs (one local, one remote), and `time` is now also an aggregation coordinate variable, with its aggregated data being derived from the same fragment datasets as `temperature`.
+This example is similar to <<example-L.1, Example L.1>>, but now the fragment dataset names are absolute URIs (one local, one remote), and `time` is now also an aggregation coordinate variable, with its aggregated data being derived from the same fragment datasets as `temperature`.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
 ====
@@ -178,8 +178,8 @@ variables:
     temperature:units = "K" ;
     temperature:cell_methods = "time: mean" ;
     temperature:aggregated_dimensions = "time level latitude longitude" ;
-    temperature:aggregated_data = "location: fragment_location
-                                   identifier: fragment_identifier
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
                                    map: fragment_map" ;
   double pressure(time, level, latitude, longitude) ;
     temperature:standard_name = "air_pressure" ;
@@ -201,8 +201,8 @@ variables:
     longitude:units = "degrees_east" ;
   // Array of fragments feature variables
   int fragment_map(j, i) ;
-  string fragment_location(f_time, f_level, f_latitude, f_longitude) ;
-  string fragment_identifier ;
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
 
 data:
   temperature = _ ;
@@ -215,14 +215,14 @@ data:
                  1, _, _, _, _, _, _, _, _, _, _, _,
                  37, 36, _, _, _, _, _, _, _, _, _, _,
                  36, 36, 36, 36, _, _, _, _, _, _, _, _ ;
-  fragment_location = ... ;
-  fragment_identifier = "temperature" ;
+  fragment_uris = ... ;
+  fragment_identifiers = "temperature" ;
 ----
 In this example, the `temperature` data variable is an aggregation of 96 fragments.
 The shape of the array of fragments is `(12, 1, 2, 4)`, indicating that three of the four aggregated dimensions are spanned by multiple fragments.
 The `pressure` data variable is not an aggregation variable.
 
-The data for the `pressure`, `level`, `latitude` and  `longitude` variables, and the `fragment_location` variable, are omitted for clarity.
+The data for the `pressure`, `level`, `latitude` and  `longitude` variables, and the `fragment_uris` variable, are omitted for clarity.
 ====
 
 [[example-L.4]]
@@ -246,8 +246,8 @@ variables:
     tas:units = "K" ;
     tas:coordinates = "time lat lon station_name" ;
     tas:aggregated_dimensions = "obs" ;
-    tas:aggregated_data = "location: fragment_location
-                           identifier: fragment_identifier
+    tas:aggregated_data = "uris: fragment_uris
+                           identifiers: fragment_identifiers
                            map: fragment_map" ;
   // DSG count variable
   int row_size(station) ;
@@ -259,33 +259,33 @@ variables:
     time:standard_name = "time" ;
     time:units = "days since 1970-01-01" ;
     time:aggregated_dimensions = "obs" ;
-    time:aggregated_data = "location: fragment_location
-                            identifier: fragment_identifier_time
+    time:aggregated_data = "uris: fragment_uris
+                            identifiers: fragment_identifiers_time
                             map: fragment_map" ;
   float lon(station) ;
-    lon:standard_name = "longitude";
-    lon:long_name = "station longitude";
-    lon:units = "degrees_east";
+    lon:standard_name = "longitude" ;
+    lon:long_name = "station longitude" ;
+    lon:units = "degrees_east" ;
     lon:aggregated_dimensions = "station" ;
-    lon:aggregated_data = "location: fragment_location
-                           identifier: fragment_identifier_lon
+    lon:aggregated_data = "uris: fragment_uris
+                           identifiers: fragment_identifiers_lon
                            map: fragment_map_latlon" ;
   float lat(station) ;
-    lat:standard_name = "latitude";
+    lat:standard_name = "latitude" ;
     lat:long_name = "station latitude" ;
     lat:units = "degrees_north" ;
     lat:aggregated_dimensions = "station" ;
-    lat:aggregated_data = "location: fragment_location
-                           identifier: fragment_identifier_lat
+    lat:aggregated_data = "uris: fragment_uris
+                           identifiers: fragment_identifiers_lat
                            map: fragment_map_latlon" ;
   // Array of fragments feature variables
   int fragment_map(j, i) ;
-  string fragment_location(f_station) ;
-  string fragment_identifier ;
+  string fragment_uris(f_station) ;
+  string fragment_identifiers ;
   int fragment_map_latlon(j, i) ;
-  string fragment_identifier_time(f_station) ;
-  string fragment_identifier_lat ;
-  string fragment_identifier_lon ;
+  string fragment_identifiers_time(f_station) ;
+  string fragment_identifiers_lat ;
+  string fragment_identifiers_lon ;
 
 // global attributes:
   :featureType = "timeSeries" ;
@@ -297,12 +297,12 @@ data:
   lat = _ ;
   lon = _ ;
   fragment_map = 5000, 4000, 6000 ;
-  fragment_location = "Harwell.nc", "Abingdon.nc", "Lambourne.nc" ;
-  fragment_identifier = "tas" ;
+  fragment_uris = "Harwell.nc", "Abingdon.nc", "Lambourne.nc" ;
+  fragment_identifiers = "tas" ;
   fragment_map_latlon = 1, 1, 1 ;
-  fragment_identifier_time = "t1", "t2", "t3" ;
-  fragment_identifier_lat = "lat" ;
-  fragment_identifier_lon = "lon" ;
+  fragment_identifiers_time = "t1", "t2", "t3" ;
+  fragment_identifiers_lat = "lat" ;
+  fragment_identifiers_lon = "lon" ;
 ----
 In this example, three fragments are aggregated into a collection of discrete sampling geometry (DSG) timeseries feature types with contiguous ragged array representation.
 The auxiliary coordinate variables `time`, `lon`, and `lat` are also aggregation variables.
@@ -314,7 +314,7 @@ No data have been omitted from the CDL.
 
 [[example-L.5]]
 [caption="Example L.5 "]
-.Aggregation variable with unique fragment values
+.Aggregation ancillary variable with unique fragment values
 ====
 ----
 dimensions:
@@ -340,16 +340,16 @@ variables:
     temperature:cell_methods = "time: mean" ;
     temperature:ancillary_variables = "uid" ;
     temperature:aggregated_dimensions = "time level latitude longitude" ;
-    temperature:aggregated_data = "location: fragment_location
-                                   identifier: fragment_identifier
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
                                    map: fragment_map" ;
   // Ancillary aggregation variable
   string uid ;
     uid:long_name = "Fragment dataset unique identifiers" ;
     uid:missing_value = "" ;
     uid:aggregated_dimensions = "time" ;
-    uid:aggregated_data = "unique_value: fragment_unique_value
-                           map: fragment_map_uid";
+    uid:aggregated_data = "unique_values: fragment_unique_values
+                           map: fragment_map_uid" ;
   // Coordinate variables
   double time(time) ;
     time:standard_name = "time" ;
@@ -365,10 +365,10 @@ variables:
     longitude:units = "degrees_east" ;
   // Array of fragments feature variables
   int fragment_map(j, i) ;
-  string fragment_location(f_time, f_level, f_latitude, f_longitude) ;
-  string fragment_identifier ;
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
   int fragment_map_uid(j_uid, i) ;
-  string fragment_unique_value(f_time) ;
+  string fragment_unique_values(f_time) ;
 
 data:
   temperature = _ ;
@@ -381,12 +381,12 @@ data:
                  1, _,
                  73, _,
                  144, _ ;
-  fragment_location = "January-March.nc", "April-December.nc" ;
-  fragment_identifier = "temperature" ;
+  fragment_uris = "January-March.nc", "April-December.nc" ;
+  fragment_identifiers = "temperature" ;
   fragment_map_uid = 3, 9 ;
-  fragment_unique_value = "04b9-7eb5-4046-97b-0bf8", "05ee0-a183-43b3-a67-1eca" ;
+  fragment_unique_values = "04b9-7eb5-4046-97b-0bf8", "05ee0-a183-43b3-a67-1eca" ;
 ----
-This example is similar to <<example-L.1, Example L.1>>, but now there is an additional aggregation ancillary variable `uid` which defines its fragments from the unique values stored in the `fragment_unique_value` variable, that are intended to be broadcast across the `time` aggregated dimension.
+This example is similar to <<example-L.1, Example L.1>>, but now there is an additional aggregation ancillary variable `uid` which defines its fragments from the unique values stored in the `fragment_unique_values` variable.
 
 The data for the `level`, `latitude` and  `longitude` variables are omitted for clarity.
 ====
@@ -405,8 +405,8 @@ variables:
     temperature:units = "K" ;
     temperature:cell_methods = "time: mean" ;
     temperature:aggregated_dimensions = "" ;
-    temperature:aggregated_data = "location: fragment_location
-                                   identifier: fragment_identifier
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
                                    map: fragment_map" ;
   // Scalar coordinate variables
   double time ;
@@ -423,8 +423,8 @@ variables:
     longitude:units = "degrees_east" ;
   // Array of fragments feature variables
   int fragment_map ;
-  string fragment_location ;
-  string fragment_identifier ;
+  string fragment_uris ;
+  string fragment_identifiers ;
 
 data:
   temperature = _ ;
@@ -433,8 +433,8 @@ data:
   latitude = 43.7 ;
   longitude = 7.27 ;
   fragment_map = 1 ;
-  fragment_location = "file.nc" ;
-  fragment_identifier = "tas" ;
+  fragment_uris = "file.nc" ;
+  fragment_identifiers = "tas" ;
 ----
 An example of an aggregation variable with scalar aggregated data, for which the map variable `fragment_map` is a scalar with the value `1`. 
 ====

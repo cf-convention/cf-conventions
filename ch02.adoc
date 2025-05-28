@@ -290,6 +290,7 @@ It acts as a container for all of the usual attributes that describe a variable,
 The data type of the aggregation variable indicates the data type of the aggregated data, and the value of the aggregation variable's single element is immaterial.
 
 Aggregation variables may be used as any kind of variable (data variable, coordinate variable, cell measures variable, etc.), but it is recommended that container variables whose data are immaterial (such as grid mapping variables) not be encoded as aggregation variables.
+A dataset may contain both aggregation and non-aggregation variables, and it is up to the data-writer to decide which variables, if any, will be stored as aggregation variables.
 
 Any rules that apply to a variable in the CF conventions apply in exactly the same way to an aggregation variable in the same role; and any reference to the dimensions or data of a variable applies to the aggregated dimensions or aggregated data, respectively, of an aggregation variable.
 For instance:
@@ -325,13 +326,13 @@ The aggregated data is formed by combining the fragments in the same relative po
 |===============
 | *Position `[0, 0, 0]`*
 
-Fragment dataset location: `file_A.nc` +
+Fragment dataset name: `file_A.nc` +
 Fragment data shape: `(17, 90, 180)` +
 `17` vertical levels  +
 `[90, 0]` degrees north  +
 `[0, 180]` degrees east | *Position `[0, 0, 1]`*
 
-Fragment dataset location: `file_B.nc` +
+Fragment dataset name: `file_B.nc` +
 Fragment data shape: `(17, 90, 180)` +
 `17` vertical levels +
 `[90, 0]` degrees north +
@@ -339,13 +340,13 @@ Fragment data shape: `(17, 90, 180)` +
 
 | *Position `[0, 1, 0]`*
 
-Fragment dataset location: `file_C.nc` +
+Fragment dataset name: `file_C.nc` +
 Fragment data shape: `(17, 45, 180)` +
 `17` vertical levels +
 `[0, -45]` degrees north +
 `[0, 180]` degrees east | *Position `[0, 1, 1]`*
 
-Fragment dataset location: `file_D.nc` +
+Fragment dataset name: `file_D.nc` +
 Fragment data shape: `(17, 45, 180)` +
 `17` vertical levels +
 `[0, -45]` degrees north +
@@ -353,13 +354,13 @@ Fragment data shape: `(17, 45, 180)` +
 
 | *Position `[0, 2, 0]`*
 
-Fragment dataset location: `file_E.nc` +
+Fragment dataset name: `file_E.nc` +
 Fragment data shape: `(17, 45, 180)` +
 `17` vertical levels +
 `[-45, -90]` degrees north +
 `[0, 180]` degrees east | *Position `[0, 2, 1]`*
 
-Fragment dataset location: `file_F.nc` +
+Fragment dataset name: `file_F.nc` +
 Fragment data shape: `(17, 45, 180)` +
 `17` vertical levels +
 `[-45, -90]` degrees north +
@@ -378,7 +379,7 @@ The array of fragments must be defined by an aggregation variable's **`aggregate
 This attribute must take  a string value comprising blank-separated elements of the form "__feature: variable__", where __feature__ is a case-sensitive keyword that specifies a feature of the array of fragments, and __variable__ is a variable in the aggregation dataset that provides values for that feature.
 The order of elements in the **`aggregated_data`** attribute is not significant.
 
-The feature keywords must comprise either all three of `map`, `location`, and `identifier`; or else both of `map` and `unique_value`.
+The feature keywords must comprise either all three of `map`, `uris`, and `identifiers`; or else both of `map` and `unique_values`.
 No other combination of feature keywords is allowed.
 The variables that correspond to these features are defined as follows:
 
@@ -394,7 +395,7 @@ Since the aggregated dimensions can be spanned by differing numbers of fragments
 The part of each aggregated dimension that is occupied by a given fragment is defined by that fragment's size along that dimension, offset by the sum of the fragment sizes that precede it.
 
 For instance, in <<example-array-of-fragments, Example 2.2>>, the corresponding `map` variable has 3 rows (one for each of the Z, Y, and X aggregated dimensions), and 3 columns (to allow space for the largest number of fragments along any of the aggregated dimensions).
-Each of these rows contains the sizes of the fragments along that dimension, padded with missing values (denoted by `_`) to create the rectangular array:
+Each of these rows contains the sizes of the fragments along that dimension, padded with missing values (denoted by `_`), to create a rectangular array:
 
 ```
  17   _   _
@@ -402,35 +403,36 @@ Each of these rows contains the sizes of the fragments along that dimension, pad
 180 180   _
 ```
 It follows that the shape of the fragment (in its canonical form, see <<fragment-interpretation>>) at position `[0, 1, 1]` of the array of fragments is `(17, 45, 180)`; and this fragment occupies zero-based indices 0 to 16 of the Z aggregated dimension, 90 to 134 of the Y aggregated dimension, and 180 to 359 of the X aggregated dimension.
+See <<example-aggregation-variable, Example 2.3>>.
 
 In the special case that aggregated data is scalar, the `map` variable must also be scalar and contain the value `1`.
 See <<example-L.6, Example L.6>>.
 
-===== location
+===== uris
 
-The string-valued `location` variable defines the locations (i.e. dataset names) of fragment datasets. 
-Its dimensions are those of the array of fragments; and its data provide a location for each fragment.
-A fragment dataset is located with a URI (Uniform Resource Identifier) <<URI>> that must be either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file:///data/file.nc`, `\https:///remote.host/data/file.nc`, `s3:///remote.host/data/file.nc`, or `locally_meaningful_protocol:///UID`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, or `data/file.nc`).
+The string-valued `uris` variable defines the name of each fragment dataset.
+Its dimensions are those of the array of fragments; and its data provides each fragment dataset name in the form of a URI (Uniform Resource Identifier) <<URI>> .
+Each URI must be either an __absolute URI__ (a URI that begins with a scheme component followed by a `:` character, such as `\file:///data/file.nc`, `\https://remote.host/data/file.nc`, `s3://remote.host/data/file.nc`, or `locally_meaningful_protocol:///UID`), or else a __relative-path URI reference__ (a URI that is not an absolute URI and which does not begin with a `/` or `#` character, such as `file.nc`, `../file.nc`, or `data/file.nc`).
 A relative-path URI reference is taken as being relative to the location of the aggregation dataset.
 If the aggregation dataset is moved to another location, then a fragment dataset identified by an absolute URI will still be accessible, whereas a fragment dataset identified by a relative-path URI reference will also need be moved to preserve the relative reference.
-Not all fragment dataset locations need be of the same URI type.
+Not all fragment dataset names need be of the same URI type.
 See <<example-L.1, Example L.1>> and <<example-L.2, Example L.2>>.
 
-===== identifier
+===== identifiers
 
-The `identifier` variable defines how to extract each fragment from within its fragment dataset.
-In general, the dimensions of the `identifier` variable are the same, and in the same order, as those of the `location` variable, and its data contain an identifier corresponding to each fragment location.
-If, however, the identifiers are the same for all fragments then the `identifier` variable may be a scalar whose single data value is the identifier common to all fragments.
+The `identifiers` variable defines how to identify each fragment within its fragment dataset.
+In general, the dimensions of the `identifiers` variable are the same, and in the same order, as those of the `uris` variable, and its data contain an identifier corresponding to each fragment dataset.
+If, however, the identifiers are the same for all fragments then the `identifiers` variable may be a scalar whose single data value is the identifier common to all fragments.
 The identifier for a netCDF fragment dataset is the string-valued variable name of the fragment, which does not need to be the same as the name of the aggregation variable.
 See <<example-L.1, Example L.1>> and <<example-L.4, Example L.4>>.
 
-===== unique_value
+===== unique_values
 
-When the data values within each fragment are all identical, the `unique_value` variable allows these unique values to be explicitly stored in the aggregation dataset, rather than by reference to external fragment datasets via the `location` and `identifier` variables.
-The `unique_value` variable dimensions are those of the array of fragments, and the data provide the unique value for each fragment.
+When the data values within each fragment are all identical, the `unique_values` variable allows these unique values to be explicitly stored in the aggregation dataset, rather than by reference to external fragment datasets via the `uris` and `identifiers` variables.
+The `unique_values` variable dimensions are those of the array of fragments, and the data provide the unique value for each fragment.
 The fragment implied by a unique value has dimensions corresponding to the aggregated dimensions, and the fragment shape is defined by the `map` variable.
 When a fragment contains wholly missing data, its unique value is specified as any missing value defined by the aggregation variable.
-See <<example-L.5, Example L.5>>, which uses an ancillary aggregation variable to make global attributes from the fragment datasets available in the aggregation dataset.
+See <<example-L.5, Example L.5>>.
 
 // Turn section numbering back on
 :numbered:
@@ -460,9 +462,9 @@ variables:
     temperature:units = "K" ;
     temperature:cell_methods = "time: mean" ;
     temperature:aggregated_dimensions = "level latitude longitude" ;
-    temperature:aggregated_data = "location: fragment_location
-                                   identifier: fragment_identifier
-                                   map: fragment_map" ;
+    temperature:aggregated_data = "map: fragment_map
+                                   uris: fragment_uris
+                                   identifiers: fragment_identifiers" ;
   // Coordinate variables
   double level(level) ;
     level:standard_name = "air_pressure" ;
@@ -475,8 +477,8 @@ variables:
     longitude:units = "degrees_east" ;
   // Array of fragments variables
   int fragment_map(j, i) ;
-  string fragment_location(f_level, f_latitude, f_longitude) ;
-  string fragment_identifier ;
+  string fragment_uris(f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
 
 data:
   temperature = _ ;
@@ -486,10 +488,10 @@ data:
   fragment_map = 17, _, _,
                  90, 45, 45,
                  180, 180, _ ;
-  fragment_location = "file_A.nc", "file_B.nc",
-                      "file_C.nc", "file_D.nc",
-                      "file_E.nc", "file_F.nc" ;
-  fragment_identifier = "tmp" ;
+  fragment_uris = "file_A.nc", "file_B.nc",
+                  "file_C.nc", "file_D.nc",
+                  "file_E.nc", "file_F.nc" ;
+  fragment_identifiers = "tmp" ;
 ----
 An encoding for the aggregated data defined by the fragments described in <<example-array-of-fragments, Example 2.2>>.
 The `temperature` data variable is an aggregation of six fragments.
@@ -502,11 +504,11 @@ The data for the `level`, `latitude` and  `longitude` variables are omitted for 
 [[fragment-interpretation, Section 2.8.2 "Fragment Interpretation"]]
 ==== Fragment Interpretation
 
-Fragment datasets can be encoded in many different but equivalent ways, so we define a __canonical form__ of a fragment's data that provides a view of the fragment for which all data values are consistent with those from other fragments, as well as with the attributes of the aggregation variable.
+Fragment datasets can be encoded in many different but equivalent ways, so we define a __canonical form__ of a fragment's data that provides a view of the fragment for which its data are consistent with the data from other fragments, as well as with the attributes of the aggregation variable.
 When constructing the aggregated data, it is assumed that each fragment's data has been transformed to its canonical form.
 The canonical form of a fragment's data is such that:
 
-* The fragment's data has the same number of dimensions, and in the same order, as the aggregated data.
+* The fragment's data have the same number of dimensions, and in the same order, as the aggregated data.
 
 * The fragment's data have the same units as the aggregation variable.
 
