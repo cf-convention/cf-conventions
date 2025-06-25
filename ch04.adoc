@@ -216,46 +216,53 @@ double time(time) ;
 The **`units`** attribute of a time coordinate variable takes a string value that follows the formatting requirements of the <<UDUNITS>> package (e.g. <<time-axis-ex>>).
 It must comprise a unit of measure that is physically equivalent to the SI base unit of time (i.e. the second), followed by the word **`since`** and a reference datetime.
 The format of the **`units`** string implies that the time coordinate equals the length of the time interval from the instant identified by the reference datetime to the instant identified by the time coordinate.
-This is exactly true in all cases except when leap seconds occur between the two intervals in the **`standard`**, **`proleptic_gregorian`**, and **`julian`** calendars.
+This is exactly true in all cases except when leap seconds occur between the two intervals in the **`standard`** calendar.
 See <<leap-seconds>>.
 
-The acceptable units of measure for time are given by UDUNITS.
-The most commonly used of these strings (and their abbreviations) are **`day`** (**`d`**), **`hour`** (**`hr`**, **`h`**), **`minute`** (**`min`**) and **`second`** (**`sec`**, **`s`**).
+The CF standard follows UDUNITS (<<units>>) in the definition of the acceptable
+units of measure for time.
+The most commonly used of these units strings (and their abbreviations) are **`day`** (**`d`**), **`hour`** (**`hr`**, **`h`**), **`minute`** (**`min`**) and **`second`** (**`sec`**, **`s`**).
 Plural forms are also acceptable.
 
 UDUNITS defines a **`year`** to be exactly 365.242198781 days (the interval between 2 successive passages of the sun through vernal equinox).
 __It is not a calendar year.__ UDUNITS defines a  **`month`** to be exactly **`year/12`**, which is __not a calendar month__.
-The CF standard follows UDUNITS in the definition of units, but we recommend that **`year`** and **`month`** should not be used, because of the potential for mistakes and confusion.
+We recommend that **`year`** and **`month`** should not be used, because of the potential for mistakes and confusion.
 
 UDUNITS defines a **`minute`** as 60 **`seconds`**, an **`hour`** as 3600 **`seconds`** and a **`day`** as 86400 **`seconds`**.
 These are not calendar units.
-When a leap second is inserted into UTC, the minute, hour and day affected differ by one second from their usual durations according to clock time, but the UDUNITS and CF **`minute`**, **`hour`** and **`day`** do not; they are fixed units of measure.
-See also <<leap-seconds>>.
+When a leap second is inserted into UTC, the minute, hour and day affected differ by one second from their usual durations according to clock time, but the units of **`minute`**, **`hour`** and **`day`** do not; they are fixed units of measure.
+To avoid mistakes and confusion, we therefore recommend that these units should not be used in the **`utc`** calendar; instead, we recommend the **`second`** as the unit for time coordinates in that calendar.
+See also <<calendar>> and <<leap-seconds>>.
 
 UDUNITS permits a number of alternatives to the word **`since`** in the units of time coordinates.
 All the alternatives have exactly the same meaning in UDUNITS.
 For compatibility with other software, CF strongly recommends that `since` should be used.
 
 The reference datetime string (appearing after the identifier **`since`**) is required.
-It must include the date, which may optionally be followed by time or time zone offset or both. Its format is __y__-__m__-__d__ [__H__:__M__:__S__] [__Z__], where [...] indicates an optional element:
+It must include the date, which may be followed by time or time zone offset or both. Its format is __y__-__m__-__d__ [__H__:__M__:__S__] [__Z__], where [...] indicates an optional element, as follows:
 
 * _y_ is year, _m_ month, _d_ day, _H_ hour and _M_ minute, which are all integers of one or more digits, and _y_ may be prefixed with a sign (but note that some CF calendars do not permit negative years; see <<calendar>>),
 
 * _S_ is second, which may be integer or floating point (see <<leap-seconds>> regarding __S__>59),
 
 * _Z_ is the time zone offset.
-This is an interval of time, specified in one of the formats described below.
-Only numbers (digits, `+`, `-` and `:`) or the letter "Z" are allowed in _Z_, not time zone names or acronyms.
-
+_Z_ is _not_ a time zone name or acronym; it is an interval of time, specified in one of the formats described below.
 The default time zone offset is zero.
+We recommend that a non-zero time zone offset should not be specified, because it is easy to make mistakes about the sign of the offset and allowance for daylight-saving/summer time.
+A non-zero offset is _not allowed_ in the **`utc`** and **`tai`** calendars (see <<calendar>>).
+While the default is an offset of zero, we suggest that a zero offset be stated explicitly to avoid any confusion where omitting it might be misunderstood as indicating local time.
+
 In a time zone with zero offset, time (approximately) equals mean solar time for 0 `degrees_east` of longitude.
 (Although this may be exact in a model, in reality the time with zero time zone offset differs by some seconds from mean solar time; see the discussion of UTC and leap seconds in <<calendar>>.)
 If both time and time zone offset are omitted the time is 00:00:00 (the beginning of the day i.e. midnight at 0 `degrees_east`).
 Thus, **`units = "days since 1990-1-1"`** means the same as **`units = "days since 1990-1-1 00:00:00"`**.
 
-The time zone offset _Z_ must be in one of the following five formats, where numeric hours may optionally be prefixed with a `+` or `-` sign:
+Only numbers (digits, `+`, `-` and `:`) or the letter "Z" are allowed in _Z_.
+If the time zone offset is the letter `Z` or begins with a sign, the space before it may be omitted.
+The time zone offset _Z_ must be in one of the following five formats, where numeric hours may optionally be prefixed with a `+` or `-` sign.
 
 ** The letter `Z` indicating zero offset, sometimes referred to as "Zulu Time".
+This is the default.
 
 ** _H_, the hour alone, of one or two digits e.g. **`-6`**, **`2`**, **`+11`**, which is sufficient for many time zones.
 
@@ -265,11 +272,8 @@ The time zone offset _Z_ must be in one of the following five formats, where num
 
 ** three digits, of which the first is the hour (0--9) e.g. **`530`**.
 
-If the time zone offset is the letter `Z` or begins with a sign, the space before it may be omitted.
-
-While the default (of omitting the _Z_ component) is an offset of zero, we suggest that a zero offset be specified to avoid any confusion where omitting it might be misunderstood as indicating local time.
-
 For example, **`seconds since 1992-10-8 15:15:42.5 -6:00`** indicates seconds since October 8th, 1992 at 3 hours, 15 minutes and 42.5 seconds in the afternoon, in a time zone where the datetime is six hours behind the default.
+To translate a given time coordinate to the time zone of the reference datetime, the time zone offset should be added to the time coordinate before converting it to a datetime.
 Subtracting the time zone offset from a given datetime converts it to the equivalent datetime with zero time zone offset e.g. **`1989-12-31 18:00:00 -6`** identifies the same instant as **`1990-1-1 0:0:0`**.
 
 
@@ -284,7 +288,6 @@ The values currently defined for **`calendar`** are listed below.
 
 Because the calendars have different sets of valid dates, and different treatments of leap seconds (see below in this section, and <<leap-seconds>>), a given time coordinate value with given **`units`** can represent different datetimes in different calendars; conversely, a given datetime is represented by different time coordinate values in different calendars.
 Moreover, in different calendars a given datetime can identify a different instant in the continuous physical dimension of time.
-// Examples of these situations are shown in the table of *Appendix ???*.
 
 The lengths of the months in the Gregorian calendar are used in all calendars except **`360_day`**, **`none`** (see <<none-calendar>>) and explicitly defined calendars (see <<explicit-calendar>>).
 The calendars differ in their treatment of leap years (when there are 29 days in February instead of 28).
