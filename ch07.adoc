@@ -3,13 +3,15 @@
 :figure: 0
 
 When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of non-zero size, a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.
-The commonest cases are one-dimensional cells along spatiotemporal axes, for instance cells along a time axis for consecutive months whose values contain monthly means.
-The methods presented in <<cell-boundaries>> and <<cell-methods>> describe cases in which each grid point is associated with a cell consisting of a single one-dimensional interval, a single two-dimensional polygonal area, or in general a single _n_-dimensional volume in the _n_-dimensional space described by its coordinate variables.
+The commonest cases have one-dimensional cells along spatiotemporal axes, for instance cells along a time axis for consecutive months whose values contain monthly means.
+The conventions presented in <<cell-boundaries>>, <<cell-measures>> and <<cell-methods>> describe cases in which each grid point is associated with a cell consisting of a single one-dimensional interval, a single two-dimensional polygonal area, or in general a single _n_-dimensional volume in the _n_-dimensional space described by its coordinate variables.
+As an alternative to _n_-dimensional volumes with bounds, we provide <<geometries>>, for the case of geospatial applications in which each data value pertains to a single real-world feature, such as a river, watershed or country, represented by one or more points, lines or polygons.
 
 It is possible for a single data value to be the result of an operation whose domain is a disjoint set of intervals or areas.
 This is true for many types of climatological statistic; for example, the mean January temperature for the years 1971-2000 is computed from the 30 individual months of January, which are a set of discontiguous time-intervals.
 Climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <<climatological-statistics>>.
-As an alternative to _n_-dimensional volumes with bounds, we provide <<geometries>>, for the case of geospatial applications in which each data value pertains to a single real-world feature, such as a river, watershed or country, represented by one or more points, lines or polygons.
+Climatological statistics and other kinds of statistic, e.g. zonal means, may be used as a reference with respect to which anomalies are computed.
+<<anomalies>> gives conventions for relating an anomaly data variable to its reference statistic, and for describing how the latter was computed.
 
 
 [[cell-boundaries, Section 7.1, "Cell Boundaries"]]
@@ -117,8 +119,8 @@ variables:
   float lat_bnds(jmax,imax,nv);
   float lon_bnds(jmax,imax,nv);
 ----
-The boundary variables `lat_bnds` and `lon_bnds` associate a gridpoint `(j,i)` with the cell determined by the vertices `(lat_bnds(j,i,n),lon_bnds(j,i,n))`, `n=0,..,3`.
-The gridpoint location, `(lat(j,i),lon(j,i))`, should be contained within this region.
+The boundary variables **`lat_bnds`** and **`lon_bnds`** associate a gridpoint **`(j,i)`** with the cell determined by the vertices **`(lat_bnds(j,i,n),lon_bnds(j,i,n))`**, **`n=0,..,3`**.
+The gridpoint location, **`(lat(j,i),lon(j,i))`**, should be contained within this region.
 ====
 
 The vertices must be ordered such that, when visiting the vertices in order, the four-sided perimeter of the cell is traversed anticlockwise on the lon-lat surface as seen from above.
@@ -723,7 +725,400 @@ data:  // time coordinates translated to datetime format
 ----
 ====
 
-[[geometries, Section 7.5, "Geometries"]]
+
+[[anomalies, Section 7.5, "Anomaly data"]]
+=== Anomaly data
+
+In a data variable containing anomaly data for some quantity, each element __A__ is the difference __P__ - __N__ between a particular value __P__ of the quantity and a normal value or norm __N__ of the same quantity.
+__N__ is some statistic calculated from the values of the quantity that lie within specified ranges of one or more of its coordinates.
+ __P__ can be, but is not necessarily, one of the set of values from which __N__ is calculated.
+
+A data variable __A__ containing anomalies with respect to a norm is __notionally__ the difference between a data variable __P__ containing the original data and a data variable __N__ containing the statistical norm of the quantity.
+The three variables all have dimensions for the same set of quantities (spatiotemporal coordinates or other quantities of which __P__ is a function).
+__P__ has all the same dimensions and coordinate variables as __A__, but __N__ shares only a subset of the dimensions and coordinate variables of __A__.
+The other dimensions of __N__ are the ones over which the normal statistic is calculated.
+The data variables __P__ and __N__ are usually not actually present in the dataset.
+
+The commonest kind of anomaly is the difference between the value __P__ of a quantity and the mean __N__ of the same quantity over some range of time coordinates, usually called the "climatological normal", the "climate normal", or the "climatology".
+__N__ is usually either a mean over a number of entire years or a climatological mean (Section 7.4, "Climatological statistics").
+The time coordinate of the anomaly may or may not lie within the range of times from which __N__ is calculated.
+
+In the case of an anomaly __A__ with respect to a climatology, __N__ contains a time-mean or a climatological mean.
+__N__ has all the same dimensions and coordinate variables as __A__ except for time.
+__N__ is computed from the temporal variation of __P__.
+
+CF offers two conventions for describing anomaly data.
+The convention of Section 7.5.1 depends on special standard names and can be used only for anomalies with respect to climatology (temporal anomalies).
+It is simple but the information it provides about the definition of the norm is insufficient for some use-cases.
+The convention of Section 7.5.2 can be used for anomalies with respect to any dimension and provides more information about the norm, but is consequently more complicated.
+
+
+[[temporal-anomalies, Section 7.5.1, "Temporal anomalies using **`anomaly`** standard names"]]
+==== Temporal anomalies using **`anomaly`** standard names
+
+Several CF standard names (ending with **`_anomaly`**) have been defined for anomalies with respect to a climatological normal.
+The start and end of the climatological normal period may be recorded in the bounds of a variable having **`reference_epoch`** as its standard name attribute.
+This variable may be either a scalar coordinate variable, as in Example 7.A, or a coordinate variable with a single size-one dimension.
+This convention using **`_anomaly`** standard names and **`reference_epoch`** is restricted to those common cases which have such standard names defined.
+
+[[anomaly-with-reference-epoch-ex]]
+[caption="Example 7.15. "]
+.An anomaly data variable with a reference epoch
+====
+----
+variables:
+  float delta_tas(time,latitude,longitude);
+    delta_tas:standard_name="air_temperature_anomaly";
+    delta_tas:units="degC";
+    delta_tas:coordinates="reference_epoch";
+    delta_tas:cell_methods="time: maximum";
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-7-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double reference_epoch;
+    reference_epoch:standard_name="reference_epoch";
+    reference_epoch:units="days since 1990-1-1";
+    reference_epoch:bounds="reference_epoch_bounds";
+    reference_epoch:calendar="standard";
+  double reference_epoch_bounds(two);
+data:
+  time_bounds=0,1, 1,2, 2,3, 3,4;
+  reference_epoch_bounds=0,10957;
+----
+
+The data variable **`delta_tas`** contains daily maximum temperatures for 16th-19th July 2023 expressed as anomalies with respect to the climatological normal time-mean of 1990-2019, which is defined by the bounds of **`reference_epoch`**.
+Note that 10957 days since 1st January 1990 in the **`standard`** calendar is 1st January 2020.
+The single value of the **`reference_epoch`** coordinate variable should be a representative time within the climatological interval (see Section 7.4).
+
+In this example, **`reference_epoch`** is a scalar coordinate variable.
+We could alternatively define a dimension **`reference_epoch=1`**, with a one-dimensional coordinate variable **`reference_epoch(reference_epoch)`** and bounds **`reference_epoch_bounds(reference_epoch,two)`**.
+In this case, we must include **`reference_epoch`** among the dimensions of **`delta_tas`** e.g. **`delta_tas(reference_epoch,time,latitude,longitude)`**, but the **`coordinates`** attribute is not needed, unlike in the case of a scalar coordinate variable.
+
+---
+
+The convention with **`_anomaly`** standard names and **`reference_epoch`** gives no indication of the **`cell_methods`** describing the climatological normal.
+The climatological normal variable is not necessarily present in the file, and even if it is present, the convention does not provide any link between the anomaly variable and the climatological normal variable.
+Hence the interpretation of the anomaly is unclear.
+In Example 7.B, we illustrate the ambiguity of Example 7.A in this respect.
+
+---
+
+_Example 7.B. Ambiguity in interpreting an anomaly data variable with a reference epoch._
+
+In Example 7.A, **`delta_tas`** (__A__ in the notation at the start of this section) is interpreted as the difference between two other variables (__P__ and __N__), which may or may not be contained in the dataset e.g. **`delta_tas`** (__A__) = **`tas`** (__P__) - **`climatological_tas`** (__N__), where __N__ isn't fully described by the metadata.
+
+One possibility is that **`delta_tas`** contains differences between daily maxima in **`tas`** and the time-mean of the entire 30-year period 1990-2019 in **`climatological_tas`**:
+
+----
+  float tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum";
+  float climatological_tas(latitude,longitude);
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:coordinates="reference_epoch";
+    climatological_tas:cell_methods="reference_epoch: mean";
+----
+
+ Another possibility is that the daily anomalies are calculated with respect to the 30-year July climatological mean:
+
+----
+  float tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum";
+  float climatological_tas(climmonths,latitude,longitude);
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:cell_methods="climmonths: mean within years climmonths: mean over years";
+----
+
+with dimension **`climonths=12`** for climatological monthly means.
+These two possibilities, and others, cannot be distinguished with this convention, but they can be distinguished by the convention of Section 7.5.2.
+
+---
+
+### 7.5.2. Convention describing the norm for general anomalies
+
+The convention of this subsection can be used to describe anomalies with respect to a statistical norm calculated from any single dimension or combination of dimensions, including the commonest case of temporal anomalies (i.e. with respect to a climatological norm, as in Section 7.5.1).
+For example, anomalies might be calculated (as a function of longitude) with respect to the zonal mean, or (as a function of horizontal location) with respect to the minimum value in the area.
+In these examples, the norm is the zonal mean or the area minimum, respectively.
+This convention also allows us to clarify the definition of the climatological norm in the case of temporal anomalies (removing the ambiguity of Example 7.B).
+
+A data variable is described as an anomaly using this convention by including in its **`cell_methods`** attribute a string of the form "_name_**`:`** [_name_**`:`** ...] **`anomaly wrt`** __norm__".
+This **`cell_methods`** entry tells us:
+
+* that the data variable contains anomalies (__A__ in the notation of the start of this section) calculated from data (__P__) with the same dimensions, as the difference from the normal statistic __norm__ (__N__).
+
+* at which stage the anomaly __A__ = __P__ - __N__ was calculated, among the stages of the processing of the data.
+This is known because the entries in **`cell_methods`** appear in order of application.
+
+* that __N__ was calculated from the variation of __P__ over dimensions identified by the _name_(s).
+
+Each _name_ must be the name of a coordinate variable (and dimension) or a scalar coordinate variable of the anomaly data variable __A__.
+Therefore we call these the _anomaly coordinate variables_.
+They are not coordinate variables of  __N__, which is not necessarily present in the dataset, but __N__ has coordinate variables for the same quantities as the anomaly coordinate variables.
+Usually there is only one _name_ and one anomaly coordinate variable, and usually it is a spatiotemporal coordinate variable.
+
+For a data variable containing anomalies with respect to climatology, _name_ identifies the time coordinate or scalar coordinate variable as the anomaly coordinate e.g. "**`time: anomaly wrt`** __norm__".
+For an anomaly with respect to the zonal mean, the anomaly coordinate is longitude.
+For an anomaly with respect to the area minimum, we need two names e.g. "**`lat: lon: anomaly wrt`** __norm__".
+As described in Section 7.3.1, the combination of horizontal coordinate variables can alternatively be represented by the word **`area`**, thus "**`area: anomaly wrt`** __norm__".
+
+There are two alternatives for __norm__, as follows:
+
+(1) **Norm data variable**.
+If the data variable containing the norm __N__ is present in the dataset, __norm__ is the name of that variable, e.g. a data variable containing zonal means for anomalies with respect to the zonal mean.
+If the anomaly data variable has a **`standard_name`** attribute, it must _not_ be a standard name ending in **`_anomaly`**, and the __norm__ variable must have the same attribute.
+
+The __norm__ variable must have all the same coordinate variables (and hence dimensions) and scalar coordinate variables as the anomaly data variable, _except_ for the anomaly coordinate variables.
+Corresponding to each of the anomaly coordinate variables (usually there is only one), the __norm__ variable must have a coordinate variable or scalar coordinate variable for the same physical quantity as the anomaly coordinate variable.
+We call these the _norm coordinate variables_ (usually there is only one).
+For instance, a norm data variable containing zonal means has a norm coordinate variable for longitude, corresponding to the anomaly coordinate variable for longitude of the anomaly data variable.
+
+Whereas the anomaly coordinate variable(s) are usually multivalued, the norm coordinate variable(s) must be of size one (except for norms which are climatological statistics; see paragraph below).
+This is because the norm is a statistic that represents the variation of __P__ within the range of the norm coordinate variable.
+
+The __norm__ data variable must have a **`cell_methods`** attribute with an entry for the norm coordinate variable, or the combination of them if more than one, to indicate how __N__ was computed from the variation of __P__.
+For instance, the __norm__ data variable for anomalies with respect to a time-mean must have a coordinate variable for time, and a **`cell_methods`** attribute containing an entry for this coordinate variable.
+The norm coordinate variables must have boundary variables to indicate the coordinate ranges over which __N__ was calculated from __P__.
+
+A norm data variable for a climatological statistic (in the sense of Section 7.4) has a norm coordinate variable which
+
+* has a **`cell_methods`** entry containing **`within`** and **`over`** keywords,
+
+* may have a dimension greater than one (for climatological variation **`within days`** or **`within years`**), and
+
+* must have a **`climatology`** attribute to identify its boundary variable.
+
+Example 7.C shows how the **`cell_methods`** of the norm data variable clarifies the ambiguity in the convention of Section 7.5.1 illustrated in Example 7.B.
+
+---
+
+_Example 7.C. Distinguishing temporal anomalies with different kinds of climatological norm_
+
+A data variable **`delta_tas(time,latitude,longitude)`** contains daily maxima for 16th-19th July 2023 (along the **`time`** dimension) of the anomaly in **`air_temperature`** with respect to the climatological mean of 1990-2019.
+It is the difference between the daily maxima contained in data variable **`tas`**, and the time-mean  **`climatological_tas`** of the entire 30-year period 1990-2019:
+
+----
+variables:
+  float delta_tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+  float tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum";
+  float climatological_tas(latitude,longitude);
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:coordinates="reference_epoch";
+    climatological_tas:cell_methods="reference_epoch: mean";
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-7-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double reference_epoch;
+    reference_epoch:standard_name="reference_epoch";
+    reference_epoch:units="days since 1990-1-1";
+    reference_epoch:bounds="reference_epoch_bounds";
+    reference_epoch:calendar="standard";
+  double reference_epoch_bounds(two);
+data:
+  time_bounds=0,1, 1,2, 2,3, 3,4;
+  reference_epoch_bounds=0,10957; // 1990-1-1, 2020-1-1
+----
+
+The **`cell_methods`** of **`delta_tas`** records that daily maxima were first calculated, then anomalised with respect to the climatological mean.
+The result would have been the same if the order of operations was reversed.
+
+ Another possibility is that the daily anomalies are calculated with respect to the 30-year July climatological mean:
+
+----
+  float delta_tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+  float tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum";
+  float climatological_tas(climmonths,latitude,longitude);
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:cell_methods="climmonths: mean within years climmonths: mean over years";
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-7-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double climmonths(climmonths);
+    climmonths:standard_name="time";
+    climmonths:units="days since 1990-1-1";
+    climmonths:climatology="climmonths_bounds";
+    climmonths:calendar="standard";
+  double climmonths_bounds(climmonths,two);
+data:
+  time_bounds=0,1, 1,2, 2,3, 3,4;
+  climmonths_bounds=0,10623, ... // 1990-1-1, 2019-2-1, i.e. January climatology
+    181,10773, ... // 1990-7-1, 2019-8-1, i.e. July climatology
+    334,10957; // 1990-12-1, 2020-1-1, i.e. December climatology
+----
+
+In this example, **`climatological_tas`** contains climatological monthly means for every month.
+Since the **`time`** coordinates all lie within July, it would be sufficient to provide the climatological mean for July only.
+In that case the **`climmonths`** variable would have a dimension **`climmonths=1`**, or it could be a scalar coordinate variable.
+
+The metadata of **`delta_tas`** is the same for the two examples above.
+They are distinguished by the **`cell_methods`** and time coordinates of **`climatological_tas`**.
+
+---
+
+(2) **Norm metadata variable**. If the data variable containing the norm __N__ is not present in the dataset, the information required to define the normal statistic can instead by provided by a norm metadata variable.
+
+For each of the anomaly coordinate variables, the norm metadata variable must have a coordinate variable or scalar coordinate variable for the same physical quantity.
+These are exactly the same the norm coordinate variables (usually there is only one of them) as in case (1), and they must have the same sizes and bounds as in case (1).
+The norm metadata variable must have a **`cell_methods`** attribute with a _single_ entry, which refers to the norm coordinate variable, or the combination of them if more than one, to indicate how __N__ was computed from the variation of __P__, as in case (1).
+
+The norm metadata variable must have no coordinate or scalar coordinate variables other than the norm coordinate variables.
+If the sole, or every, norm coordinate variable is a scalar coordinate variable, the norm metadata variable will have no dimensions i.e.
+it will be a scalar.
+Except if there is a multivalued norm coordinate variable for climatological time, the norm metadata variable will have only one element.
+The data in the norm metadata variable is immaterial and of arbitrary type, because the purpose of the variable is only to host the norm coordinate variables and the **`cell_methods`**.
+
+Although it is formally a data variable, it is recommended that a norm metadata variable does not have any of the attributes of Appendix A except for **`cell_methods`** and any which are marked as applicable to both data and domain variables.
+
+The use of norm metadata variables is illustrated by Examples 7.D, 7.E and 7.F.
+
+---
+
+_Example 7.D. Temporal anomalies with climatological norm metadata variables_
+
+This example shows how the metadata of Example 7.C can be recorded using norm metadata variables.
+The data would be the same as in Example 7.C.
+
+A data variable **`delta_tas(time,latitude,longitude)`** contains daily maxima for 16th-19th July 2023 (along the **`time`** dimension) of the anomaly in **`air_temperature`** with respect to the climatological mean of 1990-2019.
+
+----
+variables:
+  float delta_tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+  float climatological_tas;
+    climatological_tas:coordinates="reference_epoch";
+    climatological_tas:cell_methods="reference_epoch: mean";
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-7-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double reference_epoch;
+    reference_epoch:standard_name="reference_epoch";
+    reference_epoch:units="days since 1990-1-1";
+    reference_epoch:bounds="reference_epoch_bounds";
+    reference_epoch:calendar="standard";
+  double reference_epoch_bounds(two);
+----
+
+If the daily anomalies are calculated with respect to the 30-year July climatological mean:
+
+----
+  float delta_tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+  float climatological_tas(climmonths);
+    climatological_tas:cell_methods="climmonths: mean within years climmonths: mean over years";
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-7-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double climmonths(climmonths);
+    climmonths:standard_name="time";
+    climmonths:units="days since 1990-1-1";
+    climmonths:climatology="climmonths_bounds";
+    climmonths:calendar="standard";
+  double climmonths_bounds(climmonths,two);
+----
+
+As in Example 7.C, the metadata of **`delta_tas`** is the same in the two cases.
+They are distinguished by the **`cell_methods`** and time coordinates of **`climatological_tas`**.
+
+---
+
+_Example 7.E. Anomalies with respect to a zonal mean_
+
+----
+dimensions:
+  time=100;
+  latitude=180;
+  longitude=360;
+  zmlongitude=1;
+variables:
+  float rtoa(time,latitude,longitude);
+    rtoa:standard_name="toa_net_downward_radiative_flux";
+    rtoa:units="W m-2";
+    rtoa:cell_methods="time: mean latitude: mean longitude: anomaly wrt zm";
+  float longitude(longitude);
+    longitude:standard_name="longitude";
+    longitude:units="degrees_E";
+  float zm(zmlongitude);
+    zmlongitude:cell_methods="zmlongitude: mean";
+    zmlongitude:bounds="zmbounds";
+  float zmlongitude(zmlongitude);
+    zmlongitude:standard_name="longitude";
+    zmlongitude:units="degrees_E";
+  float zmbounds(zmlongitude,two);
+data:
+  zmlongitude=0; // a nominal value
+  zmbounds=-240,-90;
+----
+
+The **`zmbounds`** indicate that **`rtoa`** contains anomalies with respect to the zonal mean calculated from 120&deg;E to 90&deg;W.
+
+---
+
+_Example 7.F. Anomalies with respect to the minimum within a horizontal area_
+
+The data variable **`topography`** contains values of the surface altitude relative to the lowest point within a horizontal area delimited by bounds in the horizontal projection coordinates.
+
+
+----
+  float topography(y,x);
+    topography:standard_name="surface_altitude";
+    topography:units="m";
+    topography:cell_methods="area: anomaly wrt areamin"; // or "x: y: anomaly wrt areamin"
+    topography:grid_mapping="national_grid";
+  float areamin;
+    areamin:coordinates="xrange yrange";
+    areamin:cell_methods="area: minimum"; // or "xrange: yrange: minimum"
+  float xrange;
+    xrange:standard_name="projection_x_coordinate";
+    xrange:units="km";
+    xrange:bounds="xbounds";
+  float xbounds(two);
+  float yrange;
+    yrange:standard_name="projection_y_coordinate";
+    yrange:units="km";
+    yrange:bounds="ybounds";
+  float ybounds(two);
+----
+====
+
+
+[[geometries, Section 7.6, "Geometries"]]
 === Geometries
 
 For many geospatial applications, data values are associated with a geometry, which is a spatial representation of a real-world feature, for instance a time-series of areal average precipitation over a watershed.
