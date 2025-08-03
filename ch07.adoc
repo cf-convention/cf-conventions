@@ -739,19 +739,18 @@ __P__ has all the same dimensions and coordinate variables as __A__, but __N__ s
 The other dimensions of __N__ are the ones over which the normal statistic is calculated.
 
 The commonest kind of anomaly __A__ is the difference between the value __P__ of a quantity and the mean __N__ of the same quantity over some range of time coordinates, usually called the "climatological normal", the "climate normal", or the "climatology".
-__N__ is usually either a mean over a number of entire years or a climatological mean (<<climatological-statistics>>).
+__N__ is usually either a mean over a number of entire years or a climatological mean (<<climatological-statistics>>), computed from the temporal variation of __P__.
 The time coordinate of the anomaly may or may not lie within the range of times from which __N__ is calculated.
-In the case of an anomaly __A__ with respect to a climatology, __N__ has all the same dimensions and coordinate variables as __A__ except for time.
-__N__ is computed from the temporal variation of __P__.
+__N__ has all the same dimensions and coordinate variables as __A__ except for time.
 
 CF offers two conventions for describing anomaly data.
 In <<temporal-anomalies>> we describe a simple convention which depends on special standard names.
-It can be used only for anomalies with respect to climatology (temporal anomalies), and the information it provides about the definition of the norm is insufficient for some use-cases.
+It can be used only for anomalies with respect to time-means or climatological means (temporal anomalies), and the information it provides about the definition of the norm is insufficient for some use-cases.
 
-In the remainder of this section and in the following two (<<anomalies-norm-data>> and <<anomalies-norm-metadata>>) we describe a convention for anomalies with respect to a statistical norm that can be calculated from any single dimension or combination of dimensions, including the commonest case of temporal anomalies (i.e. with respect to a climatological norm).
+In the remainder of this section and in the following two (<<anomalies-norm-data>> and <<anomalies-norm-metadata>>) we describe a convention for anomalies with respect to a statistical norm that can be calculated from any single dimension or combination of dimensions, including the commonest case of temporal anomalies.
 For example, anomalies might be calculated (as a function of longitude) with respect to the zonal mean, or (as a function of horizontal location) with respect to the minimum value in the area.
 In these examples, the norm is the zonal mean or the area minimum, respectively.
-The convention of this section provides more information than the convention of <<temporal-anomalies>> about the climatological norm in the case of temporal anomalies.
+The convention of this section provides more information than the convention of <<temporal-anomalies>> about the norm in the case of temporal anomalies.
 
 In the convention of this section, a data variable is described as an anomaly by including in its **`cell_methods`** attribute a string of the form "__name__**`:`** [__name__**`:`** ...] **`anomaly wrt`** __norm__".
 This **`cell_methods`** entry tells us:
@@ -764,16 +763,30 @@ This is known because the entries in **`cell_methods`** appear in order of appli
 * that __N__ was calculated from the variation of __P__ over dimensions identified by the __name__(s).
 
 Each __name__ must be the name of a coordinate variable (and dimension) or a scalar coordinate variable of the anomaly data variable __A__.
-Therefore we call these the _anomaly coordinate variables_.
-They are not coordinate variables of  __N__ or __P__, but __N__ and __P__ have coordinate variables for the same quantities as the anomaly coordinate variables.
-Usually there is only one __name__ and one anomaly coordinate variable, and usually it is a spatiotemporal coordinate variable.
+Therefore we call these the __anomaly coordinate variables__.
+Usually there is only one anomaly coordinate variable, and usually it is a spatiotemporal coordinate variable.
 
-For a data variable containing anomalies with respect to climatology, __name__ identifies the time coordinate or scalar coordinate variable as the anomaly coordinate e.g. "**`time: anomaly wrt`** __norm__".
-For an anomaly with respect to the zonal mean, the anomaly coordinate is longitude.
+For instance, for a data variable containing anomalies with respect to the zonal mean, __name__ identifies the coordinate variable or scalar coordinate variable of longitude as the anomaly coordinate variable e.g. "**`longitude: anomaly wrt`** __norm__".
 For an anomaly with respect to the area minimum, we need two __name__s e.g. "**`lat: lon: anomaly wrt`** __norm__".
 As described in <<cell-methods>>, the combination of horizontal coordinate variables can alternatively be represented by the word **`area`**, thus "**`area: anomaly wrt`** __norm__".
+For an anomaly with respect to a temporal or climatological statistic, __name__ identifies the time coordinate variable of the anomaly data variable.
 
-There are two alternatives for __norm__, described in <<anomalies-norm-data>> and <<anomalies-norm-metadata>>.
+The anomaly coordinate variables are not coordinate variables of  __N__, but for each of the anomaly coordinate variables __N__ has a coordinate variable or scalar coordinate variable for the same physical quantity.
+We call these the corresponding variables the __norm coordinate variables__.
+They indicate the range(s) of coordinates over which the statistic __N__ was calculated from the variation of __P__.
+For instance, if __N__ contains zonal means, it has a norm coordinate variable for longitude, corresponding to the anomaly coordinate variable of __A__ for longitude, and indicating the range of longitudes from which the zonal mean was calculated.
+Whereas the anomaly coordinate variable(s) are usually multivalued, the norm coordinate variable(s) must be of size one, with one exception:
+The norm coordinate variable of a climatological statistic is multivalued if the norm has values for several intervals of the diurnal or annual cycle e.g. climatological means for each of the four seasons.
+
+There are two alternatives for __norm__.
+If the data variable containing the norm __N__ is present in the dataset, it can be named as __norm__ in **`cell_methods`** of the anomaly variable, e.g. a data variable containing zonal means for anomalies with respect to the zonal mean.
+No modification to the metadata of __N__ is required for it to serve as the norm for an anomaly data variable, and it may still be treated as a data variable in its own right as well.
+We describe the use of a norm data variable first (<<anomalies-norm-data>>), although it is less common, because it is conceptually more obvious.
+
+The second alternative is for __norm__ is **`cell_methods`** __norm metadata variable__ instead of the norm data variable.
+If the norm is a climatological statistic
+
+ described in  and <<anomalies-norm-metadata>>.
 
 
 [[anomalies-norm-data, Section 7.5.1, "Anomalies with respect to a norm data variable"]]
