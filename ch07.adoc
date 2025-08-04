@@ -1069,12 +1069,16 @@ The normal data variable __N__, which may or may not be present in the dataset, 
 If __N__ is provided for those three months only, its climatological time variable has a dimension of 3; quite possibly, it might contain the climatological means for every month of the year, with a dimension of 12.
 The anomaly metadata variable provides the mapping from the climatological time dimension, of whatever size, to the anomaly time dimension of size 6.
 
-In this case, the norm metadata variable is one-dimensional (not scalar, as in all other cases), with the dimension of the anomaly coordinate variable of time (6 in the example).
-It has no scalar coordinate variables (unlike in all other cases, which have norm scalar coordinate variables).
-The data array of the norm __metadata__ variable contains a list of indices to the climatological time coordinate variable of the norm __data__ variable __N__.
+In this case, the norm metadata variable is one-dimensional (not scalar, as in all other cases), with the dimension of the anomaly coordinate variable of time (6 in the example); as usual, its data type and values are immaterial because they are not used for anything.
+It has an auxiliary coordinate variable, with the same dimension as itself, named by its **`coordinates`** attribute, but it has no scalar coordinate variables (unlike in all other cases, which have norm scalar coordinate variables).
+The auxiliary coordinate variable contains a list of indices to the climatological time coordinate variable of the norm data variable __N__.
 This coordinate variable, and its dimension, must be included in the dataset, even if __N__ itself is not present in the dataset.
-The norm metadata variable has an attribute **`compress`**, which contains the name of the climatological time coordinate variable of __N__, in order to make the link between them.
-Element __i__ of the norm metadata variable contains the index (numbering from 0) of the element of the climatological time variable of __N__ that corresponds to element __i__ of anomaly time coordinate variable of __A__.
+The auxiliary coordinate variable has a **`compress`** attribute, which contains the name of the climatological time coordinate variable of __N__, in order to make the link between them.
+
+Element __i__ of the auxiliary coordinate variable contains a value, say __j__, which is the index (numbering from 0) of the element of the climatological time dimension of __N__ that corresponds to element __i__ of the anomaly time dimension of __A__.
+This indicates that the slice of the anomaly data variable __A__ with index __i__ along this dimension is the difference between the corresponding slice of the original data variable __P__ and the slice of the norm data variable __N__ with index __j__ along its climatological time dimension, whose climatological time is given by element __j__ of the climatological time coordinate variable.
+In an abstract sense, the norm metadata variable suggests that __A__ is the difference between __P__ and __N'__, where __N'__ has all same dimensions as __A__ and __P__, including time, and is constructed by selecting, with repetition if necessary, and then concatenating the slices of __N__ whose climatological time indices are listed in the auxiliary coordinate variable.
+
 Example 7.19 illustrates this convention, using the example described in the previous paragraph.
 
 [[anomaly-with-multivalued-climatology-ex]]
@@ -1100,10 +1104,12 @@ variables:
     tas:units_metadata="temperature: on_scale";
     tas:cell_methods="time: maximum";
   int climatological_tas_metadata(time);
-    climatological_tas_metadata:compress="climatological_time";
+    climatological_tas_metadata:coordinates="month_indices";
     climatological_tas_metadata:cell_methods=
       "climatological_time: mean within years
       climatological_time: mean over years";
+  int month_indices(time);
+    month_indices:compress="climatological_time";
   double time(time);
     time:standard_name="time";
     time:units="days since 2023-6-1";
@@ -1131,9 +1137,9 @@ data:
   climatological_time=15, 45, ... 349;  // 1990-1-16, 1990-2-15 ... 1990-12-16
   climatological_time_bounds=0,10623, 31,10651, ... 334,10957;
     // 1990-1-1,2019-2-1, 1990-2-1,2019-3-1 ... 1990-12-1,2020-1-1
-  climatological_tas_metadata=5, 6, 7, 5, 6, 7;
+  month_indices=5, 6, 7, 5, 6, 7;
 ----
-Element **0** of **`climatological_tas_metadata`** is **5**.
+Element **0** of **`month_indices`** is **5**.
 This means that element **5** of **`climatological_time`**, which is the climatology for June 1991-2000, corresponds to element 0 of **`time`**, which is 2023-6-16, with bounds of 2023-6-1 and 2023-7-1 i.e. the whole of June 2023.
 It indicates that **`delta_tas(0,:,:)`**, where by **`:`** we mean the entire range of the dimension, is the difference between **`tas(0,:,:)`** and **`climatological_tas(5,:,:)`**.
 ====
