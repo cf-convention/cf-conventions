@@ -774,19 +774,26 @@ For an anomaly with respect to the area minimum, we need two __name__s e.g. "**`
 As described in <<cell-methods>>, the combination of horizontal coordinate variables can alternatively be represented by the word **`area`**, thus "**`area: anomaly wrt`** __norm__".
 For an anomaly with respect to a statistic computed over time or climatological time, __name__ identifies the time coordinate variable of the anomaly data variable.
 
-The anomaly coordinate variables are not coordinate variables of  __N__, but for each of the anomaly coordinate variables  __N__ has a coordinate variable or scalar coordinate variable with the same **`standard_name`**.
+The anomaly coordinate variables are not coordinate variables of  __N__ but, for each of the anomaly coordinate variables,  __N__ has a coordinate variable or scalar coordinate variable with the same **`standard_name`**.
 We call these corresponding variables the "norm coordinate variables" (usually there is only one).
 They indicate the range(s) of coordinates over which the statistic __N__ was calculated from the variation of __P__.
 For instance, if __N__ contains zonal means, it has a norm coordinate variable for longitude, corresponding to the anomaly coordinate variable of __A__ for longitude, and indicating the range of longitudes from which the zonal mean was calculated.
 
 There are two alternatives for __norm__.
+In both cases, __norm__ is an ancillary variable of the anomaly data variable (<<ancillary-data>>).
+
 If the data variable containing the norm __N__, called the "norm data variable", is present in the dataset, it can be named as __norm__ in **`cell_methods`** of the anomaly variable, e.g. __N__ containing zonal means or long-term time-means.
 No modification to the metadata of __N__ is required for it to serve as the norm for __A__, and __N__ may still be treated as a data variable in its own right as well.
 We describe the use of a norm data variable first (<<anomalies-norm-data>>) because this case is conceptually more obvious, although it is uncommon for __N__ to be present in the dataset.
 
 The second alternative (<<anomalies-norm-metadata>>) is where __norm__ in **`cell_methods`** identifies a "norm metadata variable" instead of the norm data variable.
+A norm metadata variable contains no data of its own.
 This method can be used regardless of whether the norm data variable is present in the dataset as well.
 This method must be used, even if the norm data variable is present, for anomalies with respect to a statistic that depends on multivalued climatological time.
+
+For example, the second method must be used for a multivalued timeseries of hourly mean anomalies with respect to a climatological hourly mean diurnal cycle, because each anomaly value can refer to a different norm value (the one for the appropriate hour) i.e. the norm has a multivalued dimension.
+Moreover, the anomaly time dimension may be larger than the norm climatological time dimension.
+In this example, the anomaly timeseries may be several days long, while the norm time dimension spans only one climatological day.
 
 
 [[anomalies-norm-data, Section 7.5.1, "Anomalies with respect to a norm data variable"]]
@@ -919,18 +926,23 @@ Equivalently, the **`climatological_time`** dimension could be omitted from **`d
 In this case, the word __norm__ in **`cell_methods`** is the the name of the norm metadata variable.
 This is a variable in the dataset that is __not__ the norm data variable (although the latter may also be present in the dataset).
 Its purpose is to represent the norm data variable, by hosting the coordinate variables and the **`cell_methods`** that define the norm.
-Although it is formally a data variable, the norm metadata variable is recommended not to have any of the attributes of <<attribute-appendix>> except for **`cell_methods`** and **`coordinates`**, which are both mandatory.
+Although it is formally a data variable, the norm metadata variable is recommended not to have any of the attributes of <<attribute-appendix>> except for **`cell_methods`**, which is mandatory, and **`coordinates`**, which is optional.
 Attributes describing the quantity (standard name, units, etc.) are unnecessary, because they must be the same as for the anomaly data variable.
 The anomaly data variable must name the norm metadata variable in its **`ancillary_variables`** attribute (<<ancillary-data>>), as well as in **`cell_methods`**, in order to indicate the link between them.
 
-The norm metadata variable must have a scalar norm coordinate variable with the same **`standard_name`** as each of the anomaly coordinate variables (usually there is only one), except if the norm coordinate variable is multivalued climatological time.
-The scalar norm coordinate variable(s) must be named in the **`coordinates`** attribute of the both the norm metadata variable and the anomaly data variable, and they must have boundary variables to indicate the coordinate ranges over which __N__ was calculated from __P__.
-The norm metadata variable must have no scalar coordinate variables other than the norm coordinate variables.
+Except in the case where __N__ depends on multivalued climatological time, for each of the anomaly coordinate variables (usually there is only one), the norm metadata variable must have a scalar or a size-one norm coordinate variable with the same **`standard_name`** as the anomaly coordinate variable.
+Any scalar norm coordinate variables must be named in the **`coordinates`** attribute of the both the norm metadata variable and the anomaly data variable.
+Any size-one dimensions of the norm metadata variable must also be dimensions of the anomaly data variable.
+The norm metadata variable must have no coordinate or scalar coordinate variables other than the norm coordinate variables.
 
-If __N__ depends on multivalued climatological time, the norm metadata variable has, as its sole dimension, the dimension of the anomaly coordinate variable of time.
-In all other cases, the norm metadata variable must be a scalar, whose value is immaterial and of arbitrary type.
+In the case where __N__ depends on multivalued climatological time, the norm metadata variable has, as its sole dimension, the dimension of the anomaly coordinate variable of time.
+In this case, the norm metadata variable has more than one element.
+In all other cases, the norm metadata variable has a single element.
+In all cases, the data of the norm metadata variable are immaterial and of arbitrary type.
+In all cases, the norm coordinate variables must have boundary variables that indicate the coordinate ranges over which __N__ was calculated from __P__.
 
-The norm metadata variable must have a **`cell_methods`** attribute (<<cell-methods>>) with a _single_ entry, which refers to the dimension of the norm coordinate variable, or the combination of them if more than one, or to the multivalued climatological time dimension, to indicate how __N__ was computed from the variation of __P__, as in <<anomalies-norm-data>>.
+The norm metadata variable must have a **`cell_methods`** attribute (<<cell-methods>>) with a __single__ entry, which refers to the dimension of the norm metadata variable, or the scalar norm coordinate variable, or to the combination of these if more than one.
+The **`cell_methods`** attribute indicates how __N__ was computed from the variation of __P__, as in <<anomalies-norm-data>>.
 
 The use of norm metadata variables is illustrated by Examples 7.16, 7.17 and 7.18.
 The treatment of multivalued climatological time is described and illustrated after Example 7.18.
@@ -1070,7 +1082,7 @@ If __N__ is provided for those three months only, its climatological time variab
 The anomaly metadata variable provides the mapping from the climatological time dimension, of whatever size, to the anomaly time dimension of size 6.
 
 In this case, the norm metadata variable is one-dimensional (not scalar, as in all other cases), with the dimension of the anomaly coordinate variable of time (6 in the example); as usual, its data type and values are immaterial because they are not used for anything.
-It has an auxiliary coordinate variable, with the same dimension as itself, named by its **`coordinates`** attribute, but it has no scalar coordinate variables (unlike in all other cases, which have norm scalar coordinate variables).
+It has an auxiliary coordinate variable, with the same dimension as itself, named by its **`coordinates`** attribute, but it has no scalar coordinate variables.
 The auxiliary coordinate variable contains a list of indices to the climatological time coordinate variable of the norm data variable __N__.
 This coordinate variable, and its dimension, must be included in the dataset, even if __N__ itself is not present in the dataset.
 The auxiliary coordinate variable has a **`compress`** attribute, which contains the name of the climatological time coordinate variable of __N__, in order to make the link between them.
