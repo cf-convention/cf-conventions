@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.23">
-<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Jon&#160;Blower, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring, Christopher&#160;Barker, Sadie&#160;Bartholomew, Thomas Lavergne">
+<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Randy&#160;Horne, Jon&#160;Blower, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring, Christopher&#160;Barker, Sadie&#160;Bartholomew, Thomas Lavergne, Bryan&#160;Lawrence, Neil&#160;Massey">
 <title>NetCDF Climate and Forecast (CF) Metadata Conventions</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -471,8 +471,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author30" class="author">Christopher&#160;Barker</span><br>
 <span id="author31" class="author">Sadie&#160;Bartholomew</span><br>
 <span id="author32" class="author">Thomas Lavergne</span><br>
+<span id="author33" class="author">Bryan&#160;Lawrence</span><br>
+<span id="author34" class="author">Neil&#160;Massey</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">05&#160;June,&#160;2025&#160;17:12:45Z</span>
+<span id="revdate">11&#160;September,&#160;2025&#160;13:56:47Z</span>
 <br><span id="revremark"></span>
 </div>
 </div>
@@ -532,6 +534,12 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2024). NetCDF 
 <ul class="sectlevel3">
 <li><a href="#_scope">2.7.1. Scope</a></li>
 <li><a href="#_application_of_attributes">2.7.2. Application of attributes</a></li>
+</ul>
+</li>
+<li><a href="#aggregation-variables">2.8. Aggregation Variables</a>
+<ul class="sectlevel3">
+<li><a href="#aggregated-dimensions-and-data">2.8.1. Aggregated Dimensions and Data</a></li>
+<li><a href="#fragment-interpretation">2.8.2. Fragment Interpretation</a></li>
 </ul>
 </li>
 </ul>
@@ -625,7 +633,7 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2024). NetCDF 
 <li><a href="#geometries">7.5. Geometries</a></li>
 </ul>
 </li>
-<li><a href="#_reduction_of_dataset_size">8. Reduction of Dataset Size</a>
+<li><a href="#reduction-of-dataset-size">8. Reduction of Dataset Size</a>
 <ul class="sectlevel2">
 <li><a href="#packed-data">8.1. Packed Data</a></li>
 <li><a href="#compression-by-gathering">8.2. Lossless Compression by Gathering</a></li>
@@ -797,6 +805,7 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2024). NetCDF 
 </ul>
 </li>
 <li><a href="#appendix-mesh-topology-attributes">Appendix K: Mesh Topologies</a></li>
+<li><a href="#appendix-aggregation-examples">Appendix L: Aggregation Variable Examples</a></li>
 <li><a href="#revhistory">Revision History</a>
 <ul class="sectlevel2">
 <li><a href="#_version_1_13_draft">Version 1.13-draft</a></li>
@@ -872,6 +881,8 @@ J.5. <a href="#quadratic3">Figure J.5</a></p>
 </div>
 <div class="paragraph">
 <p>2.1. <a href="#char-and-string-variables-ex">String Variable Representations</a><br>
+2.2. <a href="#example-array-of-fragments">Schematic representation of an array of fragments for an aggregation variable</a><br>
+2.3. <a href="#example-aggregation-variable">An aggregation variable</a><br>
 3.1. <a href="#use-of-units-metadata-ex">Use of <strong><code>units_metadata</code></strong> to distinguish temperature quantities</a><br>
 3.2. <a href="#use-of-standard-name-ex">Use of <strong><code>standard_name</code></strong></a><br>
 3.3. <a href="#instrument-data-ex">Ancillary instrument data</a><br>
@@ -957,7 +968,13 @@ H.19. <a href="#example-h.19">Time series of atmospheric sounding profiles from 
 H.20. <a href="#example-h.20">Time series of atmospheric sounding profiles along a set of trajectories stored in a multidimensional array representation.</a><br>
 H.21. <a href="#example-h.21">Time series of atmospheric sounding profiles along a trajectory stored in a multidimensional array representation.</a><br>
 H.22. <a href="#example-h.22">Time series of atmospheric sounding profiles along a set of trajectories stored in a ragged array representation.</a><br>
-I.1. <a href="#cdl-domain-anc-coordinate">A single CF-netCDF variable corresponding to two data model constructs.</a></p>
+I.1. <a href="#cdl-domain-anc-coordinate">A single CF-netCDF variable corresponding to two data model constructs.</a><br>
+L.1. <a href="#example-L.1">Aggregation variable with fragment datasets defined by relative-path URI references</a><br>
+L.2. <a href="#example-L.2">Aggregation variable with fragment datasets defined by absolute URIs</a><br>
+L.3. <a href="#example-L.3">Aggregation variable with multiple aggregated dimensions</a><br>
+L.4. <a href="#example-L.4">Aggregation discrete sampling geometry variable</a><br>
+L.5. <a href="#example-L.5">Aggregation ancillary variable with unique fragment values</a><br>
+L.6. <a href="#example-L.6">Aggregation variable with a scalar map variable</a></p>
 </div>
 </div>
 </div>
@@ -1068,6 +1085,12 @@ I.1. <a href="#cdl-domain-anc-coordinate">A single CF-netCDF variable correspond
 <li>
 <p>Thomas Lavergne, MET Norway</p>
 </li>
+<li>
+<p>Bryan Lawrence, NCAS and University of Reading</p>
+</li>
+<li>
+<p>Neil Massey, NCAS and STFC</p>
+</li>
 </ul>
 </div>
 <div class="paragraph">
@@ -1174,6 +1197,18 @@ Some of those definitions are repeated below for convenience.</p>
 </div>
 <div class="dlist">
 <dl>
+<dt class="hdlist1">aggregated data</dt>
+<dd>
+<p>The data of an aggregation variable, after it has been created in memory by an application program (see <a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a>).</p>
+</dd>
+<dt class="hdlist1">aggregated dimension</dt>
+<dd>
+<p>One of the dimensions of the aggregated data of an aggregation variable (see <a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a>).</p>
+</dd>
+<dt class="hdlist1">aggregation variable</dt>
+<dd>
+<p>A variable containing no data, but which enables the formation its data (i.e. its aggregated data) by the combination of data arrays found in one or more fragments (see <a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a>).</p>
+</dd>
 <dt class="hdlist1">ancestor group</dt>
 <dd>
 <p>A group from which the referring group is descended via direct parent-child relationships</p>
@@ -1213,7 +1248,12 @@ In CF, a coordinate variable must be of a numeric data type (note that
 <a href="https://docs.unidata.ucar.edu/nug/current/best_practices.html#bp_Coordinate-Systems">NUG section on coordinate variables</a> does not have this requirement).
 The coordinate values must be in strict monotonic order (all values are different, and they are arranged in either consistently increasing or consistently decreasing order).
 Missing values are not allowed in coordinate variables.
-To avoid confusion with coordinate variables, CF does not permit a one-dimensional string-valued variable to have the same name as its dimension.</p>
+To avoid confusion with coordinate variables, CF does not permit a one-dimensional string-valued variable to have the same name as its dimension.
+Note that an aggregation coordinate variable is stored as a scalar and has the same name as its aggregated dimension (see <a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a>).</p>
+</dd>
+<dt class="hdlist1">fragment</dt>
+<dd>
+<p>Data, generally found in an external dataset, that contributes to the formation of the aggregated data of an aggregation variable (see <a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a>).</p>
 </dd>
 <dt class="hdlist1">datetime</dt>
 <dd>
@@ -1841,6 +1881,350 @@ They may not be attached to a group, even if all variables within that group use
 <div class="paragraph">
 <p>If attributes are present within groups without being attached to a variable, these attributes apply to the group where they are defined, and to that group&#8217;s descendants, but not to ancestor or sibling groups.
 If a group attribute is defined in a parent group, and one of the child group redefines the same attribute, the definition within the child group applies for the child and all of its descendants.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="aggregation-variables"><a class="anchor" href="#aggregation-variables"></a>2.8. Aggregation Variables</h3>
+<div class="paragraph">
+<p>An <em>aggregation variable</em> is a variable which has been formed by combining (i.e. aggregating) multiple <em>fragments</em> that are generally stored in <em>fragment datasets</em> that are external to the dataset containing the aggregation variable, i.e. the <em>aggregation dataset</em>.
+A fragment contains data with sufficient metadata for it to be correctly interpreted in the context of the aggregation.
+The aggregation variable does not contain any actual data, instead it contains instructions on how to create its <em>aggregated data</em> in memory as an aggregation of the data from each fragment.
+The aggregated data is identical to that which would be stored in the dataset if the variable were encoded in usual (i.e. non-aggregated) manner.</p>
+</div>
+<div class="paragraph">
+<p>Aggregation provides the utility of being able to view, as a single entity, a dataset that has been partitioned across multiple other datasets.
+This view takes up very little extra space on disk, since the aggregation dataset contains no copies of the data in the fragments.
+Fragment datasets may be CF-compliant or have any other format, thereby allowing an aggregation variable to act as a CF-compliant view of non-CF datasets.
+Aggregations can facilitate a range of activities such as data analysis, by avoiding the computational expense of deriving the aggregation at the time of analysis; archive curation, by acting as a metadata-rich archive index; and the post-processing of model simulation outputs, by spanning multiple datasets written at run time that together constitute a more cohesive and useful  product.</p>
+</div>
+<div class="paragraph">
+<p>An aggregation variable must be a scalar (i.e. it has no dimensions).
+It acts as a container for all of the usual attributes that describe a variable, with the addition of two special attributes: one that defines its <em>aggregated dimensions</em> (i.e. the dimensions of the aggregated data, which in turn define the aggregated data shape); and one that provides the instructions on how the aggregated data is to be created.
+These attributes are described in <a href="#aggregated-dimensions-and-data">Section 2.8.1, "Aggregated Dimensions and Data"</a>.
+The data type of the aggregation variable indicates the data type of the aggregated data, and the value of the aggregation variable&#8217;s single element is immaterial.</p>
+</div>
+<div class="paragraph">
+<p>Aggregation variables may be used as any kind of variable (data variable, coordinate variable, cell measures variable, etc.), but it is recommended that container variables whose data are immaterial (such as grid mapping variables) not be encoded as aggregation variables.
+A dataset may contain both aggregation and non-aggregation variables, and it is up to the data-writer to decide which variables, if any, are stored as aggregation variables.</p>
+</div>
+<div class="paragraph">
+<p>Any rules that apply to a variable in the CF conventions apply in exactly the same way to an aggregation variable in the same role; and any reference to the dimensions or data of a variable applies to the aggregated dimensions or aggregated data, respectively, of an aggregation variable.
+For instance:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The dimension of a coordinate variable of an aggregation data variable is included as one of the aggregated dimensions of the aggregation data variable.</p>
+</li>
+<li>
+<p>The name of an aggregation coordinate variable (which is a scalar) is the same as the name of its single aggregated dimension (identified by its <strong><code>aggregated_dimensions</code></strong> attribute), just as the name of a coordinate variable (which is one-dimensional) is the same as the name of its single
+dimension.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The details of how to encode and decode aggregation variables are given in this section, with extra examples provided in <a href="#appendix-aggregation-examples">Appendix L, Aggregation Variable Examples</a>.</p>
+</div>
+<div class="sect3">
+<h4 id="aggregated-dimensions-and-data"><a class="anchor" href="#aggregated-dimensions-and-data"></a>2.8.1. Aggregated Dimensions and Data</h4>
+<div class="paragraph">
+<p>If a variable has an <strong><code>aggregated_dimensions</code></strong> attribute then it must be an aggregation variable.
+This attribute records the names of the aggregated dimensions as a blank-separated list, in the order of the dimensions of the aggregated data.
+If the aggregated data is scalar then there are no aggregated dimensions and the <strong><code>aggregated_dimensions</code></strong> attribute must be an empty string.
+Any aggregated dimensions must exist as dimensions in the aggregation dataset.</p>
+</div>
+<div class="paragraph">
+<p>The aggregated dimensions are partitioned by the fragments (in their canonical forms, see <a href="#fragment-interpretation">Section 2.8.2 "Fragment Interpretation"</a>), and this partitioning is consistent across all of the fragments, i.e. any two fragments either span the same part of a given aggregated dimension, or else do not overlap along that same dimension.
+In addition, each fragment data value provides exactly one aggregated data value, and each aggregated data value comes from exactly one fragment.
+With these constraints, the fragments can be organised into a fully-populated orthogonal multidimensionsal <em>array of fragments</em>, for which the size of each dimension is equal to the number of fragments that span its corresponding aggregated dimension.
+See <a href="#example-array-of-fragments">Example 2.2</a> for a schematic representation of an array of fragments.</p>
+</div>
+<div class="paragraph">
+<p>The aggregated data is formed by combining the fragments in the same relative positions as they appear in the array of fragments, and with no gaps or overlaps between neighbouring fragments.</p>
+</div>
+<div id="example-array-of-fragments" class="exampleblock">
+<div class="title">Example 2.2. Schematic representation of an array of fragments for an aggregation variable</div>
+<div class="content">
+<div class="paragraph">
+<p><strong>Array of fragments</strong></p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Position <code>[0, 0, 0]</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Fragment dataset name: <code>file_A.nc</code><br>
+Fragment data shape: <code>(17, 90, 180)</code><br>
+<code>17</code> vertical levels <br>
+<code>[90, 0]</code> degrees north <br>
+<code>[0, 180]</code> degrees east</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Position <code>[0, 0, 1]</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Fragment dataset name: <code>file_B.nc</code><br>
+Fragment data shape: <code>(17, 90, 180)</code><br>
+<code>17</code> vertical levels<br>
+<code>[90, 0]</code> degrees north<br>
+<code>[180, 360]</code> degrees east</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Position <code>[0, 1, 0]</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Fragment dataset name: <code>file_C.nc</code><br>
+Fragment data shape: <code>(17, 45, 180)</code><br>
+<code>17</code> vertical levels<br>
+<code>[0, -45]</code> degrees north<br>
+<code>[0, 180]</code> degrees east</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Position <code>[0, 1, 1]</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Fragment dataset name: <code>file_D.nc</code><br>
+Fragment data shape: <code>(17, 45, 180)</code><br>
+<code>17</code> vertical levels<br>
+<code>[0, -45]</code> degrees north<br>
+<code>[180, 360]</code> degrees east</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Position <code>[0, 2, 0]</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Fragment dataset name: <code>file_E.nc</code><br>
+Fragment data shape: <code>(17, 45, 180)</code><br>
+<code>17</code> vertical levels<br>
+<code>[-45, -90]</code> degrees north<br>
+<code>[0, 180]</code> degrees east</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><strong>Position <code>[0, 2, 1]</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Fragment dataset name: <code>file_F.nc</code><br>
+Fragment data shape: <code>(17, 45, 180)</code><br>
+<code>17</code> vertical levels<br>
+<code>[-45, -90]</code> degrees north<br>
+<code>[180, 360]</code> degrees east</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The six fragment datasets are arranged in a three-dimensional array of fragments with shape <code>(1, 3, 2)</code>.
+Each fragment spans the entirety of the Z dimension, but only a part of the Y-X plane, which has 1 degree resolution.
+The fragments combine to create three-dimensional aggregated data that have global Z-Y-X coverage, with shape <code>(17, 180, 360)</code>.
+The Z aggregated dimension is spanned by one fragment, the Y aggregated dimension is spanned by three fragments, and the X aggregated dimension is spanned by two fragments.
+Note that, since this example is a schematic representation, the C or Fortran order of the dimensions is of no consequence.</p>
+</div>
+<div class="paragraph">
+<p>See <a href="#example-aggregation-variable">Example 2.3</a> for an encoding of an aggregation variable that uses these fragments.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>The array of fragments must be defined by an aggregation variable&#8217;s <strong><code>aggregated_data</code></strong> attribute.
+This attribute must take  a string value comprising blank-separated elements of the form "<em>feature: variable</em>", where <em>feature</em> is a case-sensitive keyword that specifies a feature of the array of fragments, and <em>variable</em> is a variable in the aggregation dataset that provides values for that feature.
+The order of elements in the <strong><code>aggregated_data</code></strong> attribute is not significant.</p>
+</div>
+<div class="paragraph">
+<p>The feature keywords must comprise either all three of <code>map</code>, <code>uris</code>, and <code>identifiers</code>; or else both of <code>map</code> and <code>unique_values</code>.
+No other combination of feature keywords is allowed.
+The variables that correspond to these features are defined as follows:</p>
+</div>
+<div class="sect4">
+<h5 id="_map"><a class="anchor" href="#_map"></a>map</h5>
+<div class="paragraph">
+<p>The integer-valued <code>map</code> variable maps each fragment (in its canonical form, see <a href="#fragment-interpretation">Section 2.8.2 "Fragment Interpretation"</a>) to a part of the aggregated data.
+The <code>map</code> variable data provides the sizes of the fragments along each of the aggregated dimensions.
+The <code>map</code> variable is two-dimensional: the rows (i.e. the slowest-varying dimension, and the first dimension in CDL order) correspond to the aggregated dimensions in the same order; and the columns correspond to the fragments along the aggregated dimensions.
+Since the aggregated dimensions can be spanned by differing numbers of fragments, the rows of the <code>map</code> variable are padded with missing values to create a rectangular array.
+The part of each aggregated dimension that is occupied by a given fragment is defined by that fragment&#8217;s size along that dimension, offset by the sum of the fragment sizes that precede it.</p>
+</div>
+<div class="paragraph">
+<p>For instance, in <a href="#example-array-of-fragments">Example 2.2</a>, the corresponding <code>map</code> variable has 3 rows (one for each of the Z, Y, and X aggregated dimensions), and 3 columns (to allow space for the largest number of fragments along any of the aggregated dimensions).
+Each of the rows contains the sizes of the fragments along that dimension, padded with missing values (denoted by <code>_</code>), to create a rectangular array:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code> 17   _   _
+ 90  45  45
+180 180   _</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>From this array we can deduce, for instance, that the shape of the fragment (in its canonical form, see <a href="#fragment-interpretation">Section 2.8.2 "Fragment Interpretation"</a>) at position <code>[0, 1, 1]</code> of the array of fragments is <code>(17, 45, 180)</code>; and  that this fragment occupies zero-based indices 0 to 16 of the Z aggregated dimension, 90 to 134 of the Y aggregated dimension, and 180 to 359 of the X aggregated dimension.
+See <a href="#example-aggregation-variable">Example 2.3</a>.</p>
+</div>
+<div class="paragraph">
+<p>In the special case that aggregated data is scalar, the <code>map</code> variable must also be scalar and contain the value <code>1</code>.
+See <a href="#example-L.6">Example L.6</a>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_uris"><a class="anchor" href="#_uris"></a>uris</h5>
+<div class="paragraph">
+<p>The string-valued <code>uris</code> variable defines the name of each fragment dataset.
+Its dimensions are those of the array of fragments; and its data provides each fragment dataset name in the form of a URI (Uniform Resource Identifier) <a href="#URI">[URI]</a> .
+Each URI must be either an <em>absolute URI</em> (a URI that begins with a scheme component followed by a <code>:</code> character, such as <code>file:///data/file.nc</code>, <code>https://remote.host/data/file.nc</code>, <code>s3://remote.host/data/file.nc</code>, or <code>locally_meaningful_protocol:///UID</code>), or else a <em>relative-path URI reference</em> (a URI that is not an absolute URI and which does not begin with a <code>/</code> or <code>#</code> character, such as <code>file.nc</code>, <code>../file.nc</code>, or <code>data/file.nc</code>).
+A relative-path URI reference is taken as being relative to the location of the aggregation dataset.
+If the aggregation dataset is moved to another location, then a fragment dataset identified by an absolute URI will still be accessible, whereas a fragment dataset identified by a relative-path URI reference will also need be moved to preserve the relative reference.
+Not all fragment dataset names need be of the same URI type.
+See <a href="#example-L.1">Example L.1</a> and <a href="#example-L.2">Example L.2</a>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_identifiers"><a class="anchor" href="#_identifiers"></a>identifiers</h5>
+<div class="paragraph">
+<p>The <code>identifiers</code> variable defines how to identify each fragment within its fragment dataset.
+In general, the dimensions of the <code>identifiers</code> variable are the same, and in the same order, as those of the <code>uris</code> variable, and its data contain an identifier corresponding to each fragment dataset.
+If, however, the identifiers are the same for all fragments then the <code>identifiers</code> variable may be a scalar whose single data value is the identifier common to all fragments.
+The identifier for a netCDF fragment dataset is the string-valued variable name of the fragment, which does not need to be the same as the name of the aggregation variable.
+See <a href="#example-L.1">Example L.1</a> and <a href="#example-L.4">Example L.4</a>.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_unique_values"><a class="anchor" href="#_unique_values"></a>unique_values</h5>
+<div class="paragraph">
+<p>When the data values within each fragment are all identical, the <code>unique_values</code> variable allows these unique values to be explicitly stored in the aggregation dataset, without reference to external fragment datasets via <code>uris</code> and <code>identifiers</code> variables.
+The <code>unique_values</code> variable dimensions are those of the array of fragments, and the data provide the unique value for each fragment.
+The fragment implied by a unique value has dimensions corresponding to the aggregated dimensions, and the fragment shape is defined by the <code>map</code> variable.
+When a fragment contains wholly missing data, its unique value is specified as any missing value defined by the aggregation variable.
+See <a href="#example-L.5">Example L.5</a>.</p>
+</div>
+<div id="example-aggregation-variable" class="exampleblock">
+<div class="title">Example 2.3. An aggregation variable</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  level = 17 ;
+  latitude = 180 ;
+  longitude = 360 ;
+  // Array of fragments dimensions
+  f_level = 1 ;
+  f_latitude = 3 ;
+  f_longitude = 2 ;
+  // Map variable dimensions
+  j = 3 ;        // Number of aggregated dimensions
+  i = 3 ;        // Largest number of fragments along any aggregated dimension
+
+variables:
+  // Data aggregation variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "level latitude longitude" ;
+    temperature:aggregated_data = "map: fragment_map
+                                   uris: fragment_uris
+                                   identifiers: fragment_identifiers" ;
+  // Coordinate variables
+  double level(level) ;
+    level:standard_name = "air_pressure" ;
+    level:units = "hPa" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+  // Array of fragments variables
+  int fragment_map(j, i) ;
+  string fragment_uris(f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
+
+data:
+  temperature = _ ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_map = 17, _, _,
+                 90, 45, 45,
+                 180, 180, _ ;
+  fragment_uris = "file_A.nc", "file_B.nc",
+                  "file_C.nc", "file_D.nc",
+                  "file_E.nc", "file_F.nc" ;
+  fragment_identifiers = "tmp" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An encoding for the aggregated data defined by the fragments described in <a href="#example-array-of-fragments">Example 2.2</a>.
+The <code>temperature</code> variable&#8217;s data is an aggregation of six fragments.
+The non-missing values in each row of the <code>fragment_map</code> variable&#8217;s data indicate that the <code>level</code> aggregated dimension is spanned by one fragment, the <code>latitude</code> aggregated dimension is spanned by three fragments, and the <code>longitude</code> aggregated dimension is spanned by two fragments. Therefore the shape of the array of fragments is <code>(1, 3, 2)</code>.
+Note that the row sums of the <code>fragment_map</code> variable are <code>17</code>, <code>180</code>, and <code>360</code>, which equal the sizes of the <code>level</code>, <code>latitude</code>, and <code>longitude</code> aggregated dimensions, respectively.</p>
+</div>
+<div class="paragraph">
+<p>The data for the <code>level</code>, <code>latitude</code> and  <code>longitude</code> variables are omitted for clarity.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="fragment-interpretation"><a class="anchor" href="#fragment-interpretation"></a>2.8.2. Fragment Interpretation</h4>
+<div class="paragraph">
+<p>Fragment datasets can be encoded in many different but equivalent ways, so we define a <em>canonical form</em> of a fragment that provides a view of the fragment for which its data are consistent with the data from other fragments, as well as with the attributes of the aggregation variable.
+When constructing the aggregated data, it is assumed that each fragment&#8217;s data has been transformed to its canonical form.
+The canonical form of a fragment&#8217;s data is such that:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The fragment&#8217;s data have the same number of dimensions, and in the same order, as the aggregated data.</p>
+</li>
+<li>
+<p>The fragment&#8217;s data have the same units as the aggregation variable.</p>
+</li>
+<li>
+<p>The fragment&#8217;s data have the same data type as the aggregation variable.</p>
+</li>
+<li>
+<p>Missing values in the fragment&#8217;s data the same as those defined by the aggregation variable.</p>
+</li>
+<li>
+<p>The fragment&#8217;s data are unpacked (as described in <a href="#packed-data">Section 8.1, "Packed Data"</a>).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>A fragment dataset can deviate from any of these requirements, provided that it is possible to convert the fragment to its canonical form without changing the meaning of the data.
+For instance, if the aggregation variable had units of kg m<sup>-2</sup>, then the fragment data within its dataset could have any of the equivalent units kg m<sup>-2</sup>, g cm<sup>-2</sup>, etc., but it would be an error if the fragment had units for which its values can not be converted to kg m<sup>-2</sup> (such m s<sup>-1</sup>).
+Similarly, if the aggregation variable had a data type of <code>float</code>, then the fragment data could have any numerical data type.</p>
+</div>
+<div class="paragraph">
+<p>The conversion of the fragment&#8217;s data to its canonical form is carried out by the application program which is creating the aggregated data in memory. The application program can ignore any metadata and variables in a fragment dataset that are not needed for the conversion to the canonical form.
+When transforming a fragment&#8217;s data to its canonical form, note that:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>A fragment can have fewer dimensions than the aggregated data, provided that the missing dimensions have size 1 (e.g. as could be the case when aggregating two-dimensional fragments into three-dimensional aggregated data); but a fragment can not have more dimensions than the aggregated data.</p>
+</li>
+<li>
+<p>It is the responsibility of the creator of the aggregation dataset to ensure that all valid values in a fragment&#8217;s data are different from any of the missing values defined by the aggregation variable.</p>
+</li>
+<li>
+<p>It is up to the application program to decide if any modifications to the values in the fragment dataset are acceptable, in terms of information loss (e.g. whether or not to create aggregated data with data type <code>int</code> when some of the fragments have data type <code>float</code>).</p>
+</li>
+<li>
+<p>The aggregated data is identical to the data that would be stored within a dataset that contained the equivalent non-aggregation variable.
+A consequence of this is that when the aggregation variable indicates that its data are packed or compressed (such as by techniques described in <a href="#reduction-of-dataset-size">Chapter 8, Reduction of Dataset Size</a>) then the aggregated data, after its creation, is subject to the aggregation variable&#8217;s unpacking or decompression procedures.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -5530,7 +5914,7 @@ data:
 </div>
 </div>
 <div class="sect1">
-<h2 id="_reduction_of_dataset_size"><a class="anchor" href="#_reduction_of_dataset_size"></a>8. Reduction of Dataset Size</h2>
+<h2 id="reduction-of-dataset-size"><a class="anchor" href="#reduction-of-dataset-size"></a>8. Reduction of Dataset Size</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>There are three methods for reducing dataset size: packing, lossless compression, and lossy compression.
@@ -7078,9 +7462,41 @@ See <a href="#appendix-grid-mappings">Appendix F, Grid Mappings</a> for the grid
 <div class="paragraph">
 <p>The "Type" values are <strong>S</strong> for string, <strong>N</strong> for numeric, and <strong>D</strong> for the type of the data variable.
 Each attribute may be used in any of the ways shown in its "Use" entry.
-<strong>G</strong> indicates it can appear as a global attribute, and <strong>Gr</strong> as a group attribute.
-For variable attributes, the possible values of "Use" are: <strong>C</strong> for variables containing coordinate data, <strong>D</strong> for data variables, <strong>M</strong> for geometry container variables, <strong>Q</strong> for quantization container variables, <strong>Do</strong> for domain variables, <strong>BI</strong> and <strong>BO</strong> for boundary and climatology boundary variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> for the distinction between <strong>BI</strong> and <strong>BO</strong>), and <strong>-</strong> for variables with some other purpose.
-CF does not prohibit any of these attributes from being attached to variables of different kinds from those listed as their "Use" in this table, but their meanings are not defined by CF if they are used in these other ways.
+<strong>G</strong> indicates it can appear as a global attribute, and <strong>Gr</strong> as a group attribute.</p>
+</div>
+<div class="paragraph">
+<p>For variable attributes, the possible values of "Use" are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>C</strong> for variables containing coordinate data,</p>
+</li>
+<li>
+<p><strong>D</strong> for data variables,</p>
+</li>
+<li>
+<p><strong>M</strong> for geometry container variables,</p>
+</li>
+<li>
+<p><strong>Q</strong> for quantization container variables,</p>
+</li>
+<li>
+<p><strong>Do</strong> for domain variables,</p>
+</li>
+<li>
+<p><strong>BI</strong> and <strong>BO</strong> for boundary variables (see <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> for the distinction between <strong>BI</strong> and <strong>BO</strong>),</p>
+</li>
+<li>
+<p><strong>A</strong> for aggregation variables (see <a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a>),</p>
+</li>
+<li>
+<p><strong>-</strong> for variables with some other purpose.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>CF does not prohibit any of these attributes from being attached to variables of different kinds from those listed as their "Use" in this table, but their meanings are not defined by CF if they are used in these other ways.
 "Links" indicates the location of the attribute"s original definition (first link) and sections where the attribute is discussed in this document (additional links as necessary).</p>
 </div>
 <table id="table-attributes" class="tableblock frame-all grid-all stretch">
@@ -7117,6 +7533,20 @@ CF does not prohibit any of these attributes from being attached to variables of
 <td class="tableblock halign-left valign-top"><p class="tableblock">If present for a variable, this number is to be added to the data after it is read by an application.
 If both <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes are present, the data are first scaled before the offset is added.
 In cases where there is a strong constraint on dataset size, it is allowed to pack the coordinate variables (using add_offset and/or scale_factor), but this is not recommended in general.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>aggregated_data</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Records the instructions that define how to create the aggregated data of an aggregation variable.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>aggregated_dimensions</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies the dimensions of the aggregated data of an aggregation variable.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>algorithm</code></strong></p></td>
@@ -11521,7 +11951,7 @@ For example, when the field construct&#8217;s data are multiannual averages of m
 </div>
 <div id="figure-dim-aux" class="imageblock text-center text-center">
 <div class="content">
-<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDAuMSAoMjAxNjEyMjUuMDMwNCkKIC0tPgo8IS0tIFRpdGxlOiAlMyBQYWdlczogMSAtLT4KPHN2ZyB3aWR0aD0iNTE3cHQiIGhlaWdodD0iNTI1cHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgNTE2Ljc2IDUyNS4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoNCA1MjEpIj4KPHRpdGxlPiUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgcG9pbnRzPSItNCw0IC00LC01MjEgNTEyLjc1NSwtNTIxIDUxMi43NTUsNCAtNCw0Ii8+CjwhLS0gTm90ZSAtLT4KPGcgaWQ9Im5vZGUxIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Ob3RlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBwb2ludHM9IjE0MiwtMzM5IDAsLTMzOSAwLC0yNzEgMTQyLC0yNzEgMTQyLC0zMzkiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNzEiIHk9Ii0zMjYuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj5EaW1lbnNpb24gYW5kIEF1eGlsaWFyeTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNzEiIHk9Ii0zMTQuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj5Db29yZGluYXRlIGNvbnN0cnVjdHM8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcxIiB5PSItMzAyLjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+YXJlIHJlbGF0ZWQgdG88L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcxIiB5PSItMjkwLjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+RG9tYWluQXhpcyB2aWEgdGhlPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI3MSIgeT0iLTI3OC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiIGZpbGw9IiMwMDAwMDAiPihpbXBsaWNpdCkgZG9tYWluIG1hcHBpbmc8L3RleHQ+CjwvZz4KPCEtLSBCb3VuZGFyeVZhcmlhYmxlIC0tPgo8ZyBpZD0ibm9kZTIiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkJvdW5kYXJ5VmFyaWFibGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzNTksLTQxMyAyNTEsLTQxMyAyNTEsLTM3NSAzNTksLTM3NSAzNTksLTQxMyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMDUiIHk9Ii0zOTcuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5DTjo6Qm91bmRhcnk8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMwNSIgeT0iLTM4Mi44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPlZhcmlhYmxlPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUzIC0tPgo8ZyBpZD0ibm9kZTE0IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTM8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzA1LjUsLTMwNS41IDMwNC41LC0zMDUuNSAzMDQuNSwtMzA0LjUgMzA1LjUsLTMwNC41IDMwNS41LC0zMDUuNSIvPgo8L2c+CjwhLS0gQm91bmRhcnlWYXJpYWJsZSYjNDU7Jmd0O3JvdXRlMyAtLT4KPGcgaWQ9ImVkZ2U4IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Cb3VuZGFyeVZhcmlhYmxlJiM0NTsmZ3Q7cm91dGUzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMzA1LC0zNjQuNjg4M0MzMDUsLTM2NC42ODgzIDMwNSwtMzA1Ljc2NzcgMzA1LC0zMDUuNzY3NyIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMzA1LC0zNzQuNjg4MyAzMDAuNTAwMSwtMzY0LjY4ODMgMzA1LC0zNjkuNjg4MyAzMDUuMDAwMSwtMzY0LjY4ODMgMzA1LjAwMDEsLTM2NC42ODgzIDMwNS4wMDAxLC0zNjQuNjg4MyAzMDUsLTM2OS42ODgzIDMwOS41MDAxLC0zNjQuNjg4NCAzMDUsLTM3NC42ODgzIDMwNSwtMzc0LjY4ODMiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzAwLjM1MTIiIHk9Ii0zNjEuOTE4OSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj4wLi4xICYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIENvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9Im5vZGUzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Db29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0NDUsLTMyNCAzMjksLTMyNCAzMjksLTI4NiA0NDUsLTI4NiA0NDUsLTMyNCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzODciIHk9Ii0zMDguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5DTjo6Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzg3IiB5PSItMjkzLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+VmFyaWFibGU8L3RleHQ+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJub2RlNCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+QXV4aWxpYXJ5Q29vcmRpbmF0ZVZhcmlhYmxlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjExLC0yMjcuNSAxMTEsLTIyNy41IDExMSwtMTc0LjUgMjExLC0xNzQuNSAyMTEsLTIyNy41Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE2MSIgeT0iLTIxMi4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkNOOjpBdXhpbGlhcnk8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE2MSIgeT0iLTE5Ny4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkNvb3JkaW5hdGU8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE2MSIgeT0iLTE4Mi4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPlZhcmlhYmxlPC90ZXh0Pgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9Im5vZGU3IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5HZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzU1LjUsLTIzNSAyNTQuNSwtMjM1IDI1NC41LC0xNjcgMzU1LjUsLTE2NyAzNTUuNSwtMjM1Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMwNSIgeT0iLTIxOS44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPiZsdDsmbHQ7YWJzdHJhY3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzA1IiB5PSItMjA0LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+R2VuZXJpYzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzA1IiB5PSItMTg5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzA1IiB5PSItMTc0LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+VmFyaWFibGU8L3RleHQ+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlVmFyaWFibGUmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTciIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkF1eGlsaWFyeUNvb3JkaW5hdGVWYXJpYWJsZSYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik0yMTEuMzY0MiwtMjAxQzIxMS4zNjQyLC0yMDEgMjQ0LjQyMDgsLTIwMSAyNDQuNDIwOCwtMjAxIi8+Cjxwb2x5Z29uIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSIyNDQuNDIwOSwtMjA0LjUwMDEgMjU0LjQyMDgsLTIwMSAyNDQuNDIwOCwtMTk3LjUwMDEgMjQ0LjQyMDksLTIwNC41MDAxIi8+CjwvZz4KPCEtLSBEb21haW5BeGlzIC0tPgo8ZyBpZD0ibm9kZTkiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkRvbWFpbkF4aXM8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIyMTUuNSwtMTIzLjUgMTA2LjUsLTEyMy41IDEwNi41LC04NS41IDIxNS41LC04NS41IDIxNS41LC0xMjMuNSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii0xMDguMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii05My4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkRvbWFpbkF4aXM8L3RleHQ+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlVmFyaWFibGUmIzQ1OyZndDtEb21haW5BeGlzIC0tPgo8IS0tIFNjYWxhckNvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9Im5vZGU1IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5TY2FsYXJDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0NDIsLTEzMSAzNTQsLTEzMSAzNTQsLTc4IDQ0MiwtNzggNDQyLC0xMzEiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzk4IiB5PSItMTE1LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Q046OlNjYWxhcjwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzk4IiB5PSItMTAwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzk4IiB5PSItODUuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5WYXJpYWJsZTwvdGV4dD4KPC9nPgo8IS0tIFNjYWxhckNvb3JkaW5hdGVWYXJpYWJsZSYjNDU7Jmd0O0Nvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPCEtLSBEaW1lbnNpb24gLS0+CjxnIGlkPSJub2RlNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGltZW5zaW9uPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjE4LC00MiAxMDQsLTQyIDEwNCwtNiAyMTgsLTYgMjE4LC00MiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii0yMC4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkNOOjpEaW1lbnNpb248L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTQgLS0+CjxnIGlkPSJub2RlMTUiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNDwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0MTMuNSwtMjAxLjUgNDEyLjUsLTIwMS41IDQxMi41LC0yMDAuNSA0MTMuNSwtMjAwLjUgNDEzLjUsLTIwMS41Ii8+CjwvZz4KPCEtLSBHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlJiM0NTsmZ3Q7cm91dGU0IC0tPgo8ZyBpZD0iZWRnZTEwIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5HZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlJiM0NTsmZ3Q7cm91dGU0PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMzY1LjUyMTcsLTIwMUMzNjUuNTIxNywtMjAxIDQxMi4yNTA4LC0yMDEgNDEyLjI1MDgsLTIwMSIvPgo8cG9seWdvbiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMzY1LjUyMTcsLTE5Ny41MDAxIDM1NS41MjE3LC0yMDEgMzY1LjUyMTYsLTIwNC41MDAxIDM2NS41MjE3LC0xOTcuNTAwMSIvPgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QgLS0+CjxnIGlkPSJub2RlOCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3Q8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIyMTEuNSwtNTE3IDExMC41LC01MTcgMTEwLjUsLTQ0OSAyMTEuNSwtNDQ5IDIxMS41LC01MTciLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTYxIiB5PSItNTAxLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Jmx0OyZsdDthYnN0cmFjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii00ODYuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5HZW5lcmljPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii00NzEuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Db29yZGluYXRlPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii00NTYuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Db25zdHJ1Y3Q8L3RleHQ+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlIC0tPgo8ZyBpZD0ibm9kZTEwIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5BdXhpbGlhcnlDb29yZGluYXRlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjMyLjUsLTQxMyA4OS41LC00MTMgODkuNSwtMzc1IDIzMi41LC0zNzUgMjMyLjUsLTQxMyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii0zOTcuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNjEiIHk9Ii0zODIuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5BdXhpbGxhcnlDb29yZGluYXRlPC90ZXh0Pgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QmIzQ1OyZndDtBdXhpbGlhcnlDb29yZGluYXRlIC0tPgo8ZyBpZD0iZWRnZTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0JiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTE2MSwtNDM4Ljg0NDhDMTYxLC00MzguODQ0OCAxNjEsLTQxMy4wMTA4IDE2MSwtNDEzLjAxMDgiLz4KPHBvbHlnb24gZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBwb2ludHM9IjE1Ny41MDAxLC00MzguODQ0OCAxNjEsLTQ0OC44NDQ4IDE2NC41MDAxLC00MzguODQ0OCAxNTcuNTAwMSwtNDM4Ljg0NDgiLz4KPC9nPgo8IS0tIHJvdXRlMSAtLT4KPGcgaWQ9Im5vZGUxMiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUxPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjI2MC41LC00ODMuNSAyNTkuNSwtNDgzLjUgMjU5LjUsLTQ4Mi41IDI2MC41LC00ODIuNSAyNjAuNSwtNDgzLjUiLz4KPC9nPgo8IS0tIEdlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0JiM0NTsmZ3Q7cm91dGUxIC0tPgo8ZyBpZD0iZWRnZTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0JiM0NTsmZ3Q7cm91dGUxPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMjIxLjY2MDEsLTQ4M0MyMjEuNjYwMSwtNDgzIDI1OS4zODcxLC00ODMgMjU5LjM4NzEsLTQ4MyIvPgo8cG9seWdvbiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMjIxLjY2MDEsLTQ3OS41MDAxIDIxMS42NjAxLC00ODMgMjIxLjY2LC00ODYuNTAwMSAyMjEuNjYwMSwtNDc5LjUwMDEiLz4KPC9nPgo8IS0tIERvbWFpbkF4aXMmIzQ1OyZndDtTY2FsYXJDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlMTQiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRvbWFpbkF4aXMmIzQ1OyZndDtTY2FsYXJDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik0yMTUuNjcwMiwtMTA0QzIxNS42NzAyLC0xMDQgMzQzLjkwMTIsLTEwNCAzNDMuOTAxMiwtMTA0Ii8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSIzNTMuOTAxMiwtMTA0IDM0My45MDEzLC0xMDguNTAwMSAzNDguOTAxMiwtMTA0IDM0My45MDEyLC0xMDQuMDAwMSAzNDMuOTAxMiwtMTA0LjAwMDEgMzQzLjkwMTIsLTEwNC4wMDAxIDM0OC45MDEyLC0xMDQgMzQzLjkwMTIsLTk5LjUwMDEgMzUzLjkwMTIsLTEwNCAzNTMuOTAxMiwtMTA0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMzOC40MDEyIiB5PSItMTA3LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+MC4uMSAmIzE2MDsmIzE2MDsmIzE2MDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIzNy4xNzAyIiB5PSItMTA3LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+IGVpdGhlci9vcjwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkF4aXMmIzQ1OyZndDtEaW1lbnNpb24gLS0+CjxnIGlkPSJlZGdlMTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRvbWFpbkF4aXMmIzQ1OyZndDtEaW1lbnNpb248L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik0xNjEsLTg1LjQyMjZDMTYxLC04NS40MjI2IDE2MSwtNTIuMTExMiAxNjEsLTUyLjExMTIiLz4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSIjMDAwMDAwIiBwb2ludHM9IjE2MSwtNDIuMTExMiAxNjUuNTAwMSwtNTIuMTExMiAxNjEsLTQ3LjExMTIgMTYxLjAwMDEsLTUyLjExMTIgMTYxLjAwMDEsLTUyLjExMTIgMTYxLjAwMDEsLTUyLjExMTIgMTYxLC00Ny4xMTEyIDE1Ni41MDAxLC01Mi4xMTEzIDE2MSwtNDIuMTExMiAxNjEsLTQyLjExMTIiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTQ4LjUiIHk9Ii00NS4zMTEyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiIGZpbGw9IiMwMDAwMDAiPjAuLjEgJiMxNjA7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMzgiIHk9Ii03Ni42MjI2IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiIGZpbGw9IiMwMDAwMDAiPiBlaXRoZXIvb3IgPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUyIC0tPgo8ZyBpZD0ibm9kZTEzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTI8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMTYxLjUsLTMwNS41IDE2MC41LC0zMDUuNSAxNjAuNSwtMzA0LjUgMTYxLjUsLTMwNC41IDE2MS41LC0zMDUuNSIvPgo8L2c+CjwhLS0gQXV4aWxpYXJ5Q29vcmRpbmF0ZSYjNDU7Jmd0O3JvdXRlMiAtLT4KPGcgaWQ9ImVkZ2U0IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5BdXhpbGlhcnlDb29yZGluYXRlJiM0NTsmZ3Q7cm91dGUyPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMTYxLC0zNzQuNjg4M0MxNjEsLTM1MC41NTc3IDE2MSwtMzExLjY5MyAxNjEsLTMwNS43Njc3Ii8+CjwvZz4KPCEtLSBEaW1lbnNpb25Db29yZGluYXRlIC0tPgo8ZyBpZD0ibm9kZTExIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5EaW1lbnNpb25Db29yZGluYXRlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDY1LjUsLTUwMiAzMDguNSwtNTAyIDMwOC41LC00NjQgNDY1LjUsLTQ2NCA0NjUuNSwtNTAyIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM4NyIgeT0iLTQ4Ni44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPiZsdDsmbHQ7Y29uc3RydWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM4NyIgeT0iLTQ3MS44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkRpbWVuc2lvbkNvb3JkaW5hdGU8L3RleHQ+CjwvZz4KPCEtLSBEaW1lbnNpb25Db29yZGluYXRlJiM0NTsmZ3Q7Q29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTYiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRpbWVuc2lvbkNvb3JkaW5hdGUmIzQ1OyZndDtDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik00MDIsLTQ2My45NTA5QzQwMiwtNDYzLjk1MDkgNDAyLC0zMzQuMTgxMiA0MDIsLTMzNC4xODEyIi8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSI0MDIsLTMyNC4xODEyIDQwNi41MDAxLC0zMzQuMTgxMSA0MDIsLTMyOS4xODEyIDQwMi4wMDAxLC0zMzQuMTgxMiA0MDIuMDAwMSwtMzM0LjE4MTIgNDAyLjAwMDEsLTMzNC4xODEyIDQwMiwtMzI5LjE4MTIgMzk3LjUwMDEsLTMzNC4xODEyIDQwMiwtMzI0LjE4MTIgNDAyLC0zMjQuMTgxMiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzOTcuMzUxMiIgeT0iLTQ1MS4xODE1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiIGZpbGw9IiMwMDAwMDAiPiAmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDtlaXRoZXIvb3I8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTYgLS0+CjxnIGlkPSJub2RlMTciIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0ODQuNSwtNDgzLjUgNDgzLjUsLTQ4My41IDQ4My41LC00ODIuNSA0ODQuNSwtNDgyLjUgNDg0LjUsLTQ4My41Ii8+CjwvZz4KPCEtLSBEaW1lbnNpb25Db29yZGluYXRlJiM0NTsmZ3Q7cm91dGU2IC0tPgo8ZyBpZD0iZWRnZTE1IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5EaW1lbnNpb25Db29yZGluYXRlJiM0NTsmZ3Q7cm91dGU2PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNNDY1Ljc1NSwtNDgzQzQ3NC41MTY4LC00ODMgNDgxLjA4NTIsLTQ4MyA0ODMuMjQwNCwtNDgzIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ4Ny4yNTUiIHk9Ii00ODYuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj4gZWl0aGVyL29yPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxJiM0NTsmZ3Q7RGltZW5zaW9uQ29vcmRpbmF0ZSAtLT4KPGcgaWQ9ImVkZ2UyIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTEmIzQ1OyZndDtEaW1lbnNpb25Db29yZGluYXRlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMjYwLjgxMSwtNDgzQzI2NS4wMzYxLC00ODMgMjg1LjIxNTIsLTQ4MyAzMDguMjM5NiwtNDgzIi8+CjwvZz4KPCEtLSByb3V0ZTImIzQ1OyZndDtBdXhpbGlhcnlDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlNSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUyJiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZVZhcmlhYmxlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMTYxLC0zMDQuMzM1OUMxNjEsLTMwNC4zMzU5IDE2MSwtMjM3LjY4OTcgMTYxLC0yMzcuNjg5NyIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMTYxLC0yMjcuNjg5NyAxNjUuNTAwMSwtMjM3LjY4OTcgMTYxLC0yMzIuNjg5NyAxNjEuMDAwMSwtMjM3LjY4OTcgMTYxLjAwMDEsLTIzNy42ODk3IDE2MS4wMDAxLC0yMzcuNjg5NyAxNjEsLTIzMi42ODk3IDE1Ni41MDAxLC0yMzcuNjg5OCAxNjEsLTIyNy42ODk3IDE2MSwtMjI3LjY4OTciLz4KPC9nPgo8IS0tIHJvdXRlMyYjNDU7Jmd0O0Nvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPCEtLSByb3V0ZTMmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTkiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMyYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik0zMDUsLTMwNC4zMzU5QzMwNSwtMjk5LjA0MjIgMzA1LC0yNjMuMTY1MyAzMDUsLTIzNS4xNTI1Ii8+CjwvZz4KPCEtLSByb3V0ZTQmIzQ1OyZndDtDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlMTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlNCYjNDU7Jmd0O0Nvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTQxMywtMjAxLjY2NDFDNDEzLC0yMDcuOTYxMiA0MTMsLTI1Ny41MzM5IDQxMywtMjg1LjY2NjkiLz4KPC9nPgo8IS0tIHJvdXRlNCYjNDU7Jmd0O1NjYWxhckNvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9ImVkZ2UxMiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU0JiM0NTsmZ3Q7U2NhbGFyQ29vcmRpbmF0ZVZhcmlhYmxlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNNDEzLC0yMDAuMzgzOEM0MTMsLTE5NS4xNTA4IDQxMywtMTU3LjcwOTQgNDEzLC0xMzEuMTk2NSIvPgo8L2c+CjwhLS0gcm91dGU1IC0tPgo8ZyBpZD0ibm9kZTE2IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNTAzLjUsLTQ4My41IDUwMi41LC00ODMuNSA1MDIuNSwtNDgyLjUgNTAzLjUsLTQ4Mi41IDUwMy41LC00ODMuNSIvPgo8L2c+CjwhLS0gcm91dGU2JiM0NTsmZ3Q7U2NhbGFyQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTE2IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTYmIzQ1OyZndDtTY2FsYXJDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik00ODQsLTQ4Mi4zODUyQzQ4NCwtNDY1LjQ0MjYgNDg0LC0xMDQgNDg0LC0xMDQgNDg0LC0xMDQgNDUyLjAwNzcsLTEwNCA0NTIuMDA3NywtMTA0Ii8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSI0NDIuMDA3NywtMTA0IDQ1Mi4wMDc4LC05OS41MDAxIDQ0Ny4wMDc3LC0xMDQgNDUyLjAwNzcsLTEwNC4wMDAxIDQ1Mi4wMDc3LC0xMDQuMDAwMSA0NTIuMDA3NywtMTA0LjAwMDEgNDQ3LjAwNzcsLTEwNCA0NTIuMDA3NywtMTA4LjUwMDEgNDQyLjAwNzcsLTEwNCA0NDIuMDA3NywtMTA0Ii8+CjwvZz4KPCEtLSBFaXRoZXJPciAtLT4KPGcgaWQ9Im5vZGUxOCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RWl0aGVyT3I8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjg2LjUsLTMwNS41IDI4NS41LC0zMDUuNSAyODUuNSwtMzA0LjUgMjg2LjUsLTMwNC41IDI4Ni41LC0zMDUuNSIvPgo8L2c+CjwhLS0gRWl0aGVyT3ImIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8L2c+Cjwvc3ZnPgo=" alt="cfdm coordinates" width="50%">
+<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDMuMCAoMCkKIC0tPgo8IS0tIFRpdGxlOiAlMyBQYWdlczogMSAtLT4KPHN2ZyB3aWR0aD0iNDk3cHQiIGhlaWdodD0iNTI1cHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgNDk3LjMyIDUyNS4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoNCA1MjEpIj4KPHRpdGxlPiUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHBvaW50cz0iLTQsNCAtNCwtNTIxIDQ5My4zMiwtNTIxIDQ5My4zMiw0IC00LDQiLz4KPCEtLSBOb3RlIC0tPgo8ZyBpZD0ibm9kZTEiIGNsYXNzPSJub2RlIj4KPHRpdGxlPk5vdGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIxMzksLTMzOSAwLC0zMzkgMCwtMjcxIDEzOSwtMjcxIDEzOSwtMzM5Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjY5LjUiIHk9Ii0zMjYuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj5EaW1lbnNpb24gYW5kIEF1eGlsaWFyeTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNjkuNSIgeT0iLTMxNC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPkNvb3JkaW5hdGUgY29uc3RydWN0czwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNjkuNSIgeT0iLTMwMi4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPmFyZSByZWxhdGVkIHRvPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI2OS41IiB5PSItMjkwLjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+RG9tYWluQXhpcyB2aWEgdGhlPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI2OS41IiB5PSItMjc4LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+KGltcGxpY2l0KSBkb21haW4gbWFwcGluZzwvdGV4dD4KPC9nPgo8IS0tIEJvdW5kYXJ5VmFyaWFibGUgLS0+CjxnIGlkPSJub2RlMiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Qm91bmRhcnlWYXJpYWJsZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmZmYiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzNDQsLTQxMyAyNDMsLTQxMyAyNDMsLTM3NSAzNDQsLTM3NSAzNDQsLTQxMyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyOTMuNSIgeT0iLTM5Ny44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNOOjpCb3VuZGFyeTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjkzLjUiIHk9Ii0zODIuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5WYXJpYWJsZTwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlMyAtLT4KPGcgaWQ9Im5vZGUxNCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjI5NCwtMzA1LjUgMjkzLC0zMDUuNSAyOTMsLTMwNC41IDI5NCwtMzA0LjUgMjk0LC0zMDUuNSIvPgo8L2c+CjwhLS0gQm91bmRhcnlWYXJpYWJsZSYjNDU7Jmd0O3JvdXRlMyAtLT4KPGcgaWQ9ImVkZ2U4IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Cb3VuZGFyeVZhcmlhYmxlJiM0NTsmZ3Q7cm91dGUzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTI5My41LC0zNjQuNjlDMjkzLjUsLTM2NC42OSAyOTMuNSwtMzA1Ljc3IDI5My41LC0zMDUuNzciLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjkzLjUsLTM3NC42OSAyODksLTM2NC42OSAyOTMuNSwtMzY5LjY5IDI5My41LC0zNjQuNjkgMjkzLjUsLTM2NC42OSAyOTMuNSwtMzY0LjY5IDI5My41LC0zNjkuNjkgMjk4LC0zNjQuNjkgMjkzLjUsLTM3NC42OSAyOTMuNSwtMzc0LjY5Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI4OC44NSIgeT0iLTM2MS45MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4xICYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIENvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9Im5vZGUzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Db29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmZmIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDI3LjUsLTMyNCAzMTcuNSwtMzI0IDMxNy41LC0yODYgNDI3LjUsLTI4NiA0MjcuNSwtMzI0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM3Mi41IiB5PSItMzA4LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q046OkNvb3JkaW5hdGU8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM3Mi41IiB5PSItMjkzLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+VmFyaWFibGU8L3RleHQ+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJub2RlNCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+QXV4aWxpYXJ5Q29vcmRpbmF0ZVZhcmlhYmxlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjIwNSwtMjI3LjUgMTEwLC0yMjcuNSAxMTAsLTE3NC41IDIwNSwtMTc0LjUgMjA1LC0yMjcuNSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNTcuNSIgeT0iLTIxMi4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNOOjpBdXhpbGlhcnk8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE1Ny41IiB5PSItMTk3LjMiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTU3LjUiIHk9Ii0xODIuMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5WYXJpYWJsZTwvdGV4dD4KPC9nPgo8IS0tIEdlbmVyaWNDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJub2RlNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IndoaXRlIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzQyLjUsLTIzNSAyNDQuNSwtMjM1IDI0NC41LC0xNjcgMzQyLjUsLTE2NyAzNDIuNSwtMjM1Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI5My41IiB5PSItMjE5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDthYnN0cmFjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyOTMuNSIgeT0iLTIwNC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkdlbmVyaWM8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI5My41IiB5PSItMTg5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjkzLjUiIHk9Ii0xNzQuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5WYXJpYWJsZTwvdGV4dD4KPC9nPgo8IS0tIEF1eGlsaWFyeUNvb3JkaW5hdGVWYXJpYWJsZSYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlNyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+QXV4aWxpYXJ5Q29vcmRpbmF0ZVZhcmlhYmxlJiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0yMDUuMDcsLTIwMUMyMDUuMDcsLTIwMSAyMzQuMzUsLTIwMSAyMzQuMzUsLTIwMSIvPgo8cG9seWdvbiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjIzNC4zNSwtMjA0LjUgMjQ0LjM1LC0yMDEgMjM0LjM1LC0xOTcuNSAyMzQuMzUsLTIwNC41Ii8+CjwvZz4KPCEtLSBEb21haW5BeGlzIC0tPgo8ZyBpZD0ibm9kZTkiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkRvbWFpbkF4aXM8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjA5LjUsLTEyMy41IDEwNS41LC0xMjMuNSAxMDUuNSwtODUuNSAyMDkuNSwtODUuNSAyMDkuNSwtMTIzLjUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTU3LjUiIHk9Ii0xMDguMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNTcuNSIgeT0iLTkzLjMiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RG9tYWluQXhpczwvdGV4dD4KPC9nPgo8IS0tIEF1eGlsaWFyeUNvb3JkaW5hdGVWYXJpYWJsZSYjNDU7Jmd0O0RvbWFpbkF4aXMgLS0+CjwhLS0gU2NhbGFyQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0ibm9kZTUiIGNsYXNzPSJub2RlIj4KPHRpdGxlPlNjYWxhckNvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmZmYiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0MjYsLTEzMSAzNDMsLTEzMSAzNDMsLTc4IDQyNiwtNzggNDI2LC0xMzEiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzg0LjUiIHk9Ii0xMTUuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DTjo6U2NhbGFyPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzODQuNSIgeT0iLTEwMC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvb3JkaW5hdGU8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM4NC41IiB5PSItODUuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5WYXJpYWJsZTwvdGV4dD4KPC9nPgo8IS0tIFNjYWxhckNvb3JkaW5hdGVWYXJpYWJsZSYjNDU7Jmd0O0Nvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPCEtLSBEaW1lbnNpb24gLS0+CjxnIGlkPSJub2RlNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGltZW5zaW9uPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjIxMS41LC00MiAxMDMuNSwtNDIgMTAzLjUsLTYgMjExLjUsLTYgMjExLjUsLTQyIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE1Ny41IiB5PSItMjAuMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DTjo6RGltZW5zaW9uPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGU0IC0tPgo8ZyBpZD0ibm9kZTE1IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTQ8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDAwLC0yMDEuNSAzOTksLTIwMS41IDM5OSwtMjAwLjUgNDAwLC0yMDAuNSA0MDAsLTIwMS41Ii8+CjwvZz4KPCEtLSBHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlJiM0NTsmZ3Q7cm91dGU0IC0tPgo8ZyBpZD0iZWRnZTEwIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5HZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlJiM0NTsmZ3Q7cm91dGU0PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTM1Mi43OCwtMjAxQzM1Mi43OCwtMjAxIDM5OC43NiwtMjAxIDM5OC43NiwtMjAxIi8+Cjxwb2x5Z29uIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMzUyLjc4LC0xOTcuNSAzNDIuNzgsLTIwMSAzNTIuNzgsLTIwNC41IDM1Mi43OCwtMTk3LjUiLz4KPC9nPgo8IS0tIEdlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0IC0tPgo8ZyBpZD0ibm9kZTgiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0PC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIyMDYuNSwtNTE3IDEwOC41LC01MTcgMTA4LjUsLTQ0OSAyMDYuNSwtNDQ5IDIwNi41LC01MTciLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTU3LjUiIHk9Ii01MDEuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2Fic3RyYWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE1Ny41IiB5PSItNDg2LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+R2VuZXJpYzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTU3LjUiIHk9Ii00NzEuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5Db29yZGluYXRlPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNTcuNSIgeT0iLTQ1Ni44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvbnN0cnVjdDwvdGV4dD4KPC9nPgo8IS0tIEF1eGlsaWFyeUNvb3JkaW5hdGUgLS0+CjxnIGlkPSJub2RlMTAiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkF1eGlsaWFyeUNvb3JkaW5hdGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjI0LjUsLTQxMyA5MC41LC00MTMgOTAuNSwtMzc1IDIyNC41LC0zNzUgMjI0LjUsLTQxMyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNTcuNSIgeT0iLTM5Ny44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7Y29uc3RydWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE1Ny41IiB5PSItMzgyLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+QXV4aWxsYXJ5Q29vcmRpbmF0ZTwvdGV4dD4KPC9nPgo8IS0tIEdlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0JiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZSAtLT4KPGcgaWQ9ImVkZ2UzIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5HZW5lcmljQ29vcmRpbmF0ZUNvbnN0cnVjdCYjNDU7Jmd0O0F1eGlsaWFyeUNvb3JkaW5hdGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTU3LjUsLTQzOC44NEMxNTcuNSwtNDM4Ljg0IDE1Ny41LC00MTMuMDEgMTU3LjUsLTQxMy4wMSIvPgo8cG9seWdvbiBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjE1NCwtNDM4Ljg0IDE1Ny41LC00NDguODQgMTYxLC00MzguODQgMTU0LC00MzguODQiLz4KPC9nPgo8IS0tIHJvdXRlMSAtLT4KPGcgaWQ9Im5vZGUxMiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUxPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjI1NCwtNDgzLjUgMjUzLC00ODMuNSAyNTMsLTQ4Mi41IDI1NCwtNDgyLjUgMjU0LC00ODMuNSIvPgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QmIzQ1OyZndDtyb3V0ZTEgLS0+CjxnIGlkPSJlZGdlMSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QmIzQ1OyZndDtyb3V0ZTE8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMjE2LjYyLC00ODNDMjE2LjYyLC00ODMgMjUyLjkxLC00ODMgMjUyLjkxLC00ODMiLz4KPHBvbHlnb24gZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIyMTYuNjIsLTQ3OS41IDIwNi42MiwtNDgzIDIxNi42MiwtNDg2LjUgMjE2LjYyLC00NzkuNSIvPgo8L2c+CjwhLS0gRG9tYWluQXhpcyYjNDU7Jmd0O1NjYWxhckNvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9ImVkZ2UxNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RG9tYWluQXhpcyYjNDU7Jmd0O1NjYWxhckNvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0yMDkuNTgsLTEwNEMyMDkuNTgsLTEwNCAzMzIuODksLTEwNCAzMzIuODksLTEwNCIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIzNDIuODksLTEwNCAzMzIuODksLTEwOC41IDMzNy44OSwtMTA0IDMzMi44OSwtMTA0IDMzMi44OSwtMTA0IDMzMi44OSwtMTA0IDMzNy44OSwtMTA0IDMzMi44OSwtOTkuNSAzNDIuODksLTEwNCAzNDIuODksLTEwNCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMjcuMzkiIHk9Ii0xMDcuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4xICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjMxLjA4IiB5PSItMTA3LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+IGVpdGhlci9vcjwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkF4aXMmIzQ1OyZndDtEaW1lbnNpb24gLS0+CjxnIGlkPSJlZGdlMTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRvbWFpbkF4aXMmIzQ1OyZndDtEaW1lbnNpb248L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTU3LjUsLTg1LjQyQzE1Ny41LC04NS40MiAxNTcuNSwtNTIuMTEgMTU3LjUsLTUyLjExIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjE1Ny41LC00Mi4xMSAxNjIsLTUyLjExIDE1Ny41LC00Ny4xMSAxNTcuNSwtNTIuMTEgMTU3LjUsLTUyLjExIDE1Ny41LC01Mi4xMSAxNTcuNSwtNDcuMTEgMTUzLC01Mi4xMSAxNTcuNSwtNDIuMTEgMTU3LjUsLTQyLjExIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE0NSIgeT0iLTQ1LjMxIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLjEgJiMxNjA7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxMzQuNSIgeT0iLTc2LjYyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPiBlaXRoZXIvb3IgPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUyIC0tPgo8ZyBpZD0ibm9kZTEzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTI8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMTU4LC0zMDUuNSAxNTcsLTMwNS41IDE1NywtMzA0LjUgMTU4LC0zMDQuNSAxNTgsLTMwNS41Ii8+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlJiM0NTsmZ3Q7cm91dGUyIC0tPgo8ZyBpZD0iZWRnZTQiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkF1eGlsaWFyeUNvb3JkaW5hdGUmIzQ1OyZndDtyb3V0ZTI8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTU3LjUsLTM3NC42OUMxNTcuNSwtMzUwLjU2IDE1Ny41LC0zMTEuNjkgMTU3LjUsLTMwNS43NyIvPgo8L2c+CjwhLS0gRGltZW5zaW9uQ29vcmRpbmF0ZSAtLT4KPGcgaWQ9Im5vZGUxMSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGltZW5zaW9uQ29vcmRpbmF0ZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0NDYsLTUwMiAyOTksLTUwMiAyOTksLTQ2NCA0NDYsLTQ2NCA0NDYsLTUwMiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzNzIuNSIgeT0iLTQ4Ni44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7Y29uc3RydWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM3Mi41IiB5PSItNDcxLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RGltZW5zaW9uQ29vcmRpbmF0ZTwvdGV4dD4KPC9nPgo8IS0tIERpbWVuc2lvbkNvb3JkaW5hdGUmIzQ1OyZndDtDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlNiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RGltZW5zaW9uQ29vcmRpbmF0ZSYjNDU7Jmd0O0Nvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0zODUuNzUsLTQ2My45NUMzODUuNzUsLTQ2My45NSAzODUuNzUsLTMzNC4xOCAzODUuNzUsLTMzNC4xOCIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIzODUuNzUsLTMyNC4xOCAzOTAuMjUsLTMzNC4xOCAzODUuNzUsLTMyOS4xOCAzODUuNzUsLTMzNC4xOCAzODUuNzUsLTMzNC4xOCAzODUuNzUsLTMzNC4xOCAzODUuNzUsLTMyOS4xOCAzODEuMjUsLTMzNC4xOCAzODUuNzUsLTMyNC4xOCAzODUuNzUsLTMyNC4xOCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzODEuMSIgeT0iLTQ1MS4xOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4gJiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7ZWl0aGVyL29yPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGU2IC0tPgo8ZyBpZD0ibm9kZTE3IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTY8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDY1LC00ODMuNSA0NjQsLTQ4My41IDQ2NCwtNDgyLjUgNDY1LC00ODIuNSA0NjUsLTQ4My41Ii8+CjwvZz4KPCEtLSBEaW1lbnNpb25Db29yZGluYXRlJiM0NTsmZ3Q7cm91dGU2IC0tPgo8ZyBpZD0iZWRnZTE1IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5EaW1lbnNpb25Db29yZGluYXRlJiM0NTsmZ3Q7cm91dGU2PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTQ0Ni4zMiwtNDgzQzQ1NS4wMSwtNDgzIDQ2MS41OCwtNDgzIDQ2My43NCwtNDgzIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ2Ny44MiIgeT0iLTQ4Ni4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPiBlaXRoZXIvb3I8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTEmIzQ1OyZndDtEaW1lbnNpb25Db29yZGluYXRlIC0tPgo8ZyBpZD0iZWRnZTIiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMSYjNDU7Jmd0O0RpbWVuc2lvbkNvb3JkaW5hdGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMjU0LjI2LC00ODNDMjU4LjIyLC00ODMgMjc3LjEzLC00ODMgMjk4LjcsLTQ4MyIvPgo8L2c+CjwhLS0gcm91dGUyJiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTUiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMiYjNDU7Jmd0O0F1eGlsaWFyeUNvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0xNTcuNSwtMzA0LjM0QzE1Ny41LC0zMDQuMzQgMTU3LjUsLTIzNy42OSAxNTcuNSwtMjM3LjY5Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjE1Ny41LC0yMjcuNjkgMTYyLC0yMzcuNjkgMTU3LjUsLTIzMi42OSAxNTcuNSwtMjM3LjY5IDE1Ny41LC0yMzcuNjkgMTU3LjUsLTIzNy42OSAxNTcuNSwtMjMyLjY5IDE1MywtMjM3LjY5IDE1Ny41LC0yMjcuNjkgMTU3LjUsLTIyNy42OSIvPgo8L2c+CjwhLS0gcm91dGUzJiM0NTsmZ3Q7Q29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8IS0tIHJvdXRlMyYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlOSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUzJiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0yOTMuNSwtMzA0LjM0QzI5My41LC0yOTkuMDQgMjkzLjUsLTI2My4xNyAyOTMuNSwtMjM1LjE1Ii8+CjwvZz4KPCEtLSByb3V0ZTQmIzQ1OyZndDtDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlMTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlNCYjNDU7Jmd0O0Nvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0zOTkuNSwtMjAxLjY2QzM5OS41LC0yMDcuOTYgMzk5LjUsLTI1Ny41MyAzOTkuNSwtMjg1LjY3Ii8+CjwvZz4KPCEtLSByb3V0ZTQmIzQ1OyZndDtTY2FsYXJDb29yZGluYXRlVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlMTIiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlNCYjNDU7Jmd0O1NjYWxhckNvb3JkaW5hdGVWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0zOTkuNSwtMjAwLjM4QzM5OS41LC0xOTUuMTUgMzk5LjUsLTE1Ny43MSAzOTkuNSwtMTMxLjIiLz4KPC9nPgo8IS0tIHJvdXRlNSAtLT4KPGcgaWQ9Im5vZGUxNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGU1PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjQ4NCwtNDgzLjUgNDgzLC00ODMuNSA0ODMsLTQ4Mi41IDQ4NCwtNDgyLjUgNDg0LC00ODMuNSIvPgo8L2c+CjwhLS0gcm91dGU2JiM0NTsmZ3Q7U2NhbGFyQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTE2IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTYmIzQ1OyZndDtTY2FsYXJDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNNDY0LjUsLTQ4Mi4zOUM0NjQuNSwtNDY1LjQ0IDQ2NC41LC0xMDQgNDY0LjUsLTEwNCA0NjQuNSwtMTA0IDQzNi4zNywtMTA0IDQzNi4zNywtMTA0Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjQyNi4zNywtMTA0IDQzNi4zNywtOTkuNSA0MzEuMzcsLTEwNCA0MzYuMzcsLTEwNCA0MzYuMzcsLTEwNCA0MzYuMzcsLTEwNCA0MzEuMzcsLTEwNCA0MzYuMzcsLTEwOC41IDQyNi4zNywtMTA0IDQyNi4zNywtMTA0Ii8+CjwvZz4KPCEtLSBFaXRoZXJPciAtLT4KPGcgaWQ9Im5vZGUxOCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RWl0aGVyT3I8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjc1LC0zMDUuNSAyNzQsLTMwNS41IDI3NCwtMzA0LjUgMjc1LC0zMDQuNSAyNzUsLTMwNS41Ii8+CjwvZz4KPCEtLSBFaXRoZXJPciYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlVmFyaWFibGUgLS0+CjwvZz4KPC9zdmc+Cg==" alt="cfdm coordinates" width="50%">
 </div>
 <div class="title">Figure I.3. The relationship between domain axis, dimension coordinate and auxiliary coordinate constructs and CF-netCDF (defined in <a href="#figure-cf-concepts">Figure I.1</a> and identified here with the "CN" prefix). A dimension or auxiliary coordinate construct is defined by a CF-netCDF coordinate, scalar coordinate or auxiliary coordinate variable, and the associated CF-netCDF boundary variable if it exists. A generic coordinate construct spans one or more domain axis constructs, but the mapping of which ones is only held by the parent field construct.</div>
 </div>
@@ -11573,7 +12003,7 @@ A data variable referenced by a formula_terms attribute corresponds to the term 
 </div>
 <div id="figure-coordinate-reference" class="imageblock text-center text-center">
 <div class="content">
-<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDAuMSAoMjAxNjEyMjUuMDMwNCkKIC0tPgo8IS0tIFRpdGxlOiAlMyBQYWdlczogMSAtLT4KPHN2ZyB3aWR0aD0iNzc5cHQiIGhlaWdodD0iMjgycHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgNzc4LjUwIDI4Mi4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoNCAyNzgpIj4KPHRpdGxlPiUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgcG9pbnRzPSItNCw0IC00LC0yNzggNzc0LjUsLTI3OCA3NzQuNSw0IC00LDQiLz4KPCEtLSBEYXRhVmFyaWFibGUgLS0+CjxnIGlkPSJub2RlMSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGF0YVZhcmlhYmxlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjU2LC0yNzQgNTgwLC0yNzQgNTgwLC0yMzYgNjU2LC0yMzYgNjU2LC0yNzQiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNjE4IiB5PSItMjU4LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Q046OkRhdGE8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjYxOCIgeT0iLTI0My44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPlZhcmlhYmxlPC90ZXh0Pgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9Im5vZGUyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5HZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNTk2LjUsLTIwMCA0OTUuNSwtMjAwIDQ5NS41LC0xMzIgNTk2LjUsLTEzMiA1OTYuNSwtMjAwIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjU0NiIgeT0iLTE4NC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPiZsdDsmbHQ7YWJzdHJhY3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTQ2IiB5PSItMTY5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+R2VuZXJpYzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTQ2IiB5PSItMTU0LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTQ2IiB5PSItMTM5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+VmFyaWFibGU8L3RleHQ+CjwvZz4KPCEtLSBGb3JtdWxhVGVybXMgLS0+CjxnIGlkPSJub2RlNSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Rm9ybXVsYVRlcm1zPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNTk1LC01MS41IDQ5NywtNTEuNSA0OTcsLTEzLjUgNTk1LC0xMy41IDU5NSwtNTEuNSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1NDYiIHk9Ii0zNi4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkNOOjpGb3JtdWxhPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI1NDYiIHk9Ii0yMS4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPlRlcm1zPC90ZXh0Pgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZSYjNDU7Jmd0O0Zvcm11bGFUZXJtcyAtLT4KPGcgaWQ9ImVkZ2UxMyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZSYjNDU7Jmd0O0Zvcm11bGFUZXJtczwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTU0NiwtMTIxLjk2NjlDNTQ2LC0xMjEuOTY2OSA1NDYsLTUxLjYwNjIgNTQ2LC01MS42MDYyIi8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSI1NDYsLTEzMS45NjY5IDU0MS41MDAxLC0xMjEuOTY2OCA1NDYsLTEyNi45NjY5IDU0Ni4wMDAxLC0xMjEuOTY2OSA1NDYuMDAwMSwtMTIxLjk2NjkgNTQ2LjAwMDEsLTEyMS45NjY5IDU0NiwtMTI2Ljk2NjkgNTUwLjUwMDEsLTEyMS45NjY5IDU0NiwtMTMxLjk2NjkgNTQ2LC0xMzEuOTY2OSIvPgo8L2c+CjwhLS0gR3JpZE1hcHBpbmdWYXJpYWJsZSAtLT4KPGcgaWQ9Im5vZGUzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5HcmlkTWFwcGluZ1ZhcmlhYmxlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMjQxLC01MS41IDEwOSwtNTEuNSAxMDksLTEzLjUgMjQxLC0xMy41IDI0MSwtNTEuNSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNzUiIHk9Ii0zNi4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkNOOjpHcmlkIE1hcHBpbmc8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE3NSIgeT0iLTIxLjMiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+VmFyaWFibGU8L3RleHQ+CjwvZz4KPCEtLSBOYW1lZEZvcm11bGEgLS0+CjxnIGlkPSJub2RlNCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+TmFtZWRGb3JtdWxhPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDA3LjUsLTU5IDI3Ni41LC01OSAyNzYuNSwtNiA0MDcuNSwtNiA0MDcuNSwtNTkiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzQyIiB5PSItNDMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj4mbHQ7Jmx0O2VudW1lcmF0aW9uJmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM0MiIgeT0iLTI4LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Q046Ok5hbWVkPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzNDIiIHk9Ii0xMy44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkZvcm11bGE8L3RleHQ+CjwvZz4KPCEtLSBHcmlkTWFwcGluZ1ZhcmlhYmxlJiM0NTsmZ3Q7TmFtZWRGb3JtdWxhIC0tPgo8ZyBpZD0iZWRnZTExIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5HcmlkTWFwcGluZ1ZhcmlhYmxlJiM0NTsmZ3Q7TmFtZWRGb3JtdWxhPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMjQxLjAwMjgsLTMyQzI0MS4wMDI4LC0zMiAyNjYuNDc2NSwtMzIgMjY2LjQ3NjUsLTMyIi8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSIyNzYuNDc2NSwtMzIgMjY2LjQ3NjUsLTM2LjUwMDEgMjcxLjQ3NjUsLTMyIDI2Ni40NzY1LC0zMi4wMDAxIDI2Ni40NzY1LC0zMi4wMDAxIDI2Ni40NzY1LC0zMi4wMDAxIDI3MS40NzY1LC0zMiAyNjYuNDc2NCwtMjcuNTAwMSAyNzYuNDc2NSwtMzIgMjc2LjQ3NjUsLTMyIi8+CjwvZz4KPCEtLSBOYW1lZEZvcm11bGEmIzQ1OyZndDtGb3JtdWxhVGVybXMgLS0+CjxnIGlkPSJlZGdlMTIiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPk5hbWVkRm9ybXVsYSYjNDU7Jmd0O0Zvcm11bGFUZXJtczwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTQxNy42Njk4LC0yNkM0MTcuNjY5OCwtMjYgNDk2Ljk1NjUsLTI2IDQ5Ni45NTY1LC0yNiIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iNDA3LjY2OTgsLTI2IDQxNy42Njk4LC0yMS41MDAxIDQxMi42Njk4LC0yNiA0MTcuNjY5OCwtMjYuMDAwMSA0MTcuNjY5OCwtMjYuMDAwMSA0MTcuNjY5OCwtMjYuMDAwMSA0MTIuNjY5OCwtMjYgNDE3LjY2OTcsLTMwLjUwMDEgNDA3LjY2OTgsLTI2IDQwNy42Njk4LC0yNiIvPgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QgLS0+CjxnIGlkPSJub2RlNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3Q8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzMDUuNSwtMjAwIDIwNC41LC0yMDAgMjA0LjUsLTEzMiAzMDUuNSwtMTMyIDMwNS41LC0yMDAiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjU1IiB5PSItMTg0LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCIgZmlsbD0iIzAwMDAwMCI+Jmx0OyZsdDthYnN0cmFjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNTUiIHk9Ii0xNjkuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5HZW5lcmljPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNTUiIHk9Ii0xNTQuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Db29yZGluYXRlPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNTUiIHk9Ii0xMzkuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Db25zdHJ1Y3Q8L3RleHQ+CjwvZz4KPCEtLSBDb29yZGluYXRlQ29udmVyc2lvbiAtLT4KPGcgaWQ9Im5vZGU5IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Db29yZGluYXRlQ29udmVyc2lvbjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjQ2My41LC0xODUgMzcyLjUsLTE4NSAzNzIuNSwtMTQ3IDQ2My41LC0xNDcgNDYzLjUsLTE4NSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0MTgiIHk9Ii0xNjkuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Db29yZGluYXRlPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0MTgiIHk9Ii0xNTQuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Db252ZXJzaW9uPC90ZXh0Pgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QmIzQ1OyZndDtDb29yZGluYXRlQ29udmVyc2lvbiAtLT4KPGcgaWQ9ImVkZ2U2IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5HZW5lcmljQ29vcmRpbmF0ZUNvbnN0cnVjdCYjNDU7Jmd0O0Nvb3JkaW5hdGVDb252ZXJzaW9uPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNMzE1LjY4MDcsLTE1OUMzMTUuNjgwNywtMTU5IDM3Mi4zMzEyLC0xNTkgMzcyLjMzMTIsLTE1OSIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMzA1LjY4MDcsLTE1OSAzMTUuNjgwOCwtMTU0LjUwMDEgMzEwLjY4MDcsLTE1OSAzMTUuNjgwNywtMTU5LjAwMDEgMzE1LjY4MDcsLTE1OS4wMDAxIDMxNS42ODA3LC0xNTkuMDAwMSAzMTAuNjgwNywtMTU5IDMxNS42ODA3LC0xNjMuNTAwMSAzMDUuNjgwNywtMTU5IDMwNS42ODA3LC0xNTkiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzIzLjgwNjkiIHk9Ii0xNDcuNzQ3NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj4gJiMxNjA7JiMxNjA7MC4uKjwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkFuY2lsbGFyeSAtLT4KPGcgaWQ9Im5vZGU3IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Eb21haW5BbmNpbGxhcnk8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0OTAsLTI3NCAzNjgsLTI3NCAzNjgsLTIzNiA0OTAsLTIzNiA0OTAsLTI3NCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0MjkiIHk9Ii0yNTguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0MjkiIHk9Ii0yNDMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Eb21haW5BbmNpbGxhcnk8L3RleHQ+CjwvZz4KPCEtLSBEb21haW5BbmNpbGxhcnkmIzQ1OyZndDtEYXRhVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlNyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RG9tYWluQW5jaWxsYXJ5JiM0NTsmZ3Q7RGF0YVZhcmlhYmxlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNNDkwLjEwMTksLTI0NUM0OTAuMTAxOSwtMjQ1IDU2OS45NDA1LC0yNDUgNTY5Ljk0MDUsLTI0NSIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iNTc5Ljk0MDUsLTI0NSA1NjkuOTQwNSwtMjQ5LjUwMDEgNTc0Ljk0MDUsLTI0NSA1NjkuOTQwNSwtMjQ1LjAwMDEgNTY5Ljk0MDUsLTI0NS4wMDAxIDU2OS45NDA1LC0yNDUuMDAwMSA1NzQuOTQwNSwtMjQ1IDU2OS45NDA0LC0yNDAuNTAwMSA1NzkuOTQwNSwtMjQ1IDU3OS45NDA1LC0yNDUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTExLjYwMTkiIHk9Ii0yNDguMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj4gZWl0aGVyL29yPC90ZXh0Pgo8L2c+CjwhLS0gRG9tYWluQW5jaWxsYXJ5JiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPGcgaWQ9ImVkZ2U4IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Eb21haW5BbmNpbGxhcnkmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNNDc2Ljc1LC0yMzUuNzU1NkM0NzYuNzUsLTIxNy4yMjg1IDQ3Ni43NSwtMTkyIDQ3Ni43NSwtMTkyIDQ3Ni43NSwtMTkyIDQ4NS4zMDc3LC0xOTIgNDg1LjMwNzcsLTE5MiIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iNDk1LjMwNzcsLTE5MiA0ODUuMzA3OCwtMTk2LjUwMDEgNDkwLjMwNzcsLTE5MiA0ODUuMzA3NywtMTkyLjAwMDEgNDg1LjMwNzcsLTE5Mi4wMDAxIDQ4NS4zMDc3LC0xOTIuMDAwMSA0OTAuMzA3NywtMTkyIDQ4NS4zMDc3LC0xODcuNTAwMSA0OTUuMzA3NywtMTkyIDQ5NS4zMDc3LC0xOTIiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDcyLjEwMTIiIHk9Ii0yMjIuOTg2MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj4gJiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7ZWl0aGVyL29yPC90ZXh0Pgo8L2c+CjwhLS0gRG9tYWluQW5jaWxsYXJ5JiM0NTsmZ3Q7Q29vcmRpbmF0ZUNvbnZlcnNpb24gLS0+CjxnIGlkPSJlZGdlNSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RG9tYWluQW5jaWxsYXJ5JiM0NTsmZ3Q7Q29vcmRpbmF0ZUNvbnZlcnNpb248L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik00MTgsLTIyNS42ODgzQzQxOCwtMjI1LjY4ODMgNDE4LC0xODUuMjc0IDQxOCwtMTg1LjI3NCIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iNDE4LC0yMzUuNjg4MyA0MTMuNTAwMSwtMjI1LjY4ODMgNDE4LC0yMzAuNjg4MyA0MTguMDAwMSwtMjI1LjY4ODMgNDE4LjAwMDEsLTIyNS42ODgzIDQxOC4wMDAxLC0yMjUuNjg4MyA0MTgsLTIzMC42ODgzIDQyMi41MDAxLC0yMjUuNjg4NCA0MTgsLTIzNS42ODgzIDQxOCwtMjM1LjY4ODMiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDEzLjM1MTIiIHk9Ii0yMjIuOTE4OSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIENvb3JkaW5hdGVSZWZlcmVuY2UgLS0+CjxnIGlkPSJub2RlOCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Q29vcmRpbmF0ZVJlZmVyZW5jZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjMzMi41LC0yNzQgMTc3LjUsLTI3NCAxNzcuNSwtMjM2IDMzMi41LC0yMzYgMzMyLjUsLTI3NCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNTUiIHk9Ii0yNTguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNTUiIHk9Ii0yNDMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIiBmaWxsPSIjMDAwMDAwIj5Db29yZGluYXRlUmVmZXJlbmNlPC90ZXh0Pgo8L2c+CjwhLS0gQ29vcmRpbmF0ZVJlZmVyZW5jZSYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0IC0tPgo8ZyBpZD0iZWRnZTIiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNvb3JkaW5hdGVSZWZlcmVuY2UmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZUNvbnN0cnVjdDwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTI1NSwtMjM1LjY4ODNDMjU1LC0yMzUuNjg4MyAyNTUsLTIxMC4zNDggMjU1LC0yMTAuMzQ4Ii8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSIyNTUsLTIwMC4zNDggMjU5LjUwMDEsLTIxMC4zNDggMjU1LC0yMDUuMzQ4IDI1NS4wMDAxLC0yMTAuMzQ4IDI1NS4wMDAxLC0yMTAuMzQ4IDI1NS4wMDAxLC0yMTAuMzQ4IDI1NSwtMjA1LjM0OCAyNTAuNTAwMSwtMjEwLjM0ODEgMjU1LC0yMDAuMzQ4IDI1NSwtMjAwLjM0OCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNDMuNSIgeT0iLTIwMy41NDgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+MC4uKiAmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSBDb29yZGluYXRlUmVmZXJlbmNlJiM0NTsmZ3Q7RG9tYWluQW5jaWxsYXJ5IC0tPgo8ZyBpZD0iZWRnZTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNvb3JkaW5hdGVSZWZlcmVuY2UmIzQ1OyZndDtEb21haW5BbmNpbGxhcnk8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik0zMzIuNTg1OCwtMjU1QzMzMi41ODU4LC0yNTUgMzU3Ljc1MDcsLTI1NSAzNTcuNzUwNywtMjU1Ii8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSIzNjcuNzUwNywtMjU1IDM1Ny43NTA3LC0yNTkuNTAwMSAzNjIuNzUwNywtMjU1IDM1Ny43NTA3LC0yNTUuMDAwMSAzNTcuNzUwNywtMjU1LjAwMDEgMzU3Ljc1MDcsLTI1NS4wMDAxIDM2Mi43NTA3LC0yNTUgMzU3Ljc1MDYsLTI1MC41MDAxIDM2Ny43NTA3LC0yNTUgMzY3Ljc1MDcsLTI1NSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzNTQuNzUwNyIgeT0iLTI1OC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiIGZpbGw9IiMwMDAwMDAiPjAuLiogJiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gQ29vcmRpbmF0ZVJlZmVyZW5jZSYjNDU7Jmd0O0Nvb3JkaW5hdGVDb252ZXJzaW9uIC0tPgo8ZyBpZD0iZWRnZTQiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNvb3JkaW5hdGVSZWZlcmVuY2UmIzQ1OyZndDtDb29yZGluYXRlQ29udmVyc2lvbjwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTMxOSwtMjIzLjc0OTVDMzE5LC0yMjMuNzQ5NSAzMTksLTE3MiAzMTksLTE3MiAzMTksLTE3MiAzNjIuMjY3MywtMTcyIDM2Mi4yNjczLC0xNzIiLz4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSIjMDAwMDAwIiBwb2ludHM9IjMxOS4wMDAxLC0yMjMuNzQ5NSAzMjMsLTIyOS43NDk1IDMxOSwtMjM1Ljc0OTUgMzE1LC0yMjkuNzQ5NSAzMTkuMDAwMSwtMjIzLjc0OTUiLz4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSIjMDAwMDAwIiBwb2ludHM9IjM3Mi4yNjczLC0xNzIgMzYyLjI2NzMsLTE3Ni41MDAxIDM2Ny4yNjczLC0xNzIgMzYyLjI2NzMsLTE3Mi4wMDAxIDM2Mi4yNjczLC0xNzIuMDAwMSAzNjIuMjY3MywtMTcyLjAwMDEgMzY3LjI2NzMsLTE3MiAzNjIuMjY3MiwtMTY3LjUwMDEgMzcyLjI2NzMsLTE3MiAzNzIuMjY3MywtMTcyIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM1Ni43NjczIiB5PSItMTc1LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+MC4uMSAmIzE2MDsmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSBEYXR1bSAtLT4KPGcgaWQ9Im5vZGUxMCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGF0dW08L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI3MywtNTAuNSAxLC01MC41IDEsLTE0LjUgNzMsLTE0LjUgNzMsLTUwLjUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzciIHk9Ii0yOC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiIGZpbGw9IiMwMDAwMDAiPkRhdHVtPC90ZXh0Pgo8L2c+CjwhLS0gQ29vcmRpbmF0ZVJlZmVyZW5jZSYjNDU7Jmd0O0RhdHVtIC0tPgo8ZyBpZD0iZWRnZTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNvb3JkaW5hdGVSZWZlcmVuY2UmIzQ1OyZndDtEYXR1bTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTE2NS40NTMxLC0yNTVDMTY1LjQ1MzEsLTI1NSAyNSwtMjU1IDI1LC0yNTUgMjUsLTI1NSAyNSwtNjAuNzA4MSAyNSwtNjAuNzA4MSIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMTY1LjQ1MzEsLTI1NS4wMDAxIDE3MS40NTMxLC0yNTEgMTc3LjQ1MzEsLTI1NSAxNzEuNDUzMiwtMjU5IDE2NS40NTMxLC0yNTUuMDAwMSIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMjUsLTUwLjcwODEgMjkuNTAwMSwtNjAuNzA4MSAyNSwtNTUuNzA4MSAyNS4wMDAxLC02MC43MDgxIDI1LjAwMDEsLTYwLjcwODEgMjUuMDAwMSwtNjAuNzA4MSAyNSwtNTUuNzA4MSAyMC41MDAxLC02MC43MDgyIDI1LC01MC43MDgxIDI1LC01MC43MDgxIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjEyLjUiIHk9Ii01My45MDgxIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiIGZpbGw9IiMwMDAwMDAiPjAuLjEgJiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gQ29vcmRpbmF0ZUNvbnZlcnNpb24mIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8IS0tIHJvdXRlNyAtLT4KPGcgaWQ9Im5vZGUxNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGU3PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjQwOC41LC05NiA0MDcuNSwtOTYgNDA3LjUsLTk1IDQwOC41LC05NSA0MDguNSwtOTYiLz4KPC9nPgo8IS0tIENvb3JkaW5hdGVDb252ZXJzaW9uJiM0NTsmZ3Q7cm91dGU3IC0tPgo8ZyBpZD0iZWRnZTE0IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Db29yZGluYXRlQ29udmVyc2lvbiYjNDU7Jmd0O3JvdXRlNzwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTQwOCwtMTQ2LjczNTZDNDA4LC0xMjcuODE4NyA0MDgsLTEwMS4xMDk0IDQwOCwtOTYuMjY3NyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0MDMuMzUxMiIgeT0iLTEzMy45NjYyIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiIGZpbGw9IiMwMDAwMDAiPmVpdGhlci9vciAmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTggLS0+CjxnIGlkPSJub2RlMTgiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlODwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0MjcuNSwtOTYgNDI2LjUsLTk2IDQyNi41LC05NSA0MjcuNSwtOTUgNDI3LjUsLTk2Ii8+CjwvZz4KPCEtLSBDb29yZGluYXRlQ29udmVyc2lvbiYjNDU7Jmd0O3JvdXRlOCAtLT4KPGcgaWQ9ImVkZ2UxNiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+Q29vcmRpbmF0ZUNvbnZlcnNpb24mIzQ1OyZndDtyb3V0ZTg8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik00MjcsLTE0Ni43MzU2QzQyNywtMTI3LjgxODcgNDI3LC0xMDEuMTA5NCA0MjcsLTk2LjI2NzciLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDIyLjM1MTIiIHk9Ii0xMzMuOTY2MiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIiBmaWxsPSIjMDAwMDAwIj4gJiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7ZWl0aGVyL29yPC90ZXh0Pgo8L2c+CjwhLS0gRGF0dW0mIzQ1OyZndDtHcmlkTWFwcGluZ1ZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTEwIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5EYXR1bSYjNDU7Jmd0O0dyaWRNYXBwaW5nVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik03My4yNTc5LC0zMkM3My4yNTc5LC0zMiA5OC44MTk5LC0zMiA5OC44MTk5LC0zMiIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iMTA4LjgxOTksLTMyIDk4LjgxOTksLTM2LjUwMDEgMTAzLjgxOTksLTMyIDk4LjgxOTksLTMyLjAwMDEgOTguODE5OSwtMzIuMDAwMSA5OC44MTk5LC0zMi4wMDAxIDEwMy44MTk5LC0zMiA5OC44MTk5LC0yNy41MDAxIDEwOC44MTk5LC0zMiAxMDguODE5OSwtMzIiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iOTMuMzE5OSIgeT0iLTM1LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+MC4uMSAmIzE2MDsmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSBEYXR1bSYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0IC0tPgo8ZyBpZD0iZWRnZTkiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRhdHVtJiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3Q8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAwMDAiIGQ9Ik00OSwtNTAuNTA0NEM0OSwtODYuOTQ0MiA0OSwtMTY2IDQ5LC0xNjYgNDksLTE2NiAxOTQuMzQyOSwtMTY2IDE5NC4zNDI5LC0xNjYiLz4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSIjMDAwMDAwIiBwb2ludHM9IjIwNC4zNDI5LC0xNjYgMTk0LjM0MjksLTE3MC41MDAxIDE5OS4zNDI5LC0xNjYgMTk0LjM0MjksLTE2Ni4wMDAxIDE5NC4zNDI5LC0xNjYuMDAwMSAxOTQuMzQyOSwtMTY2LjAwMDEgMTk5LjM0MjksLTE2NiAxOTQuMzQyOCwtMTYxLjUwMDEgMjA0LjM0MjksLTE2NiAyMDQuMzQyOSwtMTY2Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE5MS4zNDI5IiB5PSItMTY5LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCIgZmlsbD0iIzAwMDAwMCI+MC4uKiAmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTEgLS0+CjxnIGlkPSJub2RlMTEiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlMTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI2NzUuNSwtMjU1LjUgNjc0LjUsLTI1NS41IDY3NC41LC0yNTQuNSA2NzUuNSwtMjU0LjUgNjc1LjUsLTI1NS41Ii8+CjwvZz4KPCEtLSByb3V0ZTIgLS0+CjxnIGlkPSJub2RlMTIiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlMjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI2OTQuNSwtMjU1LjUgNjkzLjUsLTI1NS41IDY5My41LC0yNTQuNSA2OTQuNSwtMjU0LjUgNjk0LjUsLTI1NS41Ii8+CjwvZz4KPCEtLSByb3V0ZTMgLS0+CjxnIGlkPSJub2RlMTMiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlMzwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI3MTMuNSwtMjU1LjUgNzEyLjUsLTI1NS41IDcxMi41LC0yNTQuNSA3MTMuNSwtMjU0LjUgNzEzLjUsLTI1NS41Ii8+CjwvZz4KPCEtLSByb3V0ZTQgLS0+CjxnIGlkPSJub2RlMTQiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNDwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI3MzIuNSwtMjU1LjUgNzMxLjUsLTI1NS41IDczMS41LC0yNTQuNSA3MzIuNSwtMjU0LjUgNzMyLjUsLTI1NS41Ii8+CjwvZz4KPCEtLSByb3V0ZTUgLS0+CjxnIGlkPSJub2RlMTUiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI3NTEuNSwtMjU1LjUgNzUwLjUsLTI1NS41IDc1MC41LC0yNTQuNSA3NTEuNSwtMjU0LjUgNzUxLjUsLTI1NS41Ii8+CjwvZz4KPCEtLSByb3V0ZTYgLS0+CjxnIGlkPSJub2RlMTYiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI3NzAuNSwtMjU1LjUgNzY5LjUsLTI1NS41IDc2OS41LC0yNTQuNSA3NzAuNSwtMjU0LjUgNzcwLjUsLTI1NS41Ii8+CjwvZz4KPCEtLSByb3V0ZTcmIzQ1OyZndDtHcmlkTWFwcGluZ1ZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTE1IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTcmIzQ1OyZndDtHcmlkTWFwcGluZ1ZhcmlhYmxlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwMDAwIiBkPSJNNDA3LjQ2ODYsLTk1QzM5Ni42MDI4LC05NSAyMjIuNzUsLTk1IDIyMi43NSwtOTUgMjIyLjc1LC05NSAyMjIuNzUsLTYxLjU5MTcgMjIyLjc1LC02MS41OTE3Ii8+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0iIzAwMDAwMCIgcG9pbnRzPSIyMjIuNzUsLTUxLjU5MTcgMjI3LjI1MDEsLTYxLjU5MTYgMjIyLjc1LC01Ni41OTE3IDIyMi43NTAxLC02MS41OTE3IDIyMi43NTAxLC02MS41OTE3IDIyMi43NTAxLC02MS41OTE3IDIyMi43NSwtNTYuNTkxNyAyMTguMjUwMSwtNjEuNTkxNyAyMjIuNzUsLTUxLjU5MTcgMjIyLjc1LC01MS41OTE3Ii8+CjwvZz4KPCEtLSByb3V0ZTgmIzQ1OyZndDtGb3JtdWxhVGVybXMgLS0+CjxnIGlkPSJlZGdlMTciIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlOCYjNDU7Jmd0O0Zvcm11bGFUZXJtczwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMDAwMCIgZD0iTTQyNywtOTQuODU0MkM0MjcsLTg4LjUzNzEgNDI3LC0zOCA0MjcsLTM4IDQyNywtMzggNDg2LjkxMTEsLTM4IDQ4Ni45MTExLC0zOCIvPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9IiMwMDAwMDAiIHBvaW50cz0iNDk2LjkxMTEsLTM4IDQ4Ni45MTEyLC00Mi41MDAxIDQ5MS45MTExLC0zOCA0ODYuOTExMSwtMzguMDAwMSA0ODYuOTExMSwtMzguMDAwMSA0ODYuOTExMSwtMzguMDAwMSA0OTEuOTExMSwtMzggNDg2LjkxMTEsLTMzLjUwMDEgNDk2LjkxMTEsLTM4IDQ5Ni45MTExLC0zOCIvPgo8L2c+CjwhLS0gRGF0YSAtLT4KPGcgaWQ9Im5vZGUxOSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGF0YTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI1NDYuNSwtMjU1LjUgNTQ1LjUsLTI1NS41IDU0NS41LC0yNTQuNSA1NDYuNSwtMjU0LjUgNTQ2LjUsLTI1NS41Ii8+CjwvZz4KPCEtLSBEYXRhJiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGVWYXJpYWJsZSAtLT4KPC9nPgo8L3N2Zz4K" alt="cfdm coordinate reference" width="75%">
+<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDMuMCAoMCkKIC0tPgo8IS0tIFRpdGxlOiAlMyBQYWdlczogMSAtLT4KPHN2ZyB3aWR0aD0iNzYwcHQiIGhlaWdodD0iMjgycHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgNzU5LjUwIDI4Mi4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoNCAyNzgpIj4KPHRpdGxlPiUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHBvaW50cz0iLTQsNCAtNCwtMjc4IDc1NS41LC0yNzggNzU1LjUsNCAtNCw0Ii8+CjwhLS0gRGF0YVZhcmlhYmxlIC0tPgo8ZyBpZD0ibm9kZTEiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkRhdGFWYXJpYWJsZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmZmYiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI2MzcsLTI3NCA1NjUsLTI3NCA1NjUsLTIzNiA2MzcsLTIzNiA2MzcsLTI3NCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI2MDEiIHk9Ii0yNTguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DTjo6RGF0YTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNjAxIiB5PSItMjQzLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+VmFyaWFibGU8L3RleHQ+CjwvZz4KPCEtLSBHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0ibm9kZTIiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjU4MSwtMjAwIDQ4MywtMjAwIDQ4MywtMTMyIDU4MSwtMTMyIDU4MSwtMjAwIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjUzMiIgeT0iLTE4NC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7YWJzdHJhY3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTMyIiB5PSItMTY5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+R2VuZXJpYzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTMyIiB5PSItMTU0LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTMyIiB5PSItMTM5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+VmFyaWFibGU8L3RleHQ+CjwvZz4KPCEtLSBGb3JtdWxhVGVybXMgLS0+CjxnIGlkPSJub2RlNSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Rm9ybXVsYVRlcm1zPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjU3OSwtNTEuNSA0ODUsLTUxLjUgNDg1LC0xMy41IDU3OSwtMTMuNSA1NzksLTUxLjUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTMyIiB5PSItMzYuMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DTjo6Rm9ybXVsYTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTMyIiB5PSItMjEuMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5UZXJtczwvdGV4dD4KPC9nPgo8IS0tIEdlbmVyaWNDb29yZGluYXRlVmFyaWFibGUmIzQ1OyZndDtGb3JtdWxhVGVybXMgLS0+CjxnIGlkPSJlZGdlMTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlVmFyaWFibGUmIzQ1OyZndDtGb3JtdWxhVGVybXM8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNNTMyLC0xMjEuOTdDNTMyLC0xMjEuOTcgNTMyLC01MS42MSA1MzIsLTUxLjYxIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjUzMiwtMTMxLjk3IDUyNy41LC0xMjEuOTcgNTMyLC0xMjYuOTcgNTMyLC0xMjEuOTcgNTMyLC0xMjEuOTcgNTMyLC0xMjEuOTcgNTMyLC0xMjYuOTcgNTM2LjUsLTEyMS45NyA1MzIsLTEzMS45NyA1MzIsLTEzMS45NyIvPgo8L2c+CjwhLS0gR3JpZE1hcHBpbmdWYXJpYWJsZSAtLT4KPGcgaWQ9Im5vZGUzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5HcmlkTWFwcGluZ1ZhcmlhYmxlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZmZiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjIzNSwtNTEuNSAxMDksLTUxLjUgMTA5LC0xMy41IDIzNSwtMTMuNSAyMzUsLTUxLjUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTcyIiB5PSItMzYuMyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DTjo6R3JpZCBNYXBwaW5nPC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIxNzIiIHk9Ii0yMS4zIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPlZhcmlhYmxlPC90ZXh0Pgo8L2c+CjwhLS0gTmFtZWRGb3JtdWxhIC0tPgo8ZyBpZD0ibm9kZTQiIGNsYXNzPSJub2RlIj4KPHRpdGxlPk5hbWVkRm9ybXVsYTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmZmYiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzOTUuNSwtNTkgMjcwLjUsLTU5IDI3MC41LC02IDM5NS41LC02IDM5NS41LC01OSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMzMiIHk9Ii00My44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7ZW51bWVyYXRpb24mZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzMzIiB5PSItMjguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DTjo6TmFtZWQ8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMzMyIgeT0iLTEzLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Rm9ybXVsYTwvdGV4dD4KPC9nPgo8IS0tIEdyaWRNYXBwaW5nVmFyaWFibGUmIzQ1OyZndDtOYW1lZEZvcm11bGEgLS0+CjxnIGlkPSJlZGdlMTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkdyaWRNYXBwaW5nVmFyaWFibGUmIzQ1OyZndDtOYW1lZEZvcm11bGE8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMjM1LjE3LC0zMkMyMzUuMTcsLTMyIDI2MC4yOCwtMzIgMjYwLjI4LC0zMiIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIyNzAuMjgsLTMyIDI2MC4yOCwtMzYuNSAyNjUuMjgsLTMyIDI2MC4yOCwtMzIgMjYwLjI4LC0zMiAyNjAuMjgsLTMyIDI2NS4yOCwtMzIgMjYwLjI4LC0yNy41IDI3MC4yOCwtMzIgMjcwLjI4LC0zMiIvPgo8L2c+CjwhLS0gTmFtZWRGb3JtdWxhJiM0NTsmZ3Q7Rm9ybXVsYVRlcm1zIC0tPgo8ZyBpZD0iZWRnZTEyIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5OYW1lZEZvcm11bGEmIzQ1OyZndDtGb3JtdWxhVGVybXM8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNNDA1LjY5LC0yNkM0MDUuNjksLTI2IDQ4NC43OCwtMjYgNDg0Ljc4LC0yNiIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIzOTUuNjksLTI2IDQwNS42OSwtMjEuNSA0MDAuNjksLTI2IDQwNS42OSwtMjYgNDA1LjY5LC0yNiA0MDUuNjksLTI2IDQwMC42OSwtMjYgNDA1LjY5LC0zMC41IDM5NS42OSwtMjYgMzk1LjY5LC0yNiIvPgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QgLS0+CjxnIGlkPSJub2RlNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3Q8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjMwMSwtMjAwIDIwMywtMjAwIDIwMywtMTMyIDMwMSwtMTMyIDMwMSwtMjAwIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI1MiIgeT0iLTE4NC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7YWJzdHJhY3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjUyIiB5PSItMTY5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+R2VuZXJpYzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjUyIiB5PSItMTU0LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q29vcmRpbmF0ZTwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjUyIiB5PSItMTM5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q29uc3RydWN0PC90ZXh0Pgo8L2c+CjwhLS0gQ29vcmRpbmF0ZUNvbnZlcnNpb24gLS0+CjxnIGlkPSJub2RlOSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Q29vcmRpbmF0ZUNvbnZlcnNpb248L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDUxLjUsLTE4NSAzNjYuNSwtMTg1IDM2Ni41LC0xNDcgNDUxLjUsLTE0NyA0NTEuNSwtMTg1Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQwOSIgeT0iLTE2OS44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvb3JkaW5hdGU8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQwOSIgeT0iLTE1NC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvbnZlcnNpb248L3RleHQ+CjwvZz4KPCEtLSBHZW5lcmljQ29vcmRpbmF0ZUNvbnN0cnVjdCYjNDU7Jmd0O0Nvb3JkaW5hdGVDb252ZXJzaW9uIC0tPgo8ZyBpZD0iZWRnZTYiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0JiM0NTsmZ3Q7Q29vcmRpbmF0ZUNvbnZlcnNpb248L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMzExLjI1LC0xNTlDMzExLjI1LC0xNTkgMzY2LjI5LC0xNTkgMzY2LjI5LC0xNTkiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMzAxLjI1LC0xNTkgMzExLjI1LC0xNTQuNSAzMDYuMjUsLTE1OSAzMTEuMjUsLTE1OSAzMTEuMjUsLTE1OSAzMTEuMjUsLTE1OSAzMDYuMjUsLTE1OSAzMTEuMjQsLTE2My41IDMwMS4yNSwtMTU5IDMwMS4yNSwtMTU5Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxOS4zNyIgeT0iLTE0Ny43NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4gJiMxNjA7JiMxNjA7MC4uKjwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkFuY2lsbGFyeSAtLT4KPGcgaWQ9Im5vZGU3IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Eb21haW5BbmNpbGxhcnk8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDc1LjUsLTI3NCAzNjAuNSwtMjc0IDM2MC41LC0yMzYgNDc1LjUsLTIzNiA0NzUuNSwtMjc0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQxOCIgeT0iLTI1OC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7Y29uc3RydWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQxOCIgeT0iLTI0My44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkRvbWFpbkFuY2lsbGFyeTwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkFuY2lsbGFyeSYjNDU7Jmd0O0RhdGFWYXJpYWJsZSAtLT4KPGcgaWQ9ImVkZ2U3IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Eb21haW5BbmNpbGxhcnkmIzQ1OyZndDtEYXRhVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNNDc1LjY1LC0yNDVDNDc1LjY1LC0yNDUgNTU0LjkxLC0yNDUgNTU0LjkxLC0yNDUiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iNTY0LjkxLC0yNDUgNTU0LjkxLC0yNDkuNSA1NTkuOTEsLTI0NSA1NTQuOTEsLTI0NSA1NTQuOTEsLTI0NSA1NTQuOTEsLTI0NSA1NTkuOTEsLTI0NSA1NTQuOTEsLTI0MC41IDU2NC45MSwtMjQ1IDU2NC45MSwtMjQ1Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ5Ny4xNSIgeT0iLTI0OC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPiBlaXRoZXIvb3I8L3RleHQ+CjwvZz4KPCEtLSBEb21haW5BbmNpbGxhcnkmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8ZyBpZD0iZWRnZTgiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRvbWFpbkFuY2lsbGFyeSYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlVmFyaWFibGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNNDYzLjUsLTIzNS43NkM0NjMuNSwtMjE3LjIzIDQ2My41LC0xOTIgNDYzLjUsLTE5MiA0NjMuNSwtMTkyIDQ3Mi45NSwtMTkyIDQ3Mi45NSwtMTkyIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjQ4Mi45NSwtMTkyIDQ3Mi45NSwtMTk2LjUgNDc3Ljk1LC0xOTIgNDcyLjk1LC0xOTIgNDcyLjk1LC0xOTIgNDcyLjk1LC0xOTIgNDc3Ljk1LC0xOTIgNDcyLjk1LC0xODcuNSA0ODIuOTUsLTE5MiA0ODIuOTUsLTE5MiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0NTguODUiIHk9Ii0yMjIuOTkiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+ICYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwOyYjMTYwO2VpdGhlci9vcjwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkFuY2lsbGFyeSYjNDU7Jmd0O0Nvb3JkaW5hdGVDb252ZXJzaW9uIC0tPgo8ZyBpZD0iZWRnZTUiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRvbWFpbkFuY2lsbGFyeSYjNDU7Jmd0O0Nvb3JkaW5hdGVDb252ZXJzaW9uPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTQwOSwtMjI1LjY5QzQwOSwtMjI1LjY5IDQwOSwtMTg1LjI3IDQwOSwtMTg1LjI3Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjQwOSwtMjM1LjY5IDQwNC41LC0yMjUuNjkgNDA5LC0yMzAuNjkgNDA5LC0yMjUuNjkgNDA5LC0yMjUuNjkgNDA5LC0yMjUuNjkgNDA5LC0yMzAuNjkgNDEzLjUsLTIyNS42OSA0MDksLTIzNS42OSA0MDksLTIzNS42OSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0MDQuMzUiIHk9Ii0yMjIuOTIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSBDb29yZGluYXRlUmVmZXJlbmNlIC0tPgo8ZyBpZD0ibm9kZTgiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkNvb3JkaW5hdGVSZWZlcmVuY2U8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzI0LjUsLTI3NCAxNzkuNSwtMjc0IDE3OS41LC0yMzYgMzI0LjUsLTIzNiAzMjQuNSwtMjc0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI1MiIgeT0iLTI1OC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7Y29uc3RydWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjI1MiIgeT0iLTI0My44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvb3JkaW5hdGVSZWZlcmVuY2U8L3RleHQ+CjwvZz4KPCEtLSBDb29yZGluYXRlUmVmZXJlbmNlJiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QgLS0+CjxnIGlkPSJlZGdlMiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+Q29vcmRpbmF0ZVJlZmVyZW5jZSYjNDU7Jmd0O0dlbmVyaWNDb29yZGluYXRlQ29uc3RydWN0PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTI1MiwtMjM1LjY5QzI1MiwtMjM1LjY5IDI1MiwtMjEwLjM1IDI1MiwtMjEwLjM1Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjI1MiwtMjAwLjM1IDI1Ni41LC0yMTAuMzUgMjUyLC0yMDUuMzUgMjUyLC0yMTAuMzUgMjUyLC0yMTAuMzUgMjUyLC0yMTAuMzUgMjUyLC0yMDUuMzUgMjQ3LjUsLTIxMC4zNSAyNTIsLTIwMC4zNSAyNTIsLTIwMC4zNSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNDAuNSIgeT0iLTIwMy41NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIENvb3JkaW5hdGVSZWZlcmVuY2UmIzQ1OyZndDtEb21haW5BbmNpbGxhcnkgLS0+CjxnIGlkPSJlZGdlMSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+Q29vcmRpbmF0ZVJlZmVyZW5jZSYjNDU7Jmd0O0RvbWFpbkFuY2lsbGFyeTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0zMjQuODEsLTI1NUMzMjQuODEsLTI1NSAzNTAuNDYsLTI1NSAzNTAuNDYsLTI1NSIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIzNjAuNDYsLTI1NSAzNTAuNDYsLTI1OS41IDM1NS40NiwtMjU1IDM1MC40NiwtMjU1IDM1MC40NiwtMjU1IDM1MC40NiwtMjU1IDM1NS40NiwtMjU1IDM1MC40NiwtMjUwLjUgMzYwLjQ2LC0yNTUgMzYwLjQ2LC0yNTUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzQ3LjQ2IiB5PSItMjU4LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSBDb29yZGluYXRlUmVmZXJlbmNlJiM0NTsmZ3Q7Q29vcmRpbmF0ZUNvbnZlcnNpb24gLS0+CjxnIGlkPSJlZGdlNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+Q29vcmRpbmF0ZVJlZmVyZW5jZSYjNDU7Jmd0O0Nvb3JkaW5hdGVDb252ZXJzaW9uPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxMi43NSwtMjIzLjc1QzMxMi43NSwtMjIzLjc1IDMxMi43NSwtMTcyIDMxMi43NSwtMTcyIDMxMi43NSwtMTcyIDM1Ni4yMiwtMTcyIDM1Ni4yMiwtMTcyIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjMxMi43NSwtMjIzLjc1IDMxNi43NSwtMjI5Ljc1IDMxMi43NSwtMjM1Ljc1IDMwOC43NSwtMjI5Ljc1IDMxMi43NSwtMjIzLjc1Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjM2Ni4yMiwtMTcyIDM1Ni4yMiwtMTc2LjUgMzYxLjIyLC0xNzIgMzU2LjIyLC0xNzIgMzU2LjIyLC0xNzIgMzU2LjIyLC0xNzIgMzYxLjIyLC0xNzIgMzU2LjIyLC0xNjcuNSAzNjYuMjIsLTE3MiAzNjYuMjIsLTE3MiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzNTAuNzIiIHk9Ii0xNzUuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4xICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIERhdHVtIC0tPgo8ZyBpZD0ibm9kZTEwIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5EYXR1bTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI3MywtNTAuNSAxLC01MC41IDEsLTE0LjUgNzMsLTE0LjUgNzMsLTUwLjUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzciIHk9Ii0yOC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkRhdHVtPC90ZXh0Pgo8L2c+CjwhLS0gQ29vcmRpbmF0ZVJlZmVyZW5jZSYjNDU7Jmd0O0RhdHVtIC0tPgo8ZyBpZD0iZWRnZTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNvb3JkaW5hdGVSZWZlcmVuY2UmIzQ1OyZndDtEYXR1bTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0xNjcuMjQsLTI1NUMxNjcuMjQsLTI1NSAyNSwtMjU1IDI1LC0yNTUgMjUsLTI1NSAyNSwtNjAuNzEgMjUsLTYwLjcxIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjE2Ny4yNCwtMjU1IDE3My4yNCwtMjUxIDE3OS4yNCwtMjU1IDE3My4yNCwtMjU5IDE2Ny4yNCwtMjU1Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjI1LC01MC43MSAyOS41LC02MC43MSAyNSwtNTUuNzEgMjUsLTYwLjcxIDI1LC02MC43MSAyNSwtNjAuNzEgMjUsLTU1LjcxIDIwLjUsLTYwLjcxIDI1LC01MC43MSAyNSwtNTAuNzEiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMTIuNSIgeT0iLTUzLjkxIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLjEgJiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gQ29vcmRpbmF0ZUNvbnZlcnNpb24mIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8IS0tIHJvdXRlNyAtLT4KPGcgaWQ9Im5vZGUxNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGU3PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjM5OS41LC05NiAzOTguNSwtOTYgMzk4LjUsLTk1IDM5OS41LC05NSAzOTkuNSwtOTYiLz4KPC9nPgo8IS0tIENvb3JkaW5hdGVDb252ZXJzaW9uJiM0NTsmZ3Q7cm91dGU3IC0tPgo8ZyBpZD0iZWRnZTE0IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Db29yZGluYXRlQ29udmVyc2lvbiYjNDU7Jmd0O3JvdXRlNzwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0zOTksLTE0Ni43NEMzOTksLTEyNy44MiAzOTksLTEwMS4xMSAzOTksLTk2LjI3Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjM5NC4zNSIgeT0iLTEzMy45NyIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj5laXRoZXIvb3IgJiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGU4IC0tPgo8ZyBpZD0ibm9kZTE4IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTg8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNDE4LjUsLTk2IDQxNy41LC05NiA0MTcuNSwtOTUgNDE4LjUsLTk1IDQxOC41LC05NiIvPgo8L2c+CjwhLS0gQ29vcmRpbmF0ZUNvbnZlcnNpb24mIzQ1OyZndDtyb3V0ZTggLS0+CjxnIGlkPSJlZGdlMTYiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNvb3JkaW5hdGVDb252ZXJzaW9uJiM0NTsmZ3Q7cm91dGU4PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTQxOCwtMTQ2Ljc0QzQxOCwtMTI3LjgyIDQxOCwtMTAxLjExIDQxOCwtOTYuMjciLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNDEzLjM1IiB5PSItMTMzLjk3IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPiAmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDsmIzE2MDtlaXRoZXIvb3I8L3RleHQ+CjwvZz4KPCEtLSBEYXR1bSYjNDU7Jmd0O0dyaWRNYXBwaW5nVmFyaWFibGUgLS0+CjxnIGlkPSJlZGdlMTAiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkRhdHVtJiM0NTsmZ3Q7R3JpZE1hcHBpbmdWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik03My4xOCwtMzJDNzMuMTgsLTMyIDk4Ljg4LC0zMiA5OC44OCwtMzIiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMTA4Ljg4LC0zMiA5OC44OCwtMzYuNSAxMDMuODgsLTMyIDk4Ljg4LC0zMiA5OC44OCwtMzIgOTguODgsLTMyIDEwMy44OCwtMzIgOTguODgsLTI3LjUgMTA4Ljg4LC0zMiAxMDguODgsLTMyIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjkzLjM4IiB5PSItMzUuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4xICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIERhdHVtJiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGVDb25zdHJ1Y3QgLS0+CjxnIGlkPSJlZGdlOSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RGF0dW0mIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZUNvbnN0cnVjdDwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik00OSwtNTAuNUM0OSwtODYuOTQgNDksLTE2NiA0OSwtMTY2IDQ5LC0xNjYgMTkyLjg2LC0xNjYgMTkyLjg2LC0xNjYiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjAyLjg2LC0xNjYgMTkyLjg2LC0xNzAuNSAxOTcuODYsLTE2NiAxOTIuODYsLTE2NiAxOTIuODYsLTE2NiAxOTIuODYsLTE2NiAxOTcuODYsLTE2NiAxOTIuODYsLTE2MS41IDIwMi44NiwtMTY2IDIwMi44NiwtMTY2Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjE4OS44NiIgeT0iLTE2OS4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxIC0tPgo8ZyBpZD0ibm9kZTExIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTE8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjU2LjUsLTI1NS41IDY1NS41LC0yNTUuNSA2NTUuNSwtMjU0LjUgNjU2LjUsLTI1NC41IDY1Ni41LC0yNTUuNSIvPgo8L2c+CjwhLS0gcm91dGUyIC0tPgo8ZyBpZD0ibm9kZTEyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTI8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjc1LjUsLTI1NS41IDY3NC41LC0yNTUuNSA2NzQuNSwtMjU0LjUgNjc1LjUsLTI1NC41IDY3NS41LC0yNTUuNSIvPgo8L2c+CjwhLS0gcm91dGUzIC0tPgo8ZyBpZD0ibm9kZTEzIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTM8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjk0LjUsLTI1NS41IDY5My41LC0yNTUuNSA2OTMuNSwtMjU0LjUgNjk0LjUsLTI1NC41IDY5NC41LC0yNTUuNSIvPgo8L2c+CjwhLS0gcm91dGU0IC0tPgo8ZyBpZD0ibm9kZTE0IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTQ8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNzEzLjUsLTI1NS41IDcxMi41LC0yNTUuNSA3MTIuNSwtMjU0LjUgNzEzLjUsLTI1NC41IDcxMy41LC0yNTUuNSIvPgo8L2c+CjwhLS0gcm91dGU1IC0tPgo8ZyBpZD0ibm9kZTE1IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNzMyLjUsLTI1NS41IDczMS41LC0yNTUuNSA3MzEuNSwtMjU0LjUgNzMyLjUsLTI1NC41IDczMi41LC0yNTUuNSIvPgo8L2c+CjwhLS0gcm91dGU2IC0tPgo8ZyBpZD0ibm9kZTE2IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTY8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNzUxLjUsLTI1NS41IDc1MC41LC0yNTUuNSA3NTAuNSwtMjU0LjUgNzUxLjUsLTI1NC41IDc1MS41LC0yNTUuNSIvPgo8L2c+CjwhLS0gcm91dGU3JiM0NTsmZ3Q7R3JpZE1hcHBpbmdWYXJpYWJsZSAtLT4KPGcgaWQ9ImVkZ2UxNSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU3JiM0NTsmZ3Q7R3JpZE1hcHBpbmdWYXJpYWJsZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0zOTguNDgsLTk1QzM4Ny45MywtOTUgMjE5LC05NSAyMTksLTk1IDIxOSwtOTUgMjE5LC02MS41OSAyMTksLTYxLjU5Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjIxOSwtNTEuNTkgMjIzLjUsLTYxLjU5IDIxOSwtNTYuNTkgMjE5LC02MS41OSAyMTksLTYxLjU5IDIxOSwtNjEuNTkgMjE5LC01Ni41OSAyMTQuNSwtNjEuNTkgMjE5LC01MS41OSAyMTksLTUxLjU5Ii8+CjwvZz4KPCEtLSByb3V0ZTgmIzQ1OyZndDtGb3JtdWxhVGVybXMgLS0+CjxnIGlkPSJlZGdlMTciIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlOCYjNDU7Jmd0O0Zvcm11bGFUZXJtczwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik00MTgsLTk0Ljg1QzQxOCwtODguNTQgNDE4LC0zOCA0MTgsLTM4IDQxOCwtMzggNDc0Ljk3LC0zOCA0NzQuOTcsLTM4Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjQ4NC45NywtMzggNDc0Ljk3LC00Mi41IDQ3OS45NywtMzggNDc0Ljk3LC0zOCA0NzQuOTcsLTM4IDQ3NC45NywtMzggNDc5Ljk3LC0zOCA0NzQuOTcsLTMzLjUgNDg0Ljk3LC0zOCA0ODQuOTcsLTM4Ii8+CjwvZz4KPCEtLSBEYXRhIC0tPgo8ZyBpZD0ibm9kZTE5IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5EYXRhPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjUzMi41LC0yNTUuNSA1MzEuNSwtMjU1LjUgNTMxLjUsLTI1NC41IDUzMi41LC0yNTQuNSA1MzIuNSwtMjU1LjUiLz4KPC9nPgo8IS0tIERhdGEmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZVZhcmlhYmxlIC0tPgo8L2c+Cjwvc3ZnPgo=" alt="cfdm coordinate reference" width="75%">
 </div>
 <div class="title">Figure I.4. The relationship between coordinate reference and domain ancillary constructs and CF-netCDF (defined in <a href="#figure-cf-concepts">Figure I.1</a> and identified here with the "CN" prefix). A coordinate reference construct is defined either by a grid mapping variable, or a <strong><code>formula_terms</code></strong> attribute of a CF-netCDF coordinate variable. The coordinate reference construct is composed of generic coordinate constructs, a datum, and a coordinate conversion formula. The coordinate conversion formula is usually defined by a named formula in the CF conventions. A domain ancillary construct term of a coordinate conversion formula is defined by a CF-netCDF data variable or a CF-netCDF generic coordinate variable.</div>
 </div>
@@ -12780,6 +13210,471 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 </div>
 </div>
 <div class="sect1">
+<h2 id="appendix-aggregation-examples"><a class="anchor" href="#appendix-aggregation-examples"></a>Appendix L: Aggregation Variable Examples</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This appendix contains examples of aggregation variables.
+Details of how to encode and decode aggregation variables are found in <a href="#aggregation-variables">Section 2.8, "Aggregation Variables"</a>.</p>
+</div>
+<div id="example-L.1" class="exampleblock">
+<div class="title">Example L.1 Aggregation variable with fragment datasets defined by relative-path URI references</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Array of fragments dimensions
+  f_time = 2 ;
+  f_level = 1 ;
+  f_latitude = 1 ;
+  f_longitude = 1 ;
+  // Map variable dimensions
+  j = 4 ;        // Number of aggregated dimensions
+  i = 2 ;        // Largest number of fragments along any aggregated dimension
+
+variables:
+  // Data aggregation variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
+                                   map: fragment_map" ;
+  // Coordinate variables
+  double time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+  // Array of fragments feature variables
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
+  int fragment_map(j, i) ;
+
+data:
+  temperature = _ ;
+  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_map = 3, 9,
+                 1, _,
+                 73, _,
+                 144, _ ;
+  fragment_uris = "January-March.nc", "April-December.nc" ;
+  fragment_identifiers = "temperature" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>temperature</code> data variable is an aggregation variable.
+Its four-dimensional aggregated data with shape <code>(12, 1, 73, 144)</code> is constructed from two non-overlapping fragments, with data shapes <code>(3, 1, 73, 144)</code> and <code>(9, 1, 73, 144)</code>, which span the first 3 and last 9 elements respectively of the <code>time</code> aggregated dimension.
+The fragment dataset names are relative-path URI references, and so in this case are assumed to be in the same directory as the aggregation dataset itself.</p>
+</div>
+<div class="paragraph">
+<p>The data for the <code>level</code>, <code>latitude</code> and  <code>longitude</code> variables are omitted for clarity.</p>
+</div>
+</div>
+</div>
+<div id="example-L.2" class="exampleblock">
+<div class="title">Example L.2 Aggregation variable with fragment datasets defined by absolute URIs</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Array of fragments dimensions
+  f_time = 2 ;
+  f_level = 1 ;
+  f_latitude = 1 ;
+  f_longitude = 1 ;
+  // Map variable dimensions
+  j = 4 ;        // Number of aggregated dimensions for temperature
+  j_time = 1 ;   // Number of aggregated dimensions for time
+  i = 2 ;        // Largest number of fragments along any aggregated dimension
+
+variables:
+  // Data aggregation variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
+                                   map: fragment_map" ;
+  // Coordinate aggregation variable
+  double time ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+    time:aggregated_dimensions = "time" ;
+    time:aggregated_data = "uris: fragment_uris
+                            identifiers: fragment_identifiers_time
+                            map: fragment_map_time" ;
+  // Coordinate variables
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+  // Array of fragments feature variables
+  int fragment_map(j, i) ;
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
+  int fragment_map_time(j_time, i) ;
+  string fragment_uris_time(f_time) ;
+  string fragment_identifiers_time ;
+
+data:
+  temperature = _ ;
+  time = _ ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_map = 3, 9,
+                 1, _,
+                 73, _,
+                 144, _ ;
+  fragment_uris = "file:///data/January-March.nc",
+                  "https:///remote.host/data/April-December.nc" ;
+  fragment_identifiers = "temperature" ;
+  fragment_map_time = 3, 9 ;
+  fragment_uris_time = "file:///data/January-March.nc",
+                       "https:///remote.host/data/April-December.nc" ;
+  fragment_identifiers_time = "time" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This example is similar to <a href="#example-L.1">Example L.1</a>, but now the fragment dataset names are absolute URIs (one local, one remote), and <code>time</code> is now also an aggregation coordinate variable, with its aggregated data being derived from the same fragment datasets as <code>temperature</code>.</p>
+</div>
+<div class="paragraph">
+<p>The data for the <code>level</code>, <code>latitude</code> and  <code>longitude</code> variables are omitted for clarity.</p>
+</div>
+</div>
+</div>
+<div id="example-L.3" class="exampleblock">
+<div class="title">Example L.3 Aggregation variable with multiple aggregated dimensions</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Array of fragments dimensions
+  f_time = 12 ;
+  f_level = 1 ;
+  f_latitude = 2 ;
+  f_longitude = 4 ;
+  // Map variable dimensions
+  j = 4 ;        // Number of aggregated dimensions
+  i = 12 ;       // Largest number of fragments along any aggregated dimension
+
+variables:
+  // Data aggregation variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
+                                   map: fragment_map" ;
+  double pressure(time, level, latitude, longitude) ;
+    temperature:standard_name = "air_pressure" ;
+    temperature:units = "hPa" ;
+    temperature:cell_methods = "time: mean" ;
+
+  // Coordinate variables
+  double time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+  // Array of fragments feature variables
+  int fragment_map(j, i) ;
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
+
+data:
+  temperature = _ ;
+  pressure = ...  ;
+  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_map = 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                 1, _, _, _, _, _, _, _, _, _, _, _,
+                 37, 36, _, _, _, _, _, _, _, _, _, _,
+                 36, 36, 36, 36, _, _, _, _, _, _, _, _ ;
+  fragment_uris = ... ;
+  fragment_identifiers = "temperature" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>temperature</code> data variable is an aggregation of 96 fragments.
+The shape of the array of fragments, inferred from the <code>fragment_map</code> data, is  <code>(12, 1, 2, 4)</code>, indicating that three of the four aggregated dimensions are spanned by multiple fragments.
+The <code>pressure</code> data variable is not an aggregation variable.</p>
+</div>
+<div class="paragraph">
+<p>The data for the <code>pressure</code>, <code>level</code>, <code>latitude</code> and  <code>longitude</code> variables, and the <code>fragment_uris</code> variable, are omitted for clarity.</p>
+</div>
+</div>
+</div>
+<div id="example-L.4" class="exampleblock">
+<div class="title">Example L.4 Aggregation discrete sampling geometry variable</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  station = 3 ;
+  obs = 15000 ;
+  // Array of fragments dimensions
+  f_station = 3 ;
+  // Map variable dimensions
+  j = 1 ;        // Number of aggregated dimensions
+  i = 3 ;        // Largest number of fragments along any aggregated dimension
+
+variables:
+  // Data aggregation variable
+  float tas(obs) ;
+    tas:standard_name = "air_temperature" ;
+    tas:units = "K" ;
+    tas:coordinates = "time lat lon station_name" ;
+    tas:aggregated_dimensions = "obs" ;
+    tas:aggregated_data = "uris: fragment_uris
+                           identifiers: fragment_identifiers
+                           map: fragment_map" ;
+  // DSG count variable
+  int row_size(station) ;
+    row_size:long_name = "number of observations per station" ;
+    row_size:sample_dimension = "obs" ;
+
+  // Auxiliary coordinate aggregation variables
+  float time ;
+    time:standard_name = "time" ;
+    time:units = "days since 1970-01-01" ;
+    time:aggregated_dimensions = "obs" ;
+    time:aggregated_data = "uris: fragment_uris
+                            identifiers: fragment_identifiers_time
+                            map: fragment_map" ;
+  float lon(station) ;
+    lon:standard_name = "longitude" ;
+    lon:long_name = "station longitude" ;
+    lon:units = "degrees_east" ;
+    lon:aggregated_dimensions = "station" ;
+    lon:aggregated_data = "uris: fragment_uris
+                           identifiers: fragment_identifiers_lon
+                           map: fragment_map_latlon" ;
+  float lat(station) ;
+    lat:standard_name = "latitude" ;
+    lat:long_name = "station latitude" ;
+    lat:units = "degrees_north" ;
+    lat:aggregated_dimensions = "station" ;
+    lat:aggregated_data = "uris: fragment_uris
+                           identifiers: fragment_identifiers_lat
+                           map: fragment_map_latlon" ;
+  // Array of fragments feature variables
+  int fragment_map(j, i) ;
+  string fragment_uris(f_station) ;
+  string fragment_identifiers ;
+  int fragment_map_latlon(j, i) ;
+  string fragment_identifiers_time(f_station) ;
+  string fragment_identifiers_lat ;
+  string fragment_identifiers_lon ;
+
+// global attributes:
+  :featureType = "timeSeries" ;
+
+data:
+  tas = _ ;
+  row_size = 5000, 4000, 6000 ;
+  time = _ ;
+  lat = _ ;
+  lon = _ ;
+  fragment_map = 5000, 4000, 6000 ;
+  fragment_uris = "Harwell.nc", "Abingdon.nc", "Lambourne.nc" ;
+  fragment_identifiers = "tas" ;
+  fragment_map_latlon = 1, 1, 1 ;
+  fragment_identifiers_time = "t1", "t2", "t3" ;
+  fragment_identifiers_lat = "lat" ;
+  fragment_identifiers_lon = "lon" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Three fragments are aggregated into a collection of discrete sampling geometry (DSG) timeseries feature types with contiguous ragged array representation.
+The auxiliary coordinate variables <code>time</code>, <code>lon</code>, and <code>lat</code> are also aggregation variables.
+The time variables in the fragment datasets all have different netCDF variable names, which differ from the netCDF name of the <code>time</code> aggregation variable.
+The fragments for all aggregation variables, in this case, come from the same three fragment datasets.</p>
+</div>
+<div class="paragraph">
+<p>No data have been omitted from the CDL.</p>
+</div>
+</div>
+</div>
+<div id="example-L.5" class="exampleblock">
+<div class="title">Example L.5 Aggregation ancillary variable with unique fragment values</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time = 12 ;
+  level = 1 ;
+  latitude = 73 ;
+  longitude = 144 ;
+  // Array of fragments dimensions
+  f_time = 2 ;
+  f_level = 1 ;
+  f_latitude = 1 ;
+  f_longitude = 1 ;
+  // Map variable dimensions
+  j = 4 ;        // Number of aggregated dimensions for temperature
+  i = 2 ;        // Largest number of fragments along any aggregated dimension
+  j_uid = 1 ;    // Number of aggregated dimensions for uid
+
+variables:
+  // Data aggregation variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:ancillary_variables = "uid" ;
+    temperature:aggregated_dimensions = "time level latitude longitude" ;
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
+                                   map: fragment_map" ;
+  // Ancillary aggregation variable
+  string uid ;
+    uid:long_name = "Fragment dataset unique identifiers" ;
+    uid:missing_value = "" ;
+    uid:aggregated_dimensions = "time" ;
+    uid:aggregated_data = "unique_values: fragment_unique_values
+                           map: fragment_map_uid" ;
+  // Coordinate variables
+  double time(time) ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double level(level) ;
+    level:standard_name = "height_above_mean_sea_level" ;
+    level:units = "m" ;
+  double latitude(latitude) ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude(longitude) ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+  // Array of fragments feature variables
+  int fragment_map(j, i) ;
+  string fragment_uris(f_time, f_level, f_latitude, f_longitude) ;
+  string fragment_identifiers ;
+  int fragment_map_uid(j_uid, i) ;
+  string fragment_unique_values(f_time) ;
+
+data:
+  temperature = _ ;
+  uid = _ ;
+  time = 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 ;
+  level = ... ;
+  latitude = ... ;
+  longitude = ... ;
+  fragment_map = 3, 9,
+                 1, _,
+                 73, _,
+                 144, _ ;
+  fragment_uris = "January-March.nc", "April-December.nc" ;
+  fragment_identifiers = "temperature" ;
+  fragment_map_uid = 3, 9 ;
+  fragment_unique_values = "04b9-7eb5-4046-97b-0bf8", "05ee0-a183-43b3-a67-1eca" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This example is similar to <a href="#example-L.1">Example L.1</a>, but now there is an additional aggregation ancillary variable <code>uid</code> which defines its fragments from the unique values stored in the <code>fragment_unique_values</code> variable.</p>
+</div>
+<div class="paragraph">
+<p>The data for the <code>level</code>, <code>latitude</code> and  <code>longitude</code> variables are omitted for clarity.</p>
+</div>
+</div>
+</div>
+<div id="example-L.6" class="exampleblock">
+<div class="title">Example L.6 Aggregation variable with a scalar map variable</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+
+variables:
+  // Data aggregation variable
+  double temperature ;
+    temperature:standard_name = "air_temperature" ;
+    temperature:units = "K" ;
+    temperature:cell_methods = "time: mean" ;
+    temperature:aggregated_dimensions = "" ;
+    temperature:aggregated_data = "uris: fragment_uris
+                                   identifiers: fragment_identifiers
+                                   map: fragment_map" ;
+  // Scalar coordinate variables
+  double time ;
+    time:standard_name = "time" ;
+    time:units = "days since 2001-01-01" ;
+  double height ;
+    level:standard_name = "height" ;
+    level:units = "m" ;
+  double latitude ;
+    latitude:standard_name = "latitude" ;
+    latitude:units = "degrees_north" ;
+  double longitude ;
+    longitude:standard_name = "longitude" ;
+    longitude:units = "degrees_east" ;
+  // Array of fragments feature variables
+  int fragment_map ;
+  string fragment_uris ;
+  string fragment_identifiers ;
+
+data:
+  temperature = _ ;
+  time = 0 ;
+  height = 1.5 ;
+  latitude = 43.7 ;
+  longitude = 7.27 ;
+  fragment_map = 1 ;
+  fragment_uris = "file.nc" ;
+  fragment_identifiers = "tas" ;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An aggregation variable with scalar aggregated data, for which the <code>aggregated_dimensions</code> attribute is an empty string, and the map variable <code>fragment_map</code> is a scalar with the value <code>1</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="revhistory"><a class="anchor" href="#revhistory"></a>Revision History</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -12797,6 +13692,9 @@ The "Use" values are <strong>MT</strong> for mesh topology variables, <strong>LI
 </li>
 <li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/584">Issue #584</a>: Allow <code>Z</code> as time-zone offset, with a couple of examples, and allow time-zone offset with date alone, both being consistent with UDUNITS syntax.</p>
+</li>
+<li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/508">Issue #508</a>: Introduce aggregation variables</p>
 </li>
 </ul>
 </div>
@@ -13486,6 +14384,9 @@ OGC document 12-063. 1st May 2015.</p>
 <p><a id="UGRID"></a>[UGRID]  <a href="https://ugrid-conventions.github.io/ugrid-conventions">UGRID Conventions for storing unstructured (or flexible mesh) data in netCDF files</a></p>
 </li>
 <li>
+<p><a id="URI"></a>[URI]  <a href="https://doi.org/10.17487/RFC3986">RFC 3986. Uniform Resource Identifier (URI): Generic Syntax</a>. T. Berners-Lee, R. Fielding, L. Masinter. January 2005.</p>
+</li>
+<li>
 <p><a id="W3C"></a>[W3C]  <a href="https://www.w3.org/">World Wide Web Consortium (W3C)</a>.</p>
 </li>
 <li>
@@ -13503,7 +14404,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2025-06-05 17:12:45 UTC
+Last updated 2025-09-11 13:56:47 UTC
 </div>
 </div>
 </body>
