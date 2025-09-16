@@ -322,6 +322,7 @@ See also <<leap-seconds>>.
 **`proleptic_gregorian`**:: A calendar with the Gregorian rules for leap years extended to dates before 1582-10-15.
 All dates consistent with these rules are allowed, both before and after 1582-10-15 0:0:0.
 For model-generated data following the Gregorian calendar without leap seconds, the **`proleptic_gregorian`** calendar is recommended and preferred over the **`standard`** (or default) calendar.
+See also <<leap-seconds>>.
 
 **`julian`**:: Julian calendar, in which a year is a leap year if it is divisible by 4, even if it is also divisible by 100.
 Year 1 AD or CE in the **`julian`** calendar is also year 1 of the **`standard`** calendar.
@@ -360,40 +361,35 @@ Any other value may be given to the **`calendar`** attribute to describe an expl
 This section describes how to deal properly with leap seconds.
 Most people ignore the existence of leap seconds, including many data producers and the CF standard before version 1.12.
 
-If you are producing real-world datasets with datetimes in UTC, or with a time zone offset from UTC, and if it's important for your time coordinates to be accurate to the second, the **`utc`** calendar is recommended.
+__If you are producing real-world datasets with datetimes in UTC, and if it's important for your time coordinates to be accurate to the second, the **`utc`** calendar is recommended.__
 This calendar is also recommended for data from a model whose time coordinates follow UTC including leap seconds.
-This calendar is the __only__ one which includes leap seconds in its set of valid datetimes.
-Two instants with the same time of day on different days, which would always be separated by a multiple of 86400 seconds if there were no leap seconds, will have a few more seconds between them if leap seconds intervene.
 When a datetime is converted to a time coordinate or vice-versa in the **`utc`** calendar, any leap seconds must be counted that occurred between the instant concerned and the reference datetime in the **`units`** attribute.
 
 For example, a leap second was added to UTC at the end of 2016.
-Therefore if **`calendar="utc"`** and **`units="seconds since 2016-12-31 23:59:58"`**, a value of **`4`** for the time coordinate represents the datetime **`2017-01-01 00:00:01`**, because four seconds had elapsed by that instant since **`2016-12-31 23:59:58"`** (seconds ending at **`2016-12-31 23:59:59`**,  **`2016-12-31 23:59:60`**,  **`2017-01-01 00:00:00`**,  **`2017-01-01 00:00:01`**).
-The datetime **`2017-01-01 23:59:58"`**, which is one calendar day later than the reference datetime **`2016-12-31 23:59:58"`**, is represented by a time coordinate of **`86401`**, one more than a usual calendar day.
+Therefore if **`calendar="utc"`** and **`units="seconds since 2016-12-31 23:59:58"`**, a value of 4 for the time coordinate represents the datetime 2017-01-01 00:00:01, because four seconds had elapsed by that instant since 2016-12-31 23:59:58 (seconds ending at 2016-12-31 23:59:59,  2016-12-31 23:59:60,  2017-01-01 00:00:00,  2017-01-01 00:00:01).
+In the **`utc`** calendar, two instants with the same time of day on different days, which would always be separated by a multiple of 86400 seconds if there were no leap seconds, will have a few more seconds between them if positive leap seconds intervene.
+For example, with respect to the the reference datetime in **`units="seconds since 2016-12-31 23:59:58"`**, the datetime 2017-01-01 23:59:58, which is one calendar day later, is represented by a time coordinate of 86401.
 
-In all other calendars, datetimes within leap seconds are not valid, and reference datetimes in the **`units`** attribute must not contain seconds equal to or greater than **`60`**.
-In these calendars, when a time coordinate value is calculated from a datetime, or the reverse, it is assumed that the coordinate value increases by exactly 60 seconds from the start of any minute (identified by year, month, day, hour, minute, all being integers) to the start of the next minute, because leap seconds are not valid datetimes.
+In all calendars except **`utc`** and **`standard`** calendar, datetimes within leap seconds are not valid, and reference datetimes in the **`units`** attribute must not contain seconds equal to or greater than 60.
+In these calendars, when a time coordinate value is calculated from a datetime, or the reverse, it is assumed that the coordinate value increases by exactly 60 seconds from the start of any minute (identified by year, month, day, hour, minute, all being integers) to the start of the next minute.
 
-If you are producing model-generated datasets with datetimes that follow the Gregorian calendar but do not include leap seconds, the **`proleptic_gregorian`** calendar is recommended.
-For example, if **`calendar="proleptic_gregorian"`** and **`units="seconds since 2016-12-31 23:59:58"`**, the datetime **`2017-01-01 00:00:01`** is represented by a time coordinate of **`3`**, because the UTC leap second **`2016-12-31 23:59:59`**--**`2016-12-31 23:59:60`** does not exist in the **`proleptic_gregorian`** calendar.
-Likewise, the time coordinate for **`2017-01-01 00:00:58`** is **60**, and for **`2017-01-01 23:59:58`** is **86400**.
+__If you are producing model-generated datasets with datetimes that follow the Gregorian calendar but do not include leap seconds, the **`proleptic_gregorian`** calendar is recommended.__
+The **`standard`** calendar may alternatively be used, but is not recommended because of its uncertainty about leap seconds, described in the paragraphs after this one.
+Since the **`proleptic_gregorian`** calendar includes no leap seconds, the time coordinate for a given datetime and **`units`** may differ between this calendar and **`utc`**.
+For example, if **`calendar="proleptic_gregorian"`** and **`units="seconds since 2016-12-31 23:59:58"`**, the datetime 2017-01-01 00:00:01 is represented by a time coordinate of 3, because the UTC leap second (from 2016-12-31 23:59:60 to 2017-01-01 00:00:00) does not exist in the **`proleptic_gregorian`** calendar, whereas the time coordinate is 4 in **`utc`** with the same **`units`** attribute.
+In the **`proleptic_gregorian`** calendar, the time coordinate for 2017-01-01 00:00:58 is 60, and for 2017-01-01 23:59:58 is 86400.
 
-The default **`standard`** calendar is used both for real-world data, and for data generated by models that follow the Gregorian calendar and do not include leap seconds in the timeline.
-As in all calendars except **`utc`**, datetimes within leap seconds are not valid in the **`standard`** calendar.
-If you are using model data with the **`standard`** calendar, you can be sure that there are no leap seconds to be counted, i.e. every minute contains 60 seconds, every day 86400.
-Hence time coordinates and datetimes should be interconverted on this basis.
-
+__The **`standard`** calendar is used both for real-world data, and for data generated by models that follow the Gregorian calendar and do not include leap seconds in the timeline.__
 For real-world data in the **`standard`** calendar since 1972, datetimes are in UTC or a local time zone offset from UTC.
-Hence the time coordinates may span an interval which includes UTC leap seconds, and leap seconds may have occurred between the instant of the reference datetime in the **`udunits`** and the instant referred to be a time coordinate.
+Hence leap seconds may have occurred between the instant of the reference datetime in the **`udunits`** and the instant referred to by a time coordinate.
 Some real-world datasets take leap seconds into account, and others do not.
-For example, equipment which automatically records UTC datetimes may have prior knowledge of when new leap seconds are to be introduced, enabling it to apply a new leap second at the appropriate time, or it may have a delay in applying a new leap second.
-Some processing software might allow for leap seconds when converting UTC datetimes to time coordinates, although the majority of software does not.
+For example, equipment which automatically records data with UTC datetimes can insert a new leap second only if it has has prior knowledge of when this is to be done.
 
-You need to be aware that, as a result of such differences, the time coordinates for the same real-world instant in two observational datasets using the **`standard`** calendar could disagree by some number of seconds.
-A similar uncertainty applies if you do not know whether the data is observational or model-generated.
-Furthermore, for data in the **`standard`** calendar, the difference between two time coordinates might not exactly equal the duration of the time interval between the two instants, but could be inaccurate by a number of seconds.
-
-The uncertainty associated with time coordinates in the **`standard`** calendar can be avoided by choosing the **`utc`** calendar to write data with real-world UTC datetimes after 1972, and the **`proleptic_gregorian`** for model-generated data with Gregorian dates, if precision to the second is important.
-For data in the real-world historical Gregory--Julian calendar including datetimes before 1972, the **`standard`** calendar is the only applicable choice, despite the uncertainty.
+As a consequence of such differences, __users of real-world data in the **`standard`** calendar need to be aware that the difference between two time coordinates might not exactly equal the duration of the time interval between the two instants, but could be inaccurate by a number of seconds.__
+Similar uncertainties apply if you do not know whether the data is observational or model-generated.
+Furthermore, __the time coordinates for the same real-world instant in two datasets, both using the **`standard`** calendar, could disagree by some number of seconds.__
+Data using the **`utc`** or **`proleptic_gregorian`** calendars, whichever is appropriate, instead of **`standard`**, does not suffer from these difficulties.
+However, __for data in the real-world historical Gregorian--Julian calendar including datetimes before 1972, the **`standard`** calendar is the only applicable choice.__
 
 
 [[none-calendar, Section 4.4.4, "Time Coordinates with no Annual Cycle"]]
@@ -404,7 +400,7 @@ The time of year is indicated by the date in the reference time of the **`units`
 The time coordinates that might apply in a perpetual July experiment are given in the following example.
 
 [[perpetual-time-axis-ex]]
-[caption="Example 4.6. "]
+[caption="Example 4.5. "]
 .Perpetual time axis
 ====
 
@@ -445,7 +441,7 @@ This attribute is ignored if **`leap_year`** is not specified.
 When an explicitly defined calendar is being used, the calendar may be described by giving a value not defined in <<calendar>> to the **`calendar`** attribute; alternatively, the attribute may be omitted.
 
 [[paleoclimate-time-axis-ex]]
-[caption="Example 4.7. "]
+[caption="Example 4.6. "]
 .Paleoclimate time axis
 ====
 
