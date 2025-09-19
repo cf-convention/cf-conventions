@@ -120,16 +120,30 @@ grid_mapping_name = healpix
 ----
 
 __Map parameters:__::
-* **`refinement_level`** - This parameter defines zoom refinement level.  
-* **`healpix_order`** - This parameter is optional (default is `nested`)
+* **`indexing_scheme`** - This parameter is optional (default is `nested`)
+* **`refinement_level`** - This parameter defines the HEALPix refinement level (0 == coarsest, optional if `indexing_scheme` is "nuniq" or "zuniq")
 
 __Map coordinates:__::
-The coordinate system is defined by discrete spherical cells arranged on a HEALPix grid. Each cell is represented by its cell center coordinates (latitude and longitude). Cells are indexed using either the nested or ring ordering scheme.
-The grid resolution is controlled by the zoom refinement level parameter **`refinement_level`**, starting from 0.  See <<GHB05>> for the calculation of center coordinates and cell boundaries coordinates. 
+The map uses a discrete 1-dimensional "index" coordinate, which uses the `standard_name` `"healpix_index"`, and can additionally be identified through the `grid_mapping` attribute.
+The coordinate can be any kind of coordinate, apart from primary or auxiliary coordinates, especially a tie-point coordinate can be used to encode contiguous blocks in index space.
 
+The coordinate system is defined by discrete cells on a sphere, arranged on a HEALPix grid.
+Each cell is represented by its cell index, which, together with the `indexing_scheme` and possible `refinement_level`, determines center coordinates (latitude and longitude) as well as boundaries.
+See <<GHB05>> for the calculation of center coordinates and cell boundaries coordinates.
 
 __Notes:__::
-At a given zoom refinement level, the total number of cells corresponds to 12 \times 4^{\text{refinement\_level}}
+
+Cells are indexed using either the nested, ring, nuniq or zuniq indexing scheme, the indices are stored in the index coordinate, which can be identified through the standard name `healpix_index`, or the `grid_mapping` attribute.
+
+For "nested" and "ring" scheme, the grid resolution is controlled by the refinement level parameter **`refinement_level`**, for "nuniq" and "zuniq", the resolution of a cell is implied by the index.
+
+An index according to the `nuniq` indexing scheme can be computed from the `refinement_level` and a `nested` index as follows <<RH15>>:
+
+`index_nuniq = index_nested + 4 ^ (1 + refinement_level)`
+
+TODO: add computation for `zuniq`. This seems to depend on `DEPTH_MAX`, which seems to depend on the number of available bits. How do we (formally) define DEPTH_MAX?
+
+At a given refinement level, the total number of cells corresponds to 12 \times 4^{\text{refinement\_level}}
 
 
 [[lambert-azimuthal-equal-area]]
@@ -519,8 +533,8 @@ Domain: + **`-180.0 \<= longitude_of_projection_origin < 180.0`**
 | **`north_pole_grid_longitude`** | N
 | Longitude (degrees) of the true north pole in the rotated grid.
 
-| **`healpix_order`** | S
-| Identifier of the HEALPix cell ordering, either `nested` or `ring`. See <<GHB05>>
+| **`indexing_scheme`** | S
+| Identifier of the HEALPix cell ordering, either `nested`, `ring`, `nuniq` or `zuniq`. See <<GHB05>> TODO: we need referenes or definitions for `nuniq` and `zuniq`.
 
 | **`perspective_point_height`** | N
 | Records the height, __in metres__, of the map projection perspective point above the ellipsoid (or sphere).
