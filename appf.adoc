@@ -112,6 +112,54 @@ Note also that the values "x" and "y" are not case-sensitive.
 The use of `projection_x_coordinate` and `projection_y_coordinate` was deprecated in version 1.9 of the CF Conventions.
 The initial definition of this projection used these standard names to identify the projection coordinates even though their canonical units (meters) do not match those required for this projection (radians).
 
+[[healpix]]
+=== HEALPix
+
+----
+grid_mapping_name = healpix
+----
+
+__Map parameters:__::
+* **`indexing_scheme`**
+* **`refinement_level`** - Mandatory for `indexing_scheme` "nested" or "ring", must be omitted for "nuniq" or "zuniq".
+
+__Map coordinates:__::
+The map uses a discrete 1-dimensional "index" coordinate, which uses the `standard_name` `"healpix_index"`, and can additionally be identified through the `grid_mapping` attribute.
+The coordinate can be any kind of coordinate, apart from coordinate variables or auxiliary coordinates, especially a tie-point coordinate can be used to encode contiguous blocks in index space in a compact way.
+If tie-point coordinates are used, take special care of the required precision.
+
++
+The coordinate system is defined by discrete cells on a sphere, arranged on a HEALPix grid.
+Each cell is represented by its cell index, which, together with the `indexing_scheme` and possible `refinement_level`, determines center coordinates (latitude and longitude) as well as boundaries.
+See <<GHB05>> for the calculation of center coordinates and cell boundary coordinates.
+
+__Notes:__::
+
+Cells are indexed using either the nested, ring, nuniq or zuniq indexing scheme, the indices are stored in the index coordinate, which can be identified through the standard name `healpix_index`, or the `grid_mapping` attribute.
+
++
+For "nested" and "ring" scheme, the grid resolution is controlled by the refinement level parameter `refinement_level`.
+0 is the coarsest, the total number of cells on the sphere is `12 * 4 ^ refinement_level`.
+For the "nuniq" and "zuniq" schemes, the resolution of a cell is implied by the index, and `refinement_level` must be omitted.
+
++
+An index according to the `nuniq` indexing scheme can be computed from the `refinement_level` and a `nested` index as follows <<RH15>>:
+
++
+`index_nuniq = index_nested + 4 ^ (1 + refinement_level)`
+
++
+The `zuniq` indexing scheme depends on the number of bits used by the integer type.
+This specification assumes 64 bit integers for all `zuniq` indices.
+An index according to the `zuniq` indexing scheme can be computed from the `refinement_level` and a `nested` index as follows <<K24>>:
+
++
+`index_zuniq = (2 * index_nested + 1) * 4 ^ (29 - refinement_level)`
+
++
+The value `29` is the maximum representable `refinement_level` and is computed from the number of bits as `(n_bits - 4 - 1) // 2`.
+
+
 [[lambert-azimuthal-equal-area]]
 === Lambert azimuthal equal area
 
@@ -477,6 +525,9 @@ Domain: +
 // The cleanest-looking, which sometimes works for asciidoctor-pdf:
      **`-90.0 \<= latitude_of_projection_origin \<= 90.0`**
 
+| **`refinement_level`** | N
+| DGGS numerical order of a discrete global grid in the tessellation sequence. See "4.37. refinement level" in <<OGC_DGGS>>.
+
 | **`longitude_of_central_meridian`** | N
 | The line of longitude (degrees_east) at the center of a map projection generally used as the basis for constructing the projection.
 Domain: +
@@ -495,6 +546,9 @@ Domain: + **`-180.0 \<= longitude_of_projection_origin < 180.0`**
 
 | **`north_pole_grid_longitude`** | N
 | Longitude (degrees) of the true north pole in the rotated grid.
+
+| **`indexing_scheme`** | S
+| Identifier of the HEALPix cell indexing scheme, either `nested`, `ring`, `nuniq` or `zuniq`. See <<healpix>> for more detailed definitions.
 
 | **`perspective_point_height`** | N
 | Records the height, __in metres__, of the map projection perspective point above the ellipsoid (or sphere).
