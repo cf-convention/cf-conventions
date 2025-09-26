@@ -1,0 +1,20 @@
+name: Deploy PR Preview
+'on':
+  push:
+    branches:
+      - accessibility-alternative-themes
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+      - name: Build site
+        run: |
+          make html
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: '${{ secrets.GITHUB_TOKEN }}'
+          publish_dir: ./build
+          publish_branch: gh-pages
