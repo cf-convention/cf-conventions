@@ -3,14 +3,30 @@ name: Deploy PR Preview
   push:
     branches:
       - accessibility-alternative-themes
+permissions:
+  contents: read
+  pages: write
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            asciidoc \
+            dblatex \
+            xmlto \
+            make
       - name: Build site
         run: |
+          make clean
           make html
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
