@@ -30,6 +30,9 @@ CONF_DOC_BUILD_DIR := $(BUILD_DIR)
 
 CONF_DOC_INC := conformance.adoc version.adoc
 
+# CSS/JS assets to enable theme changes via a toggle button
+THEMES = themes/light-theme.css themes/dark-theme.css themes/theme-switcher.js
+
 ifdef CF_FINAL
 DATE_FORMAT := +%d&\#160;%B,&\#160;%Y
 FINAL_TAG := -a final
@@ -62,8 +65,10 @@ html: conventions-html conformance-html
 pdf: conventions-pdf conformance-pdf
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
-	asciidoctor --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	asciidoctor --verbose --trace -a data-uri -a docinfo=shared -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
+	mkdir -p $(MAIN_DOC_BUILD_DIR)/themes
+	cp $(THEMES) $(MAIN_DOC_BUILD_DIR)/themes/
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
 	asciidoctor-pdf --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
