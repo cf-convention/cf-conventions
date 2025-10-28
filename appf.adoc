@@ -133,28 +133,24 @@ See <<GHB05>> for the calculation of center coordinates and cell boundary coordi
 
 __Notes:__::
 
-Cells are indexed using either the nested, ring, nuniq or zuniq indexing scheme.
-
+Cells are indexed using either the **`nested`**, **`ring`**, **`nuniq`** or **`zuniq`** indexing scheme.
 +
-For "nested" and "ring" scheme, the grid resolution is controlled by the refinement level parameter **`refinement_level`** <<GHB05>>.
-0 is the coarsest, the total number of cells on the sphere is `12 * 4 ^ refinement_level`.
-For the "nuniq" and "zuniq" schemes, the resolution of a cell is implied by the index, and `refinement_level` must be omitted.
-
+For both the **`nested`** and **`ring`** schemes, the grid resolution is controlled by the refinement level parameter **`refinement_level`** <<GHB05>>.
+The total number of cells on the sphere is `12 * (4 ^ refinement_level)`.
+The lowest allowed refinement level is `0`, giving 12 cells globally.
+The algorithm that assigns cell locations to **`nested`** or **`ring`** indices at a given refinement level is defined in <<GHB05>>. In this algorithm, a cell with index `0`, at any refinment level, always has its southern vertex on the meridian at 45 degrees east.
 +
-An index according to the `nuniq` indexing scheme can be computed from the `refinement_level` and a `nested` index as follows <<RH15>>:
-
+The **`ring`** scheme sorts pixels along iso-latitude rings from north to south; and **`nested`** indexing sorts pixels along the Z-order curve within each of the 12 global cells at refinement level `0`, resulting in spatial proximity for consecutive pixels.
 +
-`index_nuniq = index_nested + 4 ^ (1 + refinement_level)`
-
+The **`nuniq`** and **`zuniq`** indexing schemes allow pixels from multiple refinement levels to be combined: **`nuniq`** effectively concatenates **`nested`** indices from lower to the higher refinement levels, resulting in spatial proximity for consecutive pixels within a refinement level but not across different refinement levels; and **`zuniq`** indexing sorts pixels of any refinement level along the Z-order curve, resulting in spatial proximity for consecutive pixels, regardless of their refinement level.
 +
-The `zuniq` indexing scheme depends on the number of bits used by the integer type.
-An index according to the `zuniq` indexing scheme can be computed from the `refinement_level` and a `nested` index as follows <<K24>>:
-
+An index according to the **`nuniq`** indexing scheme can be computed from a refinement level and a **`nested`** index with the formula `index_nuniq = index_nested + 4 ^ (1 + refinement_level)` <<RH15>>.
 +
-`index_zuniq = (2 * index_nested + 1) * 4 ^ (29 - refinement_level)`
-
+An index according to the **`zuniq`** indexing scheme can be computed from a refinement level and a **`nested`** index with the formula `index_zuniq = (2 * index_nested + 1) * 4 ^ (29 - refinement_level)` <<K24>>.
 +
-The value `29` is the maximum allowed `refinement_level` (which is the highest level for which all indices can be represented by 64-bit integers).
+The  **`refinement_level`** parameter must be omitted for the **`nuniq`** and **`zuniq`** schemes, for which the resolution of a cell is implied by the index alone.
++
+A refinement level, either given by the  **`refinement_level`** parameter or implied by **`nuniq`** and **`zuniq`** indices, must be no greater than `29`, which is the highest refinement level for which all indices of any indexing scheme can be represented by 64-bit integers.
 
 
 [[lambert-azimuthal-equal-area]]
