@@ -187,17 +187,16 @@ The `computed_standard_name` attribute indicates that the values in variable
 [[time-coordinate, Section 4.4, "Time Coordinate"]]
 === Time Coordinate
 
-Variables representing time axes have time coordinates as their elements.
-In CF data, a time coordinate is a number which identifies an instant along the continuous axis of time, expressed as elapsed time relative to a specified reference point.
-Variables containing time coordinates have a **`units`** attribute (see <<time-coordinate-variables>> and <<time-coordinate-units>>, e.g.\ **`units="days since 1990-1-1 0:0:0"`**) which defines both the unit of measure of elapsed time (here **`days`**) and the reference point in time (here **`1990-1-1 0:0:0`**).
+A time coordinate is a number which identifies an instant along the continuous axis of time, expressed as elapsed time relative to a specified reference instant.
+Variables containing time coordinates have a **`units`** attribute (see <<time-coordinate-variables>> and <<time-coordinate-units>>, e.g. **`units="days since 1990-1-1 0:0:0"`**) which defines both the unit of measure of elapsed time (here **`days`**) and the reference instant (here **`1990-1-1 0:0:0`**).
 
 The interpretation of the numeric values as dates and times depends on both the **`units`** attribute and the calendar, specified by the **`calendar`** attribute.
 Given the **`units`** and **`calendar`**, a time coordinate value and its corresponding representation as a date and time are interconvertible.
-CF defines several different calendars (see~<<calendar>>) to meet diverse requirements, both for the real world and for models.
+CF defines several different calendars (see <<calendar>>) to meet diverse requirements, both for the real world and for models.
 
 In reality, the need for explicit calendar definitions arises in part because the natural astronomical periods of year and day, which are based on the Earth's orbit and rotation, are not constants and do not align exactly.
-A year is not an integer multiple of days, the length of a day varies with changes in Earth's rotation, and the timing of seasons is affected by the precession of the equinoxes.
-Calendars introduce an extra day (a "leap day", in leap years) to keep annual cycles aligned with the seasons, and leap seconds are occasionally inserted into Coordinated Universal Time (link:$$https://en.wikipedia.org/wiki/Coordinated_Universal_Time$$[UTC]) to maintain agreement with observed rotation.
+A year is not an integer multiple of days, the length of a day varies with changes in Earth's rotation, and the timing of seasons within the astronomical year is affected by the precession of the equinoxes.
+Calendars introduce an extra day (a "leap day", in leap years) to keep their annual cycles aligned with the astronomical year, and leap seconds are occasionally inserted into Coordinated Universal Time (link:$$https://en.wikipedia.org/wiki/Coordinated_Universal_Time$$[UTC]) to maintain agreement with observed rotation.
 Some CF real-world calendars either explicitly omit leap seconds or tacitly assume they are ignored (see <<calendar>> and <<leap-seconds>>).
 
 In addition to real-world calendars, CF defines several simplified calendars that are widely used in numerical models including, for example, the **`360_day`** calendar (with twelve 30-day months) and the **`366_day`** calendar (with a leap day every year).
@@ -231,14 +230,14 @@ double time(time) ;
 ==== Time Coordinate Units
 
 The **`units`** attribute of a time coordinate variable takes a string value that follows the formatting requirements of the <<UDUNITS>> package (e.g. <<time-axis-ex>>).
-It must comprise a unit of measure that is physically equivalent (see <<units>>) to the SI base unit of time (i.e. the second), followed by the word **`since`** and a reference datetime.
+It must comprise a unit of measure that is physically equivalent (see <<units>>) to the SI base unit of time (i.e. the second), followed by the word **`since`** and a reference datetime, in the format specified below.
 By a "datetime" we mean the time and date together, specified as a set of six numbers (year, month, day, hour, minute, second), which are integers except for the second, which may have a fraction.
 The time coordinate exactly equals the length of the time interval from the instant identified by the reference datetime to the instant identified by the time coordinate, in all cases except when leap seconds occur between the two intervals in the **`standard`** calendar.
 (See <<leap-seconds>> for details.)
 
 The CF standard follows UDUNITS (<<units>>) in the definition of the acceptable
 units of measure for time.
-The most commonly used of these units strings (and their abbreviations) are **`day`** (**`d`**), **`hour`** (**`hr`**, **`h`**), **`minute`** (**`min`**) and **`second`** (**`sec`**, **`s`**).
+The most commonly used of these units strings (and their symbols) are **`day`** (**`d`**), **`hour`** (**`hr`**, **`h`**), **`minute`** (**`min`**) and **`second`** (**`sec`**, **`s`**).
 Plural forms are also acceptable.
 In CF, following UDUNITS, any unit may optionally have one of the decimal prefixes for multiples and submultiples (<<table-supported-units, Table 3.1>>) e.g. **`millisecond`** or **`ms`**; however, we note that <<SI>> does not allow these prefixes for any unit of time other than **`second`**.
 
@@ -246,10 +245,10 @@ UDUNITS defines a **`year`** to be exactly 365.242198781 days (the interval betw
 __It is not a calendar year.__ UDUNITS defines a  **`month`** to be exactly **`year/12`**, which is __not a calendar month__.
 We recommend that **`year`** and **`month`** should not be used, because of the potential for mistakes and confusion.
 
-UDUNITS defines a **`minute`** as 60 **`seconds`**, an **`hour`** as 3600 **`seconds`** and a **`day`** as 86400 **`seconds`**.
-These are not calendar units.
-When a leap second is inserted into UTC, the minute, hour and day affected differ by one second from their usual durations according to clock time, but the units of **`minute`**, **`hour`** and **`day`** do not; they are fixed units of measure.
-To avoid mistakes and confusion, we therefore recommend that these units should not be used in the **`utc`** calendar; instead, we recommend the **`second`** as the unit for time coordinates in that calendar.
+UDUNITS defines a **`minute`** as 60 **`seconds`**, an **`hour`** as 3600 **`seconds`** and a **`day`** as 86400 **`seconds`**, consistent with the <<SI>> definitions of these non-SI units.
+These are fixed units of measure.
+When a leap second is inserted into UTC, the minute, hour and day affected differ by one second from their usual durations according to clock time, but the units of **`minute`**, **`hour`** and **`day`** do not.
+To avoid mistakes and confusion, we therefore recommend that these units should not be used in the **`utc`** calendar.
 See also <<calendar>> and <<leap-seconds>>.
 
 UDUNITS permits a number of alternatives to the word **`since`** in the units of time coordinates.
@@ -257,28 +256,26 @@ All the alternatives have exactly the same meaning in UDUNITS.
 For compatibility with other software, CF strongly recommends that **`since`** should be used.
 
 The reference datetime string (appearing after the identifier **`since`**) is required.
-It must include the date, which may be followed by time or time zone offset or both.
-Its format is __y__-__m__-__d__ [__H__:__M__:__S__] [__Z__], where [...] indicates an optional element, as follows:
+It must include the date, which may be followed by the time, and optionally a time zone offset.
+Its format is __y__-__m__-__d__ [__H__:__M__:__S__ [__T__]], where [...] indicates an optional element, as follows:
 
 * __y__ is year, __m__ month, __d__ day, __H__ hour and __M__ minute, which are all integers of one or more digits, and __y__ may be prefixed with a sign (but note that some CF calendars do not permit negative years; see <<calendar>>),
 
 * __S__ is second, which may be integer or floating point (see <<leap-seconds>>),
 
-* __Z__ is the time zone offset.
-__Z__ is __not__ a time zone name or acronym; it is an interval of time.
+* __T__ is the time zone offset.
+__T__ is __not__ a time zone name or acronym; it is an interval of time.
 
-The default for time zone offset __Z__ is zero, which may also be explicitly indicated in any of the numeric formats for __Z__ defined below, or by the letter **`Z`**, sometimes referred to as "Zulu Time".
-We suggest that a zero offset be stated explicitly to avoid confusion in any situation where omitting it might be misunderstood as indicating local time.
-
-In a time zone with zero offset, time (approximately) equals mean solar time for 0 **`degrees_east`** of longitude.
-(Although this may be exact in a model, in reality the time with zero time zone offset differs by some seconds from mean solar time; see the discussion of UTC and leap seconds in <<calendar>>.)
-If both time and time zone offset are omitted the time is 00:00:00 (the beginning of the day i.e. midnight at 0 **`degrees_east`**).
-Thus, **`units = "days since 1990-1-1"`** means the same as **`units = "days since 1990-1-1 00:00:00"`**.
-
-We recommend that a non-zero time zone offset should not be specified, because it is easy to make mistakes about the sign of the offset and allowance for daylight-saving/summer time.
+The default for time zone offset __T__ is zero, which may also be explicitly indicated in any of the numeric formats for __T__ defined below, or by the letter **`Z`**, sometimes referred to as "Zulu Time".
+We suggest that a zero offset be stated explicitly to avoid confusion in situations where omitting it might be misunderstood as indicating local time.
+We recommend that a non-zero time zone offset should __not__ be specified __in any situation__, because it is easy to make mistakes about the sign of the offset and allowance for daylight-saving/summer time.
 A non-zero offset is __not allowed__ in the **`utc`** and **`tai`** calendars (see <<calendar>>).
 
-Other than **`Z`** for zero offset, the time zone offset __Z__ must be in one of the following four numeric formats, each of which may optionally be prefixed by a positive sign **`+`** or negative sign **`-`**, the default sign being positive:
+In a time zone with zero offset, time (approximately) equals mean solar time for 0 **`degrees_east`** of longitude.
+If both time and time zone offset are omitted the time is 00:00:00 (the beginning of the day i.e. midnight in the time zone with zero offset).
+Thus, **`units = "days since 1990-1-1"`** means the same as **`units = "days since 1990-1-1 00:00:00"`**.
+
+Other than **`Z`** for zero offset, the time zone offset __T__ must be in one of the following four numeric formats, each of which may optionally be prefixed by a positive sign **`+`** or negative sign **`-`**, the default sign being positive:
 
 * __H__, the hour alone, of one or two digits e.g. **`-6`**, **`2`**, **`+11`**, which is sufficient for many time zones.
 
@@ -289,10 +286,10 @@ Other than **`Z`** for zero offset, the time zone offset __Z__ must be in one of
 * three digits, of which the first is the hour (0--9) e.g. **`530`**.
 
 Spaces are not allowed in the numeric formats.
-If __Z__ is **`Z`** or begins with **`+`** or **`-`**, the space before __Z__ may be omitted.
+If __T__ is **`Z`** or begins with **`+`** or **`-`**, the space before __T__ may be omitted.
 
-For example, **`seconds since 1992-10-8 15:15:42.5 -6:00`** indicates seconds since October 8th, 1992 at 3 hours, 15 minutes and 42.5 seconds in the afternoon, in a time zone where the datetime is six hours behind the default.
-Subtracting the time zone offset from a given datetime converts it to the equivalent datetime with zero time zone offset e.g. **`1989-12-31 18:00:00 -6`** identifies the same instant as **`1990-1-1 0:0:0`**.
+For example, **`1992-10-8 15:15:42.5`** indicates 42.5 seconds after 3.15 pm on 8th October 1992, in the time zone with zero offset.
+Subtracting the time zone offset from a given datetime converts it to the equivalent datetime with zero time zone offset e.g. **`1992-10-8 09:15:42.5 -6`** identifies the same instant as **`1992-10-8 15:15:42.5`**.
 
 
 [[calendar, Section 4.4.3, "Calendar"]]
@@ -301,71 +298,75 @@ Subtracting the time zone offset from a given datetime converts it to the equiva
 The calendar defines the set of valid datetimes and their order.
 Note that the CF meaning of "calendar" refers to datetimes, not to dates alone.
 Datetimes which are not permitted in a given calendar are prohibited both in the time coordinate values and in the reference datetime string in the **`units`**.
-It is recommended that the calendar be specified by the **`calendar`** attribute of the time coordinate variable (rather than relying on the default).
+It is recommended that the calendar be explicitly specified by the **`calendar`** attribute of the time coordinate variable (rather than relying on the default).
 The values currently defined for **`calendar`** are listed below.
 
-Because the calendars have different sets of valid dates, and different treatments of leap seconds (see below in this section, and <<leap-seconds>>), a given time coordinate value with given **`units`** can represent different datetimes in different calendars; conversely, a given datetime is represented by different time coordinate values in different calendars.
+Because the calendars have different sets of valid datetimes, a given time coordinate value with given reference datetime in its **`units`** can represent different datetimes in different calendars.
 Moreover, in different calendars a given datetime can identify a different instant in the continuous physical dimension of time.
+
+In the **`julian`** and the **`standard`** calendar, dates in years before year 0 (i.e. before 0-1-1 0:0:0) are not allowed, and the year in the reference datetime of the units must not be negative.
+In these calendars, year zero has a special use to indicate a climatology (see <<climatological-statistics>>), but this use of year zero is deprecated.
+In other calendars, year 0 is the year before year 1, and negative years are allowed.
 
 The lengths of the months in the Gregorian calendar are used in all calendars except **`360_day`**, **`none`** (see <<none-calendar>>) and explicitly defined calendars (see <<explicit-calendar>>).
 The calendars differ in their treatment of leap years (when there are 29 days in February instead of 28).
 
 Positive or negative leap seconds are inserted into UTC in order to keep it close to mean solar time at 0 **`degrees_east`** i.e. the time zone with the default (zero) time zone offset in UDUNITS and CF (see <<time-coordinate-units>>).
-
 When a single positive leap second is introduced at the end of a minute, that minute contains 61 seconds.
 The net number of leap seconds added to UTC between 1958-1-1 and 2025-1-1 is 37.
-Leap seconds should be considered when processing datetimes and time-coordinates in the **`standard`** and **`utc`** calendars, which treat them differently (see <<leap-seconds>>).
+Leap seconds should be considered when processing datetimes and time-coordinates in the **`standard`** and **`utc`** calendars, which treat them differently.
 In the other CF calendars, leap seconds never need to be considered.
 
-In the **`julian`** and the default **`standard`** calendar, dates in years before year 0 (i.e. before 0-1-1 0:0:0) are not allowed, and the year in the reference datetime of the units must not be negative.
-In these calendars, year zero has a special use to indicate a climatology (see <<climatological-statistics>>), but this use of year zero is deprecated.
-In other calendars, year 0 is the year before year 1, and negative years are allowed.
+For observational or model-generated data that follows the Gregorian calendar and UTC (after 1972) including leap seconds, if precision to the second is important, the **`utc`** calendar is recommended in preference to the **`standard`** calendar.
+For model-generated data following the Gregorian calendar without leap seconds, the **`proleptic_gregorian`** calendar is recommended in preference to the **`standard`** calendar.
+See also <<leap-seconds>>.
 
-The possible values for the **`calendar`** attribute are as follows:
+The possible values for the **`calendar`** attribute and the definitions of the calendars are as follows:
 
-**`standard`**:: The historical Gregorian--Julian calendar as defined by UDUNITS.
-This is the default.
+**`standard`**:: The Gregorian--Julian calendar as defined by UDUNITS.
+This is the default calendar when there is no **`calendar`** attribute, except when the attribute `month_lengths` is present (see <<explicit_calendar>>).
 A deprecated alternative name for this calendar is **`gregorian`**.
 The Gregorian and Julian calendars have the same lengths of their months; they differ only in respect of the rules that decide which years are leap years.
 In the **`standard`** calendar, datetimes after and including 1582-10-15 0:0:0 are in the Gregorian calendar, in which a year is a leap year if either (i) it is divisible by 4 but not by 100 or (ii) it is divisible by 400.
 Datetimes before (and excluding) 1582-10-5 0:0:0 are in the Julian calendar, in which any year that is divisible by 4 is a leap year.
 Year 1 AD or CE in the **`standard`** calendar is also year 1 of the **`julian`** calendar.
 Negative years are invalid in time coordinates and reference datetimes in the **`standard`** calendar.
-In the **`standard`** calendar, 1582-10-15 0:0:0 is exactly 1 day later than 1582-10-4 0:0:0.
-Therefore datetimes in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 are invalid, and must not be used as reference in **`units`**.
++
+In the **`standard`** calendar, datetimes in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 are invalid.
+Datetimes in this range must not be used as reference in **`units`**, and the interval between the datetimes 1582-10-15 0:0:0 and 1582-10-4 0:0:0 is exactly 1 day.
 It is recommended that a reference datetime before the discontinuity should not be used for datetimes after the discontinuity, and vice-versa.
 +
 __The **`standard`** calendar is used both for (mostly observational) data with real-world datetimes, including leap seconds (after 1972), and for data not including leap seconds__, generated by models according to the Gregorian calendar.
 Therefore, __when using data written with the **`standard`** calendar, you should regard datetimes and time coordinates as uncertain by a number of seconds (but less than a minute),__ because leap seconds may have been counted when you expected them to have been ignored, or ignored when you expected them to have been counted.
 For existing datasets, this uncertainty can be eliminated only if you have separate information about how leap seconds were treated.
-For producing new datasets, where precision to the second is important, it is recommended to use the **`utc`** calendar for data that follows the real-world calendar according to UTC including leap seconds, and the **`proleptic_gregorian`** calendar for model-generated data that follows the Gregorian calendar without leap seconds.
-See also <<leap-seconds>>.
+For producing new datasets, where precision to the second is important, it is recommended to use the **`utc`** calendar for data (whether observed or simulated) that follows the real-world calendar according to UTC including leap seconds, and the **`proleptic_gregorian`** calendar for model-generated data that follows the Gregorian calendar without leap seconds.
 
 **`proleptic_gregorian`**:: A calendar with the Gregorian rules for leap years extended to dates before 1582-10-15.
 All dates consistent with these rules are allowed, both before and after 1582-10-15 0:0:0.
-For model-generated data following the Gregorian calendar without leap seconds, the **`proleptic_gregorian`** calendar is recommended, in preference to the **`standard`** (or default) calendar.
-See also <<leap-seconds>>.
 
 **`julian`**:: Julian calendar, in which a year is a leap year if it is divisible by 4, even if it is also divisible by 100.
 Year 1 AD or CE in the **`julian`** calendar is also year 1 of the **`standard`** calendar.
 Negative years are invalid in time coordinates and reference datetimes in the **`julian`** calendar, and leap seconds are not allowed.
 
 **`utc`**:: A Gregorian calendar __with__ leap seconds as prescribed by UTC.
-Datetimes before 1972-01-01 0:0:0 are not allowed in this calendar.
-Datetimes in the future are not allowed in this calendar, because it is unknown when future leap seconds will occur.
-In this calendar, the second is the only recommended unit of measure in the **`units`** of the time coordinate variable (denoted by any string allowed in UDUNITS, optionally with one of the prefixes of <<table-supported-units, Table 3.1>>).
-When a datetime is converted to a time coordinate value or vice-versa in this calendar, any leap seconds (positive or negative) must be counted that occurred in the interval between the datetime and the reference datetime in the **`units`**.
+The current definition of UTC came into force at 1972-01-01 00:00.
+This instant has the datetime 1972-01-01 00:00:10 (10 seconds greater) in the **`tai`** calendar.
+Earlier datetimes than 1972-01-01 00:00 are not allowed in the **`utc`** calendar.
 For any given instant, the **`utc`** datetime is behind the **`tai`** datetime, where "behind" means the same as it does when describing a timezone to the west as being behind one to the east.
 Moreover, a given datetime in the **`utc`** calendar represents an instant that is earlier than the same datetime in the **`tai`** calendar.
-The difference between the two datetimes for a given instant of time is the net number of leap seconds introduced since 1958-01-01.
-For observational or model-generated data that follows the Gregorian calendar and UTC (after 1972) including leap seconds, where precision to the second is important, the **`utc`** calendar is recommended, in preference to the **`standard`** (or default) calendar.
-See also <<leap-seconds>>.
+The difference between the two datetimes (**`tai`** minus **`utc`**) for a given instant of time is the net number of leap seconds introduced since 1958-01-01.
++
+To avoid mistakes and confusion, the second is the only recommended unit of measure in this **`calendar`** for the **`units`** of the time coordinate variable (denoted by any string allowed in UDUNITS, optionally with one of the prefixes of <<table-supported-units, Table 3.1>>).
+When a datetime is converted to a time coordinate value or vice-versa in this calendar, any leap seconds (positive or negative) must be counted that occurred in the interval between the datetime and the reference datetime in the **`units`**.
+Datetimes in the future are not allowed in this calendar, because it is unknown when future leap seconds will occur.
+A non-zero time zone offset is not allowed in this calendar.
 
-**`tai`**:: A Gregorian calendar __without__ leap seconds that is based on International Atomic Time (TAI).
-Datetimes before 1958-01-01 0:0:0 are not allowed in this calendar.
+**`tai`**:: A Gregorian calendar __without__ leap seconds that is based on International Atomic Time (TAI), which began on 1958-01-01 0:0:0.
+Earlier datetimes than this are not allowed in the **`tai`** calendar.
 For any given instant, the **`tai`** datetime is ahead of the **`utc`** datetime, where "ahead" means the same as it does when describing a timezone to the east as being ahead of one to the west.
 Moreover, a given datetime in the **`tai`** calendar represents an instant that is later than the same datetime in the **`utc`** calendar.
-The difference between the two datetimes for a given instant of time is the net number of leap seconds introduced since 1958-01-01.
+The difference between the two datetimes (**`tai`** minus **`utc`**) for a given instant of time is the net number of leap seconds introduced since 1958-01-01.
+A non-zero time zone offset is not allowed in this calendar.
 
 **`noleap`** or **`365_day`**:: A calendar with no leap years, i.e., all years are 365 days long, and there are no leap seconds.
 
