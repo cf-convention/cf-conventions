@@ -218,10 +218,10 @@ Optionally, a time coordinate variable may be indicated additionally by providin
 
 ----
 double time(time) ;
-  time:axis = "T"; // optional
-  time:standard_name = "time" ; // optional
-  time:calendar = "standard" ; // recommended
-  time:units = "days since 1990-1-1 0:0:0" ; // mandatory
+  time:axis = "T"; // axis attribute is optional
+  time:standard_name = "time" ; // standard_name attribute is optional
+  time:calendar = "standard" ; // calendar attribute is recommended
+  time:units = "days since 1990-1-1 0:0:0" ; // units attribute is mandatory
 ----
 
 ====
@@ -356,8 +356,8 @@ This instant has the datetime 1972-01-01 00:00:10 in the **`tai`** calendar.
 The difference of 10 seconds between these datetimes is an adjustment for variations in Earth rotation between 1958-01-01 00:00:00, when TAI began, and 1972-01-01 00:00.
 Earlier datetimes than 1972-01-01 00:00 are not allowed in the **`utc`** calendar.
 For any given instant, the **`utc`** datetime is behind the **`tai`** datetime, where "behind" means the same as it does when describing a timezone to the west as being behind one to the east.
-Moreover, a given datetime in the **`utc`** calendar represents an instant that is earlier than the same datetime in the **`tai`** calendar.
 The difference between the two datetimes (**`tai`** minus **`utc`**) for a given instant of time is 10 seconds plus the net number of leap seconds introduced since 1972-01-01.
+Moreover, a given datetime in the **`utc`** calendar represents an instant that is later than the same datetime in the **`tai`** calendar.
 +
 To avoid mistakes and confusion, the second is the only recommended unit of measure in this **`calendar`** for the **`units`** of the time coordinate variable (denoted by any string allowed in UDUNITS, optionally with one of the prefixes of <<table-supported-units, Table 3.1>>).
 When a datetime is converted to a time coordinate value or vice-versa in this calendar, any leap seconds (positive or negative) must be counted that occurred in the interval between the datetime and the reference datetime in the **`units`**.
@@ -367,8 +367,8 @@ A non-zero time zone offset is not allowed in this calendar.
 **`tai`**:: A Gregorian calendar __without__ leap seconds that is based on International Atomic Time (TAI), which began on 1958-01-01 0:0:0.
 Earlier datetimes than this are not allowed in the **`tai`** calendar.
 For any given instant, the **`tai`** datetime is ahead of the **`utc`** datetime, where "ahead" means the same as it does when describing a timezone to the east as being ahead of one to the west.
-Moreover, a given datetime in the **`tai`** calendar represents an instant that is later than the same datetime in the **`utc`** calendar.
 The difference between the two datetimes (**`tai`** minus **`utc`**) for a given instant of time is 10 seconds plus the net number of leap seconds introduced since 1972-01-01.
+Moreover, a given datetime in the **`tai`** calendar represents an instant that is earlier than the same datetime in the **`utc`** calendar.
 A non-zero time zone offset is not allowed in this calendar.
 
 **`noleap`** or **`365_day`**:: A model calendar with no leap years, i.e., all years are 365 days long.
@@ -389,8 +389,8 @@ See <<explicit-calendar>>.
 [options="header",caption="Table 4.1. "]
 |===============
 | **`calendar`** | Days in year | Months | Leap days | Leap seconds | First date | Last date | Year 0
-| **`standard`** | 365/366 | Gregorian | Gregorian | unknown | 0001-01-01 | +&#x221E; | climatology
-| **`julian`** | 365/366 | Gregorian | Julian | no | 0001-01-01 | +&#x221E; | climatology
+| **`standard`** | 365/366 | Gregorian | Gregorian | unknown | 0001-01-01 | +&#x221E; | no (climatology)
+| **`julian`** | 365/366 | Gregorian | Julian | no | 0001-01-01 | +&#x221E; | no (climatology)
 | **`proleptic_gregorian`** | 365/366 | Gregorian | Gregorian | no | -&#x221E; | +&#x221E; | yes
 | **`no_leap`**/**`365_day`** | 365 | Gregorian | never | no | -&#x221E; | +&#x221E; | yes
 | **`all_leap`**/**`366_day`** | 366 | Gregorian | every year | no | -&#x221E; | +&#x221E; | yes
@@ -398,7 +398,7 @@ See <<explicit-calendar>>.
 | **`utc`** | 365/366 | Gregorian | Gregorian | yes | 1972-01-01 | present day | no
 | **`tai`** | 365/366 | Gregorian | Gregorian | no | 1958-01-01 | +&#x221E; | no
 |===============
-In this table, "/" means "or", "-&#x221E;" means "any date (provided it is earlier than the **Last date**, if any)" and "+&#x221E;" means "any date (provided it is later than the **First date**, if any)". In the **Leap days** column, "Gregorian" and "Julian" indicate the rules for determing which years are leap years, in which a leap day is added to February. In the **Year 0** column, "yes" and "no" respectively indicate that there are, or are not, valid dates in year 0 in this calendar, while "climatology" indicates that there are no valid dates in year 0, but it may be used to denote a climatology (however, this use of year 0 is deprecated; see <<climatological-statistics>>).
+In this table, "/" means "or", "-&#x221E;" means "any date (provided it is earlier than the **Last date**, if any)" and "+&#x221E;" means "any date (provided it is later than the **First date**, if any)". In the **Leap days** column, "Gregorian" and "Julian" indicate the rules for determing which years are leap years, in which a leap day is added to February. In the **Year 0** column, "yes" and "no" respectively indicate that there are, or are not, valid dates in year 0 in this calendar, while "no (climatology)" indicates that there are no valid dates in year 0, but it may be used to denote a climatology (however, this use of year 0 is deprecated; see <<climatological-statistics>>).
 
 
 [[leap-seconds, Section 4.4.4, "Leap Seconds"]]
