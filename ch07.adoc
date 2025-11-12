@@ -730,12 +730,12 @@ data:  // time coordinates translated to datetime format
 === Anomaly data
 
 An "anomaly" is the difference between a physical quantity and its statistical norm.
-For example, a commonly-used anomaly is the temperature at a specific time and place minus the long-term global average temperature.
+For example, a commonly-used anomaly is the current temperature at a specific location minus the long-term average temperature there.
 
 CF offers two conventions for describing anomaly data.
 In <<temporal-anomalies>>, we describe a simple convention that depends on special standard names.
 It can only be used for simple temporal anomalies, and is insufficient for some use-cases.
-In the remainder of this section and the following two (<<anomalies-norm-data>> and <<anomalies-norm-metadata>>), we describe two more general conventions for anomalies that can handle more complex use-cases.
+In the remainder of this section and the following two (<<anomalies-norm-data>> and <<anomalies-norm-metadata>>), we describe more general conventions for anomalies that can handle more complex use-cases.
 
 The generalized definition of an anomaly value __A__ of some physical quantity __q__ is the difference __P__ &minus; __N__ between a particular value __P__ of __q__ and a normal value or norm __N__ of __q__.
 __N__ is some statistic calculated from the values of __q__ that lie within specified ranges of one or more of its coordinates.
@@ -754,9 +754,7 @@ __N__ is most often either a time-mean over a continuous period of multiple year
 The time coordinate of the anomaly may or may not lie within the range of times from which __N__ is calculated.
 __N__ has all the same dimensions and coordinate variables as __A__ except for time.
 
-In this section and the following two (<<anomalies-norm-data>> and <<anomalies-norm-metadata>>) we describe a general convention for anomalies with respect to a statistical norm calculated from any single dimension or combination of dimensions.
-In this convention the norm statistic does not have to be a mean.
-
+In general, a statistical norm can be calculated from any single dimension or combination of dimensions, and the norm statistic does not have to be a mean.
 For example, anomalies might be calculated (as a function of longitude) with respect to the zonal mean, or (as a function of horizontal location) with respect to the minimum value in the area.
 In these examples, the norm is the zonal mean or the area minimum, respectively.
 When temporal anomalies are described following the convention of this section, more information can be recorded about the norm than when following the alternative, less general, convention of <<temporal-anomalies>>.
@@ -764,17 +762,16 @@ When temporal anomalies are described following the convention of this section, 
 In the convention of this section, a data variable is described as an anomaly by including in its **`cell_methods`** attribute a string of the form "__name__**`:`** [__name__**`:`** ...] **`anomaly wrt`** __norm__".
 This **`cell_methods`** entry tells us:
 
-* that the data variable contains anomalies (__A__ in the notation of the start of this section) calculated from data (__P__) with the same dimensions, as the difference from the normal statistic named __norm__ (__N__).
+* that the data variable contains anomalies (__A__ in the notation of the start of this section) calculated from data (__P__) with the same dimensions, as the difference from the normal statistic (__N__) named __norm__.
 
 * at which stage the anomaly __A__ = __P__ &minus; __N__ was calculated.
 This is known because the entries in **`cell_methods`** appear in order of application.
 
 * that __N__ was calculated from the variation of __P__ over dimensions identified by the __name__(s).
 
-Each __name__ must be the name of an "axis" of the anomaly data variable __A__.
-We call these the "anomaly axes".
+Each __name__ must identify an "axis" of the anomaly data variable __A__.
 By "axis" we mean a dimension and its corresponding coordinate variable, or a scalar coordinate variable.
-In either case, we refer to the variable as an ``anomaly coordinate variable''.
+In either case, we refer to the axis as an "anomaly axis" and to the variable as an "anomaly coordinate variable".
 The anomaly coordinate variable of each axis must have a **`standard_name`** attribute.
 Usually there is only one anomaly axis, and usually it is a spatiotemporal axis.
 
@@ -783,13 +780,6 @@ For an anomaly with respect to the area minimum, we need two __name__s e.g. "**`
 As described in <<cell-methods>>, the combination of horizontal axes can alternatively be represented by the word **`area`**, thus "**`area: anomaly wrt`** __norm__".
 
 For an anomaly with respect to a statistic computed over time or climatological time, __name__ identifies the time axis of the anomaly data variable.
-
-possible deletion ****
-For each anomaly axis of __A__ (although usually there is only one), __N__ has an axis, called a "norm axis", with a coordinate variable (and dimension of the same name) or scalar coordinate variable.
-This variable is called the "norm coordinate variable", and it must have the same **`standard_name`** as the anomaly coordinate variable.
-The norm coordinate variable indicates the range(s) of coordinates over which the statistic __N__ was calculated from the variation of __P__.
-For instance, if __N__ contains zonal means, it has a norm coordinate variable for longitude that indicates the range of longitudes over which the zonal mean was calculated.
-possible deletion ****
 
 There are two alternatives for __norm__.
 In both cases, __norm__ is an ancillary variable of the anomaly data variable (<<ancillary-data>>).
@@ -817,12 +807,12 @@ The anomaly data variable must name the norm data variable in its **`ancillary_v
 
 The __norm__ data variable __N__ must have all the same axes as the anomaly data variable __A__, __except__ for the anomaly axes.
 For each anomaly axis (although usually there is only one), the norm data variable has an axis, called a "norm axis", with a coordinate variable (and dimension of the same name) or a scalar coordinate variable (named in its **`coordinates`** attribute).
-In either case, we refer to it as a ``norm coordinate variable''.
-The normal coordinate variable must have the same **`standard_name`** as the anomaly coordinate variable.
+In either case, we refer to it as a "norm coordinate variable".
+The norm coordinate variable must have the same **`standard_name`** as the anomaly coordinate variable.
 It must also have boundary variables to indicate the coordinate range over which __N__ was calculated from __P__.
 
 A norm coordinate variable cannot have a dimension greater than 1.
-Any norm axis dimensions must be included among the dimensions of the anomaly data variable as well as the norm data variable; likewise, any scalar norm coordinate variables must be named in the **`coordinates`** attribute of the anomaly data variable as well as the norm data variable.
+Any norm axis dimensions must be included among the dimensions of the anomaly data variable as well being dimensions of the norm data variable; likewise, any scalar norm coordinate variables must be named in the **`coordinates`** attribute of the anomaly data variable as well as the norm data variable.
 
 The __norm__ data variable must have a **`cell_methods`** attribute with an entry for the norm coordinate variable (or the combination of them if more than one) to indicate how __N__ was computed from the variation of __P__.
 For instance, the __norm__ data variable for anomalies with respect to a time-mean must have a norm coordinate variable for time, and a **`cell_methods`** attribute containing an entry naming this variable.
