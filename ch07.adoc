@@ -941,12 +941,7 @@ Scalar norm coordinate variables must be named in the **`coordinates`** attribut
 Size-one dimensions of the norm metadata variable must also be dimensions of the anomaly data variable.
 The norm metadata variable must have no coordinate variables other than the norm coordinate variables.
 
-Except in the case where __N__ depends on multivalued climatological time, for each of the anomaly coordinate variables (usually there is only one), the norm metadata variable must have a scalar or a size-one norm coordinate variable with the same **`standard_name`** as the anomaly coordinate variable.
-Any scalar norm coordinate variables must be named in the **`coordinates`** attribute of the both the norm metadata variable and the anomaly data variable.
-Any size-one dimensions of the norm metadata variable must also be dimensions of the anomaly data variable.
-The norm metadata variable must have no coordinate or scalar coordinate variables other than the norm coordinate variables.
-
-In the case where __N__ has a multivalued climatological time axis (such as those illustrated in Examples 7.9, 7.10, and 7.11), the norm metadata variable has, as its sole dimension, the corresponding climatological time dimension.
+In the case where __N__ has a multivalued climatological time axis (such as those illustrated in Examples 7.9, 7.10, and 7.11), the norm metadata variable has, as its sole dimension, the anomaly time dimension of __A__.
 In this case, the norm metadata variable has more than one element; in all others, it has only a single element.
 In all cases, norm coordinate variables must have boundary variables that indicate the coordinate ranges over which __N__ was calculated from __P__.
 
@@ -1086,13 +1081,13 @@ The data variable **`topography`** contains values of the surface altitude relat
 If the norm has a multivalued climatological time axis, further information must be provided to describe the correspondence between elements of __A__ and __N__.
 For example, in the case of an anomaly relative to a monthly climatology, all of the January anomaly values will be relative to the average value for January, all the February anomalies will be relative to the average value for February, and so on.
 
-The mapping between the time axis of the anomaly variable and the climatological time axis of the norm is recorded by an auxiliary coordinate variable named by the **`coordinates`** attribute of the norm metadata variable.
+The mapping between the anomaly time axis of the anomaly variable and the climatological time axis of the norm is recorded by an auxiliary coordinate variable named by the **`coordinates`** attribute of the norm metadata variable.
 This auxiliary coordinate variable is one-dimensional and has the same time dimension as the anomaly data variable.
 The value of element __i__ of the auxiliary coordinate variable is the index (numbering from 0) along the climatological time dimension of the norm corresponding to element __i__ of the anomaly time dimension.
 The norm metadata variable also has the same time dimension as the anomaly data variable (rather than being a scalar), but as usual, its values are arbitrary and meaningless.
 
 The climatological time axis of __N__ (i.e. its dimension and coordinate variable) must be included in the file, although __N__ itself need not be present.
-The auxiliary coordinate variable has a **`compress`** attribute naming the climatological time axis, in order to make the link between them.
+The auxiliary coordinate variable has a **`compress`** attribute naming the climatological time dimension, in order to make the link between them.
 This method of mapping between axes is equivalent to <<compression-by-gathering>>.
 Using this method means that the norm metadata variable can refer to a subset of elements of the climatological time axis if only some of them are relevant, and it can refer repeatedly to elements of climatological time axis if there is more than one anomaly time referring to a given climatological time.
 
