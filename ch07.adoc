@@ -759,7 +759,7 @@ For example, anomalies might be calculated (as a function of longitude) with res
 In these examples, the norm is the zonal mean or the area minimum, respectively.
 When temporal anomalies are described following the convention of this section, more information can be recorded about the norm than when following the alternative, less general, convention of <<temporal-anomalies>>.
 
-In the convention of this section, a data variable is described as an anomaly by including in its **`cell_methods`** attribute a string of the form "__name__**`:`** [__name__**`:`** ...] **`anomaly wrt`** __norm__".
+In the convention of this section, a data variable is described as an anomaly by including in its **`cell_methods`** attribute a string of the form "__name__**`:`** [__name__**`:`** ...] **`anomaly_wrt`** __norm__".
 This **`cell_methods`** entry tells us:
 
 * that the data variable contains anomalies (__A__ in the notation of the start of this section) calculated from data (__P__) with the same dimensions, as the difference from the normal statistic (__N__) named __norm__.
@@ -775,9 +775,9 @@ In either case, we refer to the axis as an "anomaly axis" and to the variable as
 The anomaly coordinate variable of each axis must have a **`standard_name`** attribute.
 Usually there is only one anomaly axis, and usually it is a spatiotemporal axis.
 
-For instance, for a data variable containing anomalies with respect to the zonal mean, __name__ identifies longitude as the anomaly axis e.g. "**`longitude: anomaly wrt`** __norm__".
-For an anomaly with respect to the area minimum, we need two __name__s e.g. "**`lat: lon: anomaly wrt`** __norm__".
-As described in <<cell-methods>>, the combination of horizontal axes can alternatively be represented by the word **`area`**, thus "**`area: anomaly wrt`** __norm__".
+For instance, for a data variable containing anomalies with respect to the zonal mean, __name__ identifies longitude as the anomaly axis e.g. "**`longitude: anomaly_wrt`** __norm__".
+For an anomaly with respect to the area minimum, we need two __name__s e.g. "**`lat: lon: anomaly_wrt`** __norm__".
+As described in <<cell-methods>>, the combination of horizontal axes can alternatively be represented by the word **`area`**, thus "**`area: anomaly_wrt`** __norm__".
 
 For an anomaly with respect to a statistic computed over time or climatological time, __name__ identifies the time axis of the anomaly data variable.
 
@@ -833,31 +833,31 @@ If the climatological time axis is multivalued, a norm metadata variable is requ
 [caption="Example 7.15. "]
 .Distinguishing temporal anomalies with different kinds of norm
 ====
-The anomaly data variable **`delta_tas(time,latitude,longitude)`** contains daily maxima (along the **`time`** dimension) for 16th-19th July 2023 of the anomaly in **`air_temperature`** with respect to the climatological mean of 1990-2019.
-**`delta_tas`** is the difference between the daily maxima contained in data variable **`tas`**, and the time-mean  **`climatological_tas`** of the entire 30-year period 1990-2019.
-Note that **`tas`** would not normally be included in the dataset; it is shown here for comparison with **`delta_tas`** and **`climatological_tas`**:
+The anomaly data variable (__A__, **`delta_tas`**) contains daily maxima (along its **`time`** dimension) for 16th-19th July 2023 of the anomaly in **`air_temperature`** with respect to the climatological mean (__N__, **`climatological_tas`**) of the 30-year period 1990-2019.
+In this example, we include the variable **`tas`** (__P__), from which __A__ was calculated, as __P__ &minus; __N__.
+The variable **`tas`** has no metadata that formally identifies it as __P__, and __P__ would not usually be included in the dataset; it is shown here for comparison of its metadata with **`delta_tas`** and **`climatological_tas`**:
 ----
 dimensions:
   time=4;
 variables:
-  float delta_tas(time,latitude,longitude);
+  float delta_tas(time,latitude,longitude); // anomaly data variable A
     delta_tas:standard_name="air_temperature";
     delta_tas:units="degC";
     delta_tas:units_metadata="temperature: difference";
-    delta_tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
     delta_tas:coordinates="climatological_time";
     delta_tas:ancillary_variables="climatological_tas";
-  float tas(time,latitude,longitude);
-    tas:standard_name="air_temperature";
-    tas:units_metadata="temperature: on_scale";
-    tas:units="degC";
-    tas:cell_methods="time: maximum";
-  float climatological_tas(latitude,longitude);
+  float climatological_tas(latitude,longitude); // norm data variable N
     climatological_tas:standard_name="air_temperature";
     climatological_tas:units="degC";
     climatological_tas:units_metadata="temperature: on_scale";
     climatological_tas:coordinates="climatological_time";
     climatological_tas:cell_methods="climatological_time: mean";
+  float tas(time,latitude,longitude); // P for comparison, not usually included in dataset
+    tas:standard_name="air_temperature";
+    tas:units_metadata="temperature: on_scale";
+    tas:units="degC";
+    tas:cell_methods="time: maximum";
   double time(time);
     time:standard_name="time";
     time:units="days since 2023-07-16";
@@ -889,13 +889,8 @@ variables:
     delta_tas:standard_name="air_temperature";
     delta_tas:units="degC";
     delta_tas:units_metadata="temperature: difference";
-    delta_tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
     delta_tas:ancillary_variables="climatological_tas";
-  float tas(time,latitude,longitude);
-    tas:standard_name="air_temperature";
-    tas:units="degC";
-    tas:units_metadata="temperature: on_scale";
-    tas:cell_methods="time: maximum";
   float climatological_tas(climatological_time,latitude,longitude);
     climatological_tas:standard_name="air_temperature";
     climatological_tas:units="degC";
@@ -966,7 +961,7 @@ variables:
     delta_tas:standard_name="air_temperature";
     delta_tas:units="degC";
     delta_tas:units_metadata="temperature: difference";
-    delta_tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
     delta_tas:coordinates="climatological_time";
     delta_tas:ancillary_variables="climatological_tas";
   float climatological_tas;
@@ -991,7 +986,7 @@ If the daily anomalies are calculated with respect to the 30-year July climatolo
     delta_tas:standard_name="air_temperature";
     delta_tas:units="degC";
     delta_tas:units_metadata="temperature: difference";
-    delta_tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
     delta_tas:coordinates="climatological_time";
     delta_tas:ancillary_variables="climatological_tas";
   float climatological_tas(climatological_time);
@@ -1028,7 +1023,7 @@ variables:
   float rtoa(time,latitude,longitude);
     rtoa:standard_name="toa_net_downward_radiative_flux";
     rtoa:units="W m-2";
-    rtoa:cell_methods="time: mean latitude: mean longitude: anomaly wrt zm";
+    rtoa:cell_methods="time: mean latitude: mean longitude: anomaly_wrt zm";
     rtoa:coordinates="zmlongitude";
     rtoa:ancillary_variables="zm";
   float longitude(longitude);
@@ -1058,7 +1053,7 @@ The data variable **`topography`** contains values of the surface altitude relat
   float topography(y,x);
     topography:standard_name="surface_altitude";
     topography:units="m";
-    topography:cell_methods="area: anomaly wrt areamin"; // or "x: y: anomaly wrt areamin"
+    topography:cell_methods="area: anomaly_wrt areamin"; // or "x: y: anomaly_wrt areamin"
     topography:coordinates="xrange yrange";
     topography:ancillary_variables="areamin";
     topography:grid_mapping="national_grid";
@@ -1120,7 +1115,7 @@ variables:
     delta_tas:standard_name="air_temperature";
     delta_tas:units="degC";
     delta_tas:units_metadata="temperature: difference";
-    delta_tas:cell_methods="time: maximum time: anomaly wrt climatological_tas";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
     delta_tas:ancillary_variables="climatological_tas_metadata";
   float tas(time,latitude,longitude);
     tas:standard_name="air_temperature";
