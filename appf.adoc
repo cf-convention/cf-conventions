@@ -138,7 +138,11 @@ Cells are indexed using the scheme identified by the **`indexing_scheme`** param
 For both the **`nested`** and **`ring`** schemes, the grid resolution is controlled by the refinement level parameter **`refinement_level`** <<GHB05>>.
 The total number of cells on the surface of the sphere (or reference ellipsoid) is `12 * (4 ^ refinement_level)`.
 The lowest allowed refinement level is `0`, giving 12 cells globally.
-The algorithm that assigns cell locations to **`nested`** or **`ring`** indices at a given refinement level is defined in <<GHB05>>. In this algorithm, a cell with index `0`, at any refinment level, always has its southern vertex on the meridian at 45 degrees east.
+The algorithm that assigns cell locations on a sphere to **`nested`** or **`ring`** indices at a given refinement level is defined in <<GHB05>>.
+In this algorithm, a cell with index `0`, at any refinement level, always has its southernmost vertex on the meridian at 45 degrees east.
+If the **`healpix`** grid mapping is used on an ellipsoid, the latitudes returned by the <<GHB05>> algorithm must be interpreted as authalic latitude, instead of geodetic latitude (for a sphere, the two latitudes are the same).
+This is necessary to retain the equal area property.
+For instance, on the WGS84 ellipsoid this results in the center of the HEALPix cell at refinement level `0` with index `0` being at geodetic latitude 41.938 degrees north, instead of at 41.810 degrees north in the case of a sphere, whilst the longitude is at 45 degrees east in both cases.
 +
 The **`ring`** scheme sorts pixels along iso-latitude rings from north to south; and **`nested`** indexing sorts pixels along the Z-order curve within each of the 12 global cells at refinement level `0`, resulting in spatial proximity for consecutive pixels.
 +
