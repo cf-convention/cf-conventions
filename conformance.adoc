@@ -238,16 +238,12 @@ The values of **`var`** must be variables that exist in the file.
 
 [[section-13]]
 [[time-coordinate]]
-=== 4.4.1 Time Coordinate Units
+=== 4.4.2 Time Coordinate Units
 
 *Requirements:*
 
 * The time **`units`** of a time coordinate variable must contain a reference datetime.
-* The value for seconds in the reference datetime must not equal or exceed 60, except for valid leap seconds if the **`calendar`** is **`utc`**.
 * A non-zero time zone offset must not appear in the reference datetime in the **`utc`** and **`tai`** calendars.
-* Datetimes before 1972-01-01 0:0:0 and after the current instant (i.e. any time in the future when the data is written) are invalid in the **`utc`** calendar, datetimes before 1958-01-01 0:0:0 are invalid in the **`tai`** calendar, datetimes in negative years are invalid in the **`standard`** and **`julian`** calendars, and datetimes in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 are invalid in the **`standard`** calendar.
-Datetimes which are invalid in the specified calendar must not be encoded as time coordinates.
-* The reference datetime of a time coordinate variable must be a valid datetime in the specified calendar.
 * The reference datetime must be written in the correct format.
 In particular, it must include the date, and the time zone offset must not be included unless the time is included.
 
@@ -259,25 +255,30 @@ In the first two recommendations, when we refer to a UDUNITS unit of time e.g. *
 * Units of **`day`**, **`hour`** and **`minute`** should not be used in the **`utc`** calendar. In that calendar, the only recommended unit is **`second`**.
 * UDUNITS permits a number of alternatives to the word **`since`** in the units of time coordinates. All the alternatives have exactly the same meaning in UDUNITS. For compatibility with other software, CF strongly recommends that **`since`** should be used.
 * A non-zero time zone offset should not be specified in the reference datetime.
-* In the **`standard`** calendar, a reference datetime before 1582-10-5 0:0:0 should not be used for a time coordinate representing 1582-10-15 0:0:0 or a later datetime, and a reference datetime of 1582-10-15 0:0:0 or later should not be used for a time coordinate representing a datetime earlier than 1582-10-5 0:0:0.
 
 [[section-14]]
 [[calendar]]
-=== 4.4.2 Calendar
+=== 4.4.3 Calendar
 
 *Requirements:*
 
 * The **`calendar`** attribute may only be attached to time coordinate variables.
 * If present, the value of the **`calendar`** attribute must be one of the standardized values (case insensitive) detailed in this section, unless the **`month_length`** attribute is present, in which case the **`calendar`** attribute must _not_ take one of the standardized values.
+* Datetimes before 1972-01-01 0:0:0 and after the current instant (i.e. any time in the future when the data is written) are invalid in the **`utc`** calendar, datetimes before 1958-01-01 0:0:0 are invalid in the **`tai`** calendar, datetimes in negative years are invalid in the **`standard`** and **`julian`** calendars, and datetimes in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 are invalid in the **`standard`** calendar.
+Datetimes which are invalid in the specified calendar must not be encoded as time coordinates.
+* The reference datetime of a time coordinate variable must be a valid datetime in the specified calendar.
 
 *Recommendations:*
 
 * A time coordinate variable should have a **`calendar`** attribute.
 * If the **`calendar`** attribute is **`standard`**, **`gregorian**` (deprecated) or **`julian`** or absent, the use of time coordinates in year 0 and reference datetimes in year 0 is deprecated.
 * The value **`standard`** should be used instead of **`gregorian`** in the **`calendar`** attribute.
+* In the **`standard`** calendar, a reference datetime before 1582-10-5 0:0:0 should not be used for a time coordinate representing 1582-10-15 0:0:0 or a later datetime, and a reference datetime of 1582-10-15 0:0:0 or later should not be used for a time coordinate representing a datetime earlier than 1582-10-5 0:0:0.
+* A datetime during a leap second (i.e. with a value for seconds that equals or exceeds 60) should not be used as the reference datetime of a time coordinate variable if the **`calendar`** is **`utc`**.
+(In other calendars, leap seconds must not be used because they are not valid datetimes.)
 
 [[explicitly-defined-calendar]]
-=== 4.4.5 Explicitly Defined Calendar
+=== 4.4.4 Explicitly Defined Calendar
 
 * The **`month_lengths`**, **`leap_year`**, and **`leap_month`** attributes may only be attached to time coordinate variables.
 * If the **`calendar`** attribute of a time coordinate variable is given a non-standard value, then the attribute **`month_lengths`** is required, along with **`leap_year`** and **`leap_month`** as appropriate.
