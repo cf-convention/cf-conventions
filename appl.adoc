@@ -5,7 +5,7 @@
 == Leap Seconds
 
 This appendix describes the treatment of leap seconds in CF in more detail than <<calendar>>.
-As second-level precision has rarely been needed in the climate and forecast community, leap seconds have typically been ignored, including in many datasets and earlier versions of the CF standard.
+Since precision to the second has rarely been needed in the climate and forecast community, leap seconds have typically been ignored, including in many datasets and earlier versions of the CF standard.
 
 If you are producing real-world datasets with datetimes in UTC, and if it's important for your time coordinates and datetimes to be accurate to the second, the **`utc`** calendar is recommended.
 When a datetime is converted to a time coordinate or vice-versa in the **`utc`** calendar, any leap seconds must be counted that occurred between the instant concerned and the reference datetime in the **`units`** attribute.
@@ -15,6 +15,7 @@ For example, a leap second was added to UTC at the end of 2016.
 Therefore if **`calendar="utc"`** and **`units="seconds since 2016-12-31 23:59:58"`**, a value of 4 for the time coordinate represents the datetime 2017-01-01 00:00:01, because four seconds had elapsed by that instant since 2016-12-31 23:59:58 (seconds ending at 2016-12-31 23:59:59, 2016-12-31 23:59:60, 2017-01-01 00:00:00, 2017-01-01 00:00:01).
 In the **`utc`** calendar, the elapsed time between the same time of day on consecutive days is normally 86400 seconds, but increases to 86401 seconds when a positive leap second intervenes.
 For example, with respect to the the reference datetime in **`units="seconds since 2016-12-31 23:59:58"`**, the datetime 2017-01-01 23:59:58, which is one calendar day later, is represented by a time coordinate of 86401.
+
 In all calendars except **`utc`**, datetimes within leap seconds are not valid, reference datetimes in the **`units`** attribute must not contain seconds equal to or greater than 60, and the elapsed time between the same time of day on consecutive days is always 86400 seconds.
 
 If you are producing model-generated datasets with datetimes that follow the Gregorian calendar but do not include leap seconds, the **`proleptic_gregorian`** calendar is recommended.
