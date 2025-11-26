@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14274886.svg)](https://doi.org/10.5281/zenodo.14274886)
+
+
 This repository contains the official source of the CF metadata conventions.
 The source files are built into HTML automatically when changes are merged into this repository.
 The latest build of the specification is held in the `gh-pages` branch and can be seen [here](https://cfconventions.org/cf-conventions/cf-conventions.html).
