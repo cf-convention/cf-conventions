@@ -70,7 +70,7 @@ dimensions:
 variables:
   float time(time);
     time:standard_name = "time";
-    time:units = "days since 2024-11-8 09:00:00";
+    time:units = "days since 2024-11-8 09:00:00Z";
     time:bounds = "time_bnds";
   float time_bnds(time,nv);
 ----
@@ -330,7 +330,7 @@ variables:
     ppn:cell_methods = "time: sum";
   double time(time);
     time:long_name = "time";
-    time:units = "h since 1998-4-19 6:0:0";
+    time:units = "h since 1998-4-19 6:0:0 Z";
     time:bounds = "time_bnds";
   double time_bnds(time,nv);
 data:
@@ -400,7 +400,7 @@ variables:
     TS_var:units="K2";
     TS_var:cell_methods="time: variance (interval: 1 hr comment: sampled instantaneously)";
   float time(time);
-    time:units="days since 1990-01-01 00:00:00";
+    time:units="days since 1990-01-01 00:00:00 Z";
     time:bounds="time_bnds";
   float time_bnds(time,nv);
 data:
@@ -520,9 +520,10 @@ In addition the two concepts may be used at once, for instance to indicate not A
 Climatological variables have a climatological time axis.
 Like an ordinary time axis, a climatological time axis may have a dimension of unity (for example, a variable containing the January average temperatures for 1961-1990), but often it will have several elements (for example, a climatological time axis with a dimension of 12 for the climatological average temperatures in each month for 1961-1990, a dimension of 3 for the January mean temperatures for the three decades 1961-1970, 1971-1980, 1981-1990, or a dimension of 24 for the hours of an average day).
 Intervals of climatological time are conceptually different from ordinary time intervals; a given interval of climatological time represents a set of subintervals which are not necessarily contiguous.
-To indicate this difference, a climatological time coordinate variable does not have a **`bounds`** attribute.
-Instead, it has a **`climatology`** attribute, which names a variable with dimensions (n,2), n being the dimension of the climatological time axis.
-Using the units and calendar of the time coordinate variable, element (i,0) of the climatology variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension.
+To indicate this difference, a climatological time coordinate variable does not have a **`bounds`** attribute, instead it has a **`climatology`** attribute which names the climatological boundary variable.
+The climatological boundary variable must have dimensions (n,2), n being the dimension of the climatological time axis.
+The rules and recommendations for attributes of the climatological boundary variable are the same as those for boundary variables in general, as described in <<cell-boundaries>>.
+Using the units and calendar of the time coordinate variable, element (i,0) of the climatology boundary variable specifies the beginning of the first subinterval and element (i,1) the end of the last subinterval used to evaluate the climatological statistics with index i in the time dimension.
 The time coordinates should be values that are representative of the climatological time intervals, such that an application which does not recognise climatological time will nonetheless be able to make a reasonable interpretation.
 
 For compatibility with the COARDS standard, a climatological time coordinate in the default **`standard`** and **`julian`** calendars may be indicated by setting the datetime reference string in the time coordinate's **`units`** attribute to midnight at 0 `degrees_east` on 1 January in year 0 (i.e., **`since 0-1-1`**).
@@ -679,8 +680,7 @@ It now applies to April from a 1961-1990 climatology.
 variables:
   float temperature(time,lat,lon);
     temperature:long_name="surface air temperature";
-    temperature:cell_methods="time: mean within days ",
-      "time: mean over days time: mean over years";
+    temperature:cell_methods="time: mean within days time: mean over days time: mean over years";
     temperature:units="K";
   double time(time);
     time:climatology="climatology_bounds";

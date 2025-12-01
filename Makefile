@@ -5,7 +5,7 @@ MAIN_DOC_BUILD_DIR := $(BUILD_DIR)
 
 MAIN_DOC_INC := version toc-extra authors about-authors
 MAIN_DOC_INC += ch01 ch02 ch03 ch04 ch05 ch06 ch07 ch08 ch09
-MAIN_DOC_INC += appa appb appc appd appe appf appg apph appi appj appk
+MAIN_DOC_INC += appa appb appc appd appe appf appg apph appi appj appk appl
 MAIN_DOC_INC += history bibliography
 
 MAIN_DOC_INC := $(addsuffix .adoc, $(MAIN_DOC_INC))
