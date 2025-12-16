@@ -112,6 +112,52 @@ Note also that the values "x" and "y" are not case-sensitive.
 The use of `projection_x_coordinate` and `projection_y_coordinate` was deprecated in version 1.9 of the CF Conventions.
 The initial definition of this projection used these standard names to identify the projection coordinates even though their canonical units (meters) do not match those required for this projection (radians).
 
+[[healpix]]
+=== HEALPix
+
+----
+grid_mapping_name = healpix
+----
+
+__Map parameters:__::
+* **`indexing_scheme`** - The HEALPix indexing scheme: One of **`nested`**, **`ring`**, **`nuniq`**, or **`zuniq`**
+* **`refinement_level`** - The HEALPix refinement level: Mandatory for indexing scheme **`nested`** or **`ring`**, but must be omitted for indexing scheme **`nuniq`** or **`zuniq`**
+
+__Map coordinates:__::
+The coordinate system is defined by discrete cells on a reference ellipsoid (or sphere), arranged on a HEALPix grid.
+Each cell is represented by its cell index, which, together with the `indexing_scheme` and possible `refinement_level`, determines center coordinates (latitude and longitude) as well as boundaries.
+See <<GHB05>> for the calculation of center coordinates and cell boundary coordinates.
++
+The integer-valued HEALPix index coordinates are non-negative and identified by the **`standard_name`** attribute value **`healpix_index`**.
+The HEALPix index coordinates may be stored in a coordinate, auxiliary, or scalar coordinate variable. Indexing schemes are optimized to allow applications efficient data access when the HEALPix indices are ordered strictly monotonically.
+Therefore it is recommended to store strictly monotonic HEALPix indices in a coordinate variable, which allows an application to assess their monotonicity without expensive checking.
+
+__Notes:__::
+
+Cells are indexed using the scheme identified by the **`indexing_scheme`** parameter.
++
+For both the **`nested`** and **`ring`** schemes, the grid resolution is controlled by the refinement level parameter **`refinement_level`** <<GHB05>>.
+The total number of cells on the surface of the sphere (or reference ellipsoid) is `12 * (4 ^ refinement_level)`.
+The lowest allowed refinement level is `0`, giving 12 cells globally.
+The algorithm that assigns cell locations on a sphere to **`nested`** or **`ring`** indices at a given refinement level is defined in <<GHB05>>.
+In this algorithm, a cell with index `0`, at any refinement level, always has its southernmost vertex on the meridian at 45 degrees east.
+If the **`healpix`** grid mapping is used on an ellipsoid, the latitudes returned by the <<GHB05>> algorithm must be interpreted as authalic latitude, instead of geodetic latitude (for a sphere, the two latitudes are the same).
+This is necessary to retain the equal area property.
+For instance, on the WGS84 ellipsoid this results in the center of the HEALPix cell at refinement level `0` with index `0` being at geodetic latitude 41.938 degrees north, instead of at 41.810 degrees north in the case of a sphere, whilst the longitude is at 45 degrees east in both cases.
++
+The **`ring`** scheme sorts pixels along iso-latitude rings from north to south; and **`nested`** indexing sorts pixels along the Z-order curve within each of the 12 global cells at refinement level `0`, resulting in spatial proximity for consecutive pixels.
++
+The **`nuniq`** and **`zuniq`** indexing schemes allow pixels from multiple refinement levels to be combined: **`nuniq`** effectively concatenates **`nested`** indices from lower to the higher refinement levels, resulting in spatial proximity for consecutive pixels within a refinement level but not across different refinement levels; and **`zuniq`** indexing sorts pixels of any refinement level along the Z-order curve, resulting in spatial proximity for consecutive pixels, regardless of their refinement level.
++
+An index according to the **`nuniq`** indexing scheme (`index_nuniq`) can be computed from a refinement level and an index according to the **`nested`** indexing scheme (`index_nested`) with the formula `index_nuniq = index_nested + 4 ^ (1 + refinement_level)` <<RH15>>.
++
+An index according to the **`zuniq`** indexing scheme (`index_zuniq`) can be computed from a refinement level and an index according to the  **`nested`** indexing scheme (`index_nested`) with the formula `index_zuniq = (2 * index_nested + 1) * 4 ^ (29 - refinement_level)` <<K24>>.
++
+The  **`refinement_level`** parameter must be omitted for the **`nuniq`** and **`zuniq`** schemes, for which the resolution of a cell is implied by the index alone.
++
+A refinement level, either given by the  **`refinement_level`** parameter or implied by **`nuniq`** and **`zuniq`** indices, must be no greater than `29`, which is the highest refinement level for which all indices of any indexing scheme can be represented by 64-bit integers.
+
+
 [[lambert-azimuthal-equal-area]]
 === Lambert azimuthal equal area
 
@@ -454,6 +500,9 @@ The valid names are obtained by transforming the EPSG name using the following r
 This is to ensure that named datums can be correctly identified for precise datum transformations (see <<CF-WKT>> for more details).
 Corresponds to a OGC WKT DATUM node name.
 
+| **`indexing_scheme`** | S
+| The HEALPix cell indexing scheme, either **`nested`**, **`ring`**, **`nuniq`**, or **`zuniq`**. See <<healpix>> for more detailed definitions.
+
 | **`inverse_flattening`** | N
 | Used to specify the __inverse__ flattening (__1/f__) of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth.
 The flattening (__f__) of the ellipsoid is related to the semi-major and semi-minor axes by the formula __f = (a-b)/a__.
@@ -476,6 +525,9 @@ Domain: +
 //     **`-90.0 \<= latitude_of_projection_origin \<= 90.0`** +
 // The cleanest-looking, which sometimes works for asciidoctor-pdf:
      **`-90.0 \<= latitude_of_projection_origin \<= 90.0`**
+
+| **`refinement_level`** | N
+| The refinement level of the grid within the HEALPix hierarchy, starting at 0 for the base tessellation with 12 cells globally, 1 for the next level with 48 cells globally, etc.
 
 | **`longitude_of_central_meridian`** | N
 | The line of longitude (degrees_east) at the center of a map projection generally used as the basis for constructing the projection.
