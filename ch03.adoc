@@ -13,6 +13,7 @@ But since it is an optional attribute, applications that implement these standar
 
 The **`units`** attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <<cell-boundaries>> and climatology boundary variables defined in <<climatological-statistics>>).
 The **`units`** attribute is permitted but not required for dimensionless quantities (see <<dimensionless-units>>).
+If multiplication by a dimensionless constant and addition of a dimensionless constant are the only operations required for the value of a dimensional quantity expressed in one unit to be converted to the value expressed in another unit, we describe the two units as __physically equivalent__.
 
 The value of the **`units`** attribute is a string that can be recognized by the UDUNITS package <<UDUNITS>>, with the exceptions that are given in <<dimensionless-units>> and <<units-multiples>>.
 Note that case is significant in the **`units`** strings.
@@ -111,7 +112,7 @@ For instance, when temperature is on-scale, a value in `kg degree_C m-2` can be 
 [[units-multiples, Section 3.1.3, "Scale factors and offsets"]]
 ==== Scale factors and offsets
 
-UDUNITS recognises the SI prefixes shown in <<table-supported-units>> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.
+UDUNITS recognises the <<SI>> prefixes shown in <<table-supported-units, Table 3.1>> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.
 UDUNITS offers a syntax for indicating arbitrary scale factors and offsets to be applied to a unit.
 (Note that this is different from the scale factors and offsets used for converting between **`units`**, as discussed for temperature in <<temperature-units>>.)
 This UDUNITS syntax for arbitrary transformation of **`units`** is not supported by the CF standard, except for the case of specifying reference time (<<time-coordinate>>).
@@ -163,13 +164,13 @@ standard name:: The name used to identify the physical quantity.
 A standard name contains no whitespace and is case sensitive.
 
 canonical units:: Representative units of the physical quantity.
-Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
+Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical, see <<units>>) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
  +
  +
 Units of time coordinates (<<time-coordinate>>), whose **`units`** attribute includes the word **`since`**, are _not_ physically equivalent to time units that do not include **`since`** in the **`units`**.
-To mark this distinction, the canonical unit given for quantities used for time coordinates is **`s since 1958-1-1`**.
-The reference datetime in the canonical unit (the beginning of the day i.e. midnight on 1st January 1958 at 0 `degrees_east`) is not restrictive; the time coordinate variable's own **`units`** may contain any reference datetime (after **`since`**) that is valid in its calendar.
-(We use `1958-1-1` because it is the beginning of International Atomic Time, and a valid datetime in all CF calendars; see also <<leap-seconds>>.)
+To mark this distinction, the canonical unit given for quantities used for time coordinates is **`s since 1972-01-01`**.
+The reference datetime in the canonical unit (the beginning of the day i.e. midnight on 1st January 1972 at 0 `degrees_east`) is not restrictive; the time coordinate variable's own **`units`** may contain any reference datetime (after **`since`**) that is valid in its calendar.
+(We use `1972-01-01` because it is when the current definition of UTC came into force, and a valid datetime in all CF calendars; see also <<calendar>>.)
 In both kinds of time **`units`** attribute (with or without **`since`**), any unit for measuring time can be used i.e. any unit which is physically equivalent to the SI base unit of time, namely the second.
 
 description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are.
@@ -217,10 +218,17 @@ When one data variable provides metadata about the individual values of another 
 For example, instrument data may have associated measures of uncertainty.
 The attribute **`ancillary_variables`** is used to express these types of relationships.
 It is a string attribute whose value is a blank separated list of variable names.
-The nature of the relationship between variables associated via **`ancillary_variables`** must be determined by other attributes.
-The variables listed by the **`ancillary_variables`** attribute will often have the standard name of the variable which points to them including a modifier (<<standard-name-modifiers>>) to indicate the relationship.
-The dimensions of an ancillary variable must be the same as or a subset of the dimensions of the variable to which it is related, but their order is not restricted, and with one exception:
-If an ancillary variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable.
+
+The nature of the relationship between a data variable and its ancillary variables (those named by its **`ancillary_variables`** attribute) must be determined by other attributes.
+An ancillary variable will often have the standard name of the data variable which points to it including a modifier (<<standard-name-modifiers>>) to indicate the relationship.
+Norm data variables and norm metadata variables (<<anomalies-norm-data>> and <<anomalies-norm-metadata>>) are ancillary variables, whose relationship to the data variable is indicated by an **`anomaly`** entry in the parent data variable's **`cell_methods`** attribute.
+The norm data and metadata (ancillary) variables must have **`cell_methods`** attributes of their own.
+
+An ancillary variable must have all or a subset of the dimensions of the variable to which it is related, with one exception:
+If an ancillary variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. it may have any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable, as well as any of the other dimensions of the data variable (those apart from the compressed dimension).
+The order of dimensions of an ancillary variable is not restricted; it does not have to be the same as for the parent data variable.
+An ancillary variable may have auxiliary coordinate variables, named by a **`coordinates`** attribute, that are auxiliary coordinate variables of its parent data variable (<<coordinate-system>>), provided their dimensions are also dimensions of the ancillary variable.
+An ancillary variable may have any scalar coordinate variable (<<scalar-coordinate-variables>>) that is also a scalar coordinate variable of the parent data variable.
 
 [[instrument-data-ex]]
 [caption="Example 3.3. "]

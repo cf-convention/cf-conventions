@@ -4,7 +4,6 @@
 #
 # For more information on the actions used in this workflow, please see:
 #   https://github.com/actions/checkout
-#   https://github.com/Analog-inc/asciidoctor-action
 #   https://github.com/actions/upload-artifact
 #   https://github.com/actions/download-artifact
 #   https://github.com/marocchino/sticky-pull-request-comment
@@ -48,20 +47,24 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-latest
     if: ${{ !(github.event_name == 'pull_request' && github.event.action == 'closed') }}
+    defaults:
+      run:
+        shell: bash -el {0}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
   
+      - name: APT Install Dependencies
+        run: sudo apt install -y python3-yaml asciidoctor ruby-asciidoctor-pdf
+
       - name: Set Final Tag
         if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch' && inputs.set_final_tag == 'true' }}
         run: |
           echo "CF_FINAL=True" >> $GITHUB_ENV
   
       - name: Build Documentation
-        uses: Analog-inc/asciidoctor-action@v1
-        with:
-          shellcommand: 'make all'
+        run: make all
   
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
