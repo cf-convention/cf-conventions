@@ -277,49 +277,48 @@ The values of **`var`** must be variables that exist in the file.
 
 [[section-13]]
 [[time-coordinate]]
-=== 4.4.1 Time Coordinate Units
+=== 4.4.2 Time Coordinate Units
 
 *Requirements:*
 
 * The time **`units`** of a time coordinate variable must contain a reference datetime.
+* A non-zero time zone offset must not appear in the reference datetime in the **`utc`** and **`tai`** calendars.
+* The reference datetime must be written in the correct format.
+In particular, it must include the date, and the time zone offset must not be included unless the time is included.
 
 *Recommendations:*
 
-* Units of **`year`** and **`month`** and any equivalent units should be used with caution.
+In the first three recommendations, when we refer to a UDUNITS unit of time e.g. **`year`**, we mean the string given or any which is equivalent to it in UDUNITS e.g. **`yr`**.
+
+* Units of **`year`** and **`month`** should not be used in any calendar.
+* Units of **`day`**, **`hour`** and **`minute`** should not be used in the **`utc`** calendar. In that calendar, the only recommended unit is **`second`**.
+* The decimal prefixes of Table 3.1 should not be used with any unit of time apart from **`second`**.
 * UDUNITS permits a number of alternatives to the word **`since`** in the units of time coordinates. All the alternatives have exactly the same meaning in UDUNITS. For compatibility with other software, CF strongly recommends that **`since`** should be used.
+* A non-zero time zone offset should not be specified in the reference datetime.
 
 [[section-14]]
 [[calendar]]
-=== 4.4.2 Calendar
+=== 4.4.3 Calendar
 
 *Requirements:*
 
 * The **`calendar`** attribute may only be attached to time coordinate variables.
 * If present, the value of the **`calendar`** attribute must be one of the standardized values (case insensitive) detailed in this section, unless the **`month_length`** attribute is present, in which case the **`calendar`** attribute must _not_ take one of the standardized values.
-* The reference datetime of a time coordinate variable must be a legal datetime in the specified calendar.
+* Datetimes before 1972-01-01 0:0:0 and after the current instant (i.e. any time in the future when the data is written) are invalid in the **`utc`** calendar, datetimes before 1958-01-01 0:0:0 are invalid in the **`tai`** calendar, datetimes in negative years are invalid in the **`standard`** and **`julian`** calendars, and datetimes in the range from (and including) 1582-10-5 0:0:0 until (but excluding) 1582-10-15 0:0:0 are invalid in the **`standard`** calendar.
+Datetimes which are invalid in the specified calendar must not be encoded as time coordinates.
+* The reference datetime of a time coordinate variable must be a valid datetime in the specified calendar.
 
 *Recommendations:*
 
 * A time coordinate variable should have a **`calendar`** attribute.
 * If the **`calendar`** attribute is **`standard`**, **`gregorian**` (deprecated) or **`julian`** or absent, the use of time coordinates in year 0 and reference datetimes in year 0 is deprecated.
 * The value **`standard`** should be used instead of **`gregorian`** in the **`calendar`** attribute.
-* The time coordinate should not cross the date 1582-10-15 when the default mixed Gregorian/Julian calendar is in use.
-
-[[leap-seconds]]
-=== 4.4.3 Leap Seconds
-
-*Requirements:*
-
-* The reference datetime in time **`units`** is not allowed to contain seconds equal to or greater than 60, except for valid leap seconds if the **`calendar`** is **`utc`**.
-* A time coordinate variable must not have a **`units_metadata`** attribute if it has a **`calendar`** attribute with a value _other than_ one of the following values: `standard`, `gregorian` (deprecated), `proleptic_gregorian`, `julian`.
-* If a time coordinate variable has a **`units_metadata`** attribute then it must have one of these values: `leap_seconds: none`, `leap_seconds: utc`, or `leap_seconds: unknown`.
-
-*Recommendations:*
-
-* A time coordinate variable should have a **`units_metadata`**  attribute if it has no **`calendar`** attribute, or if it has a **`calendar`** attribute with one of the following values: `standard`, `gregorian` (deprecated), `proleptic_gregorian`, `julian`.
+* In the **`standard`** calendar, a reference datetime before 1582-10-5 0:0:0 should not be used for a time coordinate representing 1582-10-15 0:0:0 or a later datetime, and a reference datetime of 1582-10-15 0:0:0 or later should not be used for a time coordinate representing a datetime earlier than 1582-10-5 0:0:0.
+* A datetime during a leap second (i.e. with a value for seconds that equals or exceeds 60) should not be used as the reference datetime of a time coordinate variable if the **`calendar`** is **`utc`**.
+(In other calendars, leap seconds must not be used because they are not valid datetimes.)
 
 [[explicitly-defined-calendar]]
-=== 4.4.5 Explicitly Defined Calendar
+=== 4.4.4 Explicitly Defined Calendar
 
 * The **`month_lengths`**, **`leap_year`**, and **`leap_month`** attributes may only be attached to time coordinate variables.
 * If the **`calendar`** attribute of a time coordinate variable is given a non-standard value, then the attribute **`month_lengths`** is required, along with **`leap_year`** and **`leap_month`** as appropriate.
@@ -372,15 +371,20 @@ If it is an auxiliary coordinate variable, it must be listed in the coordinates 
 
 * The grid mapping variables must have the **`grid_mapping_name`** attribute. 
 The legal values for the **`grid_mapping_name`** attribute are contained in Appendix F.
-* The data types of the attributes of the grid mapping variable must be specified in Table 1 of Appendix F. +
+* The data types of the attributes of the grid mapping variable must be as specified in Table F.1 of Appendix F. +
 * If present, the **`crs_wkt`** attribute must be a text string conforming to the CRS WKT specification described in reference [OGC_CTS].
 * **`reference_ellipsoid_name`**, **`prime_meridian_name`**, **`horizontal_datum_name`** and **`geographic_crs_name`** must be all defined if any one is defined.
 * If **`projected_crs_name`** is defined then **`geographic_crs_name`** must be also.
+* If the value of the **`indexing_scheme`** attribute is **`nested`** or **`ring`**, then the **`refinement_level`** attribute must also be present.
+* If the value of the **`indexing_scheme`** attribute is **`nuniq`** or **`zuniq`**, then the **`refinement_level`** attribute must not be present.
+* The value of the **`refinement_level`** attribute must be an integer in the range 0-29.
+* A variable with standard name **`healpix_index`** must have an integer data type and all values must be non-negative.
 
 *Recommendations:*
 
 * The grid mapping variables should have 0 dimensions.
 * Deprecated attributes for the **`grid_mapping_name`** are: **`scale_factor_at_projection_origin`** for **`grid_mapping_name = lambert_cylindrical_equal_area`** only, where **`standard_parallel`** should instead be used; and **`straight_vertical_longitude_from_pole`** for **`grid_mapping_name = polar_stereographic`** only, where **`longitude_of_projection_origin`** should instead be used.
+* An auxiliary coordinate variable with standard name **`healpix_index`**, of size greater than one, all of whose values are distinct, should be a coordinate variable instead (with values ordered monotonically).
 
 [[section-17]]
 [[domain-variables]]

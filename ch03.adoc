@@ -13,6 +13,7 @@ But since it is an optional attribute, applications that implement these standar
 
 The **`units`** attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <<cell-boundaries>> and climatology boundary variables defined in <<climatological-statistics>>).
 The **`units`** attribute is permitted but not required for dimensionless quantities (see <<dimensionless-units>>).
+If multiplication by a dimensionless constant and addition of a dimensionless constant are the only operations required for the value of a dimensional quantity expressed in one unit to be converted to the value expressed in another unit, we describe the two units as __physically equivalent__.
 
 The value of the **`units`** attribute is a string that can be recognized by the UDUNITS package <<UDUNITS>>, with the exceptions that are given in <<dimensionless-units>> and <<units-multiples>>.
 Note that case is significant in the **`units`** strings.
@@ -111,7 +112,7 @@ For instance, when temperature is on-scale, a value in `kg degree_C m-2` can be 
 [[units-multiples, Section 3.1.3, "Scale factors and offsets"]]
 ==== Scale factors and offsets
 
-UDUNITS recognises the SI prefixes shown in <<table-supported-units>> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.
+UDUNITS recognises the <<SI>> prefixes shown in <<table-supported-units, Table 3.1>> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.
 UDUNITS offers a syntax for indicating arbitrary scale factors and offsets to be applied to a unit.
 (Note that this is different from the scale factors and offsets used for converting between **`units`**, as discussed for temperature in <<temperature-units>>.)
 This UDUNITS syntax for arbitrary transformation of **`units`** is not supported by the CF standard, except for the case of specifying reference time (<<time-coordinate>>).
@@ -163,13 +164,13 @@ standard name:: The name used to identify the physical quantity.
 A standard name contains no whitespace and is case sensitive.
 
 canonical units:: Representative units of the physical quantity.
-Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
+Unless it is dimensionless, a variable with a **`standard_name`** attribute must have units which are physically equivalent (not necessarily identical, see <<units>>) to the canonical units, possibly modified by an operation specified by the standard name modifier (see below and <<standard-name-modifiers>>) or by the **`cell_methods`** attribute (see <<cell-methods>> and <<appendix-cell-methods>>) or both.
  +
  +
 Units of time coordinates (<<time-coordinate>>), whose **`units`** attribute includes the word **`since`**, are _not_ physically equivalent to time units that do not include **`since`** in the **`units`**.
-To mark this distinction, the canonical unit given for quantities used for time coordinates is **`s since 1958-1-1`**.
-The reference datetime in the canonical unit (the beginning of the day i.e. midnight on 1st January 1958 at 0 `degrees_east`) is not restrictive; the time coordinate variable's own **`units`** may contain any reference datetime (after **`since`**) that is valid in its calendar.
-(We use `1958-1-1` because it is the beginning of International Atomic Time, and a valid datetime in all CF calendars; see also <<leap-seconds>>.)
+To mark this distinction, the canonical unit given for quantities used for time coordinates is **`s since 1972-01-01`**.
+The reference datetime in the canonical unit (the beginning of the day i.e. midnight on 1st January 1972 at 0 `degrees_east`) is not restrictive; the time coordinate variable's own **`units`** may contain any reference datetime (after **`since`**) that is valid in its calendar.
+(We use `1972-01-01` because it is when the current definition of UTC came into force, and a valid datetime in all CF calendars; see also <<calendar>>.)
 In both kinds of time **`units`** attribute (with or without **`since`**), any unit for measuring time can be used i.e. any unit which is physically equivalent to the SI base unit of time, namely the second.
 
 description:: The description is meant to clarify the qualifiers of the fundamental quantities such as which surface a quantity is defined on or what the flux sign conventions are.
