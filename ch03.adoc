@@ -218,10 +218,17 @@ When one data variable provides metadata about the individual values of another 
 For example, instrument data may have associated measures of uncertainty.
 The attribute **`ancillary_variables`** is used to express these types of relationships.
 It is a string attribute whose value is a blank separated list of variable names.
-The nature of the relationship between variables associated via **`ancillary_variables`** must be determined by other attributes.
-The variables listed by the **`ancillary_variables`** attribute will often have the standard name of the variable which points to them including a modifier (<<standard-name-modifiers>>) to indicate the relationship.
-The dimensions of an ancillary variable must be the same as or a subset of the dimensions of the variable to which it is related, but their order is not restricted, and with one exception:
-If an ancillary variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable.
+
+The nature of the relationship between a data variable and its ancillary variables (those named by its **`ancillary_variables`** attribute) must be determined by other attributes.
+An ancillary variable will often have the standard name of the data variable which points to it including a modifier (<<standard-name-modifiers>>) to indicate the relationship.
+Norm data variables and norm metadata variables (<<anomalies-norm-data>> and <<anomalies-norm-metadata>>) are ancillary variables, whose relationship to the data variable is indicated by an **`anomaly`** entry in the parent data variable's **`cell_methods`** attribute.
+The norm data and metadata (ancillary) variables must have **`cell_methods`** attributes of their own.
+
+An ancillary variable must have all or a subset of the dimensions of the variable to which it is related, with one exception:
+If an ancillary variable of a data variable that has been compressed by gathering (<<compression-by-gathering>>) does not span the compressed dimension, then its dimensions may be any subset of the data variable's uncompressed dimensions, i.e. it may have any of the dimensions listed by the **`compress`** attribute of the compressed coordinate variable, as well as any of the other dimensions of the data variable (those apart from the compressed dimension).
+The order of dimensions of an ancillary variable is not restricted; it does not have to be the same as for the parent data variable.
+An ancillary variable may have auxiliary coordinate variables, named by a **`coordinates`** attribute, that are auxiliary coordinate variables of its parent data variable (<<coordinate-system>>), provided their dimensions are also dimensions of the ancillary variable.
+An ancillary variable may have any scalar coordinate variable (<<scalar-coordinate-variables>>) that is also a scalar coordinate variable of the parent data variable.
 
 [[instrument-data-ex]]
 [caption="Example 3.3. "]

@@ -509,8 +509,26 @@ The specified variable must exist in the file.
 * If a climatology boundary variable has **`units`**, **`standard_name`**, or **`calendar`** attributes, they must agree with those of its associated variable.
 * A climatology boundary variable must not have **`_FillValue`** or **`missing_value`** attributes.
 
+=== 7.5 Anomaly data
+
+*Requirements:*
+
+* In a **`cell_methods`** entry of the form __name__**`:`** [__name__**`:`** ...] **`anomaly_wrt`** __norm__, the word __norm__ must be the name of a variable that is present in the file, and is named by the **`ancillary_variables`** attribute of the data variable (hence we hereafter refer to it as the "norm ancillary variable").
+* Each of the coordinate variables and scalar coordinate variables identified by the __name__s in the **`anomaly_wrt`** entry of **`cell_methods`** (we refer to these variables hereafter as "anomaly coordinate variables") must have a **`standard_name`** attribute.
+* If either the data variable or the norm ancillary variable has a **`standard_name`** attribute, its value must not end in **`_anomaly`**, and if they both have **`standard_name`** attributes, they must have the same value.
+* The anomaly coordinate variables must not be coordinate variables or scalar coordinate variables of the norm ancillary variable.
+* The coordinate variables and scalar coordinate variables of the norm ancillary variable must satisfy one of the following conditions:
+1. The norm ancillary variable has all the coordinate variables (and their dimensions) and the scalar coordinate variables of the data variable, except for the anomaly coordinate variables.
+2. The norm ancillary variable has none of the coordinate variables or scalar coordinate variables of the data variable.
+3. The norm ancillary variable has no scalar coordinate variables, and its sole dimension is the dimension of an anomaly coordinate variable of time.
+* In cases (1) and (2), for each of the anomaly coordinate variables, the norm ancillary variable must have either a coordinate variable with a size-one dimension, or a scalar coordinate variable, with the same **`standard_name`** attribute as the anomaly coordinate variable, and each of these variables must have either a **`bounds`** or a **`climatology`** attribute. (We hereafter refer to these variables as "norm coordinate variables.)
+* In cases (1) and (2), the norm ancillary variable must have a **`cell_methods`** attribute with an entry that refers to all the norm coordinate variables, or more than one entry if they contain **`within`** and **`over`** keywords.
+* In case (3), the norm ancillary variable must have a **`cell_methods`** attribute comprising entries containing **`within`** and **`over`** keywords and referring to its sole dimension.
+* In cases (2) and (3), **`cell_methods**` must have no entries other that the ones described in the previous two points.
+* In case (3), the norm ancillary variable must have an auxiliary coordinate variable of integer type with a **`select`** attribute naming a time coordinate variable that has a **`climatology`** attribute. The auxiliary coordinate values must be non-negative and less than the dimension named by the **`select`** attribute.
+
 [[geometries]]
-=== 7.5 Geometries
+=== 7.6 Geometries
 
 *Requirements:*
 
