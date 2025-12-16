@@ -474,7 +474,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author34" class="author">Neil&#160;Massey</span><br>
 <span id="author35" class="author">Antonio&#160;Cofiño</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">16&#160;December,&#160;2025&#160;23:23:37Z</span>
+<span id="revdate">16&#160;December,&#160;2025&#160;23:26:27Z</span>
 <br><span id="revremark">main</span>
 </div>
 </div>
@@ -630,7 +630,14 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2024). NetCDF 
 </ul>
 </li>
 <li><a href="#climatological-statistics">7.4. Climatological Statistics</a></li>
-<li><a href="#geometries">7.5. Geometries</a></li>
+<li><a href="#anomalies">7.5. Anomaly data</a>
+<ul class="sectlevel3">
+<li><a href="#anomalies-norm-data">7.5.1. Anomalies with respect to a norm data variable</a></li>
+<li><a href="#anomalies-norm-metadata">7.5.2. Anomalies with respect to a norm metadata variable</a></li>
+<li><a href="#temporal-anomalies">7.5.3. Temporal anomalies using anomaly standard names</a></li>
+</ul>
+</li>
+<li><a href="#geometries">7.6. Geometries</a></li>
 </ul>
 </li>
 <li><a href="#reduction-of-dataset-size">8. Reduction of Dataset Size</a>
@@ -666,10 +673,10 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2024). NetCDF 
 <li><a href="#collections-instances-elements">9.2. Collections, instances and elements</a></li>
 <li><a href="#representations-features">9.3. Representations of collections of features in data variables</a>
 <ul class="sectlevel3">
-<li><a href="#_orthogonal_multidimensional_array_representation">9.3.1. Orthogonal multidimensional array representation</a></li>
-<li><a href="#_incomplete_multidimensional_array_representation">9.3.2.  Incomplete multidimensional array representation</a></li>
-<li><a href="#_contiguous_ragged_array_representation">9.3.3.  Contiguous ragged array representation</a></li>
-<li><a href="#_indexed_ragged_array_representation">9.3.4. Indexed ragged array representation</a></li>
+<li><a href="#orthogonal-multidimensional">9.3.1. Orthogonal multidimensional array representation</a></li>
+<li><a href="#incomplete-multidimensional">9.3.2. Incomplete multidimensional array representation</a></li>
+<li><a href="#contiguous-ragged">9.3.3. Contiguous ragged array representation</a></li>
+<li><a href="#indexed-ragged">9.3.4. Indexed ragged array representation</a></li>
 </ul>
 </li>
 <li><a href="#featureType">9.4. The featureType  attribute</a></li>
@@ -935,8 +942,15 @@ J.5. <a href="#quadratic3">Figure J.5</a></p>
 7.12. <a href="#extreme-statistics-and-spell-lengths-ex">Extreme statistics and spell-lengths</a><br>
 7.13. <a href="#temperature-each-hour-of-climatological-day-ex">Temperature for each hour of the typical climatological day</a><br>
 7.14. <a href="#monthly-max-daily-precip-totals-ex">Monthly-maximum daily precipitation totals</a><br>
-7.15. <a href="#timeseries-with-geometry">Timeseries with geometry.</a><br>
-7.16. <a href="#complete-multipolygon-example">Polygons with holes</a><br>
+7.15. <a href="#reference-epoch-distinguishing-ex">Distinguishing temporal anomalies with different kinds of norm</a><br>
+7.16. <a href="#anomalies-wrt-climatology-ex">Temporal anomalies with a climatological norm metadata variable</a><br>
+7.17. <a href="#anomalies-wrt-zonal-mean-ex">Anomalies with respect to a zonal mean</a><br>
+7.18. <a href="#anomalies-wrt-area-min-ex">Anomalies with respect to the minimum within a horizontal area</a><br>
+7.19. <a href="#anomaly-with-multivalued-climatology-ex">An anomaly data variable whose norm has a multivalued climatological time coordinate variable</a><br>
+7.20. <a href="#anomaly-with-reference-epoch-ex">An anomaly data variable with a reference epoch</a><br>
+7.21. <a href="#reference-epoch-ambiguity-ex">Ambiguity in interpreting an anomaly data variable with a reference epoch</a><br>
+7.22. <a href="#timeseries-with-geometry">Timeseries with geometry.</a><br>
+7.23. <a href="#complete-multipolygon-example">Polygons with holes</a><br>
 8.1. <a href="#horiz-compression-of-three-d-array-ex">Horizontal compression of a three-dimensional array</a><br>
 8.2. <a href="#compression-of-three-d-field-ex">Compression of a three-dimensional field</a><br>
 8.3. <a href="#example-Two-dimensional-tie-point-interpolation">Two-dimensional tie point interpolation</a><br>
@@ -2580,11 +2594,20 @@ The permissible values of these modifiers are given in <a href="#standard-name-m
 <p>When one data variable provides metadata about the individual values of another data variable it may be desirable to express this association by providing a link between the variables.
 For example, instrument data may have associated measures of uncertainty.
 The attribute <strong><code>ancillary_variables</code></strong> is used to express these types of relationships.
-It is a string attribute whose value is a blank separated list of variable names.
-The nature of the relationship between variables associated via <strong><code>ancillary_variables</code></strong> must be determined by other attributes.
-The variables listed by the <strong><code>ancillary_variables</code></strong> attribute will often have the standard name of the variable which points to them including a modifier (<a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>) to indicate the relationship.
-The dimensions of an ancillary variable must be the same as or a subset of the dimensions of the variable to which it is related, but their order is not restricted, and with one exception:
-If an ancillary variable of a data variable that has been compressed by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>) does not span the compressed dimension, then its dimensions may be any subset of the data variable&#8217;s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the <strong><code>compress</code></strong> attribute of the compressed coordinate variable.</p>
+It is a string attribute whose value is a blank separated list of variable names.</p>
+</div>
+<div class="paragraph">
+<p>The nature of the relationship between a data variable and its ancillary variables (those named by its <strong><code>ancillary_variables</code></strong> attribute) must be determined by other attributes.
+An ancillary variable will often have the standard name of the data variable which points to it including a modifier (<a href="#standard-name-modifiers">Appendix C, Standard Name Modifiers</a>) to indicate the relationship.
+Norm data variables and norm metadata variables (<a href="#anomalies-norm-data">Section 7.5.1, "Anomalies with respect to a norm data variable"</a> and <a href="#anomalies-norm-metadata">Section 7.5.2, "Anomalies with respect to a norm metadata variable"</a>) are ancillary variables, whose relationship to the data variable is indicated by an <strong><code>anomaly</code></strong> entry in the parent data variable&#8217;s <strong><code>cell_methods</code></strong> attribute.
+The norm data and metadata (ancillary) variables must have <strong><code>cell_methods</code></strong> attributes of their own.</p>
+</div>
+<div class="paragraph">
+<p>An ancillary variable must have all or a subset of the dimensions of the variable to which it is related, with one exception:
+If an ancillary variable of a data variable that has been compressed by gathering (<a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>) does not span the compressed dimension, then its dimensions may be any subset of the data variable&#8217;s uncompressed dimensions, i.e. it may have any of the dimensions listed by the <strong><code>compress</code></strong> attribute of the compressed coordinate variable, as well as any of the other dimensions of the data variable (those apart from the compressed dimension).
+The order of dimensions of an ancillary variable is not restricted; it does not have to be the same as for the parent data variable.
+An ancillary variable may have auxiliary coordinate variables, named by a <strong><code>coordinates</code></strong> attribute, that are auxiliary coordinate variables of its parent data variable (<a href="#coordinate-system">Chapter 5, Coordinate Systems and Domain</a>), provided their dimensions are also dimensions of the ancillary variable.
+An ancillary variable may have any scalar coordinate variable (<a href="#scalar-coordinate-variables">Section 5.7, "Scalar Coordinate Variables"</a>) that is also a scalar coordinate variable of the parent data variable.</p>
 </div>
 <div id="instrument-data-ex" class="exampleblock">
 <div class="title">Example 3.3. Ancillary instrument data</div>
@@ -4879,14 +4902,16 @@ int model_level(sigma); // model level number at each height
 <div class="sectionbody">
 <div class="paragraph">
 <p>When gridded data does not represent the point values of a field but instead represents some characteristic of the field within cells of non-zero size, a complete description of the variable should include metadata that describes the domain or extent of each cell, and the characteristic of the field that the cell values represent.
-The commonest cases are one-dimensional cells along spatiotemporal axes, for instance cells along a time axis for consecutive months whose values contain monthly means.
-The methods presented in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a> and <a href="#cell-methods">Section 7.3, "Cell Methods"</a> describe cases in which each grid point is associated with a cell consisting of a single one-dimensional interval, a single two-dimensional polygonal area, or in general a single <em>n</em>-dimensional volume in the <em>n</em>-dimensional space described by its coordinate variables.</p>
+The commonest cases have one-dimensional cells along spatiotemporal axes, for instance cells along a time axis for consecutive months whose values contain monthly means.
+The conventions presented in <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>, <a href="#cell-measures">Section 7.2, "Cell Measures"</a> and <a href="#cell-methods">Section 7.3, "Cell Methods"</a> describe cases in which each grid point is associated with a cell consisting of a single one-dimensional interval, a single two-dimensional polygonal area, or in general a single <em>n</em>-dimensional volume in the <em>n</em>-dimensional space described by its coordinate variables.
+As an alternative to <em>n</em>-dimensional volumes with bounds, we provide <a href="#geometries">Section 7.6, "Geometries"</a>, for the case of geospatial applications in which each data value pertains to a single real-world feature, such as a river, watershed or country, represented by one or more points, lines or polygons.</p>
 </div>
 <div class="paragraph">
 <p>It is possible for a single data value to be the result of an operation whose domain is a disjoint set of intervals or areas.
 This is true for many types of climatological statistic; for example, the mean January temperature for the years 1971-2000 is computed from the 30 individual months of January, which are a set of discontiguous time-intervals.
 Climatological statistics are of such importance that we provide special methods for describing their associated computational domains in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>.
-As an alternative to <em>n</em>-dimensional volumes with bounds, we provide <a href="#geometries">Section 7.5, "Geometries"</a>, for the case of geospatial applications in which each data value pertains to a single real-world feature, such as a river, watershed or country, represented by one or more points, lines or polygons.</p>
+Climatological statistics and other kinds of statistic, e.g. zonal means, may be used as a reference with respect to which anomalies are computed.
+<a href="#anomalies">Section 7.5, "Anomaly data"</a> gives conventions for relating an anomaly data variable to its reference statistic, and for describing how the latter was computed.</p>
 </div>
 <div class="sect2">
 <h3 id="cell-boundaries"><a class="anchor" href="#cell-boundaries"></a>7.1. Cell Boundaries</h3>
@@ -5004,8 +5029,8 @@ variables:
 </div>
 </div>
 <div class="paragraph">
-<p>The boundary variables <code>lat_bnds</code> and <code>lon_bnds</code> associate a gridpoint <code>(j,i)</code> with the cell determined by the vertices <code>(lat_bnds(j,i,n),lon_bnds(j,i,n))</code>, <code>n=0,..,3</code>.
-The gridpoint location, <code>(lat(j,i),lon(j,i))</code>, should be contained within this region.</p>
+<p>The boundary variables <strong><code>lat_bnds</code></strong> and <strong><code>lon_bnds</code></strong> associate a gridpoint <strong><code>(j,i)</code></strong> with the cell determined by the vertices <strong><code>(lat_bnds(j,i,n),lon_bnds(j,i,n))</code></strong>, <strong><code>n=0,..,3</code></strong>.
+The gridpoint location, <strong><code>(lat(j,i),lon(j,i))</code></strong>, should be contained within this region.</p>
 </div>
 </div>
 </div>
@@ -5047,7 +5072,7 @@ The starting vertex is not specified.</p>
 </div>
 <div class="paragraph">
 <p>The case of a 2-D horizontal coordinate variables with 4-sided cells (<a href="#bounds-lat-lon">Section 7.1.1, "Bounds for horizontal coordinate variables with four-sided cells"</a>) is a particular case, with <strong><code>p=4</code></strong> for boundary variables dimensioned <strong><code>(n,m,p)</strong></code>, where <strong><code>n</code></strong> and <strong><code>m</code></strong> are horizontal dimensions.
-See also <a href="#geometries">Section 7.5, "Geometries"</a> for conventions describing horizontal cells with more complicated geometry and topology.</p>
+See also <a href="#geometries">Section 7.6, "Geometries"</a> for conventions describing horizontal cells with more complicated geometry and topology.</p>
 </div>
 </div>
 <div class="sect3">
@@ -5700,13 +5725,645 @@ data:  // time coordinates translated to datetime format
 </div>
 </div>
 <div class="sect2">
-<h3 id="geometries"><a class="anchor" href="#geometries"></a>7.5. Geometries</h3>
+<h3 id="anomalies"><a class="anchor" href="#anomalies"></a>7.5. Anomaly data</h3>
+<div class="paragraph">
+<p>An "anomaly" is the difference between a physical quantity and its statistical norm.
+For example, a commonly-used anomaly is the current temperature at a specific location minus the long-term average temperature there.</p>
+</div>
+<div class="paragraph">
+<p>CF offers two conventions for describing anomaly data.
+In the remainder of this section and the following two (<a href="#anomalies-norm-data">Section 7.5.1, "Anomalies with respect to a norm data variable"</a> and <a href="#anomalies-norm-metadata">Section 7.5.2, "Anomalies with respect to a norm metadata variable"</a>), we describe a general convention for anomalies over any type of coordinate, including details about how the norm was calculated.
+In <a href="#temporal-anomalies">Section 7.5.3, "Temporal anomalies using anomaly standard names"</a>, we describe a legacy convention that depends on special standard names.
+It can be used only for simple temporal anomalies, and is insufficiently informative for many use-cases.</p>
+</div>
+<div class="paragraph">
+<p>The generalized definition of an anomaly value <em>A</em> of some physical quantity <em>q</em> is the difference <em>P</em> &minus; <em>N</em> between a particular value <em>P</em> of <em>q</em> and a normal value or norm <em>N</em> of <em>q</em>.
+<em>N</em> is some statistic calculated from the values of <em>q</em> that lie within specified ranges of one or more of the variables (usually spatiotemporal coordinates) on which <em>q</em> depends.
+We denote this set of variables as {<em>c</em>}; usually there is only one variable in the set.
+<em>P</em> can be, but is not necessarily, one of the values of <em>q</em> from which <em>N</em> is calculated.</p>
+</div>
+<div class="paragraph">
+<p>In the same way, a data variable <em>A</em> containing anomalies (an "anomaly data variable") is notionally the difference between a data variable <em>P</em> containing the original data and a data variable <em>N</em> (a "norm data variable") containing the statistical norm.
+<em>P</em> is typically not present in the dataset, and <em>N</em> is usually absent as well.</p>
+</div>
+<div class="paragraph">
+<p><em>P</em> has all the same netCDF dimensions and coordinate variables as <em>A</em>.
+<em>N</em> shares all of them except for {<em>c</em>}.
+Instead of <em>A</em>'s dimensions and coordinate variables for {<em>c</em>}, <em>N</em> has its own dimensions and coordinate variables for {<em>c</em>}.
+These dimensions of <em>N</em> are the ones over which the norm is calculated.</p>
+</div>
+<div class="paragraph">
+<p>The commonest kind of anomaly <em>A</em> is a temporal anomaly, where {<em>c</em>} is time.
+"Temporal anomaly" means the difference between the value <em>P</em> of a quantity and the mean <em>N</em> of the same quantity over some range of time coordinates, usually called the "climatological normal", the "climate normal", or the "climatology".
+<em>N</em> is most often either a time-mean over a continuous period of multiple years or a climatological time-mean (<a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>).
+The time coordinate of the anomaly may or may not lie within the range of times from which <em>N</em> is calculated.
+<em>N</em> has all the same dimensions and coordinate variables as <em>A</em> except for time.</p>
+</div>
+<div class="paragraph">
+<p>In general, a statistical norm can be calculated from any single dimension or combination of dimensions, and the norm statistic does not have to be a mean.
+For example, anomalies might be calculated (as a function of longitude) with respect to the zonal mean, or (as a function of horizontal location) with respect to the minimum value in the area.
+In these examples, the norm is the zonal mean or the area minimum, respectively.
+When temporal anomalies are described following the convention of this section, more information can be recorded about the norm than when following the legacy convention of <a href="#temporal-anomalies">Section 7.5.3, "Temporal anomalies using anomaly standard names"</a>.</p>
+</div>
+<div class="paragraph">
+<p>In the convention of this section, a data variable is described as an anomaly by including in its <strong><code>cell_methods</code></strong> attribute a string of the form "<em>name</em><strong><code>:</code></strong> [<em>name</em><strong><code>:</code></strong> &#8230;&#8203;] <strong><code>anomaly_wrt</code></strong> <em>norm</em>".
+This <strong><code>cell_methods</code></strong> entry tells us:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>that the data variable contains anomalies (<em>A</em> in the notation of the start of this section) calculated from data (<em>P</em>) with the same dimensions, as the difference from the normal statistic (<em>N</em>) named <em>norm</em>.</p>
+</li>
+<li>
+<p>at which stage the anomaly <em>A</em> = <em>P</em> &minus; <em>N</em> was calculated.
+This is known because the entries in <strong><code>cell_methods</code></strong> appear in order of application.</p>
+</li>
+<li>
+<p>that <em>N</em> was calculated from the variation of <em>P</em> over dimensions identified by the <em>name</em>(s).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Each <em>name</em> must identify an "axis" of the anomaly data variable <em>A</em>.
+By "axis" we mean a dimension and its corresponding coordinate variable, or a scalar coordinate variable.
+In either case, we refer to the axis as an "anomaly axis" and to the variable as an "anomaly coordinate variable".
+The anomaly coordinate variable of each axis must have a <strong><code>standard_name</code></strong> attribute.
+Usually there is only one anomaly axis, and usually it is a spatiotemporal axis.</p>
+</div>
+<div class="paragraph">
+<p>For instance, for a data variable containing anomalies with respect to the zonal mean, <em>name</em> identifies longitude as the anomaly axis e.g. "<strong><code>longitude: anomaly_wrt</code></strong> <em>norm</em>".
+For an anomaly with respect to the area minimum, we need two <em>name</em>s e.g. "<strong><code>lat: lon: anomaly_wrt</code></strong> <em>norm</em>".
+As described in <a href="#cell-methods">Section 7.3, "Cell Methods"</a>, the combination of horizontal axes can alternatively be represented by the word <strong><code>area</code></strong>, thus "<strong><code>area: anomaly_wrt</code></strong> <em>norm</em>".</p>
+</div>
+<div class="paragraph">
+<p>For an anomaly with respect to a statistic computed over time or climatological time, <em>name</em> identifies the time axis of the anomaly data variable.</p>
+</div>
+<div class="paragraph">
+<p>There are two alternatives for <em>norm</em>.
+In both cases, <em>norm</em> is an ancillary variable of the anomaly data variable (<a href="#ancillary-data">Section 3.4, "Ancillary Data"</a>).</p>
+</div>
+<div class="paragraph">
+<p>If the norm data variable <em>N</em> is present in the dataset, it can be named as <em>norm</em> in the <strong><code>cell_methods</code></strong> of the anomaly variable.
+Such would be the case in a dataset that contains both zonal means and anomalies relative to those means.
+No modification to the metadata of <em>N</em> is required for it to serve as the norm for <em>A</em>, and <em>N</em> may still be treated as a data variable in its own right as well.
+We describe the use of a norm data variable first (<a href="#anomalies-norm-data">Section 7.5.1, "Anomalies with respect to a norm data variable"</a>) because this case is conceptually more obvious, although it is uncommon for <em>N</em> to be present in the dataset.</p>
+</div>
+<div class="paragraph">
+<p>The second alternative (<a href="#anomalies-norm-metadata">Section 7.5.2, "Anomalies with respect to a norm metadata variable"</a>) is where <em>norm</em> in <strong><code>cell_methods</code></strong> identifies a "norm metadata variable" instead of the norm data variable.
+A norm metadata variable contains information about the norm axes, but no data of its own.
+This method can be used regardless of whether the norm data variable is also present in the dataset.
+This method must be used, even if the norm data variable is present, for anomalies with respect to a statistic that depends on multivalued climatological time.</p>
+</div>
+<div class="paragraph">
+<p>For example, the second method must be used for a timeseries of hourly mean anomalies with respect to a climatological hourly mean diurnal cycle, because the climatological time variable is multivalued, and each anomaly value is relative to a different norm value (the one for the appropriate hour).
+Note that the anomaly time dimension may be larger than the norm climatological time dimension: in this example, the anomaly timeseries may be several days long, while the norm time dimension spans only one climatological day.</p>
+</div>
+<div class="sect3">
+<h4 id="anomalies-norm-data"><a class="anchor" href="#anomalies-norm-data"></a>7.5.1. Anomalies with respect to a norm data variable</h4>
+<div class="paragraph">
+<p>In this case, the word <em>norm</em> in <strong><code>cell_methods</code></strong> is the name of the norm data variable, which must exist in the dataset.
+If either the anomaly data variable or the norm data variable has a <strong><code>standard_name</code></strong> attribute, it must <em>not</em> be a standard name ending in <strong><code>_anomaly</code></strong>, and if they both have <strong><code>standard_name</code></strong> attributes, they must contain the same standard name.
+The anomaly data variable must name the norm data variable in its <strong><code>ancillary_variables</code></strong> attribute (<a href="#ancillary-data">Section 3.4, "Ancillary Data"</a>), as well as in <strong><code>cell_methods</code></strong>, in order to indicate the link between them.</p>
+</div>
+<div class="paragraph">
+<p>The norm data variable <em>N</em> must have all the same axes as the anomaly data variable <em>A</em>, <em>except</em> for the anomaly axes.
+For each anomaly axis (although usually there is only one), the norm data variable has a coordinate variable (and dimension of the same name) or a scalar coordinate variable (named in its <strong><code>coordinates</code></strong> attribute).
+In either case, we refer to it as a "norm coordinate variable".
+The norm coordinate variable must have the same <strong><code>standard_name</code></strong> as the anomaly coordinate variable.
+It must also have boundary variables to indicate the coordinate range over which <em>N</em> was calculated from <em>P</em>.</p>
+</div>
+<div class="paragraph">
+<p>Norm coordinate variables cannot have a dimension greater than 1, and these dimensions must be included among the dimensions of the anomaly data variable as well as being dimensions of the norm data variable.
+Likewise, any scalar norm coordinate variables must be named in the <strong><code>coordinates</code></strong> attribute of the anomaly data variable as well as the norm data variable.</p>
+</div>
+<div class="paragraph">
+<p>The norm data variable must have a <strong><code>cell_methods</code></strong> attribute with an entry for the norm coordinate variable (or the combination of them if more than one) to indicate how <em>N</em> was computed from the variation of <em>P</em>.
+For instance, the norm data variable for anomalies with respect to a time-mean must have a norm coordinate variable for time, and a <strong><code>cell_methods</code></strong> attribute containing an entry naming this variable.</p>
+</div>
+<div class="paragraph">
+<p>A norm data variable for a climatological statistic (in the sense of <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>) has a norm coordinate variable that must have</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong><code>cell_methods</code></strong> entries containing <strong><code>within</code></strong> and <strong><code>over</code></strong> keywords, and</p>
+</li>
+<li>
+<p>a <strong><code>climatology</code></strong> attribute to identify its boundary variable.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Example 7.15 shows how the <strong><code>cell_methods</code></strong> of the norm data variable defines the norm.
+By contrast, metadata following the simpler convention of <a href="#temporal-anomalies">Section 7.5.3, "Temporal anomalies using anomaly standard names"</a> does not completely define the norm, as illustrated in Examples 7.20 and 7.21.</p>
+</div>
+<div class="paragraph">
+<p>In Example 7.15, the norm coordinate variable of time has just one element.
+If the climatological time axis is multivalued, a norm metadata variable is required (<a href="#anomalies-norm-metadata">Section 7.5.2, "Anomalies with respect to a norm metadata variable"</a>).</p>
+</div>
+<div id="reference-epoch-distinguishing-ex" class="exampleblock">
+<div class="title">Example 7.15. Distinguishing temporal anomalies with different kinds of norm</div>
+<div class="content">
+<div class="paragraph">
+<p>The anomaly data variable (<em>A</em>, <strong><code>delta_tas</code></strong>) contains daily maxima (along its <strong><code>time</code></strong> dimension) for 16th-19th July 2023 of the anomaly in <strong><code>air_temperature</code></strong> with respect to the climatological mean (<em>N</em>, <strong><code>climatological_tas</code></strong>) of the 30-year period 1990-2019.
+In this example, we include the variable <strong><code>tas</code></strong> (<em>P</em>), from which <em>A</em> was calculated, as <em>P</em> &minus; <em>N</em>.
+The variable <strong><code>tas</code></strong> has no metadata that formally identifies it as <em>P</em>, and <em>P</em> would not usually be included in the dataset; it is shown here for comparison of its metadata with <strong><code>delta_tas</code></strong> and <strong><code>climatological_tas</code></strong>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time=4;
+variables:
+  float delta_tas(time,latitude,longitude); // anomaly data variable A
+    delta_tas:standard_name="air_temperature";
+    delta_tas:units="degC";
+    delta_tas:units_metadata="temperature: difference";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
+    delta_tas:coordinates="climatological_time";
+    delta_tas:ancillary_variables="climatological_tas";
+  float climatological_tas(latitude,longitude); // norm data variable N
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:units_metadata="temperature: on_scale";
+    climatological_tas:coordinates="climatological_time";
+    climatological_tas:cell_methods="climatological_time: mean";
+  float tas(time,latitude,longitude); // P for comparison, not usually included in dataset
+    tas:standard_name="air_temperature";
+    tas:units_metadata="temperature: on_scale";
+    tas:units="degC";
+    tas:cell_methods="time: maximum";
+  double time(time); // anomaly coordinate variable
+    time:standard_name="time";
+    time:units="days since 2023-07-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double climatological_time; // norm coordinate variable
+    climatological_time:standard_name="time";
+    climatological_time:units="days since 1990-01-01";
+    climatological_time:bounds="climatological_time_bounds";
+    climatological_time:calendar="standard";
+  double climatological_time_bounds(two);
+data:
+  time_bounds=0,1, 1,2, 2,3, 3,4;
+  climatological_time_bounds=0,10957; // 1990-01-01, 2020-01-01
+// There are 10957 days between 1990-01-01 and 2020-01-01 in the standard calendar</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong><code>cell_methods</code></strong> of <strong><code>delta_tas</code></strong> records that daily maxima were calculated first, then anomalies taken with respect to the long-term mean (although the result would have been the same if the order of operations had been the reverse).</p>
+</div>
+<div class="paragraph">
+<p>Another possibility is that the daily anomalies are calculated with respect to the 30-year July climatological mean, contained in <strong><code>climatological_tas</code></strong>.
+The metadata of <strong><code>delta_tas</code></strong> is the same in both cases.
+The two possibilities are distinguished by the <strong><code>cell_methods</code></strong> and time coordinates of <strong><code>climatological_tas</code></strong>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time=4;
+  climatological_time=1;
+variables:
+  float delta_tas(time,climatological_time,latitude,longitude);
+    delta_tas:standard_name="air_temperature";
+    delta_tas:units="degC";
+    delta_tas:units_metadata="temperature: difference";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
+    delta_tas:ancillary_variables="climatological_tas";
+  float climatological_tas(climatological_time,latitude,longitude);
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:units_metadata="temperature: on_scale";
+    climatological_tas:cell_methods="climatological_time: mean within years
+      climatological_time: mean over years";
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-07-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double climatological_time(climatological_time);
+    climatological_time:standard_name="time";
+    climatological_time:units="days since 1990-01-01";
+    climatological_time:climatology="climatological_time_bounds";
+    climatological_time:calendar="standard";
+  double climatological_time_bounds(climatological_time,two);
+data:
+  time_bounds=0,1, 1,2, 2,3, 3,4;
+  climatological_time_bounds=181,10773; // 1990-07-01, 2019-08-01, i.e. July climatology</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Equivalently, the <strong><code>climatological_time</code></strong> dimension could be omitted from <strong><code>delta_tas</code></strong> and <strong><code>climatological_tas</code></strong>, with the <strong><code>climatological_time</code></strong> variable instead being identified as a scalar coordinate variable in the <strong><code>coordinates</code></strong> attributes of these data variables.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="anomalies-norm-metadata"><a class="anchor" href="#anomalies-norm-metadata"></a>7.5.2. Anomalies with respect to a norm metadata variable</h4>
+<div class="paragraph">
+<p>In this case, the word <em>norm</em> in <strong><code>cell_methods</code></strong> is the the name of the <em>norm metadata variable</em>.
+This is a variable in the dataset that is <em>not</em> the norm data variable itself (although the latter may also be present in the dataset), but a variable that records the definition of the norm via the attributes <strong><code>cell_methods</code></strong> (which is mandatory) and <strong><code>coordinates</code></strong> (optional).
+The norm metadata data variable is a "dummy" variable, of arbitrary type, like a grid mapping variable, for instance.
+It does not need attributes describing the <em>norm</em> quantity (standard name, units, etc.), because they must be the same as for the anomaly data variable.
+The anomaly data variable must name the norm metadata variable in its <strong><code>ancillary_variables</code></strong> attribute (<a href="#ancillary-data">Section 3.4, "Ancillary Data"</a>), as well as in <strong><code>cell_methods</code></strong>, in order to indicate the link between them.</p>
+</div>
+<div class="paragraph">
+<p>Except in the case where <em>N</em> has a multivalued climatological time axis (e.g., a monthly climatology), the norm metadata variable has a dimension and coordinate variable of size one, or a scalar coordinate variable, for each anomaly axis (although usually there is only one).
+Each such norm coordinate variable must have the same <strong><code>standard_name</code></strong> as the corresponding anomaly coordinate variable.
+Scalar norm coordinate variables must be named in the <strong><code>coordinates</code></strong> attribute of both the norm metadata variable and the anomaly data variable.
+Size-one dimensions of the norm metadata variable must also be dimensions of the anomaly data variable.
+The norm metadata variable must have no coordinate variables or scalar coordinate variables other than the norm coordinate variables, which are of size one.
+Therefore the norm metadata variable has only one element.
+It must have a <strong><code>_FillValue</code></strong> attribute, and its single element must indicate missing data.
+(Under some circumstances, this condition alone distinguishes a norm metadata variable from a norm data variable.)</p>
+</div>
+<div class="paragraph">
+<p>In the case where <em>N</em> has a multivalued climatological time axis (as described in <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a> and illustrated in Examples 7.9, 7.10, and 7.11), the norm metadata variable has, as its sole dimension, the anomaly time dimension of <em>A</em>.
+In this case, the norm metadata variable has more than one element, and its values are immaterial.</p>
+</div>
+<div class="paragraph">
+<p>In all cases, norm coordinate variables must have boundary variables that indicate the coordinate ranges over which <em>N</em> was calculated from <em>P</em>.
+The norm metadata variable must have a <strong><code>cell_methods</code></strong> attribute (<a href="#cell-methods">Section 7.3, "Cell Methods"</a>) to indicate how <em>N</em> was computed from the variation of <em>P</em>.
+The <strong><code>cell_methods</code></strong> must contain an entry referring to the norm coordinate variable (or combination thereof, if more than one), or more than one entry if they contain <strong><code>within</code></strong> and <strong><code>over</code></strong> keywords, and must have no other entries.</p>
+</div>
+<div class="paragraph">
+<p>The use of norm metadata variables is illustrated by Examples 7.16, 7.17 and 7.18.
+The treatment of multivalued climatological time is described after Example 7.18 and illustrated in Example 7.19.</p>
+</div>
+<div id="anomalies-wrt-climatology-ex" class="exampleblock">
+<div class="title">Example 7.16. Temporal anomalies with a climatological norm metadata variable</div>
+<div class="content">
+<div class="paragraph">
+<p>This example shows how the metadata of Example 7.15 can be recorded using a norm metadata variable.
+The data would be the same as in that example.</p>
+</div>
+<div class="paragraph">
+<p>A data variable <strong><code>delta_tas(time,latitude,longitude)</code></strong> contains daily maxima for 16th-19th July 2023 (along the <strong><code>time</code></strong> dimension) of the anomaly in <strong><code>air_temperature</code></strong> with respect to the climatological mean of 1990-2019.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>variables:
+  float delta_tas(time,latitude,longitude); // anomaly data variable
+    delta_tas:standard_name="air_temperature";
+    delta_tas:units="degC";
+    delta_tas:units_metadata="temperature: difference";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
+    delta_tas:coordinates="climatological_time";
+    delta_tas:ancillary_variables="climatological_tas";
+  int climatological_tas; // norm metadata variable
+    climatological_tas:coordinates="climatological_time";
+    climatological_tas:cell_methods="climatological_time: mean";
+    climatological_tas:_FillValue=-999;
+  double time(time); // anomaly coordinate variable
+    time:standard_name="time";
+    time:units="days since 2023-07-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double climatological_time; // norm coordinate variable
+    climatological_time:standard_name="time";
+    climatological_time:units="days since 1990-01-01";
+    climatological_time:bounds="climatological_time_bounds";
+    climatological_time:calendar="standard";
+  double climatological_time_bounds(two);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the daily anomalies are calculated with respect to the 30-year July climatological mean:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>  float delta_tas(time,latitude,longitude);
+    delta_tas:standard_name="air_temperature";
+    delta_tas:units="degC";
+    delta_tas:units_metadata="temperature: difference";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas";
+    delta_tas:coordinates="climatological_time";
+    delta_tas:ancillary_variables="climatological_tas";
+  int climatological_tas;
+    climatological_tas:coordinates="climatological_time";
+    climatological_tas:cell_methods="climatological_time: mean within years
+      climatological_time: mean over years";
+    climatological_tas:_FillValue=-999;
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-07-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double climatological_time;
+    climatological_time:standard_name="time";
+    climatological_time:units="days since 1990-01-01";
+    climatological_time:climatology="climatological_time_bounds";
+    climatological_time:calendar="standard";
+  double climatological_time_bounds(two);</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As in Example 7.15, the metadata of <strong><code>delta_tas</code></strong> is the same in the two cases.
+They are distinguished by the <strong><code>cell_methods</code></strong> and time coordinates of <strong><code>climatological_tas</code></strong>.</p>
+</div>
+</div>
+</div>
+<div id="anomalies-wrt-zonal-mean-ex" class="exampleblock">
+<div class="title">Example 7.17. Anomalies with respect to a zonal mean</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time=100;
+  latitude=180;
+  longitude=360;
+  zmlongitude=1;
+variables:
+  float rtoa(time,latitude,longitude,zmlongitude); // anomaly data variable
+    rtoa:standard_name="toa_net_downward_radiative_flux";
+    rtoa:units="W m-2";
+    rtoa:cell_methods="time: mean latitude: mean longitude: anomaly_wrt zm";
+    rtoa:ancillary_variables="zm";
+  float longitude(longitude); // anomaly coordinate variable
+    longitude:standard_name="longitude";
+    longitude:units="degrees_E";
+  int zm(zmlongitude); // norm data variable
+    zm:cell_methods="zmlongitude: mean";
+    zm:_FillValue=-999;
+  float zmlongitude(zmlongitude); // norm coordinate variable
+    zmlongitude:standard_name="longitude";
+    zmlongitude:units="degrees_E";
+    zmlongitude:bounds="zmbounds";
+  float zmbounds(zmlongitude,two);
+data:
+  zmlongitude=-165; // midpoint of the range
+  zmbounds=-240,-90; // eastward, from 120E to 90W
+  zm=-999; // _FillValue indicates that the norm metadata variable contains no data</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <strong><code>zmbounds</code></strong> indicate that <strong><code>rtoa</code></strong> contains anomalies with respect to the zonal mean calculated over longitudes ranging eastward from 120&deg;E to 90&deg;W.
+The <strong><code>zmlongitude</code></strong> should be a value within the range of longitudes covered, but its precise choice is usually arbitrary.</p>
+</div>
+</div>
+</div>
+<div id="anomalies-wrt-area-min-ex" class="exampleblock">
+<div class="title">Example 7.18. Anomalies with respect to the minimum within a horizontal area</div>
+<div class="content">
+<div class="paragraph">
+<p>The data variable <strong><code>topography</code></strong> contains values of the surface altitude relative to the lowest point within a horizontal area delimited by bounds in the horizontal projection coordinates.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>  float topography(y,x);
+    topography:standard_name="surface_altitude";
+    topography:units="m";
+    topography:cell_methods="area: anomaly_wrt areamin"; // or "x: y: anomaly_wrt areamin"
+    topography:coordinates="xrange yrange";
+    topography:ancillary_variables="areamin";
+    topography:grid_mapping="national_grid";
+  float areamin;
+    areamin:coordinates="xrange yrange";
+    areamin:cell_methods="area: minimum"; // or "xrange: yrange: minimum"
+  float xrange;
+    xrange:standard_name="projection_x_coordinate";
+    xrange:units="km";
+    xrange:bounds="xbounds";
+  float xbounds(two);
+  float yrange;
+    yrange:standard_name="projection_y_coordinate";
+    yrange:units="km";
+    yrange:bounds="ybounds";
+  float ybounds(two);</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>If the norm has a multivalued climatological time axis, further information must be provided to describe the correspondence between elements of <em>A</em> and <em>N</em>.
+For example, in the case of an anomaly relative to a monthly climatology, all of the January anomaly values will be relative to the average value for January, all the February anomalies will be relative to the average value for February, and so on.</p>
+</div>
+<div class="paragraph">
+<p>The norm metadata variable for a multivalued climatological time axis has the time dimension of the anomaly data variable as its sole dimension.
+The mapping between the anomaly time axis of the anomaly variable and the climatological time axis of the norm is recorded by an auxiliary coordinate variable of integer type named by the <strong><code>coordinates</code></strong> attribute of the norm metadata variable.
+The auxiliary coordinate variable is one-dimensional and has the same time dimension as the anomaly data variable.
+The climatological time axis of <em>N</em> (i.e. its dimension and coordinate variable) must be included in the file, although <em>N</em> itself need not be present.
+The auxiliary coordinate variable has a <strong><code>select</code></strong> attribute naming the climatological time dimension, in order to make the link between them.
+The value of element <em>i</em> of the auxiliary coordinate variable is the index (numbering from 0) along the climatological time dimension of the norm corresponding to element <em>i</em> of the anomaly time dimension.
+Using this method means that the norm metadata variable can refer to a subset of elements of the climatological time axis if only some of them are relevant, and it can refer repeatedly to elements of climatological time axis if there is more than one anomaly time referring to a given climatological time.</p>
+</div>
+<div class="paragraph">
+<p>In the following example, by "timestep <em>i</em>" we mean the slice of the data variable along its time dimension with index <em>i</em> (recalling that index numbering starts with 0).
+Suppose that <em>A</em> contains monthly anomalies for the months of June, July, and August of 2023 and 2024 with respect to <em>N</em>, the 30-year climatological monthly means for 1990&ndash;2019.
+<em>N</em> has a climatological time axis with a dimension of 12, one for each month January through December.
+The anomaly axis is time, and <em>A</em> has a time dimension of 6 (two years times three months).
+The first time coordinate of <em>A</em> is June 2023, and the first value of the auxiliary coordinate variable is 5, indicating that timestep 0 of <em>A</em> (June 2023) is the anomaly with respect to the timestep 5 of <em>N</em> (climatological June).</p>
+</div>
+<div class="paragraph">
+<p>Since only June, July, and August climatological means are needed in this example, we could alternatively give the climatological time axis of <em>N</em> a dimension of 3, with elements for those three months alone.
+In that case, the first value of the auxiliary coordinate variable would be 0 for climatological June.</p>
+</div>
+<div class="paragraph">
+<p>In an abstract sense, the norm metadata variable indicates that <em>A</em> is the difference between <em>P</em> and <em>N'</em>, where <em>N'</em> is an abstract construction.
+<em>N'</em> could exist at an intermediate stage of calculation of <em>A</em>, but probably never did.
+<em>N'</em> has all same dimensions as <em>A</em> and <em>P</em>, including time.
+It would be constructed by selecting, with repetition if necessary, the slices of <em>N</em> whose climatological time indices are listed in the auxiliary coordinate variable, then concatenating them.</p>
+</div>
+<div class="paragraph">
+<p>Example 7.19 illustrates this convention, using the example described above.</p>
+</div>
+<div id="anomaly-with-multivalued-climatology-ex" class="exampleblock">
+<div class="title">Example 7.19. An anomaly data variable whose norm has a multivalued climatological time coordinate variable</div>
+<div class="content">
+<div class="paragraph">
+<p>The anomaly data variable (<strong><code>delta_tas</code></strong>, <em>A</em>) contains anomalies for the months of June, July and August of 2023 and 2024 with respect to the 30-year climatological means of those months for 1990&#8212;&#8203;2019, as indicated by the norm metadata variable (<strong><code>climatological_tas_metadata</code></strong>, <em>N</em>).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  time=6;
+  climatological_time=12;
+variables:
+  float delta_tas(time,latitude,longitude); // anomaly data variable
+    delta_tas:standard_name="air_temperature";
+    delta_tas:units="degC";
+    delta_tas:units_metadata="temperature: difference";
+    delta_tas:cell_methods="time: maximum time: anomaly_wrt climatological_tas_metadata";
+    delta_tas:ancillary_variables="climatological_tas_metadata";
+  int climatological_tas_metadata(time); // norm metadata variable
+    climatological_tas_metadata:coordinates="month_indices";
+    climatological_tas_metadata:cell_methods="climatological_time: mean within years
+      climatological_time: mean over years";
+  int month_indices(time);
+    month_indices:select="climatological_time";
+  double time(time); // anomaly coordinate variable
+    time:standard_name="time";
+    time:units="days since 2023-06-01";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double climatological_time(climatological_time);
+    climatological_time:standard_name="time";
+    climatological_time:units="days since 1990-01-01";
+    climatological_time:bounds="climatological_time_bounds";
+    climatological_time:calendar="standard";
+  double climatological_time_bounds(climatological_time,two);
+data:
+  time=15, 45, 76, 381, 411, 442;
+    // 2023-06-16, 2023-07-16, 2023-08-16, 2024-06-16, 2024-07-16, 2024-08-16
+  time_bounds=0,30, 30,61, 61,92, 366,396, 396,427, 427,458;
+    // beginning and end of Jun, Jul and Aug of 2023 and 2024
+  climatological_time=15, 45, ... 349;  // 1990-01-16, 1990-02-15 ... 1990-12-16
+  climatological_time_bounds=0,10623, 31,10651, ... 334,10957;
+    // 1990-01-01,2019-02-01, 1990-02-01,2019-03-01 ... 1990-12-01,2020-01-01
+  month_indices=5, 6, 7, 5, 6, 7;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Element <strong>0</strong> of <strong><code>month_indices</code></strong> is <strong>5</strong>.</p>
+</div>
+<div class="paragraph">
+<p>This means that element <strong>0</strong> of <strong><code>time</code></strong>, which is 2023-06-16 (with bounds of 2023-06-01 and 2023-07-01, i.e. the whole of June 2023) is paired with element <strong>5</strong> of <strong><code>climatological_time</code></strong>, which is the climatology for June 1991&ndash;2000.
+It indicates that <strong><code>delta_tas(0,:,:)</code></strong>, where by <strong><code>:</code></strong> we mean the entire range of the dimension, is the difference between <strong><code>tas(0,:,:)</code></strong> and <strong><code>climatological_tas(5,:,:)</code></strong>.</p>
+</div>
+<div class="paragraph">
+<p>If we chose instead to show the climatological time axis with only the three months needed in this example (June, July, and August), the following lines would replace the corresponding ones in the example above:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  climatological_time=3;
+data:
+  climatological_time=165, 196, 227;  // 1990-06-15, 1990-07-16, 1990-08-16
+  climatological_time_bounds=151,10773, 181,10804, 212,10835;
+    // 1990-06-01,2019-07-01, 1990-07-01,2019-08-01, 1990-08-01,2020-09-01
+  month_indices=0, 1, 2, 0, 1, 2;</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="temporal-anomalies"><a class="anchor" href="#temporal-anomalies"></a>7.5.3. Temporal anomalies using anomaly standard names</h4>
+<div class="paragraph">
+<p>Several CF standard names (those ending with <strong><code>_anomaly</code></strong>) have been defined for anomalies with respect to a long-term or climatological time-mean.
+The start and end of the climatological normal period may optionally be recorded in the bounds of a variable with a standard name of <strong><code>reference_epoch</code></strong>.
+This variable may be either a scalar coordinate variable, as in Example 7.20, or a coordinate variable with a single size-one dimension.</p>
+</div>
+<div class="paragraph">
+<p>This convention, using <strong><code>_anomaly</code></strong> standard names and <strong><code>reference_epoch</code></strong>, is considered to be a legacy.
+It is restricted to those common cases that have such standard names defined.</p>
+</div>
+<div id="anomaly-with-reference-epoch-ex" class="exampleblock">
+<div class="title">Example 7.20. An anomaly data variable with a reference epoch</div>
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>variables:
+  float delta_tas(time,latitude,longitude);
+    delta_tas:standard_name="air_temperature_anomaly";
+    delta_tas:units="degC";
+    delta_tas:units_metadata="temperature: difference";
+    delta_tas:coordinates="reference_epoch";
+    delta_tas:cell_methods="time: maximum";
+  double time(time);
+    time:standard_name="time";
+    time:units="days since 2023-07-16";
+    time:bounds="time_bounds";
+    time:calendar="standard";
+  double time_bounds(time,two);
+  double reference_epoch;
+    reference_epoch:standard_name="reference_epoch";
+    reference_epoch:units="days since 1990-1-1";
+    reference_epoch:bounds="reference_epoch_bounds";
+    reference_epoch:calendar="standard";
+  double reference_epoch_bounds(two);
+data:
+  time_bounds=0,1, 1,2, 2,3, 3,4;
+  reference_epoch_bounds=0,10957; // 1990-01-01, 2020-01-01</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The data variable <strong><code>delta_tas</code></strong> contains daily maximum temperatures for 16th-19th July 2023 expressed as anomalies with respect to a long-term time-mean.
+Note that <strong><code>delta_tas</code></strong> has the attribute <strong><code>units_metadata="temperature: difference"</code></strong> because it is the difference between two temperatures, as recommended in <a href="#temperature-units">Section 3.1.2, "Temperature units"</a>.
+The climatological reference period is defined as 1990-2019 by the bounds of <strong><code>reference_epoch</code></strong> (10957 days since 1st January 1990 in the <strong><code>standard</code></strong> calendar is 1st January 2020).
+The single value of the <strong><code>reference_epoch</code></strong> coordinate variable should be a representative time within the climatological interval (see <a href="#climatological-statistics">Section 7.4, "Climatological Statistics"</a>).</p>
+</div>
+<div class="paragraph">
+<p>In this example, <strong><code>reference_epoch</code></strong> is a scalar coordinate variable.
+Alternatively, it could be defined with a dimension <strong><code>reference_epoch=1</code></strong>, a one-dimensional coordinate variable <strong><code>reference_epoch(reference_epoch)</code></strong> and bounds <strong><code>reference_epoch_bounds(reference_epoch,two)</code></strong>.
+In this case, <strong><code>reference_epoch</code></strong> must be included among the dimensions of <strong><code>delta_tas</code></strong> e.g. <strong><code>delta_tas(reference_epoch,time,latitude,longitude)</code></strong>, but the <strong><code>coordinates</code></strong> attribute is not needed, unlike in the case of a scalar coordinate variable.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>This convention, using <strong><code>_anomaly</code></strong> standard names and <strong><code>reference_epoch</code></strong>, is simpler than using a norm data or metadata variable, but provides no information about the nature of the norm, which is described by its <strong><code>cell_methods</code></strong> attribute.
+The norm data variable is not necessarily present in the file, and even if it is present, this approach does not provide any link between the anomaly variable and the norm variable.
+Hence, interpretation of the anomaly can be unclear.
+Example 7.21 illustrates this ambiguity as it manifests in Example 7.20.
+Such ambiguities can be resolved by the conventions of <a href="#anomalies-norm-data">Section 7.5.1, "Anomalies with respect to a norm data variable"</a> and <a href="#anomalies-norm-metadata">Section 7.5.2, "Anomalies with respect to a norm metadata variable"</a>.</p>
+</div>
+<div id="reference-epoch-ambiguity-ex" class="exampleblock">
+<div class="title">Example 7.21. Ambiguity in interpreting an anomaly data variable with a reference epoch</div>
+<div class="content">
+<div class="paragraph">
+<p>The standard name <strong><code>air_temperature_anomaly</code></strong> of Example 7.20 is defined as the difference of air temperature from its climatology, i.e., <strong><code>delta_tas</code></strong> (<em>A</em>) = <strong><code>tas</code></strong> (<em>P</em>) &minus; <strong><code>climatological_tas</code></strong> (<em>N</em>).
+ <em>P</em> and <em>N</em> may or may not be contained in the dataset, but <em>N</em> is not fully described by the metadata.</p>
+</div>
+<div class="paragraph">
+<p>One possibility is that <strong><code>delta_tas</code></strong> is the difference between daily maxima in <strong><code>tas</code></strong> and the time-mean of the entire 30-year period 1990&ndash;2019 in <strong><code>climatological_tas</code></strong>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>  float tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:units_metadata="temperature: on_scale";
+    tas:cell_methods="time: maximum";
+  float climatological_tas(latitude,longitude);
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:units_metadata="temperature: on_scale";
+    climatological_tas:coordinates="reference_epoch";
+    climatological_tas:cell_methods="reference_epoch: mean";</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Another possibility is that the daily anomalies are calculated with respect to the 30-year July climatological mean:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dimensions:
+  climonths=1; // for the climatological month of July
+variables:
+  float tas(time,latitude,longitude);
+    tas:standard_name="air_temperature";
+    tas:units="degC";
+    tas:units_metadata="temperature: on_scale";
+    tas:cell_methods="time: maximum";
+  float climatological_tas(climmonths,latitude,longitude);
+    climatological_tas:standard_name="air_temperature";
+    climatological_tas:units="degC";
+    climatological_tas:units_metadata="temperature: on_scale";
+    climatological_tas:cell_methods="climmonths: mean within years climmonths: mean over years";</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Without additional information about  <em>N</em>, these possibilities (and others) cannot be distinguished using the <strong><code>_anomaly</code></strong> standard name convention.</p>
+</div>
+<div class="paragraph">
+<p>Note that <strong><code>tas</code></strong> and <strong><code>climatological_tas</code></strong> both have the attribute <strong><code>units_metadata="temperature: on_scale"</code></strong>, as recommended in <a href="#temperature-units">Section 3.1.2, "Temperature units"</a>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="geometries"><a class="anchor" href="#geometries"></a>7.6. Geometries</h3>
 <div class="paragraph">
 <p>For many geospatial applications, data values are associated with a geometry, which is a spatial representation of a real-world feature, for instance a time-series of areal average precipitation over a watershed.
 Polygonal cells with an arbitrary number of vertices can be described using <a href="#cell-boundaries">Section 7.1, "Cell Boundaries"</a>, but in that case every cell must have the same number of vertices and must be a single polygon ring.
 In contrast, each geometry may have a different number of nodes, the geometries may be lines (as alternatives to points and polygons), and they may be <em>multipart</em>, i.e., include several disjoint parts.
 While line and point geometries don&#8217;t describe an interval along a dimension as the traditional cell bounds described above do, they do describe the extent of a geometry or real-world feature so are included in this section.
-The approach described here specifies how to encode such geometries following the pattern in <strong>9.3.3 Contiguous ragged array representation</strong> and attach them to variables in a way that is consistent with the cell bounds approach.</p>
+The approach described here specifies how to encode such geometries following the pattern in <a href="#contiguous-ragged">Section 9.3.3, "Contiguous ragged array representation"</a> and attach them to variables in a way that is consistent with the cell bounds approach.</p>
 </div>
 <div class="paragraph">
 <p>All geometries are made up of one or more nodes.
@@ -5720,10 +6377,10 @@ Multipart geometries, such as multiple lines representing the same river or mult
 <div class="paragraph">
 <p>Any data variable can be given a <strong><code>geometry</code></strong> attribute that indicates the geometry for the quantity held in the variable.
 One of the dimensions of the data variable must be the number of geometries to which the data applies.
-As shown in Example 7.15, if the data variable has a discrete sampling geometry, the number of geometries is the length of the instance dimension (Section 9.2).</p>
+As shown in Example 7.22, if the data variable has a discrete sampling geometry, the number of geometries is the length of the instance dimension (Section 9.2).</p>
 </div>
 <div id="timeseries-with-geometry" class="exampleblock">
-<div class="title">Example 7.15. Timeseries with geometry.</div>
+<div class="title">Example 7.22. Timeseries with geometry.</div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
@@ -5872,7 +6529,7 @@ The geometry types included in this convention are listed in Table 7.1.</p>
 </tbody>
 </table>
 <div id="complete-multipolygon-example" class="exampleblock">
-<div class="title">Example 7.16. Polygons with holes</div>
+<div class="title">Example 7.23. Polygons with holes</div>
 <div class="content">
 <div class="paragraph">
 <p>This example demonstrates all potential attributes and variables for encoding geometries.</p>
@@ -7079,7 +7736,7 @@ If the sample dimension is the netCDF unlimited dimension, new data can be appen
 Allocating unused array space in this way (pre-filled with missing values&#8201;&#8212;&#8201;see also section 9.6, <em>Missing data</em>), can be useful as a means to reserve space that will be available to add features at a later time.</p>
 </div>
 <div class="sect3">
-<h4 id="_orthogonal_multidimensional_array_representation"><a class="anchor" href="#_orthogonal_multidimensional_array_representation"></a>9.3.1. Orthogonal multidimensional array representation</h4>
+<h4 id="orthogonal-multidimensional"><a class="anchor" href="#orthogonal-multidimensional"></a>9.3.1. Orthogonal multidimensional array representation</h4>
 <div class="paragraph">
 <p>The <strong>orthogonal multidimensional array representation</strong>, the simplest representation, can be used if each feature instance in the collection has identical coordinates along the element axis of the features.
 For example, for a collection of the timeSeries that share a common set of times, or a collection of profiles that share a common set of vertical levels, this is likely to be the natural representation to use.
@@ -7167,7 +7824,7 @@ This representation is consistent with the multidimensional fields described in 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_incomplete_multidimensional_array_representation"><a class="anchor" href="#_incomplete_multidimensional_array_representation"></a>9.3.2.  Incomplete multidimensional array representation</h4>
+<h4 id="incomplete-multidimensional"><a class="anchor" href="#incomplete-multidimensional"></a>9.3.2. Incomplete multidimensional array representation</h4>
 <div class="paragraph">
 <p>The <strong>incomplete multidimensional array representation</strong> can used if the features within a collection do not all have the same number of elements, but sufficient storage space is available to allocate the number of elements required by the longest feature to all features.
 That is, features that are shorter than the longest feature must be padded with missing values to bring all instances to the same storage size.
@@ -7229,7 +7886,7 @@ The i and o subscripts would be interchanged (i.e. <a href="#table-incomplete-ar
 </table>
 </div>
 <div class="sect3">
-<h4 id="_contiguous_ragged_array_representation"><a class="anchor" href="#_contiguous_ragged_array_representation"></a>9.3.3.  Contiguous ragged array representation</h4>
+<h4 id="contiguous-ragged"><a class="anchor" href="#contiguous-ragged"></a>9.3.3. Contiguous ragged array representation</h4>
 <div class="paragraph">
 <p>The <strong>contiguous ragged array representation</strong> can be used only if the size of each feature is known at the time that it is created.
 In this representation the data for each feature will be contiguous on disk, as shown in <a href="#table-contiguous-array">Table 9.4</a>.</p>
@@ -7320,7 +7977,7 @@ For indices that correspond to features, whose data have not yet been written, t
 </div>
 </div>
 <div class="sect3">
-<h4 id="_indexed_ragged_array_representation"><a class="anchor" href="#_indexed_ragged_array_representation"></a>9.3.4. Indexed ragged array representation</h4>
+<h4 id="indexed-ragged"><a class="anchor" href="#indexed-ragged"></a>9.3.4. Indexed ragged array representation</h4>
 <div class="paragraph">
 <p>The <strong>indexed ragged array representation</strong> stores the features interleaved along the sample dimension in the data variable as shown in <a href="#table-indexed-array">Table 9.5</a>.
 The canonical use case for this representation is the storage of real-time data streams that contain reports from many sources; the data can be written as it arrives.</p>
@@ -7654,8 +8311,8 @@ Identifies the roles of mesh topology and location index set variables (see <a h
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>compress</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a>, <a href="#reduced-horizontal-grid">Section 5.3, "Reduced Horizontal Grid"</a></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Records dimensions which have been compressed by gathering.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#reduced-horizontal-grid">Section 5.3, "Reduced Horizontal Grid"</a>, <a href="#compression-by-gathering">Section 8.2, "Lossless Compression by Gathering"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies other dimension(s) to which the values in this variable are indices, used for compression by gathering.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>computed_standard_name</code></strong></p></td>
@@ -7748,14 +8405,14 @@ Use in conjunction with <strong><code>flag_meanings</code></strong>.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>geometry</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C, D, Do</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.5, "Geometries"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.6, "Geometries"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a variable that defines geometry.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>geometry_type</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">M</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.5, "Geometries"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.6, "Geometries"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Indicates the type of geometry present.</p></td>
 </tr>
 <tr>
@@ -7798,7 +8455,7 @@ The index variable indicates that the indexed ragged array representation is bei
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>interior_ring</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">M</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.5, "Geometries"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.6, "Geometries"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a variable that indicates if polygon parts are interior rings (i.e., holes) or not.</p></td>
 </tr>
 <tr>
@@ -7864,28 +8521,28 @@ Allowed for auxiliary coordinate variables but not allowed for coordinate variab
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>node_coordinates</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">M</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.5, "Geometries"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.6, "Geometries"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies variables that contain geometry node coordinates.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>node_count</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">M</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.5, "Geometries"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.6, "Geometries"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a variable indicating the count of nodes per geometry.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>nodes</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.5, "Geometries"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.6, "Geometries"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a coordinate node variable.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>part_node_count</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">M</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.5, "Geometries"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#geometries">Section 7.6, "Geometries"</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a variable providing the count of nodes per geometry part.</p></td>
 </tr>
 <tr>
@@ -7941,6 +8598,13 @@ The count variable indicates that the contiguous ragged array representation is 
 <td class="tableblock halign-left valign-top"><p class="tableblock">If present for a variable, the data are to be multiplied by this factor after the data are read by an application.
 See also the <strong><code>add_offset</code></strong> attribute.
 In cases where there is a strong constraint on dataset size, it is allowed to pack the coordinate variables (using add_offset and/or scale_factor), but this is not recommended in general.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>select</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#anomalies-norm-metadata">Section 7.5.2, "Anomalies with respect to a norm metadata variable"</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Identifies a dimension to which the values in this variable are indices, used for selection of climatological time coordinates for norm metadata variables.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>source</code></strong></p></td>
@@ -8822,6 +9486,11 @@ This is the default method for a quantity that is intensive with respect to the 
 <td class="tableblock halign-left valign-top"><p class="tableblock"><em>u</em></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The data values are representative of a sum or accumulation over the cell.
 This is the default method for a quantity that is extensive with respect to the specified dimension.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>anomaly_wrt</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><em>u</em></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Difference from a statistical norm (<a href="#anomalies">Section 7.5, "Anomaly data"</a>).</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>maximum</code></p></td>
@@ -11886,7 +12555,7 @@ All CF-netCDF elements are mapped to field constructs, domain constructs or thei
 </div>
 <div id="figure-field" class="imageblock text-center text-center">
 <div class="content">
-<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDMuMCAoMCkKIC0tPgo8IS0tIFRpdGxlOiAlMyBQYWdlczogMSAtLT4KPHN2ZyB3aWR0aD0iNjExcHQiIGhlaWdodD0iODk0cHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgNjEwLjUwIDg5NC4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoNCA4OTApIj4KPHRpdGxlPiUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHBvaW50cz0iLTQsNCAtNCwtODkwIDYwNi41LC04OTAgNjA2LjUsNCAtNCw0Ii8+CjwhLS0gRG9tYWluIC0tPgo8ZyBpZD0ibm9kZTEiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkRvbWFpbjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxNDQsLTYwNiAwLC02MDYgMCwtNTM0IDE0NCwtNTM0IDE0NCwtNjA2Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcyIiB5PSItNTczLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNzIiIHk9Ii01NTguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5Eb21haW48L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTUgLS0+CjxnIGlkPSJub2RlMTgiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxODQuNSwtNTcwLjUgMTgzLjUsLTU3MC41IDE4My41LC01NjkuNSAxODQuNSwtNTY5LjUgMTg0LjUsLTU3MC41Ii8+CjwvZz4KPCEtLSBEb21haW4mIzQ1OyZndDtyb3V0ZTUgLS0+CjxnIGlkPSJlZGdlOCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RG9tYWluJiM0NTsmZ3Q7cm91dGU1PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE1Ni4yLC01NzBDMTU2LjIsLTU3MCAxODMuMTgsLTU3MCAxODMuMTgsLTU3MCIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIxNTYuMiwtNTcwIDE1MC4yLC01NzQgMTQ0LjIsLTU3MCAxNTAuMiwtNTY2IDE1Ni4yLC01NzAiLz4KPC9nPgo8IS0tIEZpZWxkIC0tPgo8ZyBpZD0ibm9kZTIiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkZpZWxkPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjE4MCwtODg2IDAsLTg4NiAwLC04MTQgMTgwLC04MTQgMTgwLC04ODYiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iOTAiIHk9Ii04NTMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI5MCIgeT0iLTgzOC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkZpZWxkPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxIC0tPgo8ZyBpZD0ibm9kZTE0IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTE8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjMuNSwtNzUzLjUgNjIuNSwtNzUzLjUgNjIuNSwtNzUyLjUgNjMuNSwtNzUyLjUgNjMuNSwtNzUzLjUiLz4KPC9nPgo8IS0tIEZpZWxkJiM0NTsmZ3Q7cm91dGUxIC0tPgo8ZyBpZD0iZWRnZTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkZpZWxkJiM0NTsmZ3Q7cm91dGUxPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTYzLC04MDEuODhDNjMsLTgwMS44OCA2MywtNzUzLjg1IDYzLC03NTMuODUiLz4KPHBvbHlnb24gZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSI2MywtODAxLjg4IDY3LC04MDcuODggNjMsLTgxMy44OCA1OSwtODA3Ljg4IDYzLC04MDEuODgiLz4KPC9nPgo8IS0tIHJvdXRlMiAtLT4KPGcgaWQ9Im5vZGUxNSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUyPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjExOC41LC03NTMuNSAxMTcuNSwtNzUzLjUgMTE3LjUsLTc1Mi41IDExOC41LC03NTIuNSAxMTguNSwtNzUzLjUiLz4KPC9nPgo8IS0tIEZpZWxkJiM0NTsmZ3Q7cm91dGUyIC0tPgo8ZyBpZD0iZWRnZTIiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkZpZWxkJiM0NTsmZ3Q7cm91dGUyPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTExOCwtODAxLjg4QzExOCwtODAxLjg4IDExOCwtNzUzLjg1IDExOCwtNzUzLjg1Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjExOCwtODAxLjg4IDEyMiwtODA3Ljg4IDExOCwtODEzLjg4IDExNCwtODA3Ljg4IDExOCwtODAxLjg4Ii8+CjwvZz4KPCEtLSBDZWxsTWV0aG9kIC0tPgo8ZyBpZD0ibm9kZTMiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkNlbGxNZXRob2Q8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzg4LC02OTIgMjQ0LC02OTIgMjQ0LC02NDIgMzg4LC02NDIgMzg4LC02OTIiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzE2IiB5PSItNjcwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzE2IiB5PSItNjU1LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q2VsbE1ldGhvZDwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkF4aXMgLS0+CjxnIGlkPSJub2RlNCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RG9tYWluQXhpczwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODMsLTU5NSAyMzksLTU5NSAyMzksLTU0NSAzODMsLTU0NSAzODMsLTU5NSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTEiIHk9Ii01NzMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTEiIHk9Ii01NTguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5Eb21haW5BeGlzPC90ZXh0Pgo8L2c+CjwhLS0gQ2VsbE1ldGhvZCYjNDU7Jmd0O0RvbWFpbkF4aXMgLS0+CjxnIGlkPSJlZGdlMTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNlbGxNZXRob2QmIzQ1OyZndDtEb21haW5BeGlzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxMy41LC02NDEuNzdDMzEzLjUsLTY0MS43NyAzMTMuNSwtNjA1LjExIDMxMy41LC02MDUuMTEiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMzEzLjUsLTU5NS4xMSAzMTgsLTYwNS4xMSAzMTMuNSwtNjAwLjExIDMxMy41LC02MDUuMTEgMzEzLjUsLTYwNS4xMSAzMTMuNSwtNjA1LjExIDMxMy41LC02MDAuMTEgMzA5LC02MDUuMTEgMzEzLjUsLTU5NS4xMSAzMTMuNSwtNTk1LjExIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMwMC41IiB5PSItNTk4LjMxIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGUgLS0+CjxnIGlkPSJub2RlMTMiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODMsLTQ5OCAyMzksLTQ5OCAyMzksLTQzMCAzODMsLTQzMCAzODMsLTQ5OCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTEiIHk9Ii00ODIuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2Fic3RyYWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMSIgeT0iLTQ2Ny44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkdlbmVyaWM8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMSIgeT0iLTQ1Mi44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvb3JkaW5hdGU8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMSIgeT0iLTQzNy44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvbnN0cnVjdDwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkF4aXMmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZSAtLT4KPCEtLSByb3V0ZTYgLS0+CjxnIGlkPSJub2RlMTkiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0MTkuNSwtNTcwLjUgNDE4LjUsLTU3MC41IDQxOC41LC01NjkuNSA0MTkuNSwtNTY5LjUgNDE5LjUsLTU3MC41Ii8+CjwvZz4KPCEtLSBEb21haW5BeGlzJiM0NTsmZ3Q7cm91dGU2IC0tPgo8IS0tIERvbWFpbkFuY2lsbGFyeSAtLT4KPGcgaWQ9Im5vZGU1IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Eb21haW5BbmNpbGxhcnk8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzgyLC0zMDggMjM4LC0zMDggMjM4LC0yNTggMzgyLC0yNTggMzgyLC0zMDgiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMjg2LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMjcxLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RG9tYWluQW5jaWxsYXJ5PC90ZXh0Pgo8L2c+CjwhLS0gQ2VsbE1lYXN1cmUgLS0+CjxnIGlkPSJub2RlNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Q2VsbE1lYXN1cmU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzgyLC0yMjIgMjM4LC0yMjIgMjM4LC0xNzIgMzgyLC0xNzIgMzgyLC0yMjIiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMjAwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMTg1LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q2VsbE1lYXN1cmU8L3RleHQ+CjwvZz4KPCEtLSBEb21haW5BbmNpbGxhcnkmIzQ1OyZndDtDZWxsTWVhc3VyZSAtLT4KPCEtLSBEb21haW5Ub3BvbG9neSAtLT4KPGcgaWQ9Im5vZGUxMSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RG9tYWluVG9wb2xvZ3k8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzgyLC0xMzYgMjM4LC0xMzYgMjM4LC04NiAzODIsLTg2IDM4MiwtMTM2Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMCIgeT0iLTExNC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7Y29uc3RydWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMCIgeT0iLTk5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RG9tYWluVG9wb2xvZ3k8L3RleHQ+CjwvZz4KPCEtLSBDZWxsTWVhc3VyZSYjNDU7Jmd0O0RvbWFpblRvcG9sb2d5IC0tPgo8IS0tIENvb3JkaW5hdGVSZWZlcmVuY2UgLS0+CjxnIGlkPSJub2RlNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Q29vcmRpbmF0ZVJlZmVyZW5jZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODYuNSwtMzk0IDIzNy41LC0zOTQgMjM3LjUsLTM0NCAzODYuNSwtMzQ0IDM4Ni41LC0zOTQiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEyIiB5PSItMzcyLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEyIiB5PSItMzU3LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q29vcmRpbmF0ZVJlZmVyZW5jZSA8L3RleHQ+CjwvZz4KPCEtLSBDb29yZGluYXRlUmVmZXJlbmNlJiM0NTsmZ3Q7RG9tYWluQW5jaWxsYXJ5IC0tPgo8ZyBpZD0iZWRnZTIyIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Db29yZGluYXRlUmVmZXJlbmNlJiM0NTsmZ3Q7RG9tYWluQW5jaWxsYXJ5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxMCwtMzQzLjY2QzMxMCwtMzQzLjY2IDMxMCwtMzE4LjE2IDMxMCwtMzE4LjE2Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjMxMCwtMzA4LjE2IDMxNC41LC0zMTguMTYgMzEwLC0zMTMuMTYgMzEwLC0zMTguMTYgMzEwLC0zMTguMTYgMzEwLC0zMTguMTYgMzEwLC0zMTMuMTYgMzA1LjUsLTMxOC4xNiAzMTAsLTMwOC4xNiAzMTAsLTMwOC4xNiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyOTciIHk9Ii0zMTEuMzYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlIC0tPgo8ZyBpZD0ibm9kZTgiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkF1eGlsaWFyeUNvb3JkaW5hdGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjAxLC00ODkgNDU3LC00ODkgNDU3LC00MzkgNjAxLC00MzkgNjAxLC00ODkiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNDY3LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNDUyLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+QXV4aWxsYXJ5Q29vcmRpbmF0ZTwvdGV4dD4KPC9nPgo8IS0tIERpbWVuc2lvbkNvb3JkaW5hdGUgLS0+CjxnIGlkPSJub2RlOSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGltZW5zaW9uQ29vcmRpbmF0ZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI2MDIuNSwtNTk1IDQ1NS41LC01OTUgNDU1LjUsLTU0NSA2MDIuNSwtNTQ1IDYwMi41LC01OTUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNTczLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNTU4LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RGltZW5zaW9uQ29vcmRpbmF0ZTwvdGV4dD4KPC9nPgo8IS0tIERpbWVuc2lvbkNvb3JkaW5hdGUmIzQ1OyZndDtBdXhpbGlhcnlDb29yZGluYXRlIC0tPgo8IS0tIEZpZWxkQW5jaWxsYXJ5IC0tPgo8ZyBpZD0ibm9kZTEwIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5GaWVsZEFuY2lsbGFyeTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODgsLTc3OCAyNDQsLTc3OCAyNDQsLTcyOCAzODgsLTcyOCAzODgsLTc3OCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTYiIHk9Ii03NTYuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTYiIHk9Ii03NDEuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5GaWVsZEFuY2lsbGFyeTwvdGV4dD4KPC9nPgo8IS0tIEZpZWxkQW5jaWxsYXJ5JiM0NTsmZ3Q7Q2VsbE1ldGhvZCAtLT4KPCEtLSBDZWxsQ29ubmVjdGl2aXR5IC0tPgo8ZyBpZD0ibm9kZTEyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5DZWxsQ29ubmVjdGl2aXR5PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjM4MiwtNTAgMjM4LC01MCAyMzgsMCAzODIsMCAzODIsLTUwIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMCIgeT0iLTI4LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMTMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DZWxsQ29ubmVjdGl2aXR5PC90ZXh0Pgo8L2c+CjwhLS0gRG9tYWluVG9wb2xvZ3kmIzQ1OyZndDtDZWxsQ29ubmVjdGl2aXR5IC0tPgo8IS0tIEdlbmVyaWNDb29yZGluYXRlJiM0NTsmZ3Q7Q29vcmRpbmF0ZVJlZmVyZW5jZSAtLT4KPGcgaWQ9ImVkZ2UxOSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGUmIzQ1OyZndDtDb29yZGluYXRlUmVmZXJlbmNlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxMSwtNDE5Ljk3QzMxMSwtNDE5Ljk3IDMxMSwtMzk0LjE1IDMxMSwtMzk0LjE1Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjMxMSwtNDI5Ljk3IDMwNi41LC00MTkuOTcgMzExLC00MjQuOTcgMzExLC00MTkuOTcgMzExLC00MTkuOTcgMzExLC00MTkuOTcgMzExLC00MjQuOTcgMzE1LjUsLTQxOS45NyAzMTEsLTQyOS45NyAzMTEsLTQyOS45NyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyOTgiIHk9Ii00MjEuMTciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTggLS0+CjxnIGlkPSJub2RlMjEiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlODwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0MTkuNSwtNDY0LjUgNDE4LjUsLTQ2NC41IDQxOC41LC00NjMuNSA0MTkuNSwtNDYzLjUgNDE5LjUsLTQ2NC41Ii8+CjwvZz4KPCEtLSBHZW5lcmljQ29vcmRpbmF0ZSYjNDU7Jmd0O3JvdXRlOCAtLT4KPGcgaWQ9ImVkZ2UxNSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGUmIzQ1OyZndDtyb3V0ZTg8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMzkzLjA0LC00NjRDMzkzLjA0LC00NjQgNDE4LjI3LC00NjQgNDE4LjI3LC00NjQiLz4KPHBvbHlnb24gZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIzOTMuMDQsLTQ2MC41IDM4My4wNCwtNDY0IDM5My4wNCwtNDY3LjUgMzkzLjA0LC00NjAuNSIvPgo8L2c+CjwhLS0gcm91dGUxJiM0NTsmZ3Q7cm91dGUyIC0tPgo8IS0tIHJvdXRlMyAtLT4KPGcgaWQ9Im5vZGUxNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjYzLjUsLTY2Ny41IDYyLjUsLTY2Ny41IDYyLjUsLTY2Ni41IDYzLjUsLTY2Ni41IDYzLjUsLTY2Ny41Ii8+CjwvZz4KPCEtLSByb3V0ZTEmIzQ1OyZndDtyb3V0ZTMgLS0+CjxnIGlkPSJlZGdlNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxJiM0NTsmZ3Q7cm91dGUzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTYzLC03NTIuNDVDNjMsLTc0NS41OCA2MywtNjc2LjQ5IDYzLC02NjcuODgiLz4KPC9nPgo8IS0tIHJvdXRlMiYjNDU7Jmd0O0ZpZWxkQW5jaWxsYXJ5IC0tPgo8ZyBpZD0iZWRnZTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMiYjNDU7Jmd0O0ZpZWxkQW5jaWxsYXJ5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTExOC41NywtNzUzQzExOC41NywtNzUzIDIzMy44MiwtNzUzIDIzMy44MiwtNzUzIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjI0My44MiwtNzUzIDIzMy44MiwtNzU3LjUgMjM4LjgyLC03NTMgMjMzLjgyLC03NTMgMjMzLjgyLC03NTMgMjMzLjgyLC03NTMgMjM4LjgyLC03NTMgMjMzLjgyLC03NDguNSAyNDMuODIsLTc1MyAyNDMuODIsLTc1MyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjkuMzIiIHk9Ii03NTYuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlNCAtLT4KPGcgaWQ9Im5vZGUxNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGU0PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjExOC41LC02NjcuNSAxMTcuNSwtNjY3LjUgMTE3LjUsLTY2Ni41IDExOC41LC02NjYuNSAxMTguNSwtNjY3LjUiLz4KPC9nPgo8IS0tIHJvdXRlMiYjNDU7Jmd0O3JvdXRlNCAtLT4KPGcgaWQ9ImVkZ2U1IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTImIzQ1OyZndDtyb3V0ZTQ8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTE4LC03NTIuNDVDMTE4LC03NDUuNTggMTE4LC02NzYuNDkgMTE4LC02NjcuODgiLz4KPC9nPgo8IS0tIHJvdXRlMyYjNDU7Jmd0O0RvbWFpbiAtLT4KPGcgaWQ9ImVkZ2U3IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTMmIzQ1OyZndDtEb21haW48L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNNjMsLTY2Ni4zOEM2MywtNjY2LjM4IDYzLC02MTYuMDEgNjMsLTYxNi4wMSIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSI2MywtNjA2LjAxIDY3LjUsLTYxNi4wMSA2MywtNjExLjAxIDYzLC02MTYuMDEgNjMsLTYxNi4wMSA2MywtNjE2LjAxIDYzLC02MTEuMDEgNTguNSwtNjE2LjAxIDYzLC02MDYuMDEgNjMsLTYwNi4wMSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0OSIgeT0iLTYwOS4yMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4xICYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlMyYjNDU7Jmd0O3JvdXRlNCAtLT4KPCEtLSByb3V0ZTQmIzQ1OyZndDtDZWxsTWV0aG9kIC0tPgo8ZyBpZD0iZWRnZTYiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlNCYjNDU7Jmd0O0NlbGxNZXRob2Q8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTE4LjU3LC02NjdDMTE4LjU3LC02NjcgMjMzLjgyLC02NjcgMjMzLjgyLC02NjciLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjQzLjgyLC02NjcgMjMzLjgyLC02NzEuNSAyMzguODIsLTY2NyAyMzMuODIsLTY2NyAyMzMuODIsLTY2NyAyMzMuODIsLTY2NyAyMzguODIsLTY2NyAyMzMuODIsLTY2Mi41IDI0My44MiwtNjY3IDI0My44MiwtNjY3Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIyOS4zMiIgeT0iLTY3MC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGU1JiM0NTsmZ3Q7RG9tYWluQXhpcyAtLT4KPGcgaWQ9ImVkZ2U5IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTUmIzQ1OyZndDtEb21haW5BeGlzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NC44MSwtNTcwQzE4NC44MSwtNTcwIDIyOC44NywtNTcwIDIyOC44NywtNTcwIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjIzOC44NywtNTcwIDIyOC44NywtNTc0LjUgMjMzLjg3LC01NzAgMjI4Ljg3LC01NzAgMjI4Ljg3LC01NzAgMjI4Ljg3LC01NzAgMjMzLjg3LC01NzAgMjI4Ljg3LC01NjUuNSAyMzguODcsLTU3MCAyMzguODcsLTU3MCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjQuMzciIHk9Ii01NzMuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlNyAtLT4KPGcgaWQ9Im5vZGUyMCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGU3PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjE4NC41LC00NjQuNSAxODMuNSwtNDY0LjUgMTgzLjUsLTQ2My41IDE4NC41LC00NjMuNSAxODQuNSwtNDY0LjUiLz4KPC9nPgo8IS0tIHJvdXRlNSYjNDU7Jmd0O3JvdXRlNyAtLT4KPGcgaWQ9ImVkZ2UxMiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU1JiM0NTsmZ3Q7cm91dGU3PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NCwtNTY5LjMyQzE4NCwtNTYwLjcyIDE4NCwtNDcyLjg0IDE4NCwtNDY0LjYyIi8+CjwvZz4KPCEtLSByb3V0ZTYmIzQ1OyZndDtEaW1lbnNpb25Db29yZGluYXRlIC0tPgo8ZyBpZD0iZWRnZTEwIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTYmIzQ1OyZndDtEaW1lbnNpb25Db29yZGluYXRlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTQxOS43LC01NzBDNDIzLjAzLC01NzAgNDM3LjgxLC01NzAgNDU1LjQ3LC01NzAiLz4KPC9nPgo8IS0tIHJvdXRlNiYjNDU7Jmd0O3JvdXRlOCAtLT4KPGcgaWQ9ImVkZ2UxMyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU2JiM0NTsmZ3Q7cm91dGU4PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTQxOSwtNTY5LjMyQzQxOSwtNTYwLjcyIDQxOSwtNDcyLjg0IDQxOSwtNDY0LjYyIi8+CjwvZz4KPCEtLSByb3V0ZTcmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZSAtLT4KPGcgaWQ9ImVkZ2UxNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU3JiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LjgxLC00NjRDMTg0LjgxLC00NjQgMjI4Ljg3LC00NjQgMjI4Ljg3LC00NjQiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjM4Ljg3LC00NjQgMjI4Ljg3LC00NjguNSAyMzMuODcsLTQ2NCAyMjguODcsLTQ2NCAyMjguODcsLTQ2NCAyMjguODcsLTQ2NCAyMzMuODcsLTQ2NCAyMjguODcsLTQ1OS41IDIzOC44NywtNDY0IDIzOC44NywtNDY0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIyNC4zNyIgeT0iLTQ2Ny4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGU5IC0tPgo8ZyBpZD0ibm9kZTIyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTk8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMTgzLjUsLTM2OS41IDE4Mi41LC0zNjkuNSAxODIuNSwtMzY4LjUgMTgzLjUsLTM2OC41IDE4My41LC0zNjkuNSIvPgo8L2c+CjwhLS0gcm91dGU3JiM0NTsmZ3Q7cm91dGU5IC0tPgo8ZyBpZD0iZWRnZTE3IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTcmIzQ1OyZndDtyb3V0ZTk8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTgzLjUsLTQ2My4zOUMxODMuNSwtNDU1LjY4IDE4My41LC0zNzYuOTIgMTgzLjUsLTM2OS41NSIvPgo8L2c+CjwhLS0gcm91dGU4JiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZSAtLT4KPGcgaWQ9ImVkZ2UxNiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU4JiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik00MTkuNywtNDY0QzQyMy4xMiwtNDY0IDQzOC42MywtNDY0IDQ1Ni45MywtNDY0Ii8+CjwvZz4KPCEtLSByb3V0ZTkmIzQ1OyZndDtDb29yZGluYXRlUmVmZXJlbmNlIC0tPgo8ZyBpZD0iZWRnZTE4IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTkmIzQ1OyZndDtDb29yZGluYXRlUmVmZXJlbmNlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4My44MiwtMzY5QzE4My44MiwtMzY5IDIyNy4zLC0zNjkgMjI3LjMsLTM2OSIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIyMzcuMywtMzY5IDIyNy4zLC0zNzMuNSAyMzIuMywtMzY5IDIyNy4zLC0zNjkgMjI3LjMsLTM2OSAyMjcuMywtMzY5IDIzMi4zLC0zNjkgMjI3LjMsLTM2NC41IDIzNy4zLC0zNjkgMjM3LjMsLTM2OSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjIuOCIgeT0iLTM3Mi4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxMCAtLT4KPGcgaWQ9Im5vZGUyMyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUxMDwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxODQuNSwtMjgzLjUgMTgzLjUsLTI4My41IDE4My41LC0yODIuNSAxODQuNSwtMjgyLjUgMTg0LjUsLTI4My41Ii8+CjwvZz4KPCEtLSByb3V0ZTkmIzQ1OyZndDtyb3V0ZTEwIC0tPgo8ZyBpZD0iZWRnZTIwIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTkmIzQ1OyZndDtyb3V0ZTEwPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4My41LC0zNjguNDVDMTgzLjUsLTM2MS41OCAxODMuNSwtMjkyLjQ5IDE4My41LC0yODMuODgiLz4KPC9nPgo8IS0tIHJvdXRlMTAmIzQ1OyZndDtEb21haW5BbmNpbGxhcnkgLS0+CjxnIGlkPSJlZGdlMjEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMTAmIzQ1OyZndDtEb21haW5BbmNpbGxhcnk8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LjgsLTI4M0MxODQuOCwtMjgzIDIyNy43NCwtMjgzIDIyNy43NCwtMjgzIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjIzNy43NCwtMjgzIDIyNy43NCwtMjg3LjUgMjMyLjc0LC0yODMgMjI3Ljc0LC0yODMgMjI3Ljc0LC0yODMgMjI3Ljc0LC0yODMgMjMyLjc0LC0yODMgMjI3Ljc0LC0yNzguNSAyMzcuNzQsLTI4MyAyMzcuNzQsLTI4MyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjMuMjQiIHk9Ii0yODYuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlMTEgLS0+CjxnIGlkPSJub2RlMjQiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlMTE8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMTg0LjUsLTE5Ny41IDE4My41LC0xOTcuNSAxODMuNSwtMTk2LjUgMTg0LjUsLTE5Ni41IDE4NC41LC0xOTcuNSIvPgo8L2c+CjwhLS0gcm91dGUxMCYjNDU7Jmd0O3JvdXRlMTEgLS0+CjxnIGlkPSJlZGdlMjMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMTAmIzQ1OyZndDtyb3V0ZTExPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NCwtMjgyLjQ1QzE4NCwtMjc1LjU4IDE4NCwtMjA2LjQ5IDE4NCwtMTk3Ljg4Ii8+CjwvZz4KPCEtLSByb3V0ZTExJiM0NTsmZ3Q7Q2VsbE1lYXN1cmUgLS0+CjxnIGlkPSJlZGdlMjQiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMTEmIzQ1OyZndDtDZWxsTWVhc3VyZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0xODQuOCwtMTk3QzE4NC44LC0xOTcgMjI3Ljc0LC0xOTcgMjI3Ljc0LC0xOTciLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjM3Ljc0LC0xOTcgMjI3Ljc0LC0yMDEuNSAyMzIuNzQsLTE5NyAyMjcuNzQsLTE5NyAyMjcuNzQsLTE5NyAyMjcuNzQsLTE5NyAyMzIuNzQsLTE5NyAyMjcuNzQsLTE5Mi41IDIzNy43NCwtMTk3IDIzNy43NCwtMTk3Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIyMy4yNCIgeT0iLTIwMC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxMiAtLT4KPGcgaWQ9Im5vZGUyNSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUxMjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxODQuNSwtMTExLjUgMTgzLjUsLTExMS41IDE4My41LC0xMTAuNSAxODQuNSwtMTEwLjUgMTg0LjUsLTExMS41Ii8+CjwvZz4KPCEtLSByb3V0ZTExJiM0NTsmZ3Q7cm91dGUxMiAtLT4KPGcgaWQ9ImVkZ2UyNSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMSYjNDU7Jmd0O3JvdXRlMTI8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LC0xOTYuNDVDMTg0LC0xODkuNTggMTg0LC0xMjAuNDkgMTg0LC0xMTEuODgiLz4KPC9nPgo8IS0tIHJvdXRlMTImIzQ1OyZndDtEb21haW5Ub3BvbG9neSAtLT4KPGcgaWQ9ImVkZ2UyNiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMiYjNDU7Jmd0O0RvbWFpblRvcG9sb2d5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NC44LC0xMTFDMTg0LjgsLTExMSAyMjcuNzQsLTExMSAyMjcuNzQsLTExMSIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIyMzcuNzQsLTExMSAyMjcuNzQsLTExNS41IDIzMi43NCwtMTExIDIyNy43NCwtMTExIDIyNy43NCwtMTExIDIyNy43NCwtMTExIDIzMi43NCwtMTExIDIyNy43NCwtMTA2LjUgMjM3Ljc0LC0xMTEgMjM3Ljc0LC0xMTEiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjIzLjI0IiB5PSItMTE0LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTEzIC0tPgo8ZyBpZD0ibm9kZTI2IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTEzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjE4NC41LC0yNS41IDE4My41LC0yNS41IDE4My41LC0yNC41IDE4NC41LC0yNC41IDE4NC41LC0yNS41Ii8+CjwvZz4KPCEtLSByb3V0ZTEyJiM0NTsmZ3Q7cm91dGUxMyAtLT4KPGcgaWQ9ImVkZ2UyNyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMiYjNDU7Jmd0O3JvdXRlMTM8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LC0xMTAuNDVDMTg0LC0xMDMuNTggMTg0LC0zNC40OSAxODQsLTI1Ljg4Ii8+CjwvZz4KPCEtLSByb3V0ZTEzJiM0NTsmZ3Q7Q2VsbENvbm5lY3Rpdml0eSAtLT4KPGcgaWQ9ImVkZ2UyOCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMyYjNDU7Jmd0O0NlbGxDb25uZWN0aXZpdHk8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LjgsLTI1QzE4NC44LC0yNSAyMjcuNzQsLTI1IDIyNy43NCwtMjUiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjM3Ljc0LC0yNSAyMjcuNzQsLTI5LjUgMjMyLjc0LC0yNSAyMjcuNzQsLTI1IDIyNy43NCwtMjUgMjI3Ljc0LC0yNSAyMzIuNzQsLTI1IDIyNy43NCwtMjAuNSAyMzcuNzQsLTI1IDIzNy43NCwtMjUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjIzLjI0IiB5PSItMjguMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt="cfdm field" width="60%">
+<img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8IS0tIEdlbmVyYXRlZCBieSBncmFwaHZpeiB2ZXJzaW9uIDIuNDMuMCAoMCkKIC0tPgo8IS0tIFRpdGxlOiAlMyBQYWdlczogMSAtLT4KPHN2ZyB3aWR0aD0iNjExcHQiIGhlaWdodD0iODk0cHQiCiB2aWV3Qm94PSIwLjAwIDAuMDAgNjEwLjUwIDg5NC4wMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CjxnIGlkPSJncmFwaDAiIGNsYXNzPSJncmFwaCIgdHJhbnNmb3JtPSJzY2FsZSgxIDEpIHJvdGF0ZSgwKSB0cmFuc2xhdGUoNCA4OTApIj4KPHRpdGxlPiUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHBvaW50cz0iLTQsNCAtNCwtODkwIDYwNi41LC04OTAgNjA2LjUsNCAtNCw0Ii8+CjwhLS0gRG9tYWluIC0tPgo8ZyBpZD0ibm9kZTEiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkRvbWFpbjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxNDQsLTYwNiAwLC02MDYgMCwtNTM0IDE0NCwtNTM0IDE0NCwtNjA2Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcyIiB5PSItNTczLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNzIiIHk9Ii01NTguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5Eb21haW48L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTUgLS0+CjxnIGlkPSJub2RlMTgiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxODQuNSwtNTcwLjUgMTgzLjUsLTU3MC41IDE4My41LC01NjkuNSAxODQuNSwtNTY5LjUgMTg0LjUsLTU3MC41Ii8+CjwvZz4KPCEtLSBEb21haW4mIzQ1OyZndDtyb3V0ZTUgLS0+CjxnIGlkPSJlZGdlOCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RG9tYWluJiM0NTsmZ3Q7cm91dGU1PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE1Ni4yLC01NzBDMTU2LjIsLTU3MCAxODMuMTgsLTU3MCAxODMuMTgsLTU3MCIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIxNTYuMiwtNTcwIDE1MC4yLC01NzQgMTQ0LjIsLTU3MCAxNTAuMiwtNTY2IDE1Ni4yLC01NzAiLz4KPC9nPgo8IS0tIEZpZWxkIC0tPgo8ZyBpZD0ibm9kZTIiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkZpZWxkPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjE4MCwtODg2IDAsLTg4NiAwLC04MTQgMTgwLC04MTQgMTgwLC04ODYiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iOTAiIHk9Ii04NTMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI5MCIgeT0iLTgzOC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkZpZWxkPC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxIC0tPgo8ZyBpZD0ibm9kZTE0IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTE8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjMuNSwtNzUzLjUgNjIuNSwtNzUzLjUgNjIuNSwtNzUyLjUgNjMuNSwtNzUyLjUgNjMuNSwtNzUzLjUiLz4KPC9nPgo8IS0tIEZpZWxkJiM0NTsmZ3Q7cm91dGUxIC0tPgo8ZyBpZD0iZWRnZTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkZpZWxkJiM0NTsmZ3Q7cm91dGUxPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTYzLC04MDEuODhDNjMsLTgwMS44OCA2MywtNzUzLjg1IDYzLC03NTMuODUiLz4KPHBvbHlnb24gZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSI2MywtODAxLjg4IDY3LC04MDcuODggNjMsLTgxMy44OCA1OSwtODA3Ljg4IDYzLC04MDEuODgiLz4KPC9nPgo8IS0tIHJvdXRlMiAtLT4KPGcgaWQ9Im5vZGUxNSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUyPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjExOC41LC03NTMuNSAxMTcuNSwtNzUzLjUgMTE3LjUsLTc1Mi41IDExOC41LC03NTIuNSAxMTguNSwtNzUzLjUiLz4KPC9nPgo8IS0tIEZpZWxkJiM0NTsmZ3Q7cm91dGUyIC0tPgo8ZyBpZD0iZWRnZTIiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkZpZWxkJiM0NTsmZ3Q7cm91dGUyPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTExOCwtODAxLjg4QzExOCwtODAxLjg4IDExOCwtNzUzLjg1IDExOCwtNzUzLjg1Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjExOCwtODAxLjg4IDEyMiwtODA3Ljg4IDExOCwtODEzLjg4IDExNCwtODA3Ljg4IDExOCwtODAxLjg4Ii8+CjwvZz4KPCEtLSBDZWxsTWV0aG9kIC0tPgo8ZyBpZD0ibm9kZTMiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkNlbGxNZXRob2Q8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzg4LC02OTIgMjQ0LC02OTIgMjQ0LC02NDIgMzg4LC02NDIgMzg4LC02OTIiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzE2IiB5PSItNjcwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzE2IiB5PSItNjU1LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q2VsbE1ldGhvZDwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkF4aXMgLS0+CjxnIGlkPSJub2RlNCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RG9tYWluQXhpczwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODMsLTU5NSAyMzksLTU5NSAyMzksLTU0NSAzODMsLTU0NSAzODMsLTU5NSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTEiIHk9Ii01NzMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTEiIHk9Ii01NTguOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5Eb21haW5BeGlzPC90ZXh0Pgo8L2c+CjwhLS0gQ2VsbE1ldGhvZCYjNDU7Jmd0O0RvbWFpbkF4aXMgLS0+CjxnIGlkPSJlZGdlMTEiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPkNlbGxNZXRob2QmIzQ1OyZndDtEb21haW5BeGlzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxMy41LC02NDEuNzdDMzEzLjUsLTY0MS43NyAzMTMuNSwtNjA1LjExIDMxMy41LC02MDUuMTEiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMzEzLjUsLTU5NS4xMSAzMTgsLTYwNS4xMSAzMTMuNSwtNjAwLjExIDMxMy41LC02MDUuMTEgMzEzLjUsLTYwNS4xMSAzMTMuNSwtNjA1LjExIDMxMy41LC02MDAuMTEgMzA5LC02MDUuMTEgMzEzLjUsLTU5NS4xMSAzMTMuNSwtNTk1LjExIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMwMC41IiB5PSItNTk4LjMxIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gR2VuZXJpY0Nvb3JkaW5hdGUgLS0+CjxnIGlkPSJub2RlMTMiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkdlbmVyaWNDb29yZGluYXRlPC90aXRsZT4KPHBvbHlnb24gZmlsbD0id2hpdGUiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODMsLTQ5OCAyMzksLTQ5OCAyMzksLTQzMCAzODMsLTQzMCAzODMsLTQ5OCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTEiIHk9Ii00ODIuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2Fic3RyYWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMSIgeT0iLTQ2Ny44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkdlbmVyaWM8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMSIgeT0iLTQ1Mi44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvb3JkaW5hdGU8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMSIgeT0iLTQzNy44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPkNvbnN0cnVjdDwvdGV4dD4KPC9nPgo8IS0tIERvbWFpbkF4aXMmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZSAtLT4KPCEtLSByb3V0ZTYgLS0+CjxnIGlkPSJub2RlMTkiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlNjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0MTkuNSwtNTcwLjUgNDE4LjUsLTU3MC41IDQxOC41LC01NjkuNSA0MTkuNSwtNTY5LjUgNDE5LjUsLTU3MC41Ii8+CjwvZz4KPCEtLSBEb21haW5BeGlzJiM0NTsmZ3Q7cm91dGU2IC0tPgo8IS0tIERvbWFpbkFuY2lsbGFyeSAtLT4KPGcgaWQ9Im5vZGU1IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5Eb21haW5BbmNpbGxhcnk8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzgyLC0zMDggMjM4LC0zMDggMjM4LC0yNTggMzgyLC0yNTggMzgyLC0zMDgiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMjg2LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMjcxLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RG9tYWluQW5jaWxsYXJ5PC90ZXh0Pgo8L2c+CjwhLS0gQ2VsbE1lYXN1cmUgLS0+CjxnIGlkPSJub2RlNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Q2VsbE1lYXN1cmU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzgyLC0yMjIgMjM4LC0yMjIgMjM4LC0xNzIgMzgyLC0xNzIgMzgyLC0yMjIiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMjAwLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMTg1LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q2VsbE1lYXN1cmU8L3RleHQ+CjwvZz4KPCEtLSBEb21haW5BbmNpbGxhcnkmIzQ1OyZndDtDZWxsTWVhc3VyZSAtLT4KPCEtLSBEb21haW5Ub3BvbG9neSAtLT4KPGcgaWQ9Im5vZGUxMSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RG9tYWluVG9wb2xvZ3k8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMzgyLC0xMzYgMjM4LC0xMzYgMjM4LC04NiAzODIsLTg2IDM4MiwtMTM2Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMCIgeT0iLTExNC44IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQuMDAiPiZsdDsmbHQ7Y29uc3RydWN0Jmd0OyZndDs8L3RleHQ+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMCIgeT0iLTk5LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RG9tYWluVG9wb2xvZ3k8L3RleHQ+CjwvZz4KPCEtLSBDZWxsTWVhc3VyZSYjNDU7Jmd0O0RvbWFpblRvcG9sb2d5IC0tPgo8IS0tIENvb3JkaW5hdGVSZWZlcmVuY2UgLS0+CjxnIGlkPSJub2RlNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+Q29vcmRpbmF0ZVJlZmVyZW5jZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODYuNSwtMzk0IDIzNy41LC0zOTQgMjM3LjUsLTM0NCAzODYuNSwtMzQ0IDM4Ni41LC0zOTQiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEyIiB5PSItMzcyLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEyIiB5PSItMzU3LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Q29vcmRpbmF0ZVJlZmVyZW5jZSA8L3RleHQ+CjwvZz4KPCEtLSBDb29yZGluYXRlUmVmZXJlbmNlJiM0NTsmZ3Q7RG9tYWluQW5jaWxsYXJ5IC0tPgo8ZyBpZD0iZWRnZTI0IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5Db29yZGluYXRlUmVmZXJlbmNlJiM0NTsmZ3Q7RG9tYWluQW5jaWxsYXJ5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxMCwtMzQzLjY2QzMxMCwtMzQzLjY2IDMxMCwtMzE4LjE2IDMxMCwtMzE4LjE2Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjMxMCwtMzA4LjE2IDMxNC41LC0zMTguMTYgMzEwLC0zMTMuMTYgMzEwLC0zMTguMTYgMzEwLC0zMTguMTYgMzEwLC0zMTguMTYgMzEwLC0zMTMuMTYgMzA1LjUsLTMxOC4xNiAzMTAsLTMwOC4xNiAzMTAsLTMwOC4xNiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyOTciIHk9Ii0zMTEuMzYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSBBdXhpbGlhcnlDb29yZGluYXRlIC0tPgo8ZyBpZD0ibm9kZTgiIGNsYXNzPSJub2RlIj4KPHRpdGxlPkF1eGlsaWFyeUNvb3JkaW5hdGU8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjYzNmZmMyIiBzdHJva2U9ImJsYWNrIiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iNjAxLC00ODkgNDU3LC00ODkgNDU3LC00MzkgNjAxLC00MzkgNjAxLC00ODkiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNDY3LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNDUyLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+QXV4aWxsYXJ5Q29vcmRpbmF0ZTwvdGV4dD4KPC9nPgo8IS0tIERpbWVuc2lvbkNvb3JkaW5hdGUgLS0+CjxnIGlkPSJub2RlOSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+RGltZW5zaW9uQ29vcmRpbmF0ZTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI2MDIuNSwtNTk1IDQ1NS41LC01OTUgNDU1LjUsLTU0NSA2MDIuNSwtNTQ1IDYwMi41LC01OTUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNTczLjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iNTI5IiB5PSItNTU4LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+RGltZW5zaW9uQ29vcmRpbmF0ZTwvdGV4dD4KPC9nPgo8IS0tIERpbWVuc2lvbkNvb3JkaW5hdGUmIzQ1OyZndDtBdXhpbGlhcnlDb29yZGluYXRlIC0tPgo8IS0tIEZpZWxkQW5jaWxsYXJ5IC0tPgo8ZyBpZD0ibm9kZTEwIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5GaWVsZEFuY2lsbGFyeTwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiNjM2ZmYzIiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIzODgsLTc3OCAyNDQsLTc3OCAyNDQsLTcyOCAzODgsLTcyOCAzODgsLTc3OCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTYiIHk9Ii03NTYuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj4mbHQ7Jmx0O2NvbnN0cnVjdCZndDsmZ3Q7PC90ZXh0Pgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMTYiIHk9Ii03NDEuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5GaWVsZEFuY2lsbGFyeTwvdGV4dD4KPC9nPgo8IS0tIEZpZWxkQW5jaWxsYXJ5JiM0NTsmZ3Q7Q2VsbE1ldGhvZCAtLT4KPGcgaWQ9ImVkZ2UxMiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RmllbGRBbmNpbGxhcnkmIzQ1OyZndDtDZWxsTWV0aG9kPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTI4MCwtNzI3LjY2QzI4MCwtNzI3LjY2IDI4MCwtNzAyLjE2IDI4MCwtNzAyLjE2Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjI4MCwtNjkyLjE2IDI4NC41LC03MDIuMTYgMjgwLC02OTcuMTYgMjgwLC03MDIuMTYgMjgwLC03MDIuMTYgMjgwLC03MDIuMTYgMjgwLC02OTcuMTYgMjc1LjUsLTcwMi4xNiAyODAsLTY5Mi4xNiAyODAsLTY5Mi4xNiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyNjUuNSIgeT0iLTY5NS4zNiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIEZpZWxkQW5jaWxsYXJ5JiM0NTsmZ3Q7Q2VsbE1ldGhvZCAtLT4KPGcgaWQ9ImVkZ2UxMyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+RmllbGRBbmNpbGxhcnkmIzQ1OyZndDtDZWxsTWV0aG9kPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxNiwtNzE3LjY2QzMxNiwtNzE3LjY2IDMxNiwtNjkyLjE2IDMxNiwtNjkyLjE2Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjMxNiwtNzI3LjY2IDMxMS41LC03MTcuNjYgMzE2LC03MjIuNjYgMzE2LC03MTcuNjYgMzE2LC03MTcuNjYgMzE2LC03MTcuNjYgMzE2LC03MjIuNjYgMzIwLjUsLTcxNy42NiAzMTYsLTcyNy42NiAzMTYsLTcyNy42NiIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIzMDEuNSIgeT0iLTcxOC44NiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIEZpZWxkQW5jaWxsYXJ5JiM0NTsmZ3Q7Q2VsbE1ldGhvZCAtLT4KPCEtLSBDZWxsQ29ubmVjdGl2aXR5IC0tPgo8ZyBpZD0ibm9kZTEyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5DZWxsQ29ubmVjdGl2aXR5PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iI2MzZmZjMiIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjM4MiwtNTAgMjM4LC01MCAyMzgsMCAzODIsMCAzODIsLTUwIi8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjMxMCIgeT0iLTI4LjgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNC4wMCI+Jmx0OyZsdDtjb25zdHJ1Y3QmZ3Q7Jmd0OzwvdGV4dD4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMzEwIiB5PSItMTMuOCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0LjAwIj5DZWxsQ29ubmVjdGl2aXR5PC90ZXh0Pgo8L2c+CjwhLS0gRG9tYWluVG9wb2xvZ3kmIzQ1OyZndDtDZWxsQ29ubmVjdGl2aXR5IC0tPgo8IS0tIEdlbmVyaWNDb29yZGluYXRlJiM0NTsmZ3Q7Q29vcmRpbmF0ZVJlZmVyZW5jZSAtLT4KPGcgaWQ9ImVkZ2UyMSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGUmIzQ1OyZndDtDb29yZGluYXRlUmVmZXJlbmNlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTMxMSwtNDE5Ljk3QzMxMSwtNDE5Ljk3IDMxMSwtMzk0LjE1IDMxMSwtMzk0LjE1Ii8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjMxMSwtNDI5Ljk3IDMwNi41LC00MTkuOTcgMzExLC00MjQuOTcgMzExLC00MTkuOTcgMzExLC00MTkuOTcgMzExLC00MTkuOTcgMzExLC00MjQuOTcgMzE1LjUsLTQxOS45NyAzMTEsLTQyOS45NyAzMTEsLTQyOS45NyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyOTgiIHk9Ii00MjEuMTciIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTggLS0+CjxnIGlkPSJub2RlMjEiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlODwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSI0MTkuNSwtNDY0LjUgNDE4LjUsLTQ2NC41IDQxOC41LC00NjMuNSA0MTkuNSwtNDYzLjUgNDE5LjUsLTQ2NC41Ii8+CjwvZz4KPCEtLSBHZW5lcmljQ29vcmRpbmF0ZSYjNDU7Jmd0O3JvdXRlOCAtLT4KPGcgaWQ9ImVkZ2UxNyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+R2VuZXJpY0Nvb3JkaW5hdGUmIzQ1OyZndDtyb3V0ZTg8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMzkzLjA0LC00NjRDMzkzLjA0LC00NjQgNDE4LjI3LC00NjQgNDE4LjI3LC00NjQiLz4KPHBvbHlnb24gZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIzOTMuMDQsLTQ2MC41IDM4My4wNCwtNDY0IDM5My4wNCwtNDY3LjUgMzkzLjA0LC00NjAuNSIvPgo8L2c+CjwhLS0gcm91dGUxJiM0NTsmZ3Q7cm91dGUyIC0tPgo8IS0tIHJvdXRlMyAtLT4KPGcgaWQ9Im5vZGUxNiIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjYzLjUsLTY2Ny41IDYyLjUsLTY2Ny41IDYyLjUsLTY2Ni41IDYzLjUsLTY2Ni41IDYzLjUsLTY2Ny41Ii8+CjwvZz4KPCEtLSByb3V0ZTEmIzQ1OyZndDtyb3V0ZTMgLS0+CjxnIGlkPSJlZGdlNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxJiM0NTsmZ3Q7cm91dGUzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTYzLC03NTIuNDVDNjMsLTc0NS41OCA2MywtNjc2LjQ5IDYzLC02NjcuODgiLz4KPC9nPgo8IS0tIHJvdXRlMiYjNDU7Jmd0O0ZpZWxkQW5jaWxsYXJ5IC0tPgo8ZyBpZD0iZWRnZTMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMiYjNDU7Jmd0O0ZpZWxkQW5jaWxsYXJ5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTExOC41NywtNzUzQzExOC41NywtNzUzIDIzMy44MiwtNzUzIDIzMy44MiwtNzUzIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjI0My44MiwtNzUzIDIzMy44MiwtNzU3LjUgMjM4LjgyLC03NTMgMjMzLjgyLC03NTMgMjMzLjgyLC03NTMgMjMzLjgyLC03NTMgMjM4LjgyLC03NTMgMjMzLjgyLC03NDguNSAyNDMuODIsLTc1MyAyNDMuODIsLTc1MyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjkuMzIiIHk9Ii03NTYuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlNCAtLT4KPGcgaWQ9Im5vZGUxNyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGU0PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjExOC41LC02NjcuNSAxMTcuNSwtNjY3LjUgMTE3LjUsLTY2Ni41IDExOC41LC02NjYuNSAxMTguNSwtNjY3LjUiLz4KPC9nPgo8IS0tIHJvdXRlMiYjNDU7Jmd0O3JvdXRlNCAtLT4KPGcgaWQ9ImVkZ2U1IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTImIzQ1OyZndDtyb3V0ZTQ8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTE4LC03NTIuNDVDMTE4LC03NDUuNTggMTE4LC02NzYuNDkgMTE4LC02NjcuODgiLz4KPC9nPgo8IS0tIHJvdXRlMyYjNDU7Jmd0O0RvbWFpbiAtLT4KPGcgaWQ9ImVkZ2U3IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTMmIzQ1OyZndDtEb21haW48L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNNjMsLTY2Ni4zOEM2MywtNjY2LjM4IDYzLC02MTYuMDEgNjMsLTYxNi4wMSIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSI2MywtNjA2LjAxIDY3LjUsLTYxNi4wMSA2MywtNjExLjAxIDYzLC02MTYuMDEgNjMsLTYxNi4wMSA2MywtNjE2LjAxIDYzLC02MTEuMDEgNTguNSwtNjE2LjAxIDYzLC02MDYuMDEgNjMsLTYwNi4wMSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSI0OSIgeT0iLTYwOS4yMSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4xICYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlMyYjNDU7Jmd0O3JvdXRlNCAtLT4KPCEtLSByb3V0ZTQmIzQ1OyZndDtDZWxsTWV0aG9kIC0tPgo8ZyBpZD0iZWRnZTYiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlNCYjNDU7Jmd0O0NlbGxNZXRob2Q8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTE4LjU3LC02NjdDMTE4LjU3LC02NjcgMjMzLjgyLC02NjcgMjMzLjgyLC02NjciLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjQzLjgyLC02NjcgMjMzLjgyLC02NzEuNSAyMzguODIsLTY2NyAyMzMuODIsLTY2NyAyMzMuODIsLTY2NyAyMzMuODIsLTY2NyAyMzguODIsLTY2NyAyMzMuODIsLTY2Mi41IDI0My44MiwtNjY3IDI0My44MiwtNjY3Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIyOS4zMiIgeT0iLTY3MC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGU1JiM0NTsmZ3Q7RG9tYWluQXhpcyAtLT4KPGcgaWQ9ImVkZ2U5IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTUmIzQ1OyZndDtEb21haW5BeGlzPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NC44MSwtNTcwQzE4NC44MSwtNTcwIDIyOC44NywtNTcwIDIyOC44NywtNTcwIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjIzOC44NywtNTcwIDIyOC44NywtNTc0LjUgMjMzLjg3LC01NzAgMjI4Ljg3LC01NzAgMjI4Ljg3LC01NzAgMjI4Ljg3LC01NzAgMjMzLjg3LC01NzAgMjI4Ljg3LC01NjUuNSAyMzguODcsLTU3MCAyMzguODcsLTU3MCIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjQuMzciIHk9Ii01NzMuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlNyAtLT4KPGcgaWQ9Im5vZGUyMCIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGU3PC90aXRsZT4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjE4NC41LC00NjQuNSAxODMuNSwtNDY0LjUgMTgzLjUsLTQ2My41IDE4NC41LC00NjMuNSAxODQuNSwtNDY0LjUiLz4KPC9nPgo8IS0tIHJvdXRlNSYjNDU7Jmd0O3JvdXRlNyAtLT4KPGcgaWQ9ImVkZ2UxNCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU1JiM0NTsmZ3Q7cm91dGU3PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NCwtNTY5LjMyQzE4NCwtNTYwLjcyIDE4NCwtNDcyLjg0IDE4NCwtNDY0LjYyIi8+CjwvZz4KPCEtLSByb3V0ZTYmIzQ1OyZndDtEaW1lbnNpb25Db29yZGluYXRlIC0tPgo8ZyBpZD0iZWRnZTEwIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTYmIzQ1OyZndDtEaW1lbnNpb25Db29yZGluYXRlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTQxOS43LC01NzBDNDIzLjAzLC01NzAgNDM3LjgxLC01NzAgNDU1LjQ3LC01NzAiLz4KPC9nPgo8IS0tIHJvdXRlNiYjNDU7Jmd0O3JvdXRlOCAtLT4KPGcgaWQ9ImVkZ2UxNSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU2JiM0NTsmZ3Q7cm91dGU4PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTQxOSwtNTY5LjMyQzQxOSwtNTYwLjcyIDQxOSwtNDcyLjg0IDQxOSwtNDY0LjYyIi8+CjwvZz4KPCEtLSByb3V0ZTcmIzQ1OyZndDtHZW5lcmljQ29vcmRpbmF0ZSAtLT4KPGcgaWQ9ImVkZ2UxNiIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU3JiM0NTsmZ3Q7R2VuZXJpY0Nvb3JkaW5hdGU8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LjgxLC00NjRDMTg0LjgxLC00NjQgMjI4Ljg3LC00NjQgMjI4Ljg3LC00NjQiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjM4Ljg3LC00NjQgMjI4Ljg3LC00NjguNSAyMzMuODcsLTQ2NCAyMjguODcsLTQ2NCAyMjguODcsLTQ2NCAyMjguODcsLTQ2NCAyMzMuODcsLTQ2NCAyMjguODcsLTQ1OS41IDIzOC44NywtNDY0IDIzOC44NywtNDY0Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIyNC4zNyIgeT0iLTQ2Ny4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGU5IC0tPgo8ZyBpZD0ibm9kZTIyIiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTk8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMTgzLjUsLTM2OS41IDE4Mi41LC0zNjkuNSAxODIuNSwtMzY4LjUgMTgzLjUsLTM2OC41IDE4My41LC0zNjkuNSIvPgo8L2c+CjwhLS0gcm91dGU3JiM0NTsmZ3Q7cm91dGU5IC0tPgo8ZyBpZD0iZWRnZTE5IiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTcmIzQ1OyZndDtyb3V0ZTk8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTgzLjUsLTQ2My4zOUMxODMuNSwtNDU1LjY4IDE4My41LC0zNzYuOTIgMTgzLjUsLTM2OS41NSIvPgo8L2c+CjwhLS0gcm91dGU4JiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZSAtLT4KPGcgaWQ9ImVkZ2UxOCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGU4JiM0NTsmZ3Q7QXV4aWxpYXJ5Q29vcmRpbmF0ZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik00MTkuNywtNDY0QzQyMy4xMiwtNDY0IDQzOC42MywtNDY0IDQ1Ni45MywtNDY0Ii8+CjwvZz4KPCEtLSByb3V0ZTkmIzQ1OyZndDtDb29yZGluYXRlUmVmZXJlbmNlIC0tPgo8ZyBpZD0iZWRnZTIwIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTkmIzQ1OyZndDtDb29yZGluYXRlUmVmZXJlbmNlPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4My44MiwtMzY5QzE4My44MiwtMzY5IDIyNy4zLC0zNjkgMjI3LjMsLTM2OSIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIyMzcuMywtMzY5IDIyNy4zLC0zNzMuNSAyMzIuMywtMzY5IDIyNy4zLC0zNjkgMjI3LjMsLTM2OSAyMjcuMywtMzY5IDIzMi4zLC0zNjkgMjI3LjMsLTM2NC41IDIzNy4zLC0zNjkgMjM3LjMsLTM2OSIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjIuOCIgeT0iLTM3Mi4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxMCAtLT4KPGcgaWQ9Im5vZGUyMyIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUxMDwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxODQuNSwtMjgzLjUgMTgzLjUsLTI4My41IDE4My41LC0yODIuNSAxODQuNSwtMjgyLjUgMTg0LjUsLTI4My41Ii8+CjwvZz4KPCEtLSByb3V0ZTkmIzQ1OyZndDtyb3V0ZTEwIC0tPgo8ZyBpZD0iZWRnZTIyIiBjbGFzcz0iZWRnZSI+Cjx0aXRsZT5yb3V0ZTkmIzQ1OyZndDtyb3V0ZTEwPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4My41LC0zNjguNDVDMTgzLjUsLTM2MS41OCAxODMuNSwtMjkyLjQ5IDE4My41LC0yODMuODgiLz4KPC9nPgo8IS0tIHJvdXRlMTAmIzQ1OyZndDtEb21haW5BbmNpbGxhcnkgLS0+CjxnIGlkPSJlZGdlMjMiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMTAmIzQ1OyZndDtEb21haW5BbmNpbGxhcnk8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LjgsLTI4M0MxODQuOCwtMjgzIDIyNy43NCwtMjgzIDIyNy43NCwtMjgzIi8+Cjxwb2x5Z29uIGZpbGw9ImJsYWNrIiBzdHJva2U9ImJsYWNrIiBwb2ludHM9IjIzNy43NCwtMjgzIDIyNy43NCwtMjg3LjUgMjMyLjc0LC0yODMgMjI3Ljc0LC0yODMgMjI3Ljc0LC0yODMgMjI3Ljc0LC0yODMgMjMyLjc0LC0yODMgMjI3Ljc0LC0yNzguNSAyMzcuNzQsLTI4MyAyMzcuNzQsLTI4MyIvPgo8dGV4dCB0ZXh0LWFuY2hvcj0ibWlkZGxlIiB4PSIyMjMuMjQiIHk9Ii0yODYuMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8IS0tIHJvdXRlMTEgLS0+CjxnIGlkPSJub2RlMjQiIGNsYXNzPSJub2RlIj4KPHRpdGxlPnJvdXRlMTE8L3RpdGxlPgo8cG9seWdvbiBmaWxsPSIjMDAwMDAwIiBzdHJva2U9InRyYW5zcGFyZW50IiBzdHJva2Utd2lkdGg9IjIiIHBvaW50cz0iMTg0LjUsLTE5Ny41IDE4My41LC0xOTcuNSAxODMuNSwtMTk2LjUgMTg0LjUsLTE5Ni41IDE4NC41LC0xOTcuNSIvPgo8L2c+CjwhLS0gcm91dGUxMCYjNDU7Jmd0O3JvdXRlMTEgLS0+CjxnIGlkPSJlZGdlMjUiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMTAmIzQ1OyZndDtyb3V0ZTExPC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NCwtMjgyLjQ1QzE4NCwtMjc1LjU4IDE4NCwtMjA2LjQ5IDE4NCwtMTk3Ljg4Ii8+CjwvZz4KPCEtLSByb3V0ZTExJiM0NTsmZ3Q7Q2VsbE1lYXN1cmUgLS0+CjxnIGlkPSJlZGdlMjYiIGNsYXNzPSJlZGdlIj4KPHRpdGxlPnJvdXRlMTEmIzQ1OyZndDtDZWxsTWVhc3VyZTwvdGl0bGU+CjxwYXRoIGZpbGw9Im5vbmUiIHN0cm9rZT0iYmxhY2siIGQ9Ik0xODQuOCwtMTk3QzE4NC44LC0xOTcgMjI3Ljc0LC0xOTcgMjI3Ljc0LC0xOTciLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjM3Ljc0LC0xOTcgMjI3Ljc0LC0yMDEuNSAyMzIuNzQsLTE5NyAyMjcuNzQsLTE5NyAyMjcuNzQsLTE5NyAyMjcuNzQsLTE5NyAyMzIuNzQsLTE5NyAyMjcuNzQsLTE5Mi41IDIzNy43NCwtMTk3IDIzNy43NCwtMTk3Ii8+Cjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjIyMy4yNCIgeT0iLTIwMC4yIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTEuMDAiPjAuLiogJiMxNjA7JiMxNjA7JiMxNjA7PC90ZXh0Pgo8L2c+CjwhLS0gcm91dGUxMiAtLT4KPGcgaWQ9Im5vZGUyNSIgY2xhc3M9Im5vZGUiPgo8dGl0bGU+cm91dGUxMjwvdGl0bGU+Cjxwb2x5Z29uIGZpbGw9IiMwMDAwMDAiIHN0cm9rZT0idHJhbnNwYXJlbnQiIHN0cm9rZS13aWR0aD0iMiIgcG9pbnRzPSIxODQuNSwtMTExLjUgMTgzLjUsLTExMS41IDE4My41LC0xMTAuNSAxODQuNSwtMTEwLjUgMTg0LjUsLTExMS41Ii8+CjwvZz4KPCEtLSByb3V0ZTExJiM0NTsmZ3Q7cm91dGUxMiAtLT4KPGcgaWQ9ImVkZ2UyNyIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMSYjNDU7Jmd0O3JvdXRlMTI8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LC0xOTYuNDVDMTg0LC0xODkuNTggMTg0LC0xMjAuNDkgMTg0LC0xMTEuODgiLz4KPC9nPgo8IS0tIHJvdXRlMTImIzQ1OyZndDtEb21haW5Ub3BvbG9neSAtLT4KPGcgaWQ9ImVkZ2UyOCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMiYjNDU7Jmd0O0RvbWFpblRvcG9sb2d5PC90aXRsZT4KPHBhdGggZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgZD0iTTE4NC44LC0xMTFDMTg0LjgsLTExMSAyMjcuNzQsLTExMSAyMjcuNzQsLTExMSIvPgo8cG9seWdvbiBmaWxsPSJibGFjayIgc3Ryb2tlPSJibGFjayIgcG9pbnRzPSIyMzcuNzQsLTExMSAyMjcuNzQsLTExNS41IDIzMi43NCwtMTExIDIyNy43NCwtMTExIDIyNy43NCwtMTExIDIyNy43NCwtMTExIDIzMi43NCwtMTExIDIyNy43NCwtMTA2LjUgMjM3Ljc0LC0xMTEgMjM3Ljc0LC0xMTEiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjIzLjI0IiB5PSItMTE0LjIiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMS4wMCI+MC4uKiAmIzE2MDsmIzE2MDsmIzE2MDs8L3RleHQ+CjwvZz4KPCEtLSByb3V0ZTEzIC0tPgo8ZyBpZD0ibm9kZTI2IiBjbGFzcz0ibm9kZSI+Cjx0aXRsZT5yb3V0ZTEzPC90aXRsZT4KPHBvbHlnb24gZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJ0cmFuc3BhcmVudCIgc3Ryb2tlLXdpZHRoPSIyIiBwb2ludHM9IjE4NC41LC0yNS41IDE4My41LC0yNS41IDE4My41LC0yNC41IDE4NC41LC0yNC41IDE4NC41LC0yNS41Ii8+CjwvZz4KPCEtLSByb3V0ZTEyJiM0NTsmZ3Q7cm91dGUxMyAtLT4KPGcgaWQ9ImVkZ2UyOSIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMiYjNDU7Jmd0O3JvdXRlMTM8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LC0xMTAuNDVDMTg0LC0xMDMuNTggMTg0LC0zNC40OSAxODQsLTI1Ljg4Ii8+CjwvZz4KPCEtLSByb3V0ZTEzJiM0NTsmZ3Q7Q2VsbENvbm5lY3Rpdml0eSAtLT4KPGcgaWQ9ImVkZ2UzMCIgY2xhc3M9ImVkZ2UiPgo8dGl0bGU+cm91dGUxMyYjNDU7Jmd0O0NlbGxDb25uZWN0aXZpdHk8L3RpdGxlPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9ImJsYWNrIiBkPSJNMTg0LjgsLTI1QzE4NC44LC0yNSAyMjcuNzQsLTI1IDIyNy43NCwtMjUiLz4KPHBvbHlnb24gZmlsbD0iYmxhY2siIHN0cm9rZT0iYmxhY2siIHBvaW50cz0iMjM3Ljc0LC0yNSAyMjcuNzQsLTI5LjUgMjMyLjc0LC0yNSAyMjcuNzQsLTI1IDIyNy43NCwtMjUgMjI3Ljc0LC0yNSAyMzIuNzQsLTI1IDIyNy43NCwtMjAuNSAyMzcuNzQsLTI1IDIzNy43NCwtMjUiLz4KPHRleHQgdGV4dC1hbmNob3I9Im1pZGRsZSIgeD0iMjIzLjI0IiB5PSItMjguMiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExLjAwIj4wLi4qICYjMTYwOyYjMTYwOyYjMTYwOzwvdGV4dD4KPC9nPgo8L2c+Cjwvc3ZnPgo=" alt="cfdm field" width="60%">
 </div>
 <div class="title">Figure I.2. The constructs of the CF data model. The field and domain constructs correspond to CF-netCDF data and domain variables respectively (defined in <a href="#figure-cf-concepts">Figure I.1</a> and identified here with the "CN" prefix). Relationships between the other constructs and CF-netCDF are given in <a href="#figure-dim-aux">Figure I.3</a> and <a href="#figure-coordinate-reference">Figure I.4</a>. It is useful to define an abstract generic coordinate construct that can be used to refer to coordinates when the their type (dimension or auxiliary coordinate construct) is not an issue.</div>
 </div>
@@ -12283,10 +12952,12 @@ In the direct case, the integer indices contained in the UGRID variable may be u
 For example, if a data variable holds a variable retrieved from a satellite instrument, a related ancillary data variable might provide the uncertainty estimates for those retrievals (varying over the same spatiotemporal domain).</p>
 </div>
 <div class="paragraph">
-<p>The field ancillary construct consists of an array of the ancillary data which is either scalar or which depends on one, more or all of the domain axis constructs, and properties to describe the data (in the same sense as for the field construct).
+<p>The field ancillary construct consists of an array of the ancillary data which is either scalar or which depends on one, more or all of the domain axis constructs.
 It is assumed that the data do not depend on axes of the domain which are not spanned by the array, along which the values are implicitly propagated.
-CF-netCDF ancillary data variables correspond to field ancillary constructs.
-Note that a field ancillary construct is constrained by the domain definition of the parent field construct but does not contribute to the domain’s definition, unlike, for instance, an auxiliary coordinate construct or domain ancillary construct.</p>
+It may have properties to describe the data (in the same sense as for the field construct).
+Note that a field ancillary construct is constrained by the domain definition of the parent field construct but does not contribute to the domain&#8217;s definition, unlike, for instance, an auxiliary coordinate construct or domain ancillary construct.
+The field ancillary construct may have cell methods constructs (<a href="#data-model-cell-method">Cell method construct</a>), which are supplementary information for a single one of the cell method constructs of the field, but do not contribute to the definition of the domain.
+CF-netCDF ancillary data variables correspond to field ancillary constructs.</p>
 </div>
 </div>
 <div class="sect3">
@@ -14612,7 +15283,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2025-12-16 23:23:28 UTC
+Last updated 2025-12-16 23:26:16 UTC
 </div>
 </div>
 </body>

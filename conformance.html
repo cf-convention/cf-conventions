@@ -1463,7 +1463,60 @@ The specified variable must exist in the file.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="geometries">7.5 Geometries</h3>
+<h3 id="_7_5_anomaly_data">7.5 Anomaly data</h3>
+<div class="paragraph">
+<p><strong>Requirements:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>In a <strong><code>cell_methods</code></strong> entry of the form <em>name</em><strong><code>:</code></strong> [<em>name</em><strong><code>:</code></strong> &#8230;&#8203;] <strong><code>anomaly_wrt</code></strong> <em>norm</em>, the word <em>norm</em> must be the name of a variable that is present in the file, and is named by the <strong><code>ancillary_variables</code></strong> attribute of the data variable (hence we hereafter refer to it as the "norm ancillary variable").</p>
+</li>
+<li>
+<p>Each of the coordinate variables and scalar coordinate variables identified by the <em>name</em>s in the <strong><code>anomaly_wrt</code></strong> entry of <strong><code>cell_methods</code></strong> (we refer to these variables hereafter as "anomaly coordinate variables") must have a <strong><code>standard_name</code></strong> attribute.</p>
+</li>
+<li>
+<p>If either the data variable or the norm ancillary variable has a <strong><code>standard_name</code></strong> attribute, its value must not end in <strong><code>_anomaly</code></strong>, and if they both have <strong><code>standard_name</code></strong> attributes, they must have the same value.</p>
+</li>
+<li>
+<p>The anomaly coordinate variables must not be coordinate variables or scalar coordinate variables of the norm ancillary variable.</p>
+</li>
+<li>
+<p>The coordinate variables and scalar coordinate variables of the norm ancillary variable must satisfy one of the following conditions:</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The norm ancillary variable has all the coordinate variables (and their dimensions) and the scalar coordinate variables of the data variable, except for the anomaly coordinate variables.</p>
+</li>
+<li>
+<p>The norm ancillary variable has none of the coordinate variables or scalar coordinate variables of the data variable.</p>
+</li>
+<li>
+<p>The norm ancillary variable has no scalar coordinate variables, and its sole dimension is the dimension of an anomaly coordinate variable of time.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>In cases (1) and (2), for each of the anomaly coordinate variables, the norm ancillary variable must have either a coordinate variable with a size-one dimension, or a scalar coordinate variable, with the same <strong><code>standard_name</code></strong> attribute as the anomaly coordinate variable, and each of these variables must have either a <strong><code>bounds</code></strong> or a <strong><code>climatology</code></strong> attribute. (We hereafter refer to these variables as "norm coordinate variables.)</p>
+</li>
+<li>
+<p>In cases (1) and (2), the norm ancillary variable must have a <strong><code>cell_methods</code></strong> attribute with an entry that refers to all the norm coordinate variables, or more than one entry if they contain <strong><code>within</code></strong> and <strong><code>over</code></strong> keywords.</p>
+</li>
+<li>
+<p>In case (3), the norm ancillary variable must have a <strong><code>cell_methods</code></strong> attribute comprising entries containing <strong><code>within</code></strong> and <strong><code>over</code></strong> keywords and referring to its sole dimension.</p>
+</li>
+<li>
+<p>In cases (2) and (3), <strong><code>cell_methods</strong></code> must have no entries other that the ones described in the previous two points.</p>
+</li>
+<li>
+<p>In case (3), the norm ancillary variable must have an auxiliary coordinate variable of integer type with a <strong><code>select</code></strong> attribute naming a time coordinate variable that has a <strong><code>climatology</code></strong> attribute. The auxiliary coordinate values must be non-negative and less than the dimension named by the <strong><code>select</code></strong> attribute.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="geometries">7.6 Geometries</h3>
 <div class="paragraph">
 <p><strong>Requirements:</strong></p>
 </div>
@@ -1734,7 +1787,7 @@ If the optional formula term <code><strong>nsigma</strong></code> is supplied, i
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2025-12-16 23:23:28 UTC
+Last updated 2025-12-16 23:26:16 UTC
 </div>
 </div>
 </body>
