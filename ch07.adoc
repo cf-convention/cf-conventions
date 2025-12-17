@@ -737,7 +737,7 @@ In the remainder of this section and the following two (<<anomalies-norm-data>> 
 In <<temporal-anomalies>>, we describe a legacy convention that depends on special standard names.
 It can be used only for simple temporal anomalies, and is insufficiently informative for many use-cases.
 
-The generalized definition of an anomaly value __A__ of some physical quantity __q__ is the difference __P__ &minus; __N__ between a particular value __P__ of __q__ and a normal value or norm __N__ of __q__.
+The generalized definition of an anomaly value __A__ of some physical quantity __q__ is the difference __P__ − __N__ between a particular value __P__ of __q__ and a normal value or norm __N__ of __q__.
 __N__ is some statistic calculated from the values of __q__ that lie within specified ranges of one or more of the variables (usually spatiotemporal coordinates) on which __q__ depends.
 We denote this set of variables as {__c__}; usually there is only one variable in the set.
 __P__ can be, but is not necessarily, one of the values of __q__ from which __N__ is calculated.
@@ -766,7 +766,7 @@ This **`cell_methods`** entry tells us:
 
 * that the data variable contains anomalies (__A__ in the notation of the start of this section) calculated from data (__P__) with the same dimensions, as the difference from the normal statistic (__N__) named __norm__.
 
-* at which stage the anomaly __A__ = __P__ &minus; __N__ was calculated.
+* at which stage the anomaly __A__ = __P__ − __N__ was calculated.
 This is known because the entries in **`cell_methods`** appear in order of application.
 
 * that __N__ was calculated from the variation of __P__ over dimensions identified by the __name__(s).
@@ -836,7 +836,7 @@ If the climatological time axis is multivalued, a norm metadata variable is requ
 .Distinguishing temporal anomalies with different kinds of norm
 ====
 The anomaly data variable (__A__, **`delta_tas`**) contains daily maxima (along its **`time`** dimension) for 16th-19th July 2023 of the anomaly in **`air_temperature`** with respect to the climatological mean (__N__, **`climatological_tas`**) of the 30-year period 1990-2019.
-In this example, we include the variable **`tas`** (__P__), from which __A__ was calculated, as __P__ &minus; __N__.
+In this example, we include the variable **`tas`** (__P__), from which __A__ was calculated, as __P__ − __N__.
 The variable **`tas`** has no metadata that formally identifies it as __P__, and __P__ would not usually be included in the dataset; it is shown here for comparison of its metadata with **`delta_tas`** and **`climatological_tas`**:
 ----
 dimensions:
@@ -1046,7 +1046,7 @@ data:
   zm=-999; // _FillValue indicates that the norm metadata variable contains no data
 ----
 
-The **`zmbounds`** indicate that **`rtoa`** contains anomalies with respect to the zonal mean calculated over longitudes ranging eastward from 120&deg;E to 90&deg;W.
+The **`zmbounds`** indicate that **`rtoa`** contains anomalies with respect to the zonal mean calculated over longitudes ranging eastward from 120°E to 90°W.
 The **`zmlongitude`** should be a value within the range of longitudes covered, but its precise choice is usually arbitrary.
 ====
 
@@ -1091,7 +1091,7 @@ The value of element __i__ of the auxiliary coordinate variable is the index (nu
 Using this method means that the norm metadata variable can refer to a subset of elements of the climatological time axis if only some of them are relevant, and it can refer repeatedly to elements of climatological time axis if there is more than one anomaly time referring to a given climatological time.
 
 In the following example, by "timestep __i__" we mean the slice of the data variable along its time dimension with index __i__ (recalling that index numbering starts with 0).
-Suppose that __A__ contains monthly anomalies for the months of June, July, and August of 2023 and 2024 with respect to __N__, the 30-year climatological monthly means for 1990&ndash;2019.
+Suppose that __A__ contains monthly anomalies for the months of June, July, and August of 2023 and 2024 with respect to __N__, the 30-year climatological monthly means for 1990-2019.
 __N__ has a climatological time axis with a dimension of 12, one for each month January through December.
 The anomaly axis is time, and __A__ has a time dimension of 6 (two years times three months).
 The first time coordinate of __A__ is June 2023, and the first value of the auxiliary coordinate variable is 5, indicating that timestep 0 of __A__ (June 2023) is the anomaly with respect to the timestep 5 of __N__ (climatological June).
@@ -1110,7 +1110,7 @@ Example 7.19 illustrates this convention, using the example described above.
 [caption="Example 7.19. "]
 .An anomaly data variable whose norm has a multivalued climatological time coordinate variable
 ====
-The anomaly data variable (**`delta_tas`**, __A__) contains anomalies for the months of June, July and August of 2023 and 2024 with respect to the 30-year climatological means of those months for 1990--2019, as indicated by the norm metadata variable (**`climatological_tas_metadata`**, __N__). 
+The anomaly data variable (**`delta_tas`**, __A__) contains anomalies for the months of June, July and August of 2023 and 2024 with respect to the 30-year climatological means of those months for 1990-2019, as indicated by the norm metadata variable (**`climatological_tas_metadata`**, __N__). 
 ----
 dimensions:
   time=6;
@@ -1152,7 +1152,7 @@ data:
 ----
 Element **0** of **`month_indices`** is **5**.
 
-This means that element **0** of **`time`**, which is 2023-06-16 (with bounds of 2023-06-01 and 2023-07-01, i.e. the whole of June 2023) is paired with element **5** of **`climatological_time`**, which is the climatology for June 1991&ndash;2000.
+This means that element **0** of **`time`**, which is 2023-06-16 (with bounds of 2023-06-01 and 2023-07-01, i.e. the whole of June 2023) is paired with element **5** of **`climatological_time`**, which is the climatology for June 1991-2000.
 It indicates that **`delta_tas(0,:,:)`**, where by **`:`** we mean the entire range of the dimension, is the difference between **`tas(0,:,:)`** and **`climatological_tas(5,:,:)`**.
 
 If we chose instead to show the climatological time axis with only the three months needed in this example (June, July, and August), the following lines would replace the corresponding ones in the example above:
@@ -1227,10 +1227,10 @@ Such ambiguities can be resolved by the conventions of <<anomalies-norm-data>> a
 [caption="Example 7.21. "]
 .Ambiguity in interpreting an anomaly data variable with a reference epoch
 ====
-The standard name **`air_temperature_anomaly`** of Example 7.20 is defined as the difference of air temperature from its climatology, i.e., **`delta_tas`** (__A__) = **`tas`** (__P__) &minus; **`climatological_tas`** (__N__).
+The standard name **`air_temperature_anomaly`** of Example 7.20 is defined as the difference of air temperature from its climatology, i.e., **`delta_tas`** (__A__) = **`tas`** (__P__) − **`climatological_tas`** (__N__).
  __P__ and __N__ may or may not be contained in the dataset, but __N__ is not fully described by the metadata.
 
-One possibility is that **`delta_tas`** is the difference between daily maxima in **`tas`** and the time-mean of the entire 30-year period 1990&ndash;2019 in **`climatological_tas`**:
+One possibility is that **`delta_tas`** is the difference between daily maxima in **`tas`** and the time-mean of the entire 30-year period 1990-2019 in **`climatological_tas`**:
 ----
   float tas(time,latitude,longitude);
     tas:standard_name="air_temperature";
