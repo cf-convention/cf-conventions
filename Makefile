@@ -30,6 +30,19 @@ CONF_DOC_BUILD_DIR := $(BUILD_DIR)
 
 CONF_DOC_INC := conformance.adoc version.adoc
 
+# ------------------------------------------------------------
+# Tools / commands (override from environment or CLI if needed)
+# ------------------------------------------------------------
+RUBY ?= ruby
+ASCIIDOCTOR ?= asciidoctor
+# Use `ruby -S` to locate the executable in a more portable way
+# (avoids issues with RubyGems-generated shebangs)
+#ASCIIDOCTOR_PDF ?= asciidoctor-pdf
+ASCIIDOCTOR_PDF ?= $(RUBY) -S asciidoctor-pdf
+PYTHON ?= python3
+DOT ?= dot
+# ------------------------------------------------------------
+
 ifdef CF_FINAL
 DATE_FORMAT := +%d&\#160;%B,&\#160;%Y
 FINAL_TAG := -a final
@@ -67,26 +80,26 @@ html: conventions-html conformance-html
 pdf: conventions-pdf conformance-pdf
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
-	asciidoctor --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR) --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 #	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
-	asciidoctor-pdf --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR_PDF) --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
-	asciidoctor --verbose --trace ${FINAL_TAG} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR) --verbose --trace ${FINAL_TAG} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
-	asciidoctor-pdf --verbose --trace ${FINAL_TAG} -d book $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR_PDF) --verbose --trace ${FINAL_TAG} -d book $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
 about-authors.adoc: authors.adoc scripts/update_authors.py
-	python3 scripts/update_authors.py --authors-adoc=authors.adoc --write-about-authors=about-authors.adoc
+	$(PYTHON) scripts/update_authors.py --authors-adoc=authors.adoc --write-about-authors=about-authors.adoc
 
 zenodo.json: authors.adoc scripts/update_authors.py
-	python3 scripts/update_authors.py --authors-adoc=authors.adoc --update-zenodo=zenodo.json
+	$(PYTHON) scripts/update_authors.py --authors-adoc=authors.adoc --update-zenodo=zenodo.json
 
 CITATION.cff: authors.adoc scripts/update_authors.py
-	python3 scripts/update_authors.py --authors-adoc=authors.adoc --update-citation=CITATION.cff
+	$(PYTHON) scripts/update_authors.py --authors-adoc=authors.adoc --update-citation=CITATION.cff
   
 $(BUILD_DIR):
 	mkdir -vp $(BUILD_DIR)
@@ -96,13 +109,13 @@ clean:
 
 #Rules to build non-static images. See MAIN_DOC_IMG_BLD above
 images/cfdm_cf_concepts.svg: images/cfdm_cf_concepts.gv
-	dot -Tsvg $< -o $@
+	$(DOT) -Tsvg $< -o $@
 
 images/cfdm_coordinate_reference.svg: images/cfdm_coordinate_reference.gv
-	dot -Tsvg $< -o $@
+	$(DOT) -Tsvg $< -o $@
 
 images/cfdm_coordinates.svg: images/cfdm_coordinates.gv
-	dot -Tsvg $< -o $@
+	$(DOT) -Tsvg $< -o $@
 
 images/cfdm_field.svg: images/cfdm_field.gv
-	dot -Tsvg $< -o $@
+	$(DOT) -Tsvg $< -o $@
