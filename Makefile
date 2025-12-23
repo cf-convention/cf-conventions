@@ -42,6 +42,8 @@ ASCIIDOCTOR_PDF ?= $(RUBY) -S asciidoctor-pdf
 PYTHON ?= python3
 DOT ?= dot
 # ------------------------------------------------------------
+# PDF theme used by asciidoctor-pdf
+PDF_THEME ?= default-theme-CF-version.yml
 
 ifdef CF_FINAL
 DATE_FORMAT := +%d&\#160;%B,&\#160;%Y
@@ -92,8 +94,8 @@ $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_
 	$(ASCIIDOCTOR) --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 #	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 
-$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: default-theme-CF-version.yml $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
-	$(ASCIIDOCTOR_PDF) --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(PDF_THEME) $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR_PDF) --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=$(PDF_THEME) $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
 	$(ASCIIDOCTOR) --verbose --trace ${FINAL_TAG} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
