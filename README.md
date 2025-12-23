@@ -34,8 +34,8 @@ The following steps outline how to build the CF Conventions documentation into H
       `make conformance`
    - Remove built documents and clean build directories:
       `make clean`
-   - Build with the FINAL tag and a date stamp. Ensure you have manually updated the version in the `version.adoc` file before running this command:
-      `make CF_FINAL=True`
+   - Build with the FINAL tag and a date stamp. Ensure you have manually updated the version in the `version.adoc` file before running this command. For FINAL builds, the release date must be provided explicitly:
+      `make CF_FINAL=True CF_FINAL_DATE=YYYY-MM-DD`
 
 Both HTML documents will have images embedded within `.html` file.
 
