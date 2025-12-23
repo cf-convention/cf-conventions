@@ -63,27 +63,36 @@ else
 DATE_DOCPROD != LC_ALL=C date -u "$(DATE_FORMAT)"
 endif
 
-.PHONY: all clean images authors html pdf conventions-html conventions-pdf conventions conformance-html conformance-pdf conformance
-all: authors images html pdf 
-images: $(addprefix images/, $(MAIN_DOC_IMG_BLD)) 
-authors: about-authors.adoc zenodo.json CITATION.cff
+.PHONY: all clean
+.PHONY: html pdf 
+.PHONY: conventions-html conventions-pdf conventions
+.PHONY: conformance-html conformance-pdf conformance
+.PHONY: figures authors
+.PHONY: check-tools check-tools-html check-tools-pdf
+.PHONY: check-tools-ruby check-tools-asciidoctor check-tools-asciidoctor-pdf
+.PHONY: check-tools-dot check-tools-python
 
-conventions-html: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
-conventions-pdf: $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
+all:  authors html pdf 
+html: conventions-html conformance-html
+pdf:  conventions-pdf conformance-pdf
 conventions: conventions-html conventions-pdf
-
-conformance-html: $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html
-conformance-pdf: $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf
 conformance: conformance-html conformance-pdf
 
-html: conventions-html conformance-html
-pdf: conventions-pdf conformance-pdf
+authors:          check-tools-python about-authors.adoc zenodo.json CITATION.cff
+figures:          check-tools-dot    $(addprefix images/, $(MAIN_DOC_IMG_BLD)) 
+
+conventions-html: check-tools-html   figures $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
+conventions-pdf:  check-tools-pdf    figures $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf
+
+conformance-html: check-tools-html   $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html
+conformance-pdf:  check-tools-pdf    $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf
+
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
 	$(ASCIIDOCTOR) --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 #	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 
-$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
+$(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: default-theme-CF-version.yml $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
 	$(ASCIIDOCTOR_PDF) --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=default-theme-CF-version.yml $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
@@ -119,3 +128,71 @@ images/cfdm_coordinates.svg: images/cfdm_coordinates.gv
 
 images/cfdm_field.svg: images/cfdm_field.gv
 	$(DOT) -Tsvg $< -o $@
+
+# ------------------------------------------------------------
+
+# Tool checks
+check-tools:
+	@fail=0; \
+	for t in check-tools-ruby check-tools-asciidoctor check-tools-dot check-tools-asciidoctor-pdf check-tools-python; do \
+	  echo "== $$t =="; \
+	  if $(MAKE) -s $$t; then \
+	    echo "== OK"; \
+	  else \
+	    echo "== FAIL"; \
+	    fail=1; \
+	  fi; \
+	  echo ""; \
+	done; \
+	if [ $$fail -ne 0 ]; then \
+	  echo "ERROR: one or more required tools checks failed."; \
+	  exit 1; \
+	fi
+
+check-tools-html: check-tools-ruby check-tools-asciidoctor check-tools-dot
+
+check-tools-pdf: check-tools-html check-tools-asciidoctor-pdf
+
+
+check-tools-ruby:
+	@command -v $(word 1,$(RUBY)) >/dev/null 2>&1 || { \
+	  echo "ERROR: ruby not found."; \
+	  echo "       Install it via apt (e.g. apt install ruby) or conda-forge."; \
+	  exit 1; }
+	@$(RUBY) -v >/dev/null 2>&1 || { \
+	  echo "ERROR: ruby not runnable."; exit 1; }
+
+check-tools-asciidoctor:
+	@command -v $(word 1,$(ASCIIDOCTOR)) >/dev/null 2>&1 || { \
+	  echo "ERROR: asciidoctor not found."; \
+	  echo "       Install it via apt (e.g. apt install asciidoctor), conda-forge, or RubyGems."; \
+	  echo "       RubyGems: gem install asciidoctor"; \
+	  exit 1; }
+	@$(ASCIIDOCTOR) -V >/dev/null 2>&1 || { \
+	  echo "ERROR: asciidoctor not runnable."; exit 1; }
+
+check-tools-asciidoctor-pdf:
+	@$(ASCIIDOCTOR_PDF) -V >/dev/null 2>&1 || { \
+	  echo "ERROR: asciidoctor-pdf not found."; \
+	  echo "       Install it via apt (e.g. apt install asciidoctor-pdf)"; \
+	  echo "       or via RubyGems: gem install asciidoctor-pdf"; \
+	  exit 1; }
+
+check-tools-dot:
+	@command -v $(word 1,$(DOT)) >/dev/null 2>&1 || { \
+	  echo "ERROR: dot (graphviz) not found."; \
+	  echo "       Install it via apt (e.g. apt install graphviz) or conda-forge."; \
+	  exit 1; }
+	@$(DOT) -V >/dev/null 2>&1 || { \
+	  echo "ERROR: dot not runnable."; exit 1; }
+
+check-tools-python:
+	@command -v $(word 1,$(PYTHON)) >/dev/null 2>&1 || { \
+	  echo "ERROR: python not found."; \
+	  echo "       Install it via apt (e.g. apt install python3) or conda-forge."; \
+	  exit 1; }
+	@$(PYTHON) -V >/dev/null 2>&1 || { \
+	  echo "ERROR: python not runnable."; exit 1; }
+
+# ------------------------------------------------------------
+
