@@ -49,6 +49,38 @@ Ensure the built documents meet your requirements before publishing.
 
 See the [GitHub help](https://help.github.com/) pages and many other git/GitHub guides for more details on how to work with repos, forks, pull requests, etc.
 
+## Testing
+
+A basic link checker is available to validate external and internal (i.e. *fragments*) links in the generated HTML documents.
+
+To run the link check:
+  - `make test-links`
+
+This updates the HTML documents and runs `lychee` on the generated `build/cf-conventions.html` and `build/conformance.html`.
+
+A report, for both files, is written in the `tests/lychee.md` Markdown file.
+
+The command fails if broken links are detected.
+
+## Optional: reproducible build environment
+
+For convenience, a minimal `environment.yml` is provided to create a reproducible
+documentation build environment using `conda`/`mamba` from the `conda-forge`
+channel.
+
+This is optional and system packages (i.e. `apt`) or `RubyGems` can also be used.
+
+To create and activate the environment:
+  - `conda env create -f environment.yml`
+  - `conda activate cf-conventions-docs`
+
+However, `asciidoctor-pdf` is not available via `conda-forge`, and must be
+installed via RubyGems in the activated environment:
+  - `gem install asciidoctor-pdf`
+
+The `Makefile` checks for the required tools at build time and reports clear
+errors if any dependency is missing.
+
 ## Latest Spec Build
 
 Whenever a [pull request](https://github.com/cf-convention/cf-conventions/pulls) is merged, a [travis-ci build](https://travis-ci.org/github/cf-convention/cf-conventions) generates the latest specification draft and adds it to the [gh-pages branch here](https://github.com/cf-convention/cf-conventions/tree/gh-pages).
