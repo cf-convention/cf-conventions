@@ -41,9 +41,16 @@ ASCIIDOCTOR ?= asciidoctor
 ASCIIDOCTOR_PDF ?= $(RUBY) -S asciidoctor-pdf
 PYTHON ?= python3
 DOT ?= dot
+LYCHEE ?= lychee
 # ------------------------------------------------------------
 # PDF theme used by asciidoctor-pdf
 PDF_THEME ?= default-theme-CF-version.yml
+
+TESTS_DIR ?= tests
+
+LYCHEE_TESTS ?= $(TESTS_DIR)/lychee.md
+LYCHEE_EXCLUDE ?= --exclude "https://doi.org/10.5281/zenodo.FFFFFF"
+LYCHEE_OPTIONS ?= --format markdown --mode plain --require-https --include-fragments --cache --cache-exclude-status '429, 500..600'
 
 ifdef CF_FINAL
 DATE_FORMAT := +%d&\#160;%B,&\#160;%Y
@@ -73,6 +80,7 @@ endif
 .PHONY: check-tools check-tools-html check-tools-pdf
 .PHONY: check-tools-ruby check-tools-asciidoctor check-tools-asciidoctor-pdf
 .PHONY: check-tools-dot check-tools-python
+.PHONY: check-tools-lychee test-links
 
 all:  authors html pdf 
 html: conventions-html conformance-html
@@ -133,10 +141,26 @@ images/cfdm_field.svg: images/cfdm_field.gv
 
 # ------------------------------------------------------------
 
+# Tests
+test-links: check-tools-lychee html
+	@mkdir -p $(TESTS_DIR)
+	@echo "Checking links with lychee..."
+	@$(LYCHEE) $(LYCHEE_OPTIONS) --output $(LYCHEE_TESTS) \
+	  $(LYCHEE_EXCLUDE)  \
+	  $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html \
+	  $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html; \
+	rc=$$?; \
+	if [ $$rc -eq 0 ]; then \
+	  echo "Link check OK. Report written to $(LYCHEE_TESTS)"; \
+	else \
+	  echo "Link check FAILED (exit code $$rc). See $(LYCHEE_TESTS) for details."; \
+	  exit $$rc; \
+	fi
+
 # Tool checks
 check-tools:
 	@fail=0; \
-	for t in check-tools-ruby check-tools-asciidoctor check-tools-dot check-tools-asciidoctor-pdf check-tools-python; do \
+	for t in check-tools-ruby check-tools-asciidoctor check-tools-dot check-tools-asciidoctor-pdf check-tools-python check-tools-lychee; do \
 	  echo "== $$t =="; \
 	  if $(MAKE) -s $$t; then \
 	    echo "== OK"; \
@@ -195,6 +219,14 @@ check-tools-python:
 	  exit 1; }
 	@$(PYTHON) -V >/dev/null 2>&1 || { \
 	  echo "ERROR: python not runnable."; exit 1; }
+
+check-tools-lychee:
+	@command -v $(word 1,$(LYCHEE)) >/dev/null 2>&1 || { \
+	  echo "ERROR: lychee not found."; \
+	  echo "       Install it via apt (e.g. apt install lychee), conda-forge, or cargo."; \
+	  exit 1; }
+	@$(LYCHEE) --version >/dev/null 2>&1 || { \
+	  echo "ERROR: lychee not runnable."; exit 1; }
 
 # ------------------------------------------------------------
 
