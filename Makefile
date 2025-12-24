@@ -44,7 +44,11 @@ REMOTE_URL=`git config remote.$TRACKING_REMOTE.url`
 FINAL_TAG ?= -a draft -a revnumber=v1.12.0-rc7-24-gb724218 -a revremark=${LOCAL_BRANCH}
 endif
 
+ifdef CF_FINAL_DATE
+DATE_DOCPROD != LC_ALL=C date -u -d "$(CF_FINAL_DATE)" "$(DATE_FORMAT)"
+else
 DATE_DOCPROD != LC_ALL=C date -u "$(DATE_FORMAT)"
+endif
 
 .PHONY: all clean images authors html pdf conventions-html conventions-pdf conventions conformance-html conformance-pdf conformance
 all: authors images html pdf 
