@@ -127,18 +127,8 @@ clean:
 	rm -rvf $(BUILD_DIR)
 
 #Rules to build non-static images. See MAIN_DOC_IMG_BLD above
-images/cfdm_cf_concepts.svg: images/cfdm_cf_concepts.gv
+images/%.svg: images/%.gv
 	$(DOT) -Tsvg $< -o $@
-
-images/cfdm_coordinate_reference.svg: images/cfdm_coordinate_reference.gv
-	$(DOT) -Tsvg $< -o $@
-
-images/cfdm_coordinates.svg: images/cfdm_coordinates.gv
-	$(DOT) -Tsvg $< -o $@
-
-images/cfdm_field.svg: images/cfdm_field.gv
-	$(DOT) -Tsvg $< -o $@
-
 # ------------------------------------------------------------
 
 # Tests
