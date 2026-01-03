@@ -52,25 +52,114 @@ LYCHEE_TESTS ?= $(TESTS_DIR)/lychee.md
 LYCHEE_EXCLUDE ?= --exclude "https://doi.org/10.5281/zenodo.FFFFFF"
 LYCHEE_OPTIONS ?= --format markdown --mode plain --require-https --include-fragments --cache --cache-exclude-status '429, 500..600'
 
-ifdef CF_FINAL
-DATE_FORMAT := +%d&\#160;%B,&\#160;%Y
-FINAL_TAG := -a final
-else
-DATE_FORMAT ?= +%d&\#160;%B,&\#160;%Y&\#160;%H:%M:%SZ
-LOCAL_BRANCH=`git name-rev --name-only HEAD`
-TRACKING_BRANCH=`git config branch.$LOCAL_BRANCH.merge`
-TRACKING_REMOTE=`git config branch.$LOCAL_BRANCH.remote`
-REMOTE_URL=`git config remote.$TRACKING_REMOTE.url`
-#git config branch.$(git name-rev --name-only HEAD).remote
-#git name-rev --name-only HEAD
-FINAL_TAG ?= -a draft -a revnumber=v1.12.0-rc7-24-gb724218 -a revremark=${LOCAL_BRANCH}
+# -----------------------------------------------------------------------------
+# Build provenance metadata (may be overridden by CI)
+# -----------------------------------------------------------------------------
+# Semantics:
+# - BUILD_CONTEXT=LOCAL | CI
+# - BUILD_REF=AUTO            -> best-effort human ref (branch/tag), else "DETACHED"
+# - BUILD_REPOSITORY=AUTO     -> remote URL of the current tracking branch (no guessing)
+# - BUILD_REVISION=AUTO       -> revision identifier for the build (tag-aware, may include -dirty)
+# - BUILD_TIMESTAMP=AUTO      -> UTC ISO 8601 build timestamp
+#
+# BUILD_REPOSITORY resolution states when AUTO:
+# - tracking branch with remote URL  -> <remote-url>
+# - local branch without tracking    -> UNTRACKED
+# - detached HEAD                    -> DETACHED
+# - tracking remote missing URL      -> NO_REMOTE_URL
+# -----------------------------------------------------------------------------
+
+BUILD_CONTEXT     ?= LOCAL
+BUILD_REF         ?= AUTO
+BUILD_REPOSITORY  ?= AUTO
+BUILD_REVISION    ?= AUTO
+BUILD_TIMESTAMP   ?= AUTO
+
+# Build timestamp (UTC ISO 8601)
+ifeq ($(BUILD_TIMESTAMP),AUTO)
+  BUILD_TIMESTAMP != LC_ALL=C date -u +%Y-%m-%dT%H:%M:%SZ
 endif
 
-ifdef CF_FINAL_DATE
-DATE_DOCPROD != LC_ALL=C date -u -d "$(CF_FINAL_DATE)" "$(DATE_FORMAT)"
-else
-DATE_DOCPROD != LC_ALL=C date -u "$(DATE_FORMAT)"
+# Revision id (tag-aware, includes -dirty when applicable)
+ifeq ($(BUILD_REVISION),AUTO)
+  BUILD_REVISION != git describe --tags --always --dirty 2>/dev/null || \
+                    git rev-parse --short HEAD
 endif
+
+# Best-effort ref name for humans (branch or tag). Can be overridden by CI.
+ifeq ($(BUILD_REF),AUTO)
+  BUILD_REF != git symbolic-ref --quiet --short HEAD 2>/dev/null || \
+               git name-rev --name-only --tags --no-undefined HEAD 2>/dev/null || \
+               printf '%s\n' "DETACHED"
+endif
+
+# Repository provenance: remote URL of the current tracking branch, with explicit states.
+ifeq ($(BUILD_REPOSITORY),AUTO)
+  BUILD_REPOSITORY != ( \
+    BR="$$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"; \
+    if test -z "$$BR"; then \
+      printf '%s\n' "DETACHED"; \
+      exit 0; \
+    fi; \
+    REM="$$(git config --get branch.$$BR.remote 2>/dev/null || true)"; \
+    if test -z "$$REM" || test "$$REM" = "."; then \
+      printf '%s\n' "UNTRACKED"; \
+      exit 0; \
+    fi; \
+    URL="$$(git remote get-url "$$REM" 2>/dev/null || true)"; \
+    if test -z "$$URL"; then \
+      printf '%s\n' "NO_REMOTE_URL"; \
+      exit 0; \
+    fi; \
+    printf '%s\n' "$$URL"; \
+  )
+endif
+
+ASCIIDOCTOR_OPTS += -a build-context=$(BUILD_CONTEXT) \
+                    -a build-ref=$(BUILD_REF) \
+                    -a build-repository="$(BUILD_REPOSITORY)" \
+                    -a build-revision=$(BUILD_REVISION) \
+                    -a build-timestamp=$(BUILD_TIMESTAMP)
+# ------------------------------------------------------------
+
+# ------------------------------------------------------------
+# Public knobs (user-overridable)
+# ------------------------------------------------------------
+
+# Editorial state: DRAFT | FINAL | RC
+DOC_STATUS ?= DRAFT
+
+# Canonical release date (ISO) is normally read from version.adoc
+RELEASE_DATE_ISO ?= $(shell sed -n 's/^:release-date-iso:[[:space:]]*//p' version.adoc | head -n1)
+
+# Visible date formats (GNU date(1) format strings)
+ifeq ($(DOC_STATUS),FINAL)
+  RELEASE_DATE_FMT ?= +%d&\#160;%B,&\#160;%Y
+else
+  RELEASE_DATE_FMT ?= +%d&\#160;%B,&\#160;%Y&\#160;%H:%M:%SZ
+endif
+
+# Pretty date — DEFAULT computed, but overridable via env/CLI
+RELEASE_DATE_TEXT ?= $(shell LC_ALL=C date -u -d "$(RELEASE_DATE_ISO)" "$(RELEASE_DATE_FMT)")
+
+# Year used in citation (only relevant for FINAL, but overridable always)
+RELEASE_DATE_YEAR ?= $(shell LC_ALL=C date -u -d "$(RELEASE_DATE_ISO)" '+%Y')
+
+# ------------------------------------------------------------
+# Pass attributes to Asciidoctor
+# ------------------------------------------------------------
+
+ASCIIDOCTOR_OPTS += \
+  -a release-date-text="$(RELEASE_DATE_TEXT)" \
+  -a doc-status=$(DOC_STATUS)
+
+# Only pass year if FINAL (or user explicitly set it)
+ifeq ($(DOC_STATUS),FINAL)
+ASCIIDOCTOR_OPTS += \
+  -a release-date-year=$(RELEASE_DATE_YEAR)
+endif
+# ------------------------------------------------------------
+
 
 .PHONY: all clean
 .PHONY: html pdf 
@@ -99,17 +188,17 @@ conformance-pdf:  check-tools-pdf    $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf
 
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html: $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
-	$(ASCIIDOCTOR) --verbose --trace -a data-uri -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR) --failure-level=WARN --verbose --trace -a data-uri ${ASCIIDOCTOR_OPTS} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 #	sed -E -i 's+(See&#160;)(https://cfconventions.org)(&#160;for&#160;further&#160;information.)+\1<a href="\2" target="_blank">\2</a>\3+' $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).html
 
 $(MAIN_DOC_BUILD_DIR)/$(MAIN_DOC).pdf: $(PDF_THEME) $(MAIN_DOC).adoc $(MAIN_DOC_INC) $(MAIN_DOC_IMG) | $(MAIN_DOC_BUILD_DIR)
-	$(ASCIIDOCTOR_PDF) --verbose --trace -a docprodtime="$(DATE_DOCPROD)" ${FINAL_TAG} -d book -a pdf-theme=$(PDF_THEME) $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR_PDF) --failure-level=WARN --verbose --trace -d book -a pdf-theme=$(PDF_THEME) ${ASCIIDOCTOR_OPTS} $(MAIN_DOC).adoc -D $(MAIN_DOC_BUILD_DIR)
 
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).html: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
-	$(ASCIIDOCTOR) --verbose --trace ${FINAL_TAG} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR) --failure-level=WARN --verbose --trace ${ASCIIDOCTOR_OPTS} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
 $(CONF_DOC_BUILD_DIR)/$(CONF_DOC).pdf: $(CONF_DOC_INC) | $(CONF_DOC_BUILD_DIR)
-	$(ASCIIDOCTOR_PDF) --verbose --trace ${FINAL_TAG} -d book $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
+	$(ASCIIDOCTOR_PDF) --failure-level=WARN --verbose --trace -d book ${ASCIIDOCTOR_OPTS} $(CONF_DOC).adoc -D $(CONF_DOC_BUILD_DIR)
 
 about-authors.adoc: authors.adoc scripts/update_authors.py
 	$(PYTHON) scripts/update_authors.py --authors-adoc=authors.adoc --write-about-authors=about-authors.adoc
