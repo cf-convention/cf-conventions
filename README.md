@@ -13,9 +13,9 @@ The CF Conventions are changed by changing the source files in this repository.
 The rules for doing this are set forth on the [CF website](https://cfconventions.org/rules.html).
 Their implementation in GitHub is described in this repository's [CONTRIBUTING.md file](https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md).
 
-# Building the HTML
+# Building the documentation
 
-The following steps outline how to build the CF Conventions documentation into HTML and/or PDF format using AsciiDoc:
+The following steps outline how to build the CF Conventions documentation into HTML and/or PDF format using AsciiDoc and the provided Makefile:
 
 1. Ensure you have [Ruby](https://www.ruby-lang.org/) installed. (e.g. `sudo apt install ruby`)
 2. Ensure you have a recent version of [Asciidoctor](https://asciidoctor.org/) installed (e.g. `gem install asciidoctor`)
@@ -34,8 +34,6 @@ The following steps outline how to build the CF Conventions documentation into H
       `make conformance`
    - Remove built documents and clean build directories:
       `make clean`
-   - Build with the FINAL tag and a date stamp. Ensure you have manually updated the version in the `version.adoc` file before running this command. For FINAL builds, the release date must be provided explicitly:
-      `make CF_FINAL=True CF_FINAL_DATE=YYYY-MM-DD`
 
 Both HTML documents will have images embedded within `.html` file.
 
@@ -48,6 +46,47 @@ The built documents will be rendered in the `build` directory with the resulting
 Ensure the built documents meet your requirements before publishing.
 
 See the [GitHub help](https://help.github.com/) pages and many other git/GitHub guides for more details on how to work with repos, forks, pull requests, etc.
+
+## Release metadata
+
+The file `version.adoc` acts as the single source of truth for the CF version number, canonical release date, and DOI. In particular, the following attributes are edited manually at the start of each new release
+cycle:
+
+- `version`
+- `release-date-iso`
+- `doi`
+
+All other release-related attributes (such as the human-readable display date or the citation year) are either derived from these values or injected by the build system (Makefile/CI). For ad-hoc local builds without the Makefile, sensible fallbacks are provided so that the document still renders consistently.
+
+## Build modes (DRAFT vs FINAL)
+
+By default, builds are produced in **DRAFT** mode, which is what you get from a normal call to `make`:
+
+~~~bash
+make
+~~~
+
+To produce a build intended for publication as an **official FINAL release**, set the environment variable `DOC_STATUS` to `FINAL`:
+
+~~~bash
+DOC_STATUS=FINAL make
+~~~
+
+In FINAL mode:
+
+- the visible release date is derived from `release-date-iso`
+- the citation year used in the formal citation is fixed from the canonical release date
+- timestamps and other draft-only metadata are not shown
+
+### Advanced: Overriding the release date
+
+Normally you should not need to override the `release-date-iso` attribute. However, for testing or exceptional cases you may explicitly set the environment variable `RELEASE_DATE_ISO` when building in `FINAL` document status:
+
+~~~bash
+DOC_STATUS=FINAL RELEASE_DATE_ISO="2026-02-16" make
+~~~
+
+Environment-provided values always take precedence over the defaults derived by the `Makefile`.
 
 ## Testing
 
