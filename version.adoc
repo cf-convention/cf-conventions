@@ -1,25 +1,109 @@
-// Set version
+// -----------------------------------------------------------------------------
+// Primary release identifiers (manual inputs)
+// -----------------------------------------------------------------------------
+//
+// These three attributes are the *only* values that must be edited manually
+// when starting the publication process for a new CF version:
+//
+//   - version           CF version number
+//   - release-date-iso  canonical release date (ISO 8601)
+//   - doi               DOI assigned to this CF version
+//
+// All other release-related attributes (textual date, citation year, etc.)
+// are derived from these or injected by the build system (Makefile/CI).
+//
 :version: 1.14
 
-////
-Normally, a draft is produced, unless the `final` attribute is defined.
-Define the `final` attribute by uncommenting the following line
-or with the commandline switch `-a final`.
-////
-// :final:
+// Canonical release date for this CF version (ISO 8601).
+// This is the single source of truth for the official release date and is
+// also used as the publication date in external metadata (e.g. Zenodo).
+:release-date-iso: 2026-02-15
 
-ifdef::final[]
-// Change the DOI prior to releasing the next version
+// DOI assigned to this CF version.
+// IMPORTANT: update `version`, `release-date-iso` and `doi` together at the
+// start of each new release cycle.
 :doi: 10.5281/zenodo.17801666
-// No changes needed beyond this line
+
+// -----------------------------------------------------------------------------
+// Derived release and editorial metadata
+// -----------------------------------------------------------------------------
+//
+// The build system normally derives and injects these attributes based on
+// the primary identifiers above and the editorial status (FINAL / DRAFT / RC).
+// For standalone Asciidoctor builds (without the Makefile), we provide safe
+// fallbacks so the document still renders consistently.
+//
+
+// Human-readable text form of the release date shown in the document
+// (e.g. "15 February 2026").
+// Normally injected by the build system as `release-date-text`.
+// Fallback: use the canonical ISO value.
+ifndef::release-date-text[:release-date-text: {release-date-iso}]
+
+// Year used in the formal citation.
+// FINAL builds: injected from `release-date-iso` by the build system.
+// Other builds or standalone Asciidoctor: fall back to Asciidoctor's `docyear`.
+ifndef::release-date-year[:release-date-year: {docyear}]
+
+// Editorial status of this document from the CF perspective.
+// Expected values include:
+//
+//   DRAFT  - working draft, not an official release
+//   FINAL  - official, published CF release
+//   RC     - release candidate
+//
+// The build system typically sets this via DOC_STATUS.
+// For standalone builds we default to DRAFT so the document is clearly
+// marked as non-final and all conditional logic remains well-defined.
+ifndef::doc-status[:doc-status: DRAFT]
+
+// -----------------------------------------------------------------------------
+// Build metadata contract (inputs)
+// -----------------------------------------------------------------------------
+//
+// The following attributes are normally injected by the build system
+// (Makefile/CI) to capture build provenance. They are not part of the CF
+// specification itself. For standalone Asciidoctor builds, we supply safe
+// defaults so they are always defined.
+//
+
+ifndef::build-context[:build-context: LOCAL]
+ifndef::build-ref[:build-ref: UNKNOWN]
+ifndef::build-repository[:build-repository: UNKNOWN]
+ifndef::build-revision[:build-revision: UNKNOWN]
+
+// For standalone builds use Asciidoctor's docdatetime as a proxy
+// for the build timestamp.
+ifndef::build-timestamp[:build-timestamp: {docdatetime}]
+
+// -----------------------------------------------------------------------------
+// Editorial state (FINAL vs DRAFT)
+// -----------------------------------------------------------------------------
+:doi-link: https://doi.org/{doi}
+
+ifeval::["{doc-status}" == "FINAL"]
+// FINAL builds: keep release metadata stable and human-facing.
 :current-version: {version}
 :current-version-as-attribute: {version}
-:doi-text: DOI: link:https://doi.org/{doi}[{doi}]
+:doi-text: link:{doi-link}[{doi}]
+:citability-note: Use the following reference to cite this version of the document:
+
+// Revision line (Asciidoctor): show the stable release date; keep remark empty.
+:revnumber: {current-version}
+:revdate: {release-date-text}
 endif::[]
-ifndef::final[]
+
+ifeval::["{doc-status}" != "FINAL"]
+// DRAFT builds: include build provenance and discourage citation.
 :current-version: {version} draft
 :current-version-as-attribute: {version}-draft
-:doi: 10.5281/zenodo.FFFFFF
-:doi-text: has no DOI yet: link:https://doi.org/{doi}[{doi}]
+:doi-text: has no DOI yet: link:{doi-link}[{doi}]
+:citability-note: DON’T use the following reference to cite this version of the document, as it is only shown as a draft:
+
+// Revision line (Asciidoctor): preserve visible date style via docprodtime.
+:revnumber: {current-version}
+:revdate: {build-timestamp}
+// Compose provenance: <context>:<repository>@<ref> (<revision>)
+:revremark: {build-context}:{build-repository}@{build-ref}{empty}({build-revision})
 endif::[]
-:doi-link: https://doi.org/{doi}
+// -----------------------------------------------------------------------------
