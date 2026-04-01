@@ -476,7 +476,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author36" class="author">Seth&#160;McGinnis</span><br>
 <span id="author37" class="author">Patrick&#160;Van&#160;Laake</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">03&#160;March,&#160;2026&#160;09:25:18Z</span>
+<span id="revdate">01&#160;April,&#160;2026&#160;10:53:17Z</span>
 <br><span id="revremark">main</span>
 </div>
 </div>
@@ -567,7 +567,7 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2026). NetCDF 
 <li><a href="#longitude-coordinate">4.2. Longitude Coordinate</a></li>
 <li><a href="#vertical-coordinate">4.3. Vertical (Height or Depth) Coordinate</a>
 <ul class="sectlevel3">
-<li><a href="#_dimensional_vertical_coordinate">4.3.1. Dimensional Vertical Coordinate</a></li>
+<li><a href="#dimensional-vertical-coordinate">4.3.1. Dimensional Vertical Coordinate</a></li>
 <li><a href="#dimensionless-vertical-coordinate">4.3.2. Dimensionless Vertical Coordinate</a></li>
 <li><a href="#parametric-vertical-coordinate">4.3.3. Parametric Vertical Coordinate</a></li>
 </ul>
@@ -2974,14 +2974,20 @@ Hence, determination that a coordinate is a longitude type should be done via a 
 <div class="sect2">
 <h3 id="vertical-coordinate"><a class="anchor" href="#vertical-coordinate"></a>4.3. Vertical (Height or Depth) Coordinate</h3>
 <div class="paragraph">
-<p>Variables representing dimensional height or depth axes must always explicitly include the <strong><code>units</code></strong> attribute; there is no default value.</p>
+<p>Variables representing vertical coordinates must have either</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the <strong><code>positive</code></strong> attribute, which must take one of the values <strong><code>up</code></strong> or <strong><code>down</code></strong> (case insensitive), meaning respectively that increasingly positive coordinate values indicate higher locations (i.e. further from the centre of the Earth, <strong><code>positive="up"</code></strong>), or lower locations (<strong><code>positive="down"</code></strong>); or</p>
+</li>
+<li>
+<p>a <strong><code>units</code></strong> attribute containing units of pressure (as determined by UDUNITS). If the <strong><code>units</code></strong> attribute value is a valid pressure unit the default value of the <strong><code>positive</code></strong> attribute is <strong><code>down</code></strong>.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>The direction of positive (i.e., the direction in which the coordinate values are increasing), whether up or down, cannot in all cases be inferred from the units.
-The direction of positive is useful for applications displaying the data.
-For this reason the attribute <strong><code>positive</code></strong> as defined in the COARDS conventions is required if the vertical axis units are not a valid unit of pressure (as determined by the UDUNITS package <a href="#UDUNITS">[UDUNITS]</a>)&#8201;&#8212;&#8201;otherwise its inclusion is optional.
-The <strong><code>positive</code></strong> attribute may have the value <strong><code>up</code></strong> or <strong><code>down</code></strong> (case insensitive).
-This attribute may be applied to either coordinate variables or auxiliary coordinate variables that contain vertical coordinate data.</p>
+<p>The <strong><code>positive</code></strong> attribute may be applied both to coordinate variables and to auxiliary coordinate variables that contain vertical coordinate data.</p>
 </div>
 <div class="paragraph">
 <p>For example, if an oceanographic netCDF file encodes the depth of the surface as 0 and the depth of 1000 meters as 1000 then the axis would use attributes as follows:</p>
@@ -2993,21 +2999,7 @@ axis_name:positive = "down" ;</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If, on the other hand, the depth of 1000 meters were represented as -1000 then the value of the <strong><code>positive</code></strong> attribute would have been <strong><code>up</code></strong>.
-If the <strong><code>units</code></strong> attribute value is a valid pressure unit the default value of the <strong><code>positive</code></strong> attribute is <strong><code>down</code></strong>.</p>
-</div>
-<div class="paragraph">
-<p>A vertical coordinate will be identifiable by:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>units of pressure; or</p>
-</li>
-<li>
-<p>the presence of the <strong><code>positive</code></strong> attribute with a value of <strong><code>up</code></strong> or <strong><code>down</code></strong> (case insensitive).</p>
-</li>
-</ul>
+<p>If, on the other hand, the depth of 1000 meters were represented as -1000 then the value of the <strong><code>positive</code></strong> attribute would be <strong><code>up</code></strong>.</p>
 </div>
 <div class="paragraph">
 <p>Optionally, the vertical type may be indicated additionally by providing the <strong><code>standard_name</code></strong> attribute with an appropriate value, and/or the <strong><code>axis</code></strong> attribute with the value <strong><code>Z</code></strong>.
@@ -3016,28 +3008,23 @@ For instance, if a depth of 1000 metres is represented by -1000 and <strong><cod
 If an application detects such an inconsistency, the user should be warned, and the <strong><code>positive</code></strong> attribute should be used to determine the sign convention.</p>
 </div>
 <div class="sect3">
-<h4 id="_dimensional_vertical_coordinate"><a class="anchor" href="#_dimensional_vertical_coordinate"></a>4.3.1. Dimensional Vertical Coordinate</h4>
+<h4 id="dimensional-vertical-coordinate"><a class="anchor" href="#dimensional-vertical-coordinate"></a>4.3.1. Dimensional Vertical Coordinate</h4>
 <div class="paragraph">
-<p>Variables representing dimensional vertical coordinates for depth or height must always explicitly include the <strong><code>units</code></strong> attribute.
-The acceptable units for a vertical (depth or height) coordinate variable must a UDUNITS <a href="#UDUNITS">[UDUNITS]</a> representation of one of the following:</p>
+<p>Variables representing dimensional vertical coordinates (i.e. not dimensionless numbers, but having a unit of measure) must always explicitly include <strong><code>units</code></strong> consistent with UDUNITS; there is no default value.
+Acceptable units include the following:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>units of pressure.
-For vertical axes the most commonly used of these include <strong><code>bar</code></strong>, <strong><code>millibar</code></strong>, <strong><code>decibar</code></strong>, <strong><code>atmosphere (atm)</code></strong>, <strong><code>pascal (Pa)</code></strong>, and <strong><code>hPa</code></strong>.</p>
+<p>units of pressure; the most commonly used of these include <strong><code>bar</code></strong>, <strong><code>millibar</code></strong>, <strong><code>decibar</code></strong>, <strong><code>atmosphere (atm)</code></strong>, <strong><code>pascal (Pa)</code></strong>, and <strong><code>hPa</code></strong>.</p>
 </li>
 <li>
-<p>units of length.
-For vertical axes the most commonly used of these include <strong><code>meter (metre, m)</code></strong>, and <strong><code>kilometer (km)</code></strong>.</p>
+<p>units of length; the most commonly used of these include <strong><code>meter (metre, m)</code></strong>, and <strong><code>kilometer (km)</code></strong>.</p>
 </li>
 <li>
 <p>other units that may under certain circumstances reference vertical position such as units of density or temperature.</p>
 </li>
 </ul>
-</div>
-<div class="paragraph">
-<p>Plural forms are also acceptable.</p>
 </div>
 </div>
 <div class="sect3">
@@ -14546,6 +14533,9 @@ CF version 1.13 withdrew this use of <strong><code>units_metadata</code></strong
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/635">Issue #635</a>: Revision of section 4.3 to improve its clarity</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/623">Issue #623</a>: Consistently refer to "CF conventions" and use of impersonal from.</p>
 </li>
 </ul>
@@ -15302,7 +15292,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2026-03-03 09:25:06 UTC
+Last updated 2026-04-01 10:53:11 UTC
 </div>
 </div>
 </body>
