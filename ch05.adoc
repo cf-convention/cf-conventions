@@ -34,8 +34,8 @@ Horizontal dimensions are those whose coordinate variables have an `axis` attrib
 
 To geo-reference data horizontally with respect to the Earth, a __grid mapping variable__ may be provided by the data variable, using the `grid_mapping` attribute.
 If the coordinate variables for a horizontal grid are not longitude and latitude, then a grid_mapping variable provides the information required to derive longitude and latitude values for each grid location.
-If no __grid mapping variable__ is referenced by a data variable, then longitude and latitude coordinate values shall be supplied __in addition__ to the required coordinates. 
-For example, the Cartesian coordinates of a map projection may be supplied as coordinate variables and, in addition, two-dimensional latitude and longitude variables may be supplied via the `coordinates` attribute on a data variable. 
+If no __grid mapping variable__ is referenced by a data variable, then longitude and latitude coordinate values shall be supplied __in addition__ to the required coordinates.
+For example, the Cartesian coordinates of a map projection may be supplied as coordinate variables and, in addition, two-dimensional latitude and longitude variables may be supplied via the `coordinates` attribute on a data variable.
 The use of the `axis` attribute with values `X` and `Y` is recommended for the coordinate variables (see <<coordinate-types>>).
 
 It is sometimes not practical to specify the latitude-longitude location of data which is representative of geographic regions with complex boundaries.
@@ -71,7 +71,8 @@ variables:
     pres:units = "hPa" ;
   double time(time) ;
     time:long_name = "time" ;
-    time:units = "days since 1990-1-1 0:0:0" ;
+    time:units = "days since 1990-01-01" ;
+    time:calendar = "standard" ;
 ----
 
 ====
@@ -162,7 +163,7 @@ variables:
 ====
 
 `PS(n)` is associated with the coordinate values `lon(n)`, `lat(n)`.
-Compressed grid index `(n)` would be assigned to 2D index `(j,i)` (C index conventions) where 
+Compressed grid index `(n)` would be assigned to 2D index `(j,i)` (C index conventions) where
 
 ----
 j = rgrid(n) / 128
@@ -189,7 +190,7 @@ If the horizontal spatial coordinates are easting and northing in a map projecti
 When the horizontal spatial coordinate variables are not longitude and latitude, it is required that further information is provided to geo-locate the horizontal position.
 A __grid mapping variable__ provides this information.
 
-If no __grid mapping variable__ is provided and the coordinate variables for a horizontal grid are not longitude and latitude, then it is required that the latitude and longitude coordinates are supplied via the `coordinates` attribute. 
+If no __grid mapping variable__ is provided and the coordinate variables for a horizontal grid are not longitude and latitude, then it is required that the latitude and longitude coordinates are supplied via the `coordinates` attribute.
 Such coordinates may be provided in addition to the provision of a __grid mapping variable__, but that is not required.
 
 When a data variable is representative of cells of non-zero size, and the coordinate variables are not longitude and latitude, __bounds__ variables should be provided for vertices of the cell boundaries in the horizontal coordinates of the grid (see  <<cell-boundaries>>).
@@ -283,41 +284,42 @@ The entries for these names in the standard name table indicate the appropriate 
 
 ----
 dimensions:
-  y = 228;
-  x = 306;
-  time = 41;
+  y = 228 ;
+  x = 306 ;
+  time = 41 ;
 
 variables:
-  int Lambert_Conformal;
-    Lambert_Conformal:grid_mapping_name = "lambert_conformal_conic";
-    Lambert_Conformal:standard_parallel = 25.0;
-    Lambert_Conformal:longitude_of_central_meridian = 265.0;
-    Lambert_Conformal:latitude_of_projection_origin = 25.0;
-  double y(y);
-    y:units = "km";
-    y:long_name = "y coordinate of projection";
-    y:standard_name = "projection_y_coordinate";
-  double x(x);
-    x:units = "km";
-    x:long_name = "x coordinate of projection";
-    x:standard_name = "projection_x_coordinate";
-  double lat(y, x);
-    lat:units = "degrees_north";
-    lat:long_name = "latitude coordinate";
-    lat:standard_name = "latitude";
-  double lon(y, x);
-    lon:units = "degrees_east";
-    lon:long_name = "longitude coordinate";
-    lon:standard_name = "longitude";
-  int time(time);
-    time:long_name = "forecast time";
-    time:units = "hours since 2004-06-23T22:00:00Z";
-  float Temperature(time, y, x);
-    Temperature:units = "K";
-    Temperature:long_name = "Temperature @ surface";
-    Temperature:missing_value = 9999.0;
-    Temperature:coordinates = "lat lon";
-    Temperature:grid_mapping = "Lambert_Conformal";
+  int Lambert_Conformal ;
+    Lambert_Conformal:grid_mapping_name = "lambert_conformal_conic" ;
+    Lambert_Conformal:standard_parallel = 25.0 ;
+    Lambert_Conformal:longitude_of_central_meridian = 265.0 ;
+    Lambert_Conformal:latitude_of_projection_origin = 25.0 ;
+  double y(y) ;
+    y:units = "km" ;
+    y:long_name = "y coordinate of projection" ;
+    y:standard_name = "projection_y_coordinate" ;
+  double x(x) ;
+    x:units = "km" ;
+    x:long_name = "x coordinate of projection" ;
+    x:standard_name = "projection_x_coordinate" ;
+  double lat(y, x) ;
+    lat:units = "degrees_north" ;
+    lat:long_name = "latitude coordinate" ;
+    lat:standard_name = "latitude" ;
+  double lon(y, x) ;
+    lon:units = "degrees_east" ;
+    lon:long_name = "longitude coordinate" ;
+    lon:standard_name = "longitude" ;
+  int time(time) ;
+    time:long_name = "forecast time" ;
+    time:units = "hours since 2004-06-23 22:00:00" ;
+    time:calendar = "standard" ;
+  float Temperature(time, y, x) ;
+    Temperature:units = "K" ;
+    Temperature:long_name = "Temperature @ surface" ;
+    Temperature:missing_value = 9999.0 ;
+    Temperature:coordinates = "lat lon" ;
+    Temperature:grid_mapping = "Lambert_Conformal" ;
 ----
 ====
 
@@ -444,15 +446,15 @@ It is envisaged that the value of the `crs_wkt` attribute typically will be a si
 Other than the requirement to be a valid WKT string, the CF conventions do not prescribe the content of the `crs_wkt` attribute since it will necessarily be context-dependent.
 
 Where a `crs_wkt` attribute is added to a `grid_mapping`, the extended syntax for the `grid_mapping` attribute enables the list of variables containing coordinate values being referenced to be explicitly stated and the CRS WKT Axis order to be explicitly defined.
-The explicit definition of WKT CRS Axis order is expected by the OGC standards for referencing by coordinates. 
+The explicit definition of WKT CRS Axis order is expected by the OGC standards for referencing by coordinates.
 Software implementing these standards are likely to expect to receive coordinate value tuples, with the correct coordinate value order, along with the coordinate reference system definition that those coordinate values are defined with respect to.
 
 The order of the `<coordinatesVariable>` references within the `grid_mapping` attribute definition defines the order of elements within a derived coordinate value tuple.
-This enables an application reading the data from a file to construct an array of coordinate value tuples, where each tuple is ordered to match the specification of the coordinate reference system being used whilst the array of tuples is structured according to the netCDF definition. 
+This enables an application reading the data from a file to construct an array of coordinate value tuples, where each tuple is ordered to match the specification of the coordinate reference system being used whilst the array of tuples is structured according to the netCDF definition.
 It is the responsibility of the data producer to ensure that the `<coordinatesVariable>` list is consistent with the CRS WKT definition of CS AXIS, with the correct number of entries in the correct order (note: this is not a conformance requirement as CF conformance is not dependent on CRS WKT parsing).
 
 For example, a file has two coordinate variables, lon and lat, and a grid mapping variable `crs` with an associated `crs_wkt` attribute; the WKT definition defines the AXIS order as `["latitude", "longitude"]`.
-The `grid_mapping` attribute is thus given a value `crs:lat lon` to define that where coordinate pairs are required, these shall be ordered (lat, lon), to be consistent with the provided `crs_wkt` string (and not order inverted). 
+The `grid_mapping` attribute is thus given a value `crs:lat lon` to define that where coordinate pairs are required, these shall be ordered (lat, lon), to be consistent with the provided `crs_wkt` string (and not order inverted).
 A 2-D array of (lat, lon) tuples can then be explicitly derived from the combination of the lat and lon variables.
 
 The `crs_wkt` attribute is intended to act as a _supplement_ to other single-property CF grid mapping attributes (as described in Appendix F); it is not intended to replace those attributes.
@@ -469,9 +471,9 @@ Likewise, in those cases where the value of a CRS WKT element should be used con
 https://github.com/cf-convention/cf-conventions/wiki/Mapping-from-CF-Grid-Mapping-Attributes-to-CRS-WKT-Elements
 should be preferred; these are derived from the OGP/EPSG registry of geodetic parameters, which is considered to represent the definitive authority as regards CRS property names and values.
 
-Examples 5.11 illustrates how the coordinate system properties specified via the `crs` grid mapping variable in Example 5.9 might be expressed using a `crs_wkt` attribute. 
-Example 5.12 also illustrates the addition of the `crs_wkt` attribute, but here the attribute is added to the `crs` variable of a simplified variant of Example 5.10. 
-For brevity in Example 5.11, only the grid mapping variable and its `grid_mapping_name` and `crs_wkt` attributes are included; all other elements are as per the Example 5.9. 
+Examples 5.11 illustrates how the coordinate system properties specified via the `crs` grid mapping variable in Example 5.9 might be expressed using a `crs_wkt` attribute.
+Example 5.12 also illustrates the addition of the `crs_wkt` attribute, but here the attribute is added to the `crs` variable of a simplified variant of Example 5.10.
+For brevity in Example 5.11, only the grid mapping variable and its `grid_mapping_name` and `crs_wkt` attributes are included; all other elements are as per the Example 5.9.
 Names of projection. `PARAMETERs` follow the spellings used in the EPSG geodetic parameter registry.
 
 Example 5.12 illustrates how certain WKT elements - all of which are optional - can be used to specify CRS properties not covered by existing CF grid mapping attributes, including:
@@ -669,23 +671,25 @@ dimensions:
   lon = 360 ;
   time = UNLIMITED ;
 variables:
-  double atime
+  double atime ;
     atime:standard_name = "forecast_reference_time" ;
-    atime:units = "hours since 1999-01-01 00:00" ;
-  double time(time);
+    atime:units = "hours since 1999-01-01 00:00:00" ;
+    atime:calendar = "standard" ;
+  double time(time) ;
     time:standard_name = "time" ;
-    time:units = "hours since 1999-01-01 00:00" ;
+    time:units = "hours since 1999-01-01 00:00:00" ;
+    time:calendar = "standard" ;
   double lon(lon) ;
-    lon:long_name = "station longitude";
-    lon:units = "degrees_east";
+    lon:long_name = "station longitude" ;
+    lon:units = "degrees_east" ;
   double lat(lat) ;
     lat:long_name = "station latitude" ;
     lat:units = "degrees_north" ;
-  double p500
+  double p500 ;
     p500:long_name = "pressure" ;
     p500:units = "hPa" ;
     p500:positive = "down" ;
-  float height(time,lat,lon);
+  float height(time, lat, lon) ;
     height:long_name = "geopotential height" ;
     height:standard_name = "geopotential_height" ;
     height:units = "m" ;
@@ -761,7 +765,8 @@ variables:
     pres:units = "hPa" ;
   double time(time) ;
     time:long_name = "time" ;
-    time:units = "days since 1990-1-1 0:0:0" ;
+    time:units = "days since 1990-01-01" ;
+    time:calendar = "standard" ;
 ----
 
 In this example the data variable `xwind` from the <<independent-coordinate-variables-ex>> example has been replaced by the domain variable `domain`.
@@ -788,9 +793,10 @@ variables:
     rotated_pole:grid_mapping_name = "rotated_latitude_longitude" ;
     rotated_pole:grid_north_pole_latitude = 32.5 ;
     rotated_pole:grid_north_pole_longitude = 170. ;
-  double time
+  double time ;
     time:standard_name = "time" ;
-    time:units = "days since 2000-12-01 00:00" ;
+    time:units = "days since 2000-12-01" ;
+    time:calendar = "standard" ;
   float rlon(rlon) ;
     rlon:long_name = "longitude in rotated pole grid" ;
     rlon:units = "degrees" ;
@@ -838,10 +844,11 @@ variables:
   float time(time) ;
     time:long_name = "time" ;
     time:units = "days since 1979-01-01" ;
+    time:calendar = "standard" ;
   float cell_area(cell) ;
     cell_area:long_name = "area of grid cell" ;
     cell_area:standard_name = "cell_area" ;
-    cell_area:units = "m2"
+    cell_area:units = "m2" ;
   float lon_vertices(cell, nv) ;
   float lat_vertices(cell, nv) ;
 ----
@@ -865,6 +872,7 @@ variables:
   double t ;
     t:standard_name = "time" ;
     t:units = "days since 2021-01-01" ;
+    t:calendar = "standard" ;
 ----
 ====
 
@@ -958,7 +966,8 @@ variables:
   double time(obs) ;
     time:standard_name = "time" ;
     time:long_name = "time of measurement" ;
-    time:units = "days since 1970-01-01 00:00:00" ;
+    time:units = "days since 1970-01-01" ;
+    time:calendar = "proleptic_gregorian" ;
 
 attributes:
     :featureType = "timeSeries" ;
@@ -972,12 +981,12 @@ In this example the data variables `humidity` and `temp` from the <<example-h.7>
 === Mesh Topology Variables
 
 A __mesh topology variable__ defines the geospatial topology of cells arranged in two or three dimensions in real space but indexed by a single dimension.
-It explicitly describes the topological relationships between cells, i.e. spatial relationships which do not depend on the cell locations, via a mesh of connected nodes. 
+It explicitly describes the topological relationships between cells, i.e. spatial relationships which do not depend on the cell locations, via a mesh of connected nodes.
 A mesh topology variable may provide the topology for one or more domains, defined at the nodes, edges, or faces of the mesh.
 See the <<data-model-domain-topology>> and <<data-model-cell-connectivity>> descriptions in the CF data model for more details, including on how the mesh relates to the cells of the domain.
 
 The canonical definitions of mesh topology variables and location index set variables are given externally by the UGRID conventions <<UGRID>>, but their standardized attributes, many of which are optional, are listed in <<appendix-mesh-topology-attributes>> and <<attribute-appendix>>.
-Some features of the UGRID conventions <<UGRID>> are not currently recognized by the CF conventions: mesh topology volume cells (that are used to describe fully three-dimensional unstructured mesh topologies); and the "boundary node connectivity" variable (that specifies an index variable identifying the nodes that define where boundary condtions have been provided). 
+Some features of the UGRID conventions <<UGRID>> are not currently recognized by the CF conventions: mesh topology volume cells (that are used to describe fully three-dimensional unstructured mesh topologies); and the "boundary node connectivity" variable (that specifies an index variable identifying the nodes that define where boundary condtions have been provided).
 
 A data or domain variable may use one of a mesh topology variable's domains by referencing the mesh topology variable with the **`mesh`** attribute; along with the identity of required domain provided by the **`location`** attribute (see example <<example-mesh-topology-variable>>).
 
@@ -1029,6 +1038,7 @@ variables:
   float time(time) ;
     time:standard_name = "time" ;
     time:units = "days since 2004-06-01" ;
+    time:calendar = "standard" ;
 
   // Data at mesh faces
   double volume_at_faces(time, face) ;
