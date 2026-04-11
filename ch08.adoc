@@ -1,5 +1,5 @@
 [[reduction-of-dataset-size, Chapter 8, Reduction of Dataset Size]]
-==  Reduction of Dataset Size 
+==  Reduction of Dataset Size
 :doc-part: 8
 :figure: 0
 
@@ -59,7 +59,7 @@ The list variable must not have an associated boundary variable.
 ====
 In a longitude-latitude-depth array of soil temperatures all sea points at all depths can be eliminated.
 In this case, only the longitude and latitude axes would be affected by the compression.
-A list `landpoint(landpoint)` is constructed containing the indices of land points. 
+A list `landpoint(landpoint)` is constructed containing the indices of land points.
 
 ----
 dimensions:
@@ -88,7 +88,7 @@ This corresponds to indices `(3,75)`, i.e., `363 = 3*96 + 75`.
 .Compression of a three-dimensional field
 ====
 Points below the sea floor can be eliminated to compress a longitude-latitude-depth field of ocean salinity.
-In this case, all three dimensions are affected by the compression, since there are successively fewer active ocean points at increasing depths. 
+In this case, all three dimensions are affected by the compression, since there are successively fewer active ocean points at increasing depths.
 
 ----
 variables:
@@ -438,7 +438,8 @@ variables:
   // Time tie points
   double t(tp_track, tp_time_scan) ;
     t:standard_name = "time" ;
-    t:units = "days since 1990-1-1 0:0:0" ;
+    t:units = "days since 1990-01-01" ;
+    t:calendar = "standard" ;
 ----
 
 This example demonstrates the use of multiple interpolation variables, the reusability of the interpolation variable between data variables of different dimensions and the use of the interpolation parameter attribute.
@@ -451,13 +452,13 @@ This example demonstrates the use of multiple interpolation variables, the reusa
 ====
 ----
 dimensions:
-  y = 228;
-  x = 306;
-  time = 41;
+  y = 228 ;
+  x = 306 ;
+  time = 41 ;
 
   // Tie point dimensions
-  tp_y = 58;
-  tp_x = 52;
+  tp_y = 58 ;
+  tp_x = 52 ;
 
 variables:
   // Data variable
@@ -493,6 +494,7 @@ variables:
   double time(time) ;
     time:standard_name = "time" ;
     time:units = "days since 2021-03-01" ;
+    time:calendar = "standard" ;
   double y(time, tp_y) ;
     y:units = "km" ;
     y:standard_name = "projection_y_coordinate" ;
@@ -537,7 +539,7 @@ For the example of 2D bounds, the resulting set of bounds tie points are marked 
 
 Note that within a continuous area, there is one more reconstituted bounds point than there are reconstituted coordinate points in each dimension.
 For this reason, a  virtual __interpolated bounds dimension__ is introduced for each dimension, having a size equal to the size of the interpolated dimension plus one.
-This dimension is used for solely descriptive purposes, and is not required in a compressed dataset. 
+This dimension is used for solely descriptive purposes, and is not required in a compressed dataset.
 
 [[figure_interpolation_of_cell_boundaries]]
 [caption="Figure {doc-part}.{counter:figure}. ", reftext=Figure {doc-part}.{figure}]
@@ -761,7 +763,7 @@ The netCDF library wrote the system-defined **`_QuantizeBitRoundNumberOfSignific
 [caption="Example 8.9. "]
 .Quantization performed by Granular BitRound algorithm in NCO
 ====
-Quantization of different variables to different levels often makes good scientific sense. Here the pressure variable **`ps`** has four significant digits of precision while the temperature variable **`ts`** retains only three significant digits. 
+Quantization of different variables to different levels often makes good scientific sense. Here the pressure variable **`ps`** has four significant digits of precision while the temperature variable **`ts`** retains only three significant digits.
 ----
   variables:
     char quantization_info ;
@@ -801,7 +803,7 @@ Granular BitRound combines the DigitRound approach for compressibility with the 
 Granular BitRound and DigitRound are both good choices when the NSD to retain is known.
 
 The netCDF C and Fortran libraries can directly invoke BitRound, BitGroom, and Granular BitRound [<<NetCDF>>].
-The netCDF library attaches a long, system-defined attribute to every data variable that it quantizes, such as 
+The netCDF library attaches a long, system-defined attribute to every data variable that it quantizes, such as
 **`_QuantizeBitRoundNumberOfSignificantBits = 9`** in <<example-quantization-nsb-libnetcdf>>.
 The leading underscore indicates that the netCDF library wrote this attribute <<NUG>>.
 Any variable that has the library-defined attribute must, in addition, contain the corresponding CF metadata.
