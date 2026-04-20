@@ -476,7 +476,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author36" class="author">Seth&#160;McGinnis</span><br>
 <span id="author37" class="author">Patrick&#160;Van&#160;Laake</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">01&#160;April,&#160;2026&#160;10:53:17Z</span>
+<span id="revdate">20&#160;April,&#160;2026&#160;15:35:32Z</span>
 <br><span id="revremark">main</span>
 </div>
 </div>
@@ -2290,6 +2290,9 @@ Special treatment is required in converting the <strong><code>units</code></stro
 The unit <code>degrees</code> is also allowed on coordinate variables such as the latitude and longitude coordinates of a transformed grid.
 In this case the coordinate values are not true latitudes and longitudes, which must always be identified using the more specific forms of <code>degrees</code> as described in <a href="#latitude-coordinate">Section 4.1, "Latitude Coordinate"</a> and <a href="#longitude-coordinate">Section 4.2, "Longitude Coordinate"</a>.</p>
 </div>
+<div class="paragraph">
+<p>See <a href="#units-multiples">Section 3.1.3, "Scale factors and offsets"</a> concerning the use of scale factors and offsets for units and data.</p>
+</div>
 <div class="sect3">
 <h4 id="dimensionless-units"><a class="anchor" href="#dimensionless-units"></a>3.1.1. Dimensionless units</h4>
 <div class="paragraph">
@@ -2309,11 +2312,6 @@ These units are prohibited by CF if there is a <strong><code>standard_name</code
 "area fraction" or "probability") does not belong in the <strong><code>units</code></strong> attribute, but should be given in the <strong><code>long_name</code></strong> or <strong><code>standard_name</code></strong> attributes (see <a href="#long-name">Section 3.2, "Long Name"</a> and <a href="#standard-name">Section 3.3, "Standard Name"</a>), in the same way as for physical quantities with dimensional units.
 As an exception, to maintain backwards compatibility with COARDS, the text strings <code>level</code>, <code>layer</code>, and <code>sigma_level</code> are allowed in the <strong><code>units</code></strong> attribute, in order to indicate dimensionless vertical coordinates.
 This use of <strong><code>units</code></strong> is not compatible with UDUNITS, and is deprecated by these conventions because conventions for more precisely identifying dimensionless vertical coordinates are available (see <a href="#dimensionless-vertical-coordinate">Section 4.3.2, "Dimensionless Vertical Coordinate"</a>).</p>
-</div>
-<div class="paragraph">
-<p>The UDUNITS syntax that allows scale factors and offsets to be applied to a unit is not supported by these conventions, except for case of specifying reference time, see section <a href="#time-coordinate">Section 4.4, "Time Coordinate"</a>.
-The application of any scale factors or offsets to data should be indicated by the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes.
-Use of these attributes for data packing, which is their most important application, is discussed in detail in <a href="#packed-data">Section 8.1, "Packed Data"</a>.</p>
 </div>
 </div>
 <div class="sect3">
@@ -2383,12 +2381,17 @@ For instance, when temperature is on-scale, a value in <code>kg degree_C m-2</co
 <div class="sect3">
 <h4 id="units-multiples"><a class="anchor" href="#units-multiples"></a>3.1.3. Scale factors and offsets</h4>
 <div class="paragraph">
-<p>UDUNITS recognises the <a href="#SI">[SI]</a> prefixes shown in <a href="#table-supported-units">Table 3.1</a> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.
-UDUNITS offers a syntax for indicating arbitrary scale factors and offsets to be applied to a unit.
-(Note that this is different from the scale factors and offsets used for converting between <strong><code>units</code></strong>, as discussed for temperature in <a href="#temperature-units">Section 3.1.2, "Temperature units"</a>.)
-This UDUNITS syntax for arbitrary transformation of <strong><code>units</code></strong> is not supported by the CF conventions, except for the case of specifying reference time (<a href="#time-coordinate">Section 4.4, "Time Coordinate"</a>).
-The application of any scale factors or offsets to data should be indicated by the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes.
-Use of these attributes for data packing, which is their most important application, is discussed in detail in <a href="#packed-data">Section 8.1, "Packed Data"</a>.</p>
+<p>UDUNITS recognises the <a href="#SI">[SI]</a> prefixes shown in <a href="#table-supported-units">Table 3.1</a> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.</p>
+</div>
+<div class="paragraph">
+<p>UDUNITS offers a syntax of its own for indicating arbitrary scale factors and offsets to be applied to a unit of measure named in the <strong><code>units</code></strong> attribute.
+(Note that this facility is not related to the scale factors and offsets used for converting between different units of measure, as discussed for temperature in <a href="#temperature-units">Section 3.1.2, "Temperature units"</a>.)
+The UDUNITS syntax allows dimensionless numbers to appear in <strong><code>units</code></strong>, as multiplicative factors before the name of the unit and as additive offsets to the named unit (following <code>@</code> or various keywords).
+This UDUNITS syntax for arbitrary transformation of <strong><code>units</code></strong> must not be used with the CF conventions, except for offsets following <strong><code>since</code></strong> for specifying reference time (<a href="#time-coordinate">Section 4.4, "Time Coordinate"</a>.</p>
+</div>
+<div class="paragraph">
+<p>The application of any scale factors or offsets to the data values, without altering the <strong><code>units</code></strong>, should be indicated by the <strong><code>scale_factor</code></strong> and <strong><code>add_offset</code></strong> attributes.
+Use of these attributes for data compression, which is their most important application, is discussed in detail in <a href="#packed-data">Section 8.1, "Packed Data"</a>.</p>
 </div>
 <table id="table-supported-units" class="tableblock frame-all grid-all stretch">
 <caption class="title">Table 3.1. Prefixes for decimal multiples and submultiples of units</caption>
@@ -14533,10 +14536,13 @@ CF version 1.13 withdrew this use of <strong><code>units_metadata</code></strong
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/610">Issue #610</a>: Clarify the CF prohibition of the UDUNITS syntax for scale factors and additive offsets to units</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/635">Issue #635</a>: Revision of section 4.3 to improve its clarity</p>
 </li>
 <li>
-<p><a href="https://github.com/cf-convention/cf-conventions/issues/623">Issue #623</a>: Consistently refer to "CF conventions" and use of impersonal from.</p>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/623">Issue #623</a>: Consistently refer to "CF conventions" and use of impersonal form</p>
 </li>
 </ul>
 </div>
@@ -15292,7 +15298,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2026-04-01 10:53:11 UTC
+Last updated 2026-04-20 15:35:25 UTC
 </div>
 </div>
 </body>
