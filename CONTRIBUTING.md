@@ -39,7 +39,10 @@ Your contribution is valuable and the community will be happy to give a hand.
 These rules apply to the CF conventions document and the conformance document.
 They describe the practices and procedures that should be used in fixing, updating, or adding to the conventions.
 
-All changes to these documents are proposed and discussed in an [issue](https://github.com/cf-convention/cf-conventions/issues) and implemented in a related [pull request](https://github.com/cf-convention/cf-conventions/compare) in the CF [conventions GitHub repository](https://github.com/cf-convention/cf-conventions), which contains the source of the CF conventions documents.
+**These rules do not apply to changes in CF standard names and other vocabularies.
+The rules for changes to CF vocabularies are [here](https://cfconventions.org/standard_name_rules.html).**
+
+All changes to the conventions documents are proposed and discussed in an [issue](https://github.com/cf-convention/cf-conventions/issues) and implemented in a related [pull request](https://github.com/cf-convention/cf-conventions/compare) in the CF [conventions GitHub repository](https://github.com/cf-convention/cf-conventions), which contains the source of the CF conventions documents.
 Changes are of three kinds:
 
 1. Enhancements, which add new capabilities or improve existing ones. Removing or making a recommendation against an existing convention is also an enhancement, but these are very uncommon because of design principle 9 of [section 1.2](https://cfconventions.org/cf-conventions/cf-conventions.html#design). See also the [rules for rectifying flaws](#flaw_rules) in the conventions.
