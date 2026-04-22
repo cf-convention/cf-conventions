@@ -11,7 +11,7 @@ Thank you for taking the time to consider making a contribution to this effort.
 As a prerequisite to getting involved, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md).
 
 The CF Conventions are changed by changing the source files in this repository.
-The rules for doing this are set forth in this repository's [`CONTRIBUTING.md`](https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md) file.
+The rules for doing this are set forth in this repository's [`CONTRIBUTING.md`](https://github.com/cf-convention/cf-conventions/blob/main/CONTRIBUTING.md) file.
 
 # Building the HTML
 
