@@ -228,7 +228,7 @@ Trivial defects to the conventions and conformance documents should be included 
 A corresponding GitHub pull request can also be submitted at the same time as the issue.
 
 The correction is held to have been agreed if three weeks pass without anyone disagreeing with it.
-After that period, the issue should be closed by the manager of the CF conventions, the manager of CF standard names or any member of the CF conventions committee, who will make the change and/or merge the pull request.
+After that period, the issue should be closed by the secretary of the CF conventions, the secretary of CF standard names or any member of the CF conventions committee, who will make the change and/or merge the pull request.
 No moderator is needed because there cannot be any substantive discussion under these rules.
 
 If anyone disagrees that the correction should be made, because they think that the document is already clear or has the intended meaning, then a correction cannot be made by these rules.
