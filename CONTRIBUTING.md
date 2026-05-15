@@ -103,7 +103,7 @@ This is so that the conceptual development of the proposal is easily found in on
 
 During the discussion, the implications of the proposal for the CF data model, and vice-versa, must be considered, following the [additional rules](#data_model_rules) for the data model.
 
-In some cases, examples of netCDF files or pseudocode to illustrate the idea may be necessary to inform the discussion and give confidence that the proposal is not flawed.
+In some cases, examples of datasets or pseudocode to illustrate the idea may be necessary to inform the discussion and give confidence that the proposal is not flawed.
 By default, these are not necessary, but they must be provided by the proposer if requested during the discussion.
 In case of any disagreement about the need, the conventions committee will arbitrate.
 
