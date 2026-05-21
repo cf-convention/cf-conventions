@@ -105,6 +105,52 @@ The `computed_standard_name` is `air_pressure`.
 No `standard_name` has been defined for `a`, `b` or `ap`.
 
 
+===  Atmosphere hybrid sigma log-pressure coordinate
+
+----
+standard_name = "atmosphere_hybrid_sigma_ln_pressure_coordinate"
+----
+
+Definition:::
++
+----
+eta(k) = p(n,k,j,i)/p0 * ( ps(n,j,i)/p0 )**(-b(k))
+----
+
++
+equivalent to
+
++
+----
+ln( p(n,k,j,i)/p0 ) = ln( eta(k) ) + b(k)*ln( ps(n,j,i)/p0 )
+p(n,k,j,i) = p0 * eta(k) * ( ps(n,j,i)/p0 )**b(k)
+----
+
+where `p(n,k,j,i)` is the pressure at gridpoint `(n,k,j,i)`, `p0` is a reference pressure, and `ps(n,j,i)` is the surface pressure at horizontal gridpoint `(j,i)` and time `(n)`. 
+`eta(k)` is the hybrid level coordinate value at level `k`. 
+`eta(k)` is dimensionless and takes values in the range [0,1]. 
+`b(k)` is dimensionless and is a function of `eta(k)` and two dimensionless parameters `rmin` and `rmax` according to:
+
+----
+lambda(k) = ( zeta(k) - zeta_U ) / ( zeta_S - zeta_U )
+r(k) = rmax - (rmax - rmin)*lambda(k)
+b(k) = lambda(k)**r(k)
+----
+
+where `zeta_S = ln(p0)`, `zeta(k) = zeta_S + ln(eta(k))` and `zeta_U = min(zeta(k))`. `rmin` and `rmax` can be adjusted to control the rectification of levels over high terrain as described by Girard et al. 2014 (https://doi.org/10.1175/MWR-D-13-00255.1).
+
+The format for the formula_terms attribute is
+----
+formula_terms = "eta: var1 b: var2 ps: var3 p0: var4"
+----
+
+The `standard_name` of `eta` is `atmosphere_hybrid_sigma_ln_pressure_coordinate`. 
+The `standard_name` of `p0` is `reference_air_pressure_for_atmosphere_vertical_coordinate`, and of `ps` is `surface_air_pressure`.  
+The air pressure `p` is the computed vertical coordinate. 
+To indicate the `standard_name` of this quantity, the coordinate variable may be given the attribute `computed_standard_name="air_pressure"`. 
+No `standard_name` has been defined for `b`.
+
+
 [[atmosphere-hybrid-height-coordinate]]
 ===  Atmosphere hybrid height coordinate 
 
