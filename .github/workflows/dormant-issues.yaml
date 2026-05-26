@@ -1,0 +1,35 @@
+name: Mark and Close Dormant Issues
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # daily
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # 6 months ≈ 180 days
+          days-before-stale: 180
+          # 3 weeks = 21 days
+          days-before-close: 21
+
+          stale-issue-label: "inactive"
+          close-issue-label: "dormant"
+
+          stale-issue-message: >
+            This issue has been inactive for 6 months.
+            It will be closed as dormant in 3 weeks if no further activity occurs.
+
+          close-issue-message: >
+            This issue was closed as dormant because of inactivity for more than six months. Anyone can reopen it to resume the discussion.
+
+          # Optional but recommended
+          #exempt-issue-labels: 
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          only-issues: true
