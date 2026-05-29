@@ -92,7 +92,7 @@ git push origin HEAD
   - "Choose a tag" for the new version on the "main" branch: The tag should be called `v<VN>.0`, substituting `<VN>` with the release version (e.g. `v1.12.0`).
   - Set the release title to `CF-<VN>`, substituting `<VN>` the release version (e.g. `CF-1.12`).
   - Click "Generate release notes". This will automatically generate a description of the release.
-  - Edit the description to remove the list of contributors, instead adding any new people who have made substantive contributions to the list at http://cfconventions.org/conventions_contributors.html.
+  - Edit the description to remove the list of contributors.
   - Select "Set as the latest release".
   - Select "Publish release".
 
