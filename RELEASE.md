@@ -133,6 +133,7 @@ After the release has been completed, make the following changes to re-ininstate
 - For any issue which has been incorporated in the new release:
   - If the issue has a `new contributor` label, add the new contributor(s) to the list at https://cfconventions.org/conventions_contributors.html.
   - Ensure that the issue is closed.
+  - Add the `change agreed` label to the issue, if not already there.
 
 - For any pull request which has been incorporated in the new release:
   - Ensure that it has the milestone for the new version (e.g. `1.13`)
