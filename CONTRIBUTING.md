@@ -13,6 +13,9 @@ These rules are designed to make it easy to contribute to the CF conventions and
 They are intended to support your work and not to constrict you; if at any time you find them difficult to follow, please ask for help.
 Your contribution is valuable and the community will be happy to give a hand.
 
+This document is long, but it's not all immediately relevant when starting a proposal for changing the conventions, so please don't feel obliged to read it all at the outset.
+The most relevant parts are about the categories of changes in the [first section](#rules), the opening paragraphs of the [section on enhancements](#enhancement_rules), its subsections on the [way the discussion is run](#conduct) and [how it reaches a conclusion](#conclusions), and the [section on correcting defects](#defect_rules).
+
 ## Contents
 
 * [Rules for Changes to the CF Conventions](#rules)
@@ -128,7 +131,7 @@ If it proves impossible to resolve disagreements after considerable efforts by d
 When this proposal is made, anyone who is concerned about the outcome of the issue should be strongly encouraged to join the group.
 Everyone who wants to join must be allowed to do so, and must indicate their wish to do so within three weeks of the proposal being made to convene a group.
 Every reasonable effort must be made to facilitate participation by all who wish to.
-Anyone who objects to the issue being delegating to a group must state their objection within three weeks of the proposal being made to convene a group.
+Anyone who objects to the issue being delegated to a group must state their objection within three weeks of the proposal being made to convene a group.
 If there are any such objections, the conventions committee will decide by majority whether a group should be convened.
 
 Once a group has been convened, it arranges whatever meetings it needs for its work, until it has decided (by consensus if possible, otherwise by majority) how the issue should be concluded: with proposed text, with an outline of text to be elaborated, or that no change can be agreed.
@@ -270,7 +273,7 @@ The documents refer to the "CF conventions" like that (like the website URL), no
 
 ### <a name="infrastructure_guide">Infrastructure guide</a>
 
-See [548](https://github.com/cf-convention/cf-convention.github.io/issues/548).
+See [CF website repo issue #548](https://github.com/cf-convention/cf-convention.github.io/issues/548).
 
 ----
 
