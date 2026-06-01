@@ -5,7 +5,7 @@ Dear CF community member,
 Thank you for taking the time to consider making a contribution to the [CF conventions](https://cfconventions.org/).
 The conventions are produced by and for a broad community and your contribution is the key to their usefulness.
 
-As a prerequisite to getting involved, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions/blob/main/CODE_OF_CONDUCT.md).
+As a prerequisite to getting involved, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions?tab=coc-ov-file#contributor-code-of-conduct).
 The CF community takes great pride in respectful and collegial discourse.
 Any disrespectful or otherwise derogatory communication will not be tolerated.
 
