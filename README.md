@@ -8,7 +8,7 @@ For the official web site please visit: https://cfconventions.org and the [corre
 
 The CF conventions are produced by and for a broad community.
 Thank you for taking the time to consider making a contribution to this effort.
-As a prerequisite to getting involved, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions?tab=coc-ov-file).
+As a prerequisite to getting involved, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions?tab=coc-ov-file#contributor-code-of-conduct).
 
 The CF Conventions are changed by changing the source files in this repository.
 The rules for doing this are set forth in this repository's [`CONTRIBUTING.md`](https://github.com/cf-convention/cf-conventions?tab=contributing-ov-file#contributing-to-the-netcdf-cf-conventions) file.
