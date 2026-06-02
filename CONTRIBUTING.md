@@ -14,11 +14,13 @@ They are intended to support your work and not to constrict you; if at any time 
 Your contribution is valuable and the community will be happy to give a hand.
 
 This document is long, but it's not all immediately relevant when starting a proposal for changing the conventions, so please don't feel obliged to read it all at the outset.
-The most relevant parts are about the categories of changes in the [first section](#rules), the opening paragraphs of the [section on enhancements](#enhancement_rules), its subsections on the [way the discussion is run](#conduct) and [how it reaches a conclusion](#conclusions), and the [section on correcting defects](#defect_rules).
+The most relevant parts are the start of the [first section](#rules), the [section on categories and labels for changes](#categories_and_labels), the opening paragraphs of the [section on enhancements](#enhancement_rules), its subsections on the [way the discussion is run](#conduct) and [how it reaches a conclusion](#conclusions), and the [section on correcting defects](#defect_rules).
 
 ## Contents
 
 * [Rules for Changes to the CF Conventions](#rules)
+  * [Categories of change and associated labels for issues](#categories_and_labels)
+  * [Rules for changing the standard name guidelines](#standard_name_guidelines)
   * [Rules for recognising contributions to the development of the CF conventions](#recognition_rules)
   * [Versions and schedule for updating the CF conventions](#new_versions)
   * [Rules for enhancements to the CF conventions and the CF standard name guidelines](#enhancement_rules)
@@ -37,7 +39,7 @@ The most relevant parts are about the categories of changes in the [first sectio
   * [Infrastructure guide](#infrastructure_guide)
 * [Revision history of the rules](#history)
 
-## <a name="rules">Rules for Changes to the CF Conventions</a>
+## <a name="rules">Rules for changes to the CF Conventions</a>
 
 These rules apply to the CF conventions document and the conformance document.
 They describe the practices and procedures that should be used in fixing, updating, or adding to the conventions.
@@ -46,7 +48,12 @@ They describe the practices and procedures that should be used in fixing, updati
 The rules for changes to CF vocabularies are [here](https://cfconventions.org/standard_name_rules.html).**
 
 All changes to the conventions documents are proposed and discussed in an [issue](https://github.com/cf-convention/cf-conventions/issues) and implemented in a related [pull request](https://github.com/cf-convention/cf-conventions/pulls) in the CF [conventions GitHub repository](https://github.com/cf-convention/cf-conventions), which contains the source of the CF conventions documents.
-Changes are of three kinds:
+
+----
+
+### <a name="categories_and_labels">Categories of change and associated labels for issues</a>
+
+Changes to the CF conventions are of three kinds:
 
 1. Enhancements, which add new capabilities or improve existing ones. Removing or making a recommendation against an existing convention is also an enhancement, but these are very uncommon because of design principle 9 of [section 1.2](https://cfconventions.org/cf-conventions/cf-conventions.html#design). See also the [rules for rectifying flaws](#flaw_rules) in the conventions.
 
@@ -62,7 +69,11 @@ To propose such a change, include it in the existing open `defect` issue for "Tr
 
 The [rules for enhancements](#enhancement_rules) (1) and the [rules for defects](#defect_rules) (2 and 3) are different, as described below.
 
-Changes to the standard name guidelines are classified as enhancements or corrections to defects, and follow the same [rules for enhancements](#enhancement_rules) and [rules for defects](#defect_rules).
+----
+
+### <a name="standard_name_guidelines">Rules for changing the standard name guidelines</a>
+
+Changes to the standard name guidelines are classified as enhancements or corrections to defects, and follow the same [rules for enhancements](#enhancement_rules) and [rules for defects](#defect_rules) as changes to the CF conventions.
 Since the standard name guidelines are stored in the [CF vocabularies repository](https://github.com/cf-convention/vocabularies), `enhancement` and `defect` issues applying to the guidelines should be opened in that repository, not in the conventions repository.
 
 ----
