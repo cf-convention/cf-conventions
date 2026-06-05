@@ -477,7 +477,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author37" class="author">Patrick&#160;Van&#160;Laake</span><br>
 <span id="author38" class="author">Lorea&#160;García&#160;San&#160;Martín</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">05&#160;June,&#160;2026&#160;06:04:59Z</span>
+<span id="revdate">05&#160;June,&#160;2026&#160;06:12:51Z</span>
 <br><span id="revremark">main</span>
 </div>
 </div>
@@ -720,6 +720,7 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2026). NetCDF 
 <li><a href="#_oblique_mercator">Oblique Mercator</a></li>
 <li><a href="#_orthographic">Orthographic</a></li>
 <li><a href="#polar-stereographic">Polar stereographic</a></li>
+<li><a href="#_reduced_gaussian">Reduced Gaussian</a></li>
 <li><a href="#_rotated_pole">Rotated pole</a></li>
 <li><a href="#_sinusoidal">Sinusoidal</a></li>
 <li><a href="#_stereographic">Stereographic</a></li>
@@ -10201,6 +10202,100 @@ As PROJ requires the standard parallel, <a href="#Snyder">[Snyder]</a> formula 2
 </div>
 </div>
 <div class="sect2">
+<h3 id="_reduced_gaussian"><a class="anchor" href="#_reduced_gaussian"></a>Reduced Gaussian</h3>
+<div class="listingblock">
+<div class="content">
+<pre>grid_mapping_name = reduced_gaussian</pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><em>Map parameters:</em></dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p><strong><code>grid_subtype</code></strong> - Reduced Gaussian grid type.
+The permitted values (case-insensitive) are <strong><code>normal</code></strong> and <strong><code>octahedral</code></strong>.</p>
+</li>
+<li>
+<p><strong><code>latitude_dimension</code></strong> - The name of both a one-dimensional variable, which contains the latitude coordinates of the latitude lines, and of its single dimension, which specifies the number of latitude lines <em>N</em>, where <em>N</em> must be even because these grids do not have points at the poles and equator.</p>
+</li>
+<li>
+<p>Either <strong><code>points_per_latitude</code></strong> or <strong><code>accumulated_points_per_latitude</code></strong> - Whichever is given, it contains the name of a one-dimensional variable, whose single dimension is identified by the <strong><code>latitude_dimension</code></strong> attribute.
+The <strong><code>points_per_latitude</code></strong> and <strong><code>accumulated_points_per_latitude</code></strong> variables are equivalent; the latter is the cumulative sum of the former, and may ease user computations of latitudes and longitudes.</p>
+</li>
+<li>
+<p><strong><code>longitude_of_first_meridian</code></strong> - This parameter is optional (default is 0)</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1"><em>Map coordinates:</em></dt>
+<dd>
+<p>In addition to the map parameters, the coordinate system is defined by a one-dimensional variable whose single dimension is identified by the <strong><code>latitude_dimension</code></strong> attribute, and whose name is the same as the name of its dimension.
+It must have a <strong><code>units</code></strong> attribute and may have other attributes to identify it as containing latitude coordinates (see Section 4.2).
+The latitudes correspond to the zeroes of the Legendre polynomial of order <em>N</em>.</p>
+<div class="paragraph">
+<p>The data variable must have an integer-valued one-dimensional coordinate variable with <strong><code>standard_name</code></strong> attribute value <strong><code>reduced_gaussian_index</code></strong>.
+This is a discrete index with a unique value to identify each gridpoint.
+The <strong><code>reduced_gaussian_index</code></strong>, together with the numbers of longitude points for each latitude line and the <strong><code>latitude</code></strong> values, can be used to reconstruct the latitude and longitude of each of the gridpoints.</p>
+</div>
+<div class="paragraph">
+<p>The <strong><code>reduced_gaussian_index</code></strong> is strictly monotonic and non‑negative.
+It is a serial index for the points of the grid, ordered east to west and north to south, starting from 0 on the closest latitude line to the North Pole, proceeding eastward along each latitude line for the number of points specified for that latitude, and continuing to the last point on the latitude line closest to the South Pole.
+The last index is <em>M</em>-1, where <em>M</em> is number of points in the global reduced Gaussian grid.
+Along each latitude line, the first point is at the longitude given by the <strong><code>longitude_of_first_meridian</code></strong> (by default 0 degrees East), and the points are evenly spaced.</p>
+</div>
+<div class="paragraph">
+<p>The <strong><code>latitude</code></strong> and <strong><code>longitude</code></strong> coordinates for each cell can be optionally included as 1D auxiliary coordinate variables.</p>
+</div>
+</dd>
+<dt class="hdlist1"><em>Notes:</em></dt>
+<dd>
+<p>The reduced Gaussian grid is customarily identified by a nominal grid resolution.
+This number is half the number of latitudes <em>N</em>/2, equal to the number of latitudes in each hemisphere between pole and equator e.g. grid resolution of 1280 means that the size of the dimension named by the <strong><code>latitude_dimension</code></strong> attribute is <em>N</em>=2560.</p>
+<div class="paragraph">
+<p>The <strong><code>grid_subtype</code></strong> (e.g., Octahedral, Normal) and the number of latitudes from pole to equator (the nominal resolution) together identify the grid.
+For more information on the grid type, see <code><a href="#RGG">[RGG]</a></code> and <code><a href="#RGG-O">[RGG-O]</a></code>.</p>
+</div>
+<div class="paragraph">
+<p>For a non-global domain (regional or selective e.g. land only), the number of reduced Gaussian gridpoints is smaller than <em>M</em> for the global grid.
+The <strong><code>reduced_gaussian_index</code></strong> coordinate variable locates the points by their reduced Gaussian index on the global grid.
+The map parameters, the latitude variable, and the variable specifying the numbers of longitudes always refer to the global grid.</p>
+</div>
+</dd>
+<dt class="hdlist1"><em>Example:</em></dt>
+</dl>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-none" data-lang="none">dimensions:
+   reduced_gaussian_index = 6599680 ;
+   lat = 2560 ;
+variables:
+   char reduced_gaussian ;
+        reduced_gaussian:grid_mapping_name = "reduced_gaussian" ;
+        reduced_gaussian:grid_subtype = "octahedral" ;
+        reduced_gaussian:points_per_latitude = "pl" ;
+        reduced_gaussian:latitude_dimension = "lat" ;
+   float lat(lat) ;
+        lat:long_name = "latitude" ;
+        lat:units = "degrees_north" ;
+   int pl(lat) ;
+        pl:long_name = "number of points per latitude" ;
+        pl:units = "1" ;
+   int reduced_gaussian_index(reduced_gaussian_index) ;
+        reduced_gaussian_index:standard_name = "reduced_gaussian_index"
+        reduced_gaussian_index:long_name = "Reduced Gaussian grid point index";
+        reduced_gaussian_index:units = "1";
+   float data(reduced_gaussian_index) ;
+        data:grid_mapping = "reduced_gaussian" ;
+        data:coordinates = "reduced_gaussian_index" ;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_rotated_pole"><a class="anchor" href="#_rotated_pole"></a>Rotated pole</h3>
 <div class="listingblock">
 <div class="content">
@@ -10512,6 +10607,12 @@ This attribute and <strong><code>geoid_name</code></strong> cannot both be speci
 <td class="tableblock halign-left valign-top"><p class="tableblock">True longitude (degrees_east) of the north pole of the rotated grid.</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>grid_subtype</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reduced Gaussian grid type (case-insensitive).
+Normal or octahedral.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>horizontal_datum_name</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The name of the geodetic (horizontal) datum, which corresponds to the procedure used to measure positions on the surface of the Earth.
@@ -10536,6 +10637,13 @@ Example: 298.257222101 for the GRS 1980 ellipsoid.
 If all three attributes are specified then the supplied values must be consistent with the aforementioned formula.)</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>latitude_dimension</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of latitude lines from pole to equator (N) in a reduced Gaussian grid.
+The full grid therefore contains 2N latitude lines.
+N must be an even number.</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>latitude_of_projection_origin</code></strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The latitude (degrees_north) chosen as the origin of rectangular coordinates for a map projection.
@@ -10553,6 +10661,12 @@ Domain:<br>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The line of longitude (degrees_east) at the center of a map projection generally used as the basis for constructing the projection.
 Domain:<br>
      <strong><code>-180.0 &lt;= longitude_of_central_meridian &lt; 180.0</code></strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>longitude_of_first_meridian</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specifies the longitude, with respect to Greenwich, of the first meridian used to define the grid mapping indexing in a reduced Gaussian grid.
+It is 0 degrees by default.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>longitude_of_prime_meridian</code></strong></p></td>
@@ -10579,6 +10693,11 @@ Domain: + <strong><code>-180.0 &lt;= longitude_of_projection_origin &lt; 180.0</
 <td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Records the height, <em>in metres</em>, of the map projection perspective point above the ellipsoid (or sphere).
 Used by perspective-type map projections, for example the Vertical Perspective Projection, which may be used to simulate the view from a Meteosat satellite.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>points_per_latitude</code></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of longitude points that exist in a given latitude line for a reduced Gaussian grid.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>prime_meridian_name</code></strong></p></td>
@@ -14540,6 +14659,9 @@ CF version 1.13 withdrew this use of <strong><code>units_metadata</code></strong
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/433">Issue #619</a>: Convention for reduced Gaussian grid parameters</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/610">Issue #610</a>: Clarify the CF prohibition of the UDUNITS syntax for scale factors and additive offsets to units</p>
 </li>
 <li>
@@ -15264,6 +15386,12 @@ OGC document 12-063. 1st May 2015.</p>
 <p><a id="OGP-EPSG_GN7_2"></a>[OGP-EPSG_GN7_2]  <a href="https://epsg.org/guidance-notes.html">OGP Surveying and Positioning Guidance Note 7, part 2: Coordinate Conversions and Transformations including Formulas</a>.</p>
 </li>
 <li>
+<p><a id="RGG"></a>[RGG] <a href="https://doi.org/10.1175/1520-0493(1991)119%3C1057:UORGGI%3E2.0.CO;2">Use of reduced Gaussian grids in spectral models</a>. Hortal, M. &amp; A.J. Simmons, 1991.</p>
+</li>
+<li>
+<p><a id="RGG-O"></a>[RGG-O] <a href="https://doi.org/10.21957/zwdu9u5i">A new grid for the IFS</a>. Malardel, S., Wedi, N., Deconinck, W., Diamantakis, M., Kühnlein, C., Mozdzynski, G., Hamrud, M., &amp; Smolarkiewicz, P. (2016): ECMWF Newsletter, 146, 23–28.</p>
+</li>
+<li>
 <p><a id="RH15"></a>[RH15] <a href="https://doi.org/10.1051/0004-6361/201526549">Efficient data structures for masks on 2D grids</a>. M Reinecke and E Hivon. 2015. <em>Astronomy &amp; Astrophysics</em>. 580, A132</p>
 </li>
 <li>
@@ -15302,7 +15430,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2026-06-05 06:04:51 UTC
+Last updated 2026-06-05 06:12:34 UTC
 </div>
 </div>
 </body>
