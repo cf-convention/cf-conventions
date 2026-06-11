@@ -26,6 +26,8 @@ The COARDS conventions prohibit the unit `degrees` altogether, but this unit is 
 The unit `degrees` is also allowed on coordinate variables such as the latitude and longitude coordinates of a transformed grid.
 In this case the coordinate values are not true latitudes and longitudes, which must always be identified using the more specific forms of `degrees` as described in <<latitude-coordinate>> and <<longitude-coordinate>>.
 
+See <<units-multiples>> concerning the use of scale factors and offsets for units and data.
+
 
 [[dimensionless-units, Section 3.1.1, "Dimensionless units"]]
 ==== Dimensionless units
@@ -44,10 +46,6 @@ Information describing a dimensionless physical quantity itself (e.g.
 "area fraction" or "probability") does not belong in the **`units`** attribute, but should be given in the **`long_name`** or **`standard_name`** attributes (see <<long-name>> and <<standard-name>>), in the same way as for physical quantities with dimensional units.
 As an exception, to maintain backwards compatibility with COARDS, the text strings `level`, `layer`, and `sigma_level` are allowed in the **`units`** attribute, in order to indicate dimensionless vertical coordinates.
 This use of **`units`** is not compatible with UDUNITS, and is deprecated by these conventions because conventions for more precisely identifying dimensionless vertical coordinates are available (see <<dimensionless-vertical-coordinate>>).
-
-The UDUNITS syntax that allows scale factors and offsets to be applied to a unit is not supported by these conventions, except for case of specifying reference time, see section <<time-coordinate>>.
-The application of any scale factors or offsets to data should be indicated by the **`scale_factor`** and **`add_offset`** attributes.
-Use of these attributes for data packing, which is their most important application, is discussed in detail in <<packed-data>>.
 
 
 [[temperature-units, Section 3.1.2, "Temperature units"]]
@@ -113,11 +111,14 @@ For instance, when temperature is on-scale, a value in `kg degree_C m-2` can be 
 ==== Scale factors and offsets
 
 UDUNITS recognises the <<SI>> prefixes shown in <<table-supported-units, Table 3.1>> for decimal multiples and submultiples of units, and allows them to be applied to non-SI units as well.
-UDUNITS offers a syntax for indicating arbitrary scale factors and offsets to be applied to a unit.
-(Note that this is different from the scale factors and offsets used for converting between **`units`**, as discussed for temperature in <<temperature-units>>.)
-This UDUNITS syntax for arbitrary transformation of **`units`** is not supported by the CF conventions, except for the case of specifying reference time (<<time-coordinate>>).
-The application of any scale factors or offsets to data should be indicated by the **`scale_factor`** and **`add_offset`** attributes.
-Use of these attributes for data packing, which is their most important application, is discussed in detail in <<packed-data>>.
+
+UDUNITS offers a syntax of its own for indicating arbitrary scale factors and offsets to be applied to a unit of measure named in the **`units`** attribute.
+(Note that this facility is not related to the scale factors and offsets used for converting between different units of measure, as discussed for temperature in <<temperature-units>>.)
+The UDUNITS syntax allows dimensionless numbers to appear in **`units`**, as multiplicative factors before the name of the unit and as additive offsets to the named unit (following `@` or various keywords).
+This UDUNITS syntax for arbitrary transformation of **`units`** must not be used with the CF conventions, except for offsets following **`since`** for specifying reference time (<<time-coordinate>>).
+
+The application of any scale factors or offsets to the data values, without altering the **`units`**, should be indicated by the **`scale_factor`** and **`add_offset`** attributes.
+Use of these attributes for data compression, which is their most important application, is discussed in detail in <<packed-data>>.
 
 [[table-supported-units]]
 .Prefixes for decimal multiples and submultiples of units

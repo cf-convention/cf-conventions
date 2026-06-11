@@ -183,6 +183,8 @@ References can be absolute, relative or with no path, in which case, the variabl
 * The **`units`** attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in https://cfconventions.org/cf-conventions/cf-conventions.html#cell-boundaries[section 7.1] and climatology boundary variables defined in https://cfconventions.org/cf-conventions/cf-conventions.html#climatological-statistics[section 7.4]).
 * The type of the **`units`** attribute is a string that must be recognizable by the UDUNITS package.
 Exceptions are the units **`level`**, **`layer`**, and **`sigma_level`**.
+* The **`units`** string must not contain literal numbers (integer or real) as factors or offsets to a named unit of measure.
+An equivalent statement, using the syntax and terms of the link:$$https://docs.unidata.ucar.edu/udunits/current/udunits2lib.html#Grammar$$[UDUNITS Unit Grammar], is that **`INT`** or **`REAL`** are not allowed in a **`units`** string that contains **`ID`**, except for the specification of a reference time in the units of time coordinates.
 * Dimensionless units for volume fractions defined by UDUNITS (**`ppv`**, **`ppmv`**, **`ppbv`**, **`pptv`**, **`ppqv`**) are not allowed in the **`units`** attribute of any variable which also has a **`standard_name`** attribute.
 * If present, the **`units_metadata`** attribute must have one of these values: `temperature: on_scale`, `temperature: difference`, `temperature: unknown`, `leap_seconds: none`, `leap_seconds: utc`, or `leap_seconds: unknown`.
 * The **`units`** of a variable that specifies a **`standard_name`** must be physically equivalent to the canonical units given in the standard name table, as modified by the **`standard_name`** modifier, if there is one, according to Appendix C, and then modified by all the methods listed in order by the **`cell_methods`** attribute, if one is present, according to Appendix E.
@@ -380,6 +382,12 @@ The legal values for the **`grid_mapping_name`** attribute are contained in Appe
 * If the value of the **`indexing_scheme`** attribute is **`nuniq`** or **`zuniq`**, then the **`refinement_level`** attribute must not be present.
 * The value of the **`refinement_level`** attribute must be an integer in the range 0-29.
 * A variable with standard name **`healpix_index`** must have an integer data type and all values must be non-negative.
+* A variable with standard name **`reduced_gaussian_index`** must have an integer data type.
+Its values must be positive, strictly monotonic, and less than the total number of points in the global reduced Gaussian grid.
+* The attribute **`grid_subtype`** of the **`reduced_gaussian`** grid mapping must be **`normal`** or **`octahedral`**.
+* The value of the attribute **`latitude_dimension`** of the **`reduced_gaussian`** grid mapping must be an even number.
+* A one-dimensional variable must exist whose name, and the name of its single dimension, must both equal the **`latitude_dimension`** attribute of the **`reduced_gaussian`** grid mapping.
+* A one-dimensional variable must exist whose name, and the name of its single dimension, must both equal the **`latitude_dimension`** attribute of the **`reduced_gaussian`** grid mapping.
 
 *Recommendations:*
 
