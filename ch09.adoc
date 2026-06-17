@@ -7,7 +7,7 @@ Discrete sampling geometry datasets are characterized by a dimensionality that i
 === Features and feature types
 
 Each type of discrete sampling geometry (point, time series, profile or trajectory) is defined by the relationships among its spatiotemporal coordinates.
-We refer to the type of discrete sampling geometry as its **featureType**.
+The type of discrete sampling geometry is called its **featureType**.
 The term {ldquo} **feature** {rdquo} refers herein to a single instance of the **discrete sampling geometry** (such as a single time series).
 The representation of such features in a CF dataset was supported previous to the introduction of this chapter using a particular convention, which is still supported (that described by section 9.3.1).
 This chapter describes further conventions which offer advantages of efficiency and clarity for storing a collection of features in a single file.
@@ -72,7 +72,7 @@ Instance variables provide the metadata that differentiates individual features.
 The subscripts o and p distinguish the data elements that compose a single feature. 
 For example in a collection of **timeSeries** features, each time series instance, i, has data values at various times, o. 
 In a collection of **profile** features, the subscript, o, provides the index position along the vertical axis of each profile instance.
-We refer to data values in a feature as its **elements**, and to the dimensions of o and p as **element dimensions**.
+Data values in a feature are called **elements**, and the dimensions of o and p are called **element dimensions**.
 Each feature can have its own set of element subscripts o and p.
 For instance, in a collection of timeSeries features, each individual timeSeries can have its own set of times.
 The notation t(i,o) means there is a set of times with subscripts o for the elements of each feature i.  
@@ -96,7 +96,7 @@ Four types of representation are utilized in this chapter:
 * two **multidimensional array representations**, in which each feature instance is allocated the identical amount of storage space. 
 In these representations the instance dimension and the element dimension(s) are distinct CF coordinate axes (typical of coordinate axes discussed in chapter 4); and
 * two **ragged array representations**, in which each feature is provided with the minimum amount of space that it requires.
-In these representations the instances of the individual features are stacked sequentially along the same array dimension as the elements of the features; we refer to this combined dimension as the **sample dimension**.
+In these representations the instances of the individual features are stacked sequentially along the same array dimension as the elements of the features; this combined dimension is called the **sample dimension**.
 
 In the multidimensional array representations, data variables have both an instance dimension and an element dimension. 
 The dimensions may be given in any order. 
@@ -108,6 +108,7 @@ If the sample dimension is the netCDF unlimited dimension, new data can be appen
 In all representations, the instance dimension (which is also the sample dimension in ragged representations) may be set initially to a size that is arbitrarily larger than what is required for the features which are available at the time that the file is created.  
 Allocating unused array space in this way (pre-filled with missing values -- see also section 9.6, __Missing data__), can be useful as a means to reserve space that will be available to add features at a later time.
 
+[[orthogonal-multidimensional, Section 9.3.1, "Orthogonal multidimensional array representation"]]
 ==== Orthogonal multidimensional array representation
 
 The **orthogonal multidimensional array representation**, the simplest representation, can be used if each feature instance in the collection has identical coordinates along the element axis of the features. 
@@ -171,7 +172,8 @@ and the element coordinate axis will be one-dimensional with size 3 (for example
 coordinates that are shared by all of the timeSeries).
 This representation is consistent with the multidimensional fields described in chapter 5; the characteristic that makes it atypical from chapter 5 (though not incompatible) is that the instance dimension is a discrete axis (see section 4.5).
 
-====  Incomplete multidimensional array representation
+[[incomplete-multidimensional, Section 9.3.2, "Incomplete multidimensional array representation"]]
+==== Incomplete multidimensional array representation
 
 The **incomplete multidimensional array representation** can used if the features within a collection do not all have the same number of elements, but sufficient storage space is available to allocate the number of elements required by the longest feature to all features. 
 That is, features that are shorter than the longest feature must be padded with missing values to bring all instances to the same storage size.
@@ -233,7 +235,8 @@ The i and o subscripts would be interchanged (i.e. <<table-incomplete-array, Tab
 {set:cellbgcolor:#ddaaaa}
 |===============
 
-====  Contiguous ragged array representation
+[[contiguous-ragged, Section 9.3.3, "Contiguous ragged array representation"]]
+==== Contiguous ragged array representation
 
 The **contiguous ragged array representation** can be used only if the size of each feature is known at the time that it is created. 
 In this representation the data for each feature will be contiguous on disk, as shown in <<table-contiguous-array, Table 9.4>>.
@@ -313,6 +316,7 @@ The count variable contains the number of elements that each feature has.
 This representation and its count variable are identifiable by the presence of an attribute, **`sample_dimension`**, found on the count variable, which names the sample dimension being counted.
 For indices that correspond to features, whose data have not yet been written, the count variable should  have a value of zero or a missing value.
 
+[[indexed-ragged, Section 9.3.4, "Indexed ragged array representation"]]
 ==== Indexed ragged array representation
 
 The **indexed ragged array representation** stores the features interleaved along the sample dimension in the data variable as shown in <<table-indexed-array, Table 9.5>>.

@@ -1,8 +1,8 @@
 ==  NetCDF Files and Components 
 
 The components of a netCDF file are described in section 2 of the <<NUG>>.
-In this section we describe conventions associated with filenames and the basic components of a netCDF file.
-We also introduce new attributes for describing the contents of a file.
+In this section conventions associated with filenames and the basic components of a netCDF file are described.
+New attributes for describing the contents of a file are also introduced.
 
 === Filename
 
@@ -53,15 +53,15 @@ The examples in this document that use string-valued variables alternate between
 === Naming Conventions
 
 It is recommended that variable, dimension, attribute and group names begin with a letter and be composed of letters, digits, and underscores.
-By the word _letters_ we mean the standard ASCII letters uppercase `A` to `Z` and lowercase `a` to `z`.
-By the word _digits_ we mean the standard ASCII digits `0` to `9`, and similarly _underscores_ means the standard ASCII underscore `_`.
+The word _letters_ means the standard ASCII letters uppercase `A` to `Z` and lowercase `a` to `z`.
+The word _digits_ means the standard ASCII digits `0` to `9`, and similarly _underscores_ means the standard ASCII underscore `_`.
 Note that this is in conformance with the COARDS conventions, but is more restrictive than the netCDF interface which allows almost all Unicode characters encoded as multibyte UTF-8 characters (link:$$https://docs.unidata.ucar.edu/nug/current/file_format_specifications.html$$[NUG Appendix B]).
 The netCDF interface also allows leading underscores in names, but the NUG states that this is reserved for system use.
 
 Case is significant in netCDF names, but it is recommended that names should not be distinguished purely by case, i.e., if case is disregarded, no two names should be the same.
 It is also recommended that names should be obviously meaningful, if possible, as this renders the file more effectively self-describing.
 
-This convention does not standardize any variable or dimension names.
+These conventions do not standardize any variable or dimension names.
 Attribute names and their contents, where standardized, are given in English in this document and should appear in English in conforming netCDF files for the sake of portability.
 Languages other than English are permitted for variables, dimensions, and non-standardized attributes.
 The content of some standardized attributes are string values that are not standardized, and thus are not required to be in English.
@@ -71,14 +71,14 @@ For example, a description of what a variable represents may be given in a non-E
 === Dimensions
 
 A variable may have any number of dimensions, including zero, and the dimensions must all have different names.
-__COARDS strongly recommends limiting the number of dimensions to four, but we wish to allow greater flexibility__.
+__COARDS strongly recommends limiting the number of dimensions to four, but these conventions allow greater flexibility__.
 The dimensions of the variable define the axes of the quantity it contains.
 Dimensions other than those of space and time may be included.
 Several examples can be found in this document.
 Under certain circumstances, one may need more than one dimension in a particular quantity.
 For instance, a variable containing a two-dimensional probability density function might correlate the temperature at two different vertical levels, and hence would have temperature on both axes.
 
-If any or all of the dimensions of a variable have the interpretations of "date or time" (**`T`**), "height or depth" (**`Z`**), "latitude" (**`Y`**), or "longitude" (**`X`**) then we recommend, but do not require (see <<coards-relationship>>), those dimensions to appear in the relative order **`T`**, then **`Z`**, then **`Y`**, then **`X`** in the CDL definition corresponding to the file.
+If any or all of the dimensions of a variable have the interpretations of "date or time" (**`T`**), "height or depth" (**`Z`**), "latitude" (**`Y`**), or "longitude" (**`X`**) then it is recommended but not required (see <<coards-relationship>>) that those dimensions to appear in the relative order **`T`**, then **`Z`**, then **`Y`**, then **`X`** in the CDL definition corresponding to the file.
 All other dimensions should, whenever possible, be placed to the left of the spatiotemporal dimensions.
 
 Dimensions may be of any size, including unity.
@@ -90,7 +90,7 @@ For example, a variable containing data for temperature at 1.5 m above the groun
 [[variables]]
 === Variables
 
-This convention does not standardize variable names.
+These conventions do not standardize variable names.
 
 NetCDF variables that contain coordinate data are referred to as __coordinate variables__, __auxiliary coordinate variables__, __scalar coordinate variables__, or __multidimensional coordinate variables__.
 
@@ -105,7 +105,7 @@ Missing data is not allowed in coordinate variables.
 
 The NUG conventions for missing data changed significantly between version 2.3 and version 2.4.
 Since version 2.4 the NUG defines missing data as all values outside of the **`valid_range`**, and specifies how the **`valid_range`** should be defined from the **`_FillValue`** (which has library specified default values) if it hasn't been explicitly specified.
-If only one missing value is needed for a variable then we recommend  that this value be specified using the **`_FillValue`** attribute.
+If only one missing value is needed for a variable then it is recommended that this value be specified using the **`_FillValue`** attribute.
 Doing this guarantees that the missing value will be recognized by generic applications that follow either the before or after version 2.4 conventions.
 
 The scalar attribute with the name **`_FillValue`** and of the same type as its variable is recognized by the netCDF library as the value used to pre-fill disk space allocated to the variable.
@@ -119,26 +119,26 @@ Note that values that are identified as missing should not be transformed.
 Since the missing value is outside the valid range it is possible that applying a transformation to it could result in an invalid operation.
 For example, the default **`_FillValue`** is very close to the maximum representable value of IEEE single precision floats, and multiplying it by 100 produces an "Infinity" (using single precision arithmetic).
 
-This convention defines a two-element vector attribute **`actual_range`** for variables containing numeric data.
+These conventions define a two-element vector attribute **`actual_range`** for variables containing numeric data.
 If the variable is packed using the **`scale_factor`** and **`add_offset`** attributes (see <<packed-data>>), the elements of the **`actual_range`** should have the type intended for the unpacked data.
 The elements of **`actual_range`** must be exactly equal to the minimum and the maximum data values which occur in the variable (when unpacked if packing is used), and both must be within the **`valid_range`** if specified.
 If the data is all missing or invalid, the **`actual_range`** attribute cannot be used.
 
 === Attributes
 
-This standard describes many attributes (some mandatory, others optional), but a file may also contain non-standard attributes.
-Such attributes do not represent a violation of this standard.
+These conventions describe many attributes (some mandatory, others optional), but a file may also contain non-standard attributes.
+Such attributes do not represent a violation of these conventions.
 Application programs should ignore attributes that they do not recognise or which are irrelevant for their purposes.
 Conventional attribute names should be used wherever applicable.
 Non-standard names should be as meaningful as possible.
 Before introducing an attribute, consideration should be given to whether the information would be better represented as a variable.
 In general, if a proposed attribute requires ancillary data to describe it, is multidimensional, requires any of the defined netCDF dimensions to index its values, or requires a significant amount of storage, a variable should be used instead.
-When this standard defines string attributes that may take various prescribed values, the possible values are generally given in lower case.
+When these conventions define string attributes that may take various prescribed values, the possible values are generally given in lower case.
 However, applications programs should not be sensitive to case in these attributes.
-Several string attributes are defined by this standard to contain "blank-separated lists".
+Several string attributes are defined by these conventions to contain "blank-separated lists".
 Consecutive words in such a list are separated by one or more adjacent spaces.
 The list may begin and end with any number of spaces.
-See <<attribute-appendix>> for a list of attributes described by this standard.
+See <<attribute-appendix>> for a list of attributes described by these conventions.
 
 [[identification-of-conventions]]
 ==== Identification of Conventions
@@ -167,7 +167,7 @@ For readability in ncdump outputs it is recommended to embed newline characters 
 For backwards compatibility with COARDS none of these global attributes is required.
 
 The <<NUG>> defines **`title`** and **`history`** to be global attributes.
-We wish to allow the newly defined attributes, i.e., **`institution`**, **`source`**, **`references`**, and **`comment`**, to be either global or assigned to individual variables.
+The newly defined attributes, i.e., **`institution`**, **`source`**, **`references`**, and **`comment`**, may be either global or assigned to individual variables.
 When an attribute appears both globally and as a variable attribute, the variable's version has precedence.
 
 **`title`**:: A succinct description of what is in the dataset.
@@ -180,7 +180,7 @@ If it is observational, **`source`** should characterize it (e.g., "**`surface o
 
 **`history`**:: Provides an audit trail for modifications to the original data.
 Well-behaved generic netCDF filters will automatically append their name and the parameters with which they were invoked to the global history attribute of an input netCDF file.
-We recommend that each line begin by indicating the date and time of day that the program was executed.
+It is recommended that each line begin by indicating the date and time of day that the program was executed.
 
 **`references`**:: Published or web-based references that describe the data or methods used to produce it.
 
@@ -196,9 +196,9 @@ The only attribute for which CF standardises the use of external variables is **
 === Groups
 
 Groups provide a powerful mechanism to structure data hierarchically.
-This convention does not standardize group names.
+These conventions do not standardize group names.
 It may be of benefit to name groups in such a way that human readers can interpret them.
-However, files that conform to this standard shall not require software to interpret or decode information from group names.
+However, files that conform to these conventions shall not require software to interpret or decode information from group names.
 References to out-of-group variable and dimensions shall be found by applying the scoping rules outlined below.
 
 ==== Scope
@@ -245,7 +245,7 @@ The lateral search algorithm may only be used for <<NUG>> coordinate variables; 
 [NOTE]
 ====
 This use of the lateral search strategy to find them is discouraged.
-They are allowed mainly for backwards-compatibility with existing datasets, and may be deprecated in future versions of the standard.
+They are allowed mainly for backwards-compatibility with existing datasets, and may be deprecated in future versions of these conventions.
 ====
 
 ==== Application of attributes
@@ -405,7 +405,7 @@ Each of the rows contains the sizes of the fragments along that dimension, padde
  90  45  45
 180 180   _
 ```
-From this array we can deduce, for instance, that the shape of the fragment (in its canonical form, see <<fragment-interpretation>>) at position `[0, 1, 1]` of the array of fragments is `(17, 45, 180)`; and  that this fragment occupies zero-based indices 0 to 16 of the Z aggregated dimension, 90 to 134 of the Y aggregated dimension, and 180 to 359 of the X aggregated dimension.
+From this array it can be deduced, for instance, that the shape of the fragment (in its canonical form, see <<fragment-interpretation>>) at position `[0, 1, 1]` of the array of fragments is `(17, 45, 180)`; and  that this fragment occupies zero-based indices 0 to 16 of the Z aggregated dimension, 90 to 134 of the Y aggregated dimension, and 180 to 359 of the X aggregated dimension.
 See <<example-aggregation-variable, Example 2.3>>.
 
 In the special case that aggregated data is scalar, the `map` variable must also be scalar and contain the value `1`.
@@ -507,7 +507,7 @@ The data for the `level`, `latitude` and  `longitude` variables are omitted for 
 [[fragment-interpretation, Section 2.8.2 "Fragment Interpretation"]]
 ==== Fragment Interpretation
 
-Fragment datasets can be encoded in many different but equivalent ways, so we define a __canonical form__ of a fragment that provides a view of the fragment for which its data are consistent with the data from other fragments, as well as with the attributes of the aggregation variable.
+Fragment datasets can be encoded in many different but equivalent ways, so a __canonical form__ of a fragment is defined that provides a view of the fragment for which its data are consistent with the data from other fragments, as well as with the attributes of the aggregation variable.
 When constructing the aggregated data, it is assumed that each fragment's data has been transformed to its canonical form.
 The canonical form of a fragment's data is such that:
 
