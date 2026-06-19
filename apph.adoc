@@ -1,4 +1,4 @@
-﻿[[appendix-examples-discrete-geometries, Appendix H, Annotated Examples of Discrete Geometries]]
+[[appendix-examples-discrete-geometries, Appendix H, Annotated Examples of Discrete Geometries]]
 
 [appendix]
 == Annotated Examples of Discrete Geometries
@@ -7,8 +7,8 @@
 === Point Data
 
 To represent data at scattered locations and times with no implied relationship among of coordinate positions, both data and coordinates must share the same (sample) instance dimension.  
-Because each feature contains only a single data element, there is no need for a separate element dimension. 
-The representation of point features is a special, degenerate case of the standard four representations. 
+Because each feature contains only a single data element, there is no need for a separate element dimension.
+The representation of point features is a special, degenerate case of the standard four representations.
 The `coordinates` attribute is used on the data variables to unambiguously identify the relevant space and time auxiliary coordinate variables.
 
 [[example-h.1, "Point data"]]
@@ -21,23 +21,24 @@ The `coordinates` attribute is used on the data variables to unambiguously ident
 
    variables:
       double time(obs) ;
-          time:standard_name = “time”;
+          time:standard_name = “time” ;
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float lon(obs) ;
-          lon:standard_name = "longitude";
-          lon:long_name = "longitude of the observation";
-          lon:units = "degrees_east";
+          lon:standard_name = "longitude" ;
+          lon:long_name = "longitude of the observation" ;
+          lon:units = "degrees_east" ;
       float lat(obs) ;
-          lat:standard_name = "latitude";
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude of the observation" ;
           lat:units = "degrees_north" ;
       float alt(obs) ;
           alt:long_name = "vertical distance above the surface" ;
           alt:standard_name = "height" ;
-          alt:units = "m";
-          alt:positive = "up";
-          alt:axis = "Z";
+          alt:units = "m" ;
+          alt:positive = "up" ;
+          alt:axis = "Z" ;
 
       float humidity(obs) ;
           humidity:standard_name = "specific_humidity" ;
@@ -89,30 +90,31 @@ In the former case, listing the time variable in the **`coordinates`** attribute
      float humidity(station,time) ;
        humidity:standard_name = "specific humidity" ;
        humidity:coordinates = "lat lon alt station_name" ;
-       humidity:_FillValue = -999.9f;
+       humidity:_FillValue = -999.9f ;
      double time(time) ;
-       time:standard_name = "time";
+       time:standard_name = "time" ;
        time:long_name = "time of measurement" ;
-       time:units = "days since 1970-01-01 00:00:00" ;
+       time:units = "days since 1970-01-01" ;
+       time:calendar = "proleptic_gregorian" ;
      float lon(station) ;
-       lon:standard_name = "longitude";
-       lon:long_name = "station longitude";
-       lon:units = "degrees_east";
+       lon:standard_name = "longitude" ;
+       lon:long_name = "station longitude" ;
+       lon:units = "degrees_east" ;
      float lat(station) ;
-       lat:standard_name = "latitude";
+       lat:standard_name = "latitude" ;
        lat:long_name = "station latitude" ;
        lat:units = "degrees_north" ;
      float alt(station) ;
        alt:long_name = "vertical distance above the surface" ;
        alt:standard_name = "height" ;
-       alt:units = "m";
-       alt:positive = "up";
-       alt:axis = "Z";
+       alt:units = "m" ;
+       alt:positive = "up" ;
+       alt:axis = "Z" ;
      string station_name(station) ;
        station_name:long_name = "station name" ;
-       station_name:cf_role = "timeseries_id";
+       station_name:cf_role = "timeseries_id" ;
    attributes:
-       :featureType = "timeSeries";
+       :featureType = "timeSeries" ;
 ----
 In this example, `humidity(i,o)` is element `o` of time series `i`, and associated with the coordinate values `time(o)`, `lat(i)`, and `lon(i)`.
 Either the instance (`station`) or the element (`time`) dimension may optionally be the netCDF unlimited dimension.
@@ -120,7 +122,7 @@ Either the instance (`station`) or the element (`time`) dimension may optionally
 
 ==== Incomplete multidimensional array representation of time series
 
-Much of the simplicity of the orthogonal multidimensional representation can be preserved even in cases where individual time series have different time coordinate values. 
+Much of the simplicity of the orthogonal multidimensional representation can be preserved even in cases where individual time series have different time coordinate values.
 All time series must be allocated the amount of storage needed by the longest, so the use of this representation will trade off simplicity against storage space in some cases.  
 
 [[example-h.3]]
@@ -136,49 +138,49 @@ All time series must be allocated the amount of storage needed by the longest, s
 
    variables:
       float lon(station) ;
-          lon:standard_name = "longitude";
-          lon:long_name = "station longitude";
-          lon:units = "degrees_east";
+          lon:standard_name = "longitude" ;
+          lon:long_name = "station longitude" ;
+          lon:units = "degrees_east" ;
       float lat(station) ;
-          lat:standard_name = "latitude";
+          lat:standard_name = "latitude" ;
           lat:long_name = "station latitude" ;
           lat:units = "degrees_north" ;
       float alt(station) ;
           alt:long_name = "vertical distance above the surface" ;
           alt:standard_name = "height" ;
-          alt:units = "m";
-          alt:positive = "up";
-          alt:axis = "Z";
+          alt:units = "m" ;
+          alt:positive = "up" ;
+          alt:axis = "Z" ;
       char station_name(station, name_strlen) ;
           station_name:long_name = "station name" ;
-          station_name:cf_role = "timeseries_id";
+          station_name:cf_role = "timeseries_id" ;
       int station_info(station) ;
           station_info:long_name = "any kind of station info" ;
       float station_elevation(station) ;
           station_elevationalt:long_name = "height above the geoid" ;
           station_elevationalt:standard_name = "surface_altitude" ;
-          station_elevationalt:units = "m";
-
+          station_elevationalt:units = "m" ;
       double time(station, obs) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-          time:missing_value = -999.9;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+          time:missing_value = -999.9 ;
       float humidity(station, obs) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9f;
+          humidity:_FillValue = -999.9f ;
       float temp(station, obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9f;
+          temp:_FillValue = -999.9f ;
 
    attributes:
-          :featureType = "timeSeries";
+          :featureType = "timeSeries" ;
 ----
 In this example, the `humidity(i,o)` and `temp(i,o)` data for element `o` of time series `i` are associated with the coordinate values `time(i,o)`, `lat(i)`, `lon(i)` and `alt(i)`.
-Either the instance (`station`) dimension or the element (`obs`) dimension could be the unlimited dimension of a netCDF file. 
+Either the instance (`station`) dimension or the element (`obs`) dimension could be the unlimited dimension of a netCDF file.
 Any unused elements of the data and auxiliary coordinate variables must contain the missing data flag value(section 9.6).
 ====
 
@@ -196,43 +198,43 @@ When the intention of a data variable is to contain only a single time series, t
 
    variables:
       float lon ;
-          lon:standard_name = "longitude";
-          lon:long_name = "station longitude";
-          lon:units = "degrees_east";
+          lon:standard_name = "longitude" ;
+          lon:long_name = "station longitude" ;
+          lon:units = "degrees_east" ;
       float lat ;
-          lat:standard_name = "latitude";
+          lat:standard_name = "latitude" ;
           lat:long_name = "station latitude" ;
           lat:units = "degrees_north" ;
       float alt ;
           alt:long_name = "vertical distance above the surface" ;
           alt:standard_name = "height" ;
-          alt:units = "m";
-          alt:positive = "up";
-          alt:axis = "Z";
+          alt:units = "m" ;
+          alt:positive = "up" ;
+          alt:axis = "Z" ;
       string station_name ;
           station_name:long_name = "station name" ;
-          station_name:cf_role = "timeseries_id";
-
+          station_name:cf_role = "timeseries_id" ;
       double time(time) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float humidity(time) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9f;
+          humidity:_FillValue = -999.9f ;
       float temp(time) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9f;
+          temp:_FillValue = -999.9f ;
 
    attributes:
-          :featureType = "timeSeries";
+          :featureType = "timeSeries" ;
 ----
 ====
 
-While an idealized time series is defined at a single, stable point location, there are examples of time series, such as cabled ocean surface mooring measurements, in which the precise position of the observations varies slightly from a nominal fixed point. It is quite common that the deployment position of a station changes after maintenance or repositioning after it drifts. 
+While an idealized time series is defined at a single, stable point location, there are examples of time series, such as cabled ocean surface mooring measurements, in which the precise position of the observations varies slightly from a nominal fixed point. It is quite common that the deployment position of a station changes after maintenance or repositioning after it drifts.
 The following example shows how the spatial positions of such a time series should be encoded in CF. In addition, this example shows how lossless compression by gathering <<compression-by-gathering>> has been applied to the deployment coordinate variables, which otherwise would contain a lot of missing or repetitive data.
 Note that although this example shows only a single time series, the technique is applicable to all of the representations.
 
@@ -288,7 +290,8 @@ Note that although this example shows only a single time series, the technique i
       double time(time) ;
           time:standard_name = "time";
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01 ;
+          time:calendar = "proleptic_gregorian" ;
       float humidity(time) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt precise_lon precise_lat deploy_lon deploy_lat station_name" ;
@@ -344,19 +347,20 @@ When the time series have different lengths and the data values for entire time 
       double time(obs) ;
           time:standard_name = "time";
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float humidity(obs) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9f;
+          humidity:_FillValue = -999.9f ;
       float temp(obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9f;
+          temp:_FillValue = -999.9f ;
 
    attributes:
-          :featureType = "timeSeries";
+          :featureType = "timeSeries" ;
 ----
 
 The data `humidity(o)` and `temp(o)` are associated with the coordinate values `time(o)`, `lat(i)`, `lon(i)`, and `alt(i)`, where `i` indicates which time series.
@@ -373,11 +377,11 @@ where
       rowStart(i) = rowStart(i-1) + row_size(i-1) if i > 0
 ----
 
-The variable, `row_size`, is the count variable containing the length of each time series feature. 
-It is identified by having an attribute with name `sample_dimension` whose value is name of the sample dimension (`obs` in this example). 
-The sample dimension could optionally be the netCDF unlimited dimension. 
-The variable bearing the `sample_dimension` attribute must have the instance dimension (`station` in this example) as its single dimension, and must have an integer type. 
-This variable implicitly partitions into individual instances all variables that have the sample dimension. 
+The variable, `row_size`, is the count variable containing the length of each time series feature.
+It is identified by having an attribute with name `sample_dimension` whose value is name of the sample dimension (`obs` in this example).
+The sample dimension could optionally be the netCDF unlimited dimension.
+The variable bearing the `sample_dimension` attribute must have the instance dimension (`station` in this example) as its single dimension, and must have an integer type.
+This variable implicitly partitions into individual instances all variables that have the sample dimension.
 The auxiliary coordinate variables `lat`, `lon`, `alt` and `station_name` are station variables.
 ====
 
@@ -422,26 +426,27 @@ When time series with different lengths are written incrementally, the indexed r
       double time(obs) ;
           time:standard_name = "time";
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float humidity(obs) ;
           humidity:standard_name = “specific_humidity” ;
           humidity:coordinates = "time lat lon alt station_name" ;
-          humidity:_FillValue = -999.9f;
+          humidity:_FillValue = -999.9f ;
       float temp(obs) ;
           temp:standard_name = “air_temperature” ;
           temp:units = "Celsius" ;
           temp:coordinates = "time lat lon alt station_name" ;
-          temp:_FillValue = -999.9f;
+          temp:_FillValue = -999.9f ;
 
    attributes:
-          :featureType = "timeSeries";
+          :featureType = "timeSeries" ;
 ----
 The `humidity(o)` and `temp(o)` data are associated with the coordinate values `time(o)`, `lat(i)`, `lon(i)`, and `alt(i)`, where `i = stationIndex(o)` is a zero-based index indicating which time series.
 Thus, `time(0)`, `humidity(0)` and `temp(0)` belong to the element of the `station` dimension that is indicated by `stationIndex(0)` ; `time(1)`, `humidity(1)` and `temp(1)` belong to element `stationIndex(1)` of the `station` dimension, etc.
 
-The variable, `stationIndex`, is identified as the index variable by having an attribute with name of `instance_dimension` whose value is the instance dimension (`station` in this example). 
-The variable bearing the `instance_dimension` attribute must have the sample dimension (`obs` in this example) as its single dimension, and must have an integer type. 
-This variable implicitly assigns the station to each value of any variable having the sample dimension. 
+The variable, `stationIndex`, is identified as the index variable by having an attribute with name of `instance_dimension` whose value is the instance dimension (`station` in this example).
+The variable bearing the `instance_dimension` attribute must have the sample dimension (`obs` in this example) as its single dimension, and must have an integer type.
+This variable implicitly assigns the station to each value of any variable having the sample dimension.
 The sample dimension need not be the netCDF unlimited dimension, though it commonly is.
 ====
 
@@ -476,26 +481,27 @@ In the former case, listing the vertical coordinate variable in the **coordinate
 
    variables:
       int profile(profile) ;
-            profile:cf_role = "profile_id";
+          profile:cf_role = "profile_id" ;
       double time(profile);
           time:standard_name = "time";
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-      float lon(profile);
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+      float lon(profile) ;
           lon:standard_name = "longitude";
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
-      float lat(profile);
-          lat:standard_name = "latitude";
+      float lat(profile) ;
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
 
       float z(z) ;
-          z:standard_name = “altitude”;
+          z:standard_name = “altitude” ;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-          z:axis = "Z" ;  
+          z:axis = "Z" ;
 
       float pressure(profile, z) ;
           pressure:standard_name = "air_pressure" ;
@@ -544,39 +550,35 @@ This is a special case of the orthogonal multidimensional array representation (
 
    variables:
       int profile ;
-          profile:cf_role = "profile_id";
-
-      double time;
-          time:standard_name = "time";
+          profile:cf_role = "profile_id" ;
+      double time ;
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-      float lon;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+      float lon ;
           lon:standard_name = "longitude";
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
-      float lat;
-          lat:standard_name = "latitude";
+      float lat ;
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
-
       float z(z) ;
-          z:standard_name = “altitude”;
+          z:standard_name = “altitude” ;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-          z:axis = "Z" ;  
-
+          z:axis = "Z" ;
       float pressure(z) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat z" ;
-
       float temperature(z) ;
           temperature:standard_name = "air_temperature" ;
           temperature:units = "degree_celsius" ;
           temperature:coordinates = "time lon lat z" ;
-
       float humidity(z) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -584,7 +586,7 @@ This is a special case of the orthogonal multidimensional array representation (
           humidity:coordinates = "time lon lat z" ;
 
    attributes:
-      :featureType = "profile";
+      :featureType = "profile" ;
 ----
 The `pressure(o)`, `temperature(o)`, and `humidity(o)` data is associated with the coordinate values `time`, `z(o)`, `lat`, and `lon`.
 The profile variables `time`, `lat` and `lon`, shown here as scalar, could alternatively be one-dimensional `time(profile)`, `lat(profile)`, `lon(profile)` if a size-one profile dimension were retained in the file.
@@ -608,39 +610,36 @@ The canonical use case for this is when rewriting raw data, and you expect that 
       int profile(profile) ;
           profile:cf_role = "profile_id";
       double time(profile);
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-      float lon(profile);
-          lon:standard_name = "longitude";
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+      float lon(profile) ;
+          lon:standard_name = "longitude" ;
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
-      float lat(profile);
-          lat:standard_name = "latitude";
+      float lat(profile) ;
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
        int rowSize(profile) ;
           rowSize:long_name = "number of obs for this profile " ;
           rowSize:sample_dimension = "obs" ;
-
       float z(obs) ;
-          z:standard_name = “altitude”;
+          z:standard_name = “altitude” ;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-          z:axis = "Z" ;  
-
+          z:axis = "Z" ;
       float pressure(obs) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat z" ;
-
       float temperature(obs) ;
           temperature:standard_name = "air_temperature" ;
           temperature:units = "degree_celsius" ;
           temperature:coordinates = "time lon lat z" ;
-
       float humidity(obs) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -648,15 +647,15 @@ The canonical use case for this is when rewriting raw data, and you expect that 
           humidity:coordinates = "time lon lat z" ;
 
    attributes:
-      :featureType = "profile";
+      :featureType = "profile" ;
 ----
 The `pressure(o)`, `temperature(o)`, and `humidity(o)` data is associated with the coordinate values `time(i)`, `z(o)`, `lat(i)`, and `lon(i)`, where `i` indicates which profile.
 All elements for one profile are contiguous along the sample dimension.
 The sample dimension (`obs`) may be the unlimited dimension or not.
 All variables that have the instance dimension (`profile`) as their single dimension are considered to be information about the profiles.
 
-The count variable (`row_size`) contains the number of elements for each profile, and is identified by having an attribute with name `sample_dimension` whose value is the sample dimension being counted. 
-It must have the profile dimension as its single dimension, and must have an integer type. 
+The count variable (`row_size`) contains the number of elements for each profile, and is identified by having an attribute with name `sample_dimension` whose value is the sample dimension being counted.
+It must have the profile dimension as its single dimension, and must have an integer type.
 The elements are associated with the profile using the same algorithm as in H.2.4.
 ====
 
@@ -677,42 +676,38 @@ If the sample dimension is the unlimited dimension, this allows data to be appen
 
    variables:
       int profile(profile) ;
-          profile:cf_role = "profile_id";
+          profile:cf_role = "profile_id" ;
       double time(profile);
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-      float lon(profile);
-          lon:standard_name = "longitude";
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+      float lon(profile) ;
+          lon:standard_name = "longitude" ;
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
-      float lat(profile);
-          lat:standard_name = "latitude";
+      float lat(profile) ;
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
-
       int parentIndex(obs) ;
           parentIndex:long_name = "index of profile " ;
           parentIndex:instance_dimension= "profile" ;
-      
        float z(obs) ;
           z:standard_name = “altitude”;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-          z:axis = "Z" ;  
-
+          z:axis = "Z" ;
       float pressure(obs) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat z" ;
-
       float temperature(obs) ;
           temperature:standard_name = "air_temperature" ;
           temperature:units = "degree_celsius" ;
           temperature:coordinates = "time lon lat z" ;
-
       float humidity(obs) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -720,12 +715,12 @@ If the sample dimension is the unlimited dimension, this allows data to be appen
           humidity:coordinates = "time lon lat z" ;
 
    attributes:
-      :featureType = "profile";
+      :featureType = "profile" ;
 ----
 The `pressure(o)`, `temperature(o)`, and `humidity(o)` data are associated with the coordinate values `time(i)`, `z(o)`, `lat(i)`, and `lon(i)`, where `i` indicates which profile.
 The sample dimension (`obs`) may be the unlimited dimension or not.
-The profile index variable (`parentIndex`) is identified by having an attribute with name of `instance_dimension` whose value is the profile dimension name. 
-It must have the sample dimension as its single dimension, and must have an integer type. 
+The profile index variable (`parentIndex`) is identified by having an attribute with name of `instance_dimension` whose value is the profile dimension name.
+It must have the sample dimension as its single dimension, and must have an integer type.
 Each value in the profile index variable is the zero-based profile index that the element belongs to.
 The elements are associated with the profiles using the same algorithm as in H.2.5.
 ====
@@ -763,21 +758,20 @@ In that case, any unused elements of the data and auxiliary coordinate variables
           trajectory:cf_role = "trajectory_id";
           trajectory:long_name = "trajectory name" ;
       int trajectory_info(trajectory) ;
-          trajectory_info:long_name = "some kind of trajectory info"
-
+          trajectory_info:long_name = "some kind of trajectory info" ;
       double time(trajectory, obs) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float lon(trajectory, obs) ;
-          lon:standard_name = "longitude";
+          lon:standard_name = "longitude" ;
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
       float lat(trajectory, obs) ;
-          lat:standard_name = "latitude";
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
-
       float z(trajectory, obs) ;
           z:standard_name = “altitude”;
           z:long_name = "height above mean sea level" ;
@@ -824,22 +818,22 @@ This is a special case of the multidimensional array representation.
 
    variables:
       char trajectory(name_strlen) ;
-          trajectory:cf_role = "trajectory_id";
-
+          trajectory:cf_role = "trajectory_id" ;
       double time(time) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float lon(time) ;
-          lon:standard_name = "longitude";
+          lon:standard_name = "longitude" ;
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
       float lat(time) ;
-          lat:standard_name = "latitude";
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
       float z(time) ;
-          z:standard_name = “altitude”;
+          z:standard_name = “altitude” ;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
@@ -890,19 +884,20 @@ The canonical use case for this is when rewriting raw data, and you expect that 
           rowSize:sample_dimension = "obs" ;
 
       double time(obs) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float lon(obs) ;
-          lon:standard_name = "longitude";
+          lon:standard_name = "longitude" ;
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
       float lat(obs) ;
-          lat:standard_name = "latitude";
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
       float z(obs) ;
-          z:standard_name = “altitude”;
+          z:standard_name = “altitude” ;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
@@ -928,8 +923,8 @@ All elements for one trajectory are contiguous along the sample dimension.
 The sample dimension (`obs`) may be the unlimited dimension or not.
 All variables that have the instance dimension (`trajectory`) as their single dimension are considered to be information about that trajectory.
 
-The count variable (`row_size`) contains the number of elements for each trajectory, and is identified by having an attribute with name `sample_dimension` whose value is the sample dimension being counted. 
-It must have the trajectory dimension as its single dimension, and must have an integer type. 
+The count variable (`row_size`) contains the number of elements for each trajectory, and is identified by having an attribute with name `sample_dimension` whose value is the sample dimension being counted.
+It must have the trajectory dimension as its single dimension, and must have an integer type.
 The elements are associated with the trajectories using the same algorithm as in H.2.4.
 ====
 
@@ -957,45 +952,44 @@ The data can be written as it arrives; if the flatsample dimension is the unlimi
           trajectory_index:long_name = "index of trajectory this obs belongs to " ;
           trajectory_index:instance_dimension= "trajectory" ;
       double time(obs) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       float lon(obs) ;
-          lon:standard_name = "longitude";
+          lon:standard_name = "longitude" ;
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
       float lat(obs) ;
-          lat:standard_name = "latitude";
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
       float z(obs) ;
-          z:standard_name = “altitude”;
+          z:standard_name = “altitude” ;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
-          z:axis = "Z" ;  
-
+          z:axis = "Z" ;
       float O3(obs) ;
-          O3:standard_name = “mass_fraction_of_ozone_in_air”;
+          O3:standard_name = “mass_fraction_of_ozone_in_air” ;
           O3:long_name = "ozone concentration" ;
           O3:units = "1e-9" ;
           O3:coordinates = "time lon lat z" ;
-
       float NO3(obs) ;
-          NO3:standard_name = “mass_fraction_of_nitrate_radical_in_air”;
+          NO3:standard_name = “mass_fraction_of_nitrate_radical_in_air” ;
           NO3:long_name = "NO3 concentration" ;
           NO3:units = "1e-9" ;
           NO3:coordinates = "time lon lat z" ;
 
    attributes:
-      :featureType = "trajectory";
+      :featureType = "trajectory" ;
 ----
 The `O3(o)` and `NO3(o)` data are associated with the coordinate values `time(o)`, `lat(o)`, `lon(o)`, and `alt(o)`.
 All elements for one trajectory will have the same trajectory index value.
 The sample dimension (`obs`) may be the unlimited dimension or not.
 
-The index variable (`trajectory_index`) is identified by having an attribute with name of `instance_dimension` whose value is the trajectory dimension name. 
-It must have the sample dimension as its single dimension, and must have an integer type. 
+The index variable (`trajectory_index`) is identified by having an attribute with name of `instance_dimension` whose value is the trajectory dimension name.
+It must have the sample dimension as its single dimension, and must have an integer type.
 Each value in the `trajectory_index` variable is the zero-based trajectory index that the element belongs to.
 The elements are associated with the trajectories using the same algorithm as in H.2.5.
 ====
@@ -1014,7 +1008,7 @@ In addition,
 
 * It is strongly recommended that there should be a station variable (which may be of any type) with `cf_role` attribute `timeseries_id`, whose values uniquely identify the stations.
 * It is recommended that there should be station variables with standard_name attributes `platform_name`, `surface_altitude` and `platform_id` when applicable.
-      
+
 TimeSeriesProfiles are more complicated than timeSeries because there are two element dimensions (profile and vertical).
 Each time series has a number of profiles from different times as its elements, and each profile has a number of data from various levels as its elements.
 It is strongly recommended that there always be a variable (of any data type) with the profile dimension and the `cf_role` attribute `profile_id`, whose values uniquely identify the profiles.
@@ -1053,26 +1047,23 @@ When storing time series of profiles at multiple stations in the same data varia
           alt:long_name = "height above mean sea level" ;
           alt:units = "km" ;
           alt:positive = "up" ;
-          alt:axis = "Z" ;  
-
+          alt:axis = "Z" ;
       double time(station, profile ) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-          time:missing_value = -999.9;
-
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+          time:missing_value = -999.9 ;
       float pressure(station, profile , z) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat alt station_name" ;
-
       float temperature(station, profile , z) ;
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
           temperature:coordinates = "time lon lat alt station_name" ;
-
       float humidity(station, profile , z) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -1110,11 +1101,12 @@ If there is only a single set of levels and a single set of times, the multidime
        humidity:standard_name = “specific_humidity” ;
        humidity:coordinates = "lat lon" ;
      double time(time) ;
-       time:standard_name = "time";
+       time:standard_name = "time" ;
        time:long_name = "time of measurement" ;
-       time:units = "days since 1970-01-01 00:00:00" ;
+       time:units = "days since 1970-01-01" ;
+       time:calendar = "proleptic_gregorian" ;
      float lon(station) ;
-       lon:long_name = "station longitude";
+       lon:long_name = "station longitude" ;
        lon:units = "degrees_east";
      float lat(station) ;
        lat:long_name = "station latitude" ;
@@ -1160,32 +1152,28 @@ If there is only one station in the data variable, there is no need for the stat
           station_name:long_name = "station name" ;
       int station_info;
           station_info:long_name = "some kind of station info" ;
-
       float alt(profile , z) ;
           alt:standard_name = “altitude”;
           alt:long_name = "height above mean sea level" ;
           alt:units = "km" ;
-          alt:axis = "Z" ;  
+          alt:axis = "Z" ;
           alt:positive = "up" ;
-
-      double time(profile ) ;
-          time:standard_name = "time";
+      double time(profile) ;
+          time:standard_name = "time" ;
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
           time:missing_value = -999.9;
-
       float pressure(profile , z) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat alt station_name" ;
-
       float temperature(profile , z) ;
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
           temperature:coordinates = "time lon lat alt station_name" ;
-
       float humidity(profile , z) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -1234,25 +1222,24 @@ The canonical use case is when writing real-time data streams that contain profi
           station_name:cf_role = "timeseries_id";
       int station_info(station) ;
           station_info:long_name = "some kind of station info" ;
-
       int profile(profile) ;
-          profile:cf_role = "profile_id";
-      double time(profile);
-          time:standard_name = "time";
+          profile:cf_role = "profile_id" ;
+      double time(profile) ;
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
       int station_index(profile) ;
           station_index:long_name = "which station this profile is for" ;
           station_index:instance_dimension = "station" ;
       int row_size(profile) ;
-          row_size:long_name = "number of obs for this profile " ;
+          row_size:long_name = "number of obs for this profile" ;
           row_size:sample_dimension = "obs" ;
-
       float z(obs) ;
-          z:standard_name = “altitude”;
+          z:standard_name = “altitude” ;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
-          z:axis = "Z" ;  
+          z:axis = "Z" ;
           z:positive = "up" ;
 
       float pressure(obs) ;
@@ -1278,13 +1265,13 @@ The canonical use case is when writing real-time data streams that contain profi
 ----
 The `pressure(o)`, `temperature(o)`, and `humidity(o)` data for element `o` of profile `p` at station `i` are associated with the coordinate values `time(p)`, `z(o)`, `lat(i)`, and `lon(i)`.
 
-The index variable (`station_index`) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (`station` in this example). 
-The index variable must have the profile dimension as its sole dimension, and must have an integer type. 
+The index variable (`station_index`) is identified by having an attribute with name of instance_dimension whose value is the instance dimension name (`station` in this example).
+The index variable must have the profile dimension as its sole dimension, and must have an integer type.
 Each value in the index variable is the zero-based station index that the profile belongs to i.e. profile `p` belongs to `station i=station_index(p)`, as in section H.2.5.
 
 The count variable (`row_size`) contains the number of elements for each profile, which must be written contiguously.
-The count variable is identified by having an attribute with name `sample_dimension` whose value is the sample dimension (`obs` in this example) being counted. 
-It must have the profile dimension as its sole dimension, and must have an integer type. 
+The count variable is identified by having an attribute with name `sample_dimension` whose value is the sample dimension (`obs` in this example) being counted.
+It must have the profile dimension as its sole dimension, and must have an integer type.
 The number of elements in profile `p` is recorded in `row_size(p)`, as in section H.2.4.
 The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====
@@ -1327,32 +1314,28 @@ If there are the same number of profiles for all trajectories, and the same numb
           lat:standard_name = "latitude";
           lat:long_name = "station latitude" ;
           lat:units = "degrees_north" ;
-
       float alt(trajectory, profile , z) ;
           alt:standard_name = “altitude”;
           alt:long_name = "height above mean sea level" ;
           alt:units = "km" ;
           alt:positive = "up" ;
           alt:axis = "Z" ;  
-
       double time(trajectory, profile ) ;
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-          time:missing_value = -999.9;
-
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+          time:missing_value = -999.9 ;
       float pressure(trajectory, profile , z) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat alt" ;
-
       float temperature(trajectory, profile , z) ;
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
           temperature:coordinates = "time lon lat alt" ;
-
       float humidity(trajectory, profile , z) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -1400,32 +1383,28 @@ If there is only one trajectory in the data variable, there is no need for the t
           lat:standard_name = "latitude";
           lat:long_name = "station latitude" ;
           lat:units = "degrees_north" ;
-
       float alt(profile, z) ;
           alt:standard_name = “altitude”;
           alt:long_name = "height above mean sea level" ;
           alt:units = "km" ;
           alt:positive = "up" ;
           alt:axis = "Z" ;  
-
-      double time(profile ) ;
-          time:standard_name = "time";
+      double time(profile) ;
+          time:standard_name = "time" ;
           time:long_name = "time of measurement" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-          time:missing_value = -999.9;
-
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+          time:missing_value = -999.9 ;
       float pressure(profile, z) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat alt" ;
-
       float temperature(profile, z) ;
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
           temperature:coordinates = "time lon lat alt" ;
-
       float humidity(profile, z) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -1460,45 +1439,41 @@ The canonical use case is when writing real-time data streams that contain profi
    variables:
       int trajectory(trajectory) ;
           cf_role = "trajectory_id" ;
-
       double time(profile);
-          time:standard_name = "time";
+          time:standard_name = "time" ;
           time:long_name = "time" ;
-          time:units = "days since 1970-01-01 00:00:00" ;
-      float lon(profile);
-          lon:standard_name = "longitude";
+          time:units = "days since 1970-01-01" ;
+          time:calendar = "proleptic_gregorian" ;
+      float lon(profile) ;
+          lon:standard_name = "longitude" ;
           lon:long_name = "longitude" ;
           lon:units = "degrees_east" ;
-      float lat(profile);
-          lat:standard_name = "latitude";
+      float lat(profile) ;
+          lat:standard_name = "latitude" ;
           lat:long_name = "latitude" ;
           lat:units = "degrees_north" ;
       int row_size(profile) ;
-          row_size:long_name = "number of obs for this profile " ;
+          row_size:long_name = "number of obs for this profile" ;
           row_size:sample_dimension = "obs" ;
       int trajectory_index(profile) ;
           trajectory_index:long_name = "which trajectory this profile is for" ;
           trajectory_index:instance_dimension= "trajectory" ;
-      
        float z(obs) ;
           z:standard_name = “altitude”;
           z:long_name = "height above mean sea level" ;
           z:units = "km" ;
           z:positive = "up" ;
           z:axis = "Z" ;  
-
       float pressure(obs) ;
           pressure:standard_name = "air_pressure" ;
           pressure:long_name = "pressure level" ;
           pressure:units = "hPa" ;
           pressure:coordinates = "time lon lat z" ;
-
       float temperature(obs) ;
           temperature:standard_name = "surface_temperature" ;
           temperature:long_name = "skin temperature" ;
           temperature:units = "Celsius" ;
           temperature:coordinates = "time lon lat z" ;
-
       float humidity(obs) ;
           humidity:standard_name = "relative_humidity" ;
           humidity:long_name = "relative humidity" ;
@@ -1510,13 +1485,13 @@ The canonical use case is when writing real-time data streams that contain profi
 ----
 The `pressure(o)`, `temperature(o)`, and `humidity(o)` data for element `o` of profile `p` along trajectory `i` are associated with the coordinate values `time(p)`, `z(o)`, `lat(p)`, and `lon(p)`.
 
-The index variable (`trajectory_index`) is identified by having an attribute with name of `instance_dimension` whose value is the instance dimension name (trajectory in this example). 
-The index variable must have the profile dimension as its sole dimension, and must have an integer type. 
+The index variable (`trajectory_index`) is identified by having an attribute with name of `instance_dimension` whose value is the instance dimension name (trajectory in this example).
+The index variable must have the profile dimension as its sole dimension, and must have an integer type.
 Each value in the index variable is the zero-based trajectory index that the profile belongs to i.e. profile `p` belongs to trajectory `i=trajectory_index(p)`, as in section H.2.5.
 
 The count variable (`row_size`) contains the number of elements for each profile, which must be written contiguously.
-The count variable is identified by having an attribute with name `sample_dimension` whose value is the sample dimension (`obs` in this example) being counted. 
-It must have the profile dimension as its sole dimension, and must have an integer type. 
+The count variable is identified by having an attribute with name `sample_dimension` whose value is the sample dimension (`obs` in this example) being counted.
+It must have the profile dimension as its sole dimension, and must have an integer type.
 The number of elements in profile `p` is recorded in `row_size(p)`, as in section H.2.4.
 The sample dimension need not be the netCDF unlimited dimension,  though it commonly is.
 ====
