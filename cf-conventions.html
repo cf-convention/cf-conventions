@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 2.0.20">
-<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Jon&#160;Blower, Randy&#160;Horne, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring, Christopher&#160;Barker, Sadie&#160;L.&#160;Bartholomew, Thomas&#160;Lavergne, Bryan&#160;Lawrence, Neil&#160;Massey, Antonio&#160;S.&#160;Cofiño, Seth&#160;McGinnis, Patrick&#160;Van&#160;Laake, Lorea&#160;García&#160;San&#160;Martín">
+<meta name="author" content="Brian&#160;Eaton, Jonathan&#160;Gregory, Bob&#160;Drach, Karl&#160;Taylor, Steve&#160;Hankin, John&#160;Caron, Rich&#160;Signell, Phil&#160;Bentley, Greg&#160;Rappa, Heinke&#160;Höck, Alison&#160;Pamment, Martin&#160;Juckes, Martin&#160;Raspaud, Jon&#160;Blower, Randy&#160;Horne, Timothy&#160;Whiteaker, David&#160;Blodgett, Charlie&#160;Zender, Daniel&#160;Lee, David&#160;Hassell, Alan&#160;D.&#160;Snow, Tobias&#160;Kölling, Dave&#160;Allured, Aleksandar&#160;Jelenak, Anders&#160;Meier&#160;Soerensen, Lucile&#160;Gaultier, Sylvain&#160;Herlédan, Fernando&#160;Manzano, Lars&#160;Bärring, Christopher&#160;Barker, Sadie&#160;L.&#160;Bartholomew, Thomas&#160;Lavergne, Bryan&#160;Lawrence, Neil&#160;Massey, Antonio&#160;S.&#160;Cofiño, Seth&#160;McGinnis, Patrick&#160;Van&#160;Laake, Lorea&#160;García&#160;San&#160;Martín, James&#160;Anstey">
 <title>NetCDF Climate and Forecast (CF) Metadata Conventions</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
@@ -433,6 +433,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<!-- Theme CSS and JS -->
+<link id="theme-light" rel="stylesheet" href="themes/light-theme.css" media="(prefers-color-scheme: light)">
+<link id="theme-dark" rel="stylesheet" href="themes/dark-theme.css" media="(prefers-color-scheme: dark)">
+<script src="themes/theme-switcher.js"></script>
+
+<!-- Toggle button -->
+<div style="position: fixed; top: 1rem; right: 1rem; z-index: 999;">
+  <button onclick="toggleTheme()">&#9680; Switch theme</button>
+</div>
 </head>
 <body class="book">
 <div id="header">
@@ -476,8 +485,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author36" class="author">Seth&#160;McGinnis</span><br>
 <span id="author37" class="author">Patrick&#160;Van&#160;Laake</span><br>
 <span id="author38" class="author">Lorea&#160;García&#160;San&#160;Martín</span><br>
+<span id="author39" class="author">James&#160;Anstey</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">11&#160;June,&#160;2026&#160;08:48:18Z</span>
+<span id="revdate">20&#160;June,&#160;2026&#160;08:57:51Z</span>
 <br><span id="revremark">main</span>
 </div>
 </div>
@@ -695,6 +705,7 @@ Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S. et al. (2026). NetCDF 
 <li><a href="#atmosphere-natural-log-pressure-coordinate">Atmosphere natural log pressure coordinate</a></li>
 <li><a href="#_atmosphere_sigma_coordinate">Atmosphere sigma coordinate</a></li>
 <li><a href="#_atmosphere_hybrid_sigma_pressure_coordinate">Atmosphere hybrid sigma pressure coordinate</a></li>
+<li><a href="#_atmosphere_hybrid_sigma_log_pressure_coordinate">Atmosphere hybrid sigma log-pressure coordinate</a></li>
 <li><a href="#atmosphere-hybrid-height-coordinate">Atmosphere hybrid height coordinate</a></li>
 <li><a href="#_atmosphere_smooth_level_vertical_sleve_coordinate">Atmosphere smooth level vertical (SLEVE) coordinate</a></li>
 <li><a href="#_ocean_sigma_coordinate">Ocean sigma coordinate</a></li>
@@ -1122,6 +1133,9 @@ L.6. <a href="#example-L.6">Aggregation variable with a scalar map variable</a><
 </li>
 <li>
 <p>Lorea García San Martín, European Centre for Medium-Range Weather Forecasts</p>
+</li>
+<li>
+<p>James Anstey, Canadian Centre for Climate Modelling and Analysis (CCCma)</p>
 </li>
 </ul>
 </div>
@@ -5442,6 +5456,8 @@ data:
   land_sea="land","sea";</pre>
 </div>
 </div>
+</div>
+</div>
 <div class="paragraph">
 <p>If the <em>method</em> is <code>mean</code>, various ways of calculating the mean can be distinguished in the <code>cell_methods</code> attribute with a string of the form "mean where  <em>type1</em> [over <em>type2</em>]".
 Here, <em>type1</em> can be any of the possibilities allowed for <em>typevar</em> or <em>type</em> (as specified in the two paragraphs preceding above Example).
@@ -5450,8 +5466,6 @@ A <code>cell_methods</code> attribute with a string of the form "mean where <em>
 In particular, a <code>cell_methods</code> string of the form "mean where all_area_types over <em>type2</em>" indicates the mean is calculated by summing over all types of area within the cell and dividing by the area of the <em>type2</em> portion.
 (Note that <code>all_area_types</code> is one of the valid strings permitted for a variable with the <code>standard_name</code> <code>area_type</code>.)
 If "over <em>type2</em>" is omitted, the mean is calculated by summing over the <em>type1</em> portion of the cell and dividing by the area of this portion.</p>
-</div>
-</div>
 </div>
 <div id="thickness-over-sea-area-ex" class="exampleblock">
 <div class="title">Example 7.8. Thickness of sea-ice and snow on sea-ice averaged over sea area.</div>
@@ -9070,6 +9084,66 @@ In both formulations, <strong><code>b(k)</code></strong> is a dimensionless frac
 <p>The <code>standard_name</code> of <code>p0</code> is <code>reference_air_pressure_for_atmosphere_vertical_coordinate</code>, and of <code>ps</code> is <code>surface_air_pressure</code>.
 The <code>computed_standard_name</code> is <code>air_pressure</code>.
 No <code>standard_name</code> has been defined for <code>a</code>, <code>b</code> or <code>ap</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_atmosphere_hybrid_sigma_log_pressure_coordinate"><a class="anchor" href="#_atmosphere_hybrid_sigma_log_pressure_coordinate"></a>Atmosphere hybrid sigma log-pressure coordinate</h3>
+<div class="listingblock">
+<div class="content">
+<pre>standard_name = "atmosphere_hybrid_sigma_ln_pressure_coordinate"</pre>
+</div>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Definition</dt>
+<dd>
+<div class="listingblock">
+<div class="content">
+<pre>eta(k) = p(n,k,j,i)/p0 * ( ps(n,j,i)/p0 )**(-b(k))</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>equivalent to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ln( p(n,k,j,i)/p0 ) = ln( eta(k) ) + b(k)*ln( ps(n,j,i)/p0 )
+p(n,k,j,i) = p0 * eta(k) * ( ps(n,j,i)/p0 )**b(k)</pre>
+</div>
+</div>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>where <code>p(n,k,j,i)</code> is the pressure at gridpoint <code>(n,k,j,i)</code>, <code>p0</code> is a reference pressure, and <code>ps(n,j,i)</code> is the surface pressure at horizontal gridpoint <code>(j,i)</code> and time <code>(n)</code>.
+<code>eta(k)</code> is the hybrid level coordinate value at level <code>k</code>.
+<code>eta(k)</code> is dimensionless and takes values in the range [0,1].
+<code>b(k)</code> is dimensionless and is a function of <code>eta(k)</code> and two dimensionless parameters <code>rmin</code> and <code>rmax</code> according to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>lambda(k) = ( zeta(k) - zeta_U ) / ( zeta_S - zeta_U )
+r(k) = rmax - (rmax - rmin)*lambda(k)
+b(k) = lambda(k)**r(k)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>zeta_S = ln(p0)</code>, <code>zeta(k) = zeta_S + ln(eta(k))</code> and <code>zeta_U = min(zeta(k))</code>. <code>rmin</code> and <code>rmax</code> can be adjusted to control the rectification of levels over high terrain as described by Girard et al. 2014 (<a href="https://doi.org/10.1175/MWR-D-13-00255.1" class="bare">https://doi.org/10.1175/MWR-D-13-00255.1</a>).</p>
+</div>
+<div class="paragraph">
+<p>The format for the formula_terms attribute is</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>formula_terms = "eta: var1 b: var2 ps: var3 p0: var4"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>standard_name</code> of <code>eta</code> is <code>atmosphere_hybrid_sigma_ln_pressure_coordinate</code>.
+The <code>standard_name</code> of <code>p0</code> is <code>reference_air_pressure_for_atmosphere_vertical_coordinate</code>, and of <code>ps</code> is <code>surface_air_pressure</code>.
+The air pressure <code>p</code> is the computed vertical coordinate.
+To indicate the <code>standard_name</code> of this quantity, the coordinate variable may be given the attribute <code>computed_standard_name="air_pressure"</code>.
+No <code>standard_name</code> has been defined for <code>b</code>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -14688,6 +14762,9 @@ CF version 1.13 withdrew this use of <strong><code>units_metadata</code></strong
 <div class="ulist">
 <ul>
 <li>
+<p><a href="https://github.com/cf-convention/cf-conventions/issues/647">Issue #647</a>: Add Appendix D entry for atmospheric_hybrid_sigma_ln_pressure_coordinate</p>
+</li>
+<li>
 <p><a href="https://github.com/cf-convention/cf-conventions/issues/624">Issue #624</a>, <a href="https://github.com/cf-convention/cf-conventions/issues/625">Issue #625</a>: Consistent representation of datetimes and use of calendar attribute</p>
 </li>
 <li>
@@ -15465,7 +15542,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2026-06-11 08:48:07 UTC
+Last updated 2026-06-20 08:57:34 UTC
 </div>
 </div>
 </body>
