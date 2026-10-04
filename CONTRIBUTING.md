@@ -123,7 +123,6 @@ In case of any disagreement about the need, the conventions committee will arbit
 
 The participants in the discussion should bear in mind the [principles for design](https://cfconventions.org/cf-conventions/cf-conventions.html#design), which aim in general to keep the CF conventions stable and simple (self-explanatory, self-consistent, minimal, easy to use).
 The discussion is concluded either by changes being agreed and made, or with an agreement that the convention should not be changed.
-
 It is appropriate to conclude that no change should be made when substantial and sustained support has been expressed, with reasons, both for and against the proposed change, or when more than one version of the proposal has been put forward and it has not been possible to agree which alternative should be adopted.
 Other notable reasons why a sound proposal might not be agreed are that it lacks a sufficient use-case (principle 2) or that there is already a satisfactory convention for the purpose (principle 10).
 
