@@ -121,6 +121,11 @@ In some cases, examples of datasets or pseudocode to illustrate the idea may be 
 By default, these are not necessary, but they must be provided by the proposer if requested during the discussion.
 In case of any disagreement about the need, the conventions committee will arbitrate.
 
+The participants in the discussion should bear in mind the [principles for design](https://cfconventions.org/cf-conventions/cf-conventions.html#design), which aim in general to keep the CF conventions stable and simple (self-explanatory, self-consistent, minimal, easy to use).
+The discussion is concluded either by changes being agreed and made, or with an agreement that the convention should not be changed.
+It is appropriate to conclude that no change should be made when substantial and sustained support has been expressed, with reasons, both for and against the proposed change, or when more than one version of the proposal has been put forward and it has not been possible to agree which alternative should be adopted.
+Other notable reasons why a sound proposal might not be agreed are that it lacks a sufficient use-case (principle 2) or that there is already a satisfactory convention for the purpose (principle 10).
+
 #### <a name="conduct">Conduct and moderation of the discussion on the GitHub issue</a>:
 
 It is expected that everyone with an interest will contribute to the discussion and to achieving a consensus in the GitHub issue.
@@ -145,7 +150,7 @@ Every reasonable effort must be made to facilitate participation by all who wish
 Anyone who objects to the issue being delegated to a group must state their objection within three weeks of the proposal being made to convene a group.
 If there are any such objections, the conventions committee will decide by majority whether a group should be convened.
 
-Once a group has been convened, it arranges whatever meetings it needs for its work, until it has decided (by consensus if possible, otherwise by majority) how the issue should be concluded: with proposed text, with an outline of text to be elaborated, or that no change can be agreed.
+Once a group has been convened, it arranges whatever meetings it needs for its work, until it has decided (by consensus if possible, otherwise by majority) how the issue should be concluded: either that a change should be made (for which the group proposes the exact text, or an outline of the text to be elaborated by subsequent discussion on the issue), or that no change can be agreed.
 When the group has finished its work, it reports its decisions on the GitHub issue.
 Thereafter, the discussion resumes on the issue as usual, except that no objections may be made to the substance of the group's decisions.
 However, comments and concerns may be made about the proposed wording of changes, of the same kind as would normally be treated as defects.
