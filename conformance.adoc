@@ -658,3 +658,143 @@ If the optional formula term `**nsigma**` is supplied, it must equal the number 
 * For a vertical coordinate variable with `**standard_name = "ocean_sigma_z_coordinate"**`, the formula term `**nsigma**` should be omitted.
 * Versions of the standard before 1.9 should not be used for vertical coordinate variables with `**standard_name = "ocean_sigma_z_coordinate"**` because these versions are defective in their definition of this coordinate.
 
+[[uncertainty]]
+=== 10 Uncertainty
+
+*Requirements:*
+
+* A variable named by the **`uncertainty_variables`** attribute of a parent data variable must be an uncertainty variable that exists in the file.
+
+* An uncertainty variable must have a numeric data type.
+
+* When an uncertainty variable trailing size-two interval dimension exists, its first element must be less than or equal to its second element.
+
+* When an uncertainty variable has no trailing size-two interval dimension, all array values must be non-negative.
+
+* If an uncertainty variable of a data variable that has been compressed by gathering does not span the compressed dimension, then the subset of the parent data variable dimensions is restricted to the data variable’s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the compress attribute of the compressed coordinate variable.
+
+=== 10.2 Relative differences
+
+*Requirements:*
+
+* When an uncertainty variable has an **`uncertainty_representation`** attribute value of `relative_difference`:
+
+** The uncertainty variable must have dimensionless units or units or percent.
+
+** The uncertainty variable must not have a **`standard_name`** attribute
+
+*Recommendations:*
+
+* When an uncertainty variable has an **`uncertainty_representation`** attribute value of `relative_difference`:
+
+** The uncertainty variable array should not contain values of zero.
+
+** Data variable on-scale units should not have a shifted origin.
+
+=== 10.2 Uncertainty variable attributes
+
+*Requirements:*
+
+* An uncertainty variable must have a numerical **`coverage_probability`** attribute in the range 0 to 1.
+
+* If an uncertainty variable has a **`uncertainty_representation`** attribute then it must be one of `difference` or `relative_difference`.
+
+** If an uncertainty variable has an **`uncertainty_representation`** attribute of difference then the variable must have units that are physically equivalent to those of its parent data variable.
+
+** If an uncertainty variable has an **`uncertainty_representation`** attribute of `relative_difference` then the variable must have dimensionless units, or units of percent.
+
+* An uncertainty variable must have a **`coverage_interval`** attribute with one of `standard_deviation`, `half_width` or `offsets`.
+
+** When the uncertainty variable **`coverage_interval`** attribute is `offsets` then the uncertainty variable must have a trailing size-2 interval dimension.
+
+** When the uncertainty variable **`coverage_interval`** attribute is `standard_deviation` or `half_width` then the uncertainty variable must not have an interval dimension.
+
+* The uncertainty variable **`coverage_factor`** attribute may only be set if the **`coverage_interval`** attribute is `standard_deviation`.
+
+** The uncertainty variable **`coverage_factor`** attribute must be a positive number.
+
+* If an uncertainty variable has an **`uncertainty_evaluation`** attribute then it must be one of `statistical`, `scientific_judgement`, or `mixed`.
+
+* An uncertainty variable **`uncertainty_component`** attribute must be string-valued.
+
+** At most one of the uncertainty variables named by a parent data variable can have an **`uncertainty_component`** attribute of `combined_uncertainty`.
+
+=== 10.3 Probability distribution
+
+*Requirements:*
+
+* An uncertainty variable must have a probability_distribution attribute if the coverage_interval attribute is standard_deviation.
+
+* An uncertainty variable probability_distribution attribute must be a string attribute of the form: "distribution [(parameter: value [parameter: value …​])]".
+
+** The "distribution" keyword must be one of the probability distribution names defined in Appendix N.
+
+** A "moment" keyword must be one of the moment names defined in Appendix N.
+
+** A "value" keyword must name a moment variable that exists in the file.
+
+* A moment variable must have all or a subset of the dimensions of its parent uncertainty.
+
+** The order of the dimensions of a moment variable is not restricted.
+
+** If moment variable of an uncertainty variable that has been compressed by gathering does not span the compressed dimension, then the subset of the parent uncertainty variable dimensions is restricted to the uncertainty variable’s uncompressed dimensions, i.e. any of the dimensions of the data variable except the compressed dimension, and any of the dimensions listed by the compress attribute of the compressed coordinate variable.
+
+=== 10.4 Error correlations
+
+*Requirements:*
+
+* If an uncertainty variable has an **`error_correlation`** attribute then it must be a string whose value is one or more blank separated word lists, each with one of the forms, where square brackets indicate optional content:
+
+  dim: error_correlation_var [([comment:] comment)]
+
+  dim: dim: [dim: ...] error_correlation_var [([comment:] comment)]
+
+  dim: [dim: ...] error_correlation_structure [(comment: comment)]
+
+  dim: [dim: ...] error_correlation_structure (parameter: value [parameter: value ...] [comment: comment])
+
+  dim: [dim: ...] ([comment:] comment)
+
+* The valid values for "__dim__" are the names of dimensions of the parent data variable.
+
+* A dimension name must appear at most once in the **`error_correlation`** attribute.
+
+* An error-correlation variable named by "__error_correlation_var__" must exist in the file.
+
+** An error-correlation variable must have a numeric data type.
+
+** An error-correlation variable must have exactly two equal-sized dimensions.
+
+** The size of each dimension of an error-correlation variable must equal the product of the sizes of the corresponding named dimensions.
+
+** When there is only one named dimension, it must also be one of the error-correlation variable dimensions, and the other dimension must not be a dimension of the parent data variable.
+
+** When there are two or more named dimensions, it must be that neither dimension of the error-correlation variable is a dimension of the parent data variable.
+
+** An error-correlation variable array must have numeric values in the range −1 to 1.
+
+** An error-correlation variable array must have only ones on its main diagonal.
+
+** An error-correlation variable array must be symmetric.
+
+** An error-correlation variable must have dimensionless units.
+
+* The valid values of "__error_correlation_structure__" are those defined in Appendix N.
+
+** The number of associated dimensions must be in the range defined in Appendix N.
+
+** The valid values of parameter for a given "__error_correlation_structure__" are those defined in Appendix N.
+
+** A parameter value must either name an error-correlation parameter variable or else be a string representation of an integer.
+
+** When a comment appears with a "__parameter: value__" pair, the comment must be preceded by the string "__comment:__"
+
+** A comment must be placed after any parameter definitions.
+
+** An error-correlation parameter variable must exist in the file.
+
+*Recommendations:*
+
+* A comment following a error-correlation variable name in the **`error_correlation`** attribute should not be preceded by the string "__comment:__".
+
+* A comment following a dimension name in the **`error_correlation`** attribute should not be preceded by the string "__comment:__".

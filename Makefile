@@ -108,6 +108,3 @@ images/cfdm_coordinate_reference.svg: images/cfdm_coordinate_reference.gv
 
 images/cfdm_coordinates.svg: images/cfdm_coordinates.gv
 	dot -Tsvg $< -o $@
-
-images/cfdm_field.svg: images/cfdm_field.gv
-	dot -Tsvg $< -o $@
