@@ -412,6 +412,50 @@ __Map parameters:__::
 
 __Map coordinates:__:: The rotated latitude and longitude coordinates are identified by the **`standard_name`** attribute values **`grid_latitude`** and **`grid_longitude`** respectively.
 
+
+=== Time-dependent rotated pole
+
+----
+grid_mapping_name = time_dependent_rotated_latitude_longitude
+----
+
+This grid mapping describes a grid whose horizontal coordinates are the longitude and latitude in a rotated frame that turns about the Earth's polar axis at a constant rate.
+It is intended for data, such as satellite swath data resampled onto a regular angular grid, in which each row of the grid has a single time.
+At the reference time the frame is the rotated pole of the **`rotated_latitude_longitude`** grid mapping.
+At any other time the frame has turned about the Earth's polar axis through the rotation rate multiplied by the time elapsed since the reference time.
+
+__Map parameters:__::
+* **`grid_north_pole_latitude`** - The latitude of the north pole of the rotated frame. It does not change with time, because the frame turns about the Earth's polar axis.
+* **`grid_north_pole_longitude`** - The longitude of the north pole of the rotated frame at the reference time.
+* **`north_pole_grid_longitude`** - This parameter is optional (default is 0).
+* **`eastward_rotation_rate`** - The rate at which the frame turns about the Earth's polar axis, positive eastward.
+* **`units_of_eastward_rotation_rate`** - The units of **`eastward_rotation_rate`**.
+* **`reference_time`** - The time at which the frame is the rotated pole defined by the three preceding pole parameters. This parameter is optional (default is 0).
+* **`units_of_reference_time`** - The units of **`reference_time`**, in the form of the units of a time coordinate (<<time-coordinate-units>>).
+* **`calendar_of_reference_time`** - The calendar (<<calendar>>) of **`reference_time`**, which must be the same as the calendar of the time coordinate used by the mapping.
+
+__Map coordinates:__:: The x (abscissa) and y (ordinate) coordinates are identified by the **`standard_name`** attribute values **`projection_x_angular_coordinate`** and **`projection_y_angular_coordinate`**, respectively.
+The x coordinate is the longitude and the y coordinate the latitude in the rotated frame, in the same senses as **`grid_longitude`** and **`grid_latitude`** in the **`rotated_latitude_longitude`** grid mapping.
+The x coordinate must be one-dimensional, and its dimension is the row dimension of the grid.
+The time used by the mapping is that of the data variable's coordinate with **`standard_name`** **`time`** which is one-dimensional over the row dimension.
+If the **`grid_mapping`** attribute of the data variable takes the simple form, this rule identifies the time coordinate.
+If it takes the expanded form, the time coordinate so identified must be listed for the grid mapping variable together with both angular coordinates, because coordinates that are not listed are unrelated to any grid mapping (<<grid-mappings-and-projections>>).
+The mapping cannot be applied at any point where the value of either angular coordinate or of the time coordinate is missing.
+
+__Notes:__:: Let λ′ and φ′ be the x and y coordinates of a point in a row whose time coordinate value identifies the instant __t__.
+Let φ and λ~0~ be the latitude and longitude given by applying the **`rotated_latitude_longitude`** transformation, with the same three pole parameters, to λ′ and φ′.
+The latitude of the point is φ, and its longitude is λ = λ~0~ + ω Δ__t__, reduced to the range of longitude in use, where ω is **`eastward_rotation_rate`** and Δ__t__ is the time elapsed from **`reference_time`** to __t__, expressed in the time unit of **`units_of_eastward_rotation_rate`**.
+The elapsed time is the length of the time interval between the two instants in their common calendar, as defined for time coordinates in <<time-coordinate-units>>.
++
+Equivalently, at the instant __t__ the mapping is the **`rotated_latitude_longitude`** grid mapping with the same **`grid_north_pole_latitude`** and **`north_pole_grid_longitude`** and with **`grid_north_pole_longitude`** increased by ω Δ__t__.
+Every longitude fixed in the rotated frame changes at the same rate ω, including the longitudes at which the rotated equator crosses the Earth's equator.
+When the rotated equator follows the ground track of a satellite, those crossings are the nodes of the orbit, and ω is the rate at which their longitude changes relative to the Earth.
+The mapping itself does not require ω to equal any physical rate of the orbit.
+The value is the one stated by the producer of the data, and it may for example be fitted to reconstruct stored coordinates rather than derived from orbital mechanics.
+Values near -15 degrees per hour are typical for a frame aligned with a satellite orbit, because the Earth turns eastward under the orbital plane.
++
+The mapping converts angles only, and requires no Earth radius.
+
 === Sinusoidal
 
 ----
@@ -506,6 +550,11 @@ In the following table the "Type" values are **S** for string and **N** for nume
 | Specifies a horizontal angle measured in degrees clockwise from North.
 Used by certain projections (e.g., Oblique Mercator) to define the orientation of the map projection relative to a reference direction.
 
+| **`calendar_of_reference_time`** | S
+| Used by **`time_dependent_rotated_latitude_longitude`**.
+The calendar (<<calendar>>) of **`reference_time`**.
+It must be the same as the calendar of the time coordinate used by the mapping.
+
 | **`crs_wkt`** | S
 | This optional attribute may be used to specify multiple coordinate system properties in well-known text (WKT) format.
 The syntax must conform to the WKT format as specified in reference <<OGC_WKT-CRS>>.
@@ -516,6 +565,10 @@ Use of the **`crs_wkt`** attribute is described in section 5.6.1.
 This attribute should be specified for those projected coordinate reference systems in which the X-Y cartesian coordinates have been derived using a spherical Earth approximation.
 If the cartesian coordinates were derived using an ellipsoid, this attribute should not be defined.
 Example: "6371007", which is the radius of the GRS 1980 Authalic Sphere.
+
+| **`eastward_rotation_rate`** | N
+| Used by **`time_dependent_rotated_latitude_longitude`**.
+The rate at which the rotated frame turns about the Earth's polar axis, positive eastward, in the units given by **`units_of_eastward_rotation_rate`**.
 
 | **`false_easting`** | N
 |  Applied to all abscissa values in the rectangular coordinates for a map projection in order to eliminate negative numbers.
@@ -563,6 +616,7 @@ This attribute and **`geoid_name`** cannot both be specified.
 
 | **`grid_north_pole_longitude`** | N
 | True longitude (degrees_east) of the north pole of the rotated grid.
+For **`time_dependent_rotated_latitude_longitude`**, the longitude at the reference time.
 
 | **`grid_subtype`** | N
 | Reduced Gaussian grid type (case-insensitive). 
@@ -653,6 +707,10 @@ Corresponds to a OGC WKT PROJCS node name.
 Valid names are given in **`ellipsoid.csv`**, following Table 2 in <<CF-WKT>>.
 Corresponds to a OGC WKT SPHEROID node name.
 
+| **`reference_time`** | N
+| Used by **`time_dependent_rotated_latitude_longitude`**.
+The time at which the rotated frame is the rotated pole defined by **`grid_north_pole_latitude`**, **`grid_north_pole_longitude`** and **`north_pole_grid_longitude`**, in the units given by **`units_of_reference_time`**.
+
 | **`scale_factor_at_central_meridian`** | N
 | A multiplier for reducing a distance obtained from a map by computation or scaling to the actual distance along the central meridian.
 Domain: **`scale_factor_at_central_meridian &gt; 0.0`**
@@ -696,6 +754,14 @@ If one of the attributes `fixed_angle_axis` or `sweep_angle_axis` is provided, t
 More precise datum transformations can be done with datum shift grids.
 Represented as a double-precision array, with 3, 6 or 7 values (if there are less than 7 values the remaining are considered to be zero).
 Corresponds to a OGC WKT TOWGS84 node.
+
+| **`units_of_eastward_rotation_rate`** | S
+| Used by **`time_dependent_rotated_latitude_longitude`**.
+The units of **`eastward_rotation_rate`**, which must be physically equivalent to an angle divided by a time, for example **`degree s-1`**.
+
+| **`units_of_reference_time`** | S
+| Used by **`time_dependent_rotated_latitude_longitude`**.
+The units of **`reference_time`**, in the form of the units of a time coordinate (<<time-coordinate-units>>), comprising a unit of time, the word **`since`** and a reference datetime.
 
 |===============
 
