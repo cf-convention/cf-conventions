@@ -17,7 +17,7 @@ These are:
 - `semi_major_axis`
 - `semi_minor_axis`
 
-In general we have used the FGDC "Content Standard for Digital Geospatial Metadata" <<FGDC>> as a guide in choosing the values for **`grid_mapping_name`** and the attribute names for the parameters describing map projections.
+In general, the FGDC "Content Standard for Digital Geospatial Metadata" <<FGDC>> is used as a guide in choosing the values for **`grid_mapping_name`** and the attribute names for the parameters describing map projections.
 
 === Albers Equal Area
 
@@ -84,7 +84,7 @@ This model is independent of the physical scan principles of any observing instr
 The model consists conceptually of a set of two rotating circles with a colocated centre, whose axes of rotation are perpendicular to each other.
 The axis of the outer circle is stationary, while the axis of the inner circle moves about the stationary axis.
 This means that a given viewing angle described using this model is the result of matrix multiplications, which is not commutative, so that order of operations is essential in achieving accurate results.
-The two axes are conventionally called the sweep-angle and fixed-angle axes; we adhere to this terminology, although some find these terms confusing, for the sake of interoperability with existing implementations.
+The two axes are conventionally called the sweep-angle and fixed-angle axes; this terminology is used here, although some find these terms confusing, for the sake of interoperability with existing implementations.
 
 +
 The algorithm for computing the mapping may be found at link:$$https://www.cgms-info.org/documents/pdf_cgms_03.pdf$$[https://www.cgms-info.org/documents/pdf_cgms_03.pdf].
@@ -111,6 +111,52 @@ Note also that the values "x" and "y" are not case-sensitive.
 +
 The use of `projection_x_coordinate` and `projection_y_coordinate` was deprecated in version 1.9 of the CF Conventions.
 The initial definition of this projection used these standard names to identify the projection coordinates even though their canonical units (meters) do not match those required for this projection (radians).
+
+[[healpix]]
+=== HEALPix
+
+----
+grid_mapping_name = healpix
+----
+
+__Map parameters:__::
+* **`indexing_scheme`** - The HEALPix indexing scheme: One of **`nested`**, **`ring`**, **`nuniq`**, or **`zuniq`**
+* **`refinement_level`** - The HEALPix refinement level: Mandatory for indexing scheme **`nested`** or **`ring`**, but must be omitted for indexing scheme **`nuniq`** or **`zuniq`**
+
+__Map coordinates:__::
+The coordinate system is defined by discrete cells on a reference ellipsoid (or sphere), arranged on a HEALPix grid.
+Each cell is represented by its cell index, which, together with the `indexing_scheme` and possible `refinement_level`, determines center coordinates (latitude and longitude) as well as boundaries.
+See <<GHB05>> for the calculation of center coordinates and cell boundary coordinates.
++
+The integer-valued HEALPix index coordinates are non-negative and identified by the **`standard_name`** attribute value **`healpix_index`**.
+The HEALPix index coordinates may be stored in a coordinate, auxiliary, or scalar coordinate variable. Indexing schemes are optimized to allow applications efficient data access when the HEALPix indices are ordered strictly monotonically.
+Therefore it is recommended to store strictly monotonic HEALPix indices in a coordinate variable, which allows an application to assess their monotonicity without expensive checking.
+
+__Notes:__::
+
+Cells are indexed using the scheme identified by the **`indexing_scheme`** parameter.
++
+For both the **`nested`** and **`ring`** schemes, the grid resolution is controlled by the refinement level parameter **`refinement_level`** <<GHB05>>.
+The total number of cells on the surface of the sphere (or reference ellipsoid) is `12 * (4 ^ refinement_level)`.
+The lowest allowed refinement level is `0`, giving 12 cells globally.
+The algorithm that assigns cell locations on a sphere to **`nested`** or **`ring`** indices at a given refinement level is defined in <<GHB05>>.
+In this algorithm, a cell with index `0`, at any refinement level, always has its southernmost vertex on the meridian at 45 degrees east.
+If the **`healpix`** grid mapping is used on an ellipsoid, the latitudes returned by the <<GHB05>> algorithm must be interpreted as authalic latitude, instead of geodetic latitude (for a sphere, the two latitudes are the same).
+This is necessary to retain the equal area property.
+For instance, on the WGS84 ellipsoid this results in the center of the HEALPix cell at refinement level `0` with index `0` being at geodetic latitude 41.938 degrees north, instead of at 41.810 degrees north in the case of a sphere, whilst the longitude is at 45 degrees east in both cases.
++
+The **`ring`** scheme sorts pixels along iso-latitude rings from north to south; and **`nested`** indexing sorts pixels along the Z-order curve within each of the 12 global cells at refinement level `0`, resulting in spatial proximity for consecutive pixels.
++
+The **`nuniq`** and **`zuniq`** indexing schemes allow pixels from multiple refinement levels to be combined: **`nuniq`** effectively concatenates **`nested`** indices from lower to the higher refinement levels, resulting in spatial proximity for consecutive pixels within a refinement level but not across different refinement levels; and **`zuniq`** indexing sorts pixels of any refinement level along the Z-order curve, resulting in spatial proximity for consecutive pixels, regardless of their refinement level.
++
+An index according to the **`nuniq`** indexing scheme (`index_nuniq`) can be computed from a refinement level and an index according to the **`nested`** indexing scheme (`index_nested`) with the formula `index_nuniq = index_nested + 4 ^ (1 + refinement_level)` <<RH15>>.
++
+An index according to the **`zuniq`** indexing scheme (`index_zuniq`) can be computed from a refinement level and an index according to the  **`nested`** indexing scheme (`index_nested`) with the formula `index_zuniq = (2 * index_nested + 1) * 4 ^ (29 - refinement_level)` <<K24>>.
++
+The  **`refinement_level`** parameter must be omitted for the **`nuniq`** and **`zuniq`** schemes, for which the resolution of a cell is implied by the index alone.
++
+A refinement level, either given by the  **`refinement_level`** parameter or implied by **`nuniq`** and **`zuniq`** indices, must be no greater than `29`, which is the highest refinement level for which all indices of any indexing scheme can be represented by 64-bit integers.
+
 
 [[lambert-azimuthal-equal-area]]
 === Lambert azimuthal equal area
@@ -282,6 +328,77 @@ link:$$http://geotiff.maptools.org/proj_list/polar_stereographic.html$$[http://g
 The standard_parallel variant corresponds to EPSG Polar Stereographic (Variant B) (EPSG dataset coordinate operation method code 9829), while the scale_factor_at_projection_origin variant corresponds to EPSG Polar Stereographic (Variant A) (EPSG dataset coordinate operation method code 9810).
 As PROJ requires the standard parallel, <<Snyder>> formula 21-7 can be used to compute it from the scale factor if needed.
 
+=== Reduced Gaussian
+
+----
+grid_mapping_name = reduced_gaussian
+----
+
+__Map parameters:__::
+
+* **`grid_subtype`** - Reduced Gaussian grid type.
+The permitted values (case-insensitive) are **`normal`** and **`octahedral`**.
+* **`latitude_dimension`** - The name of both a one-dimensional variable, which contains the latitude coordinates of the latitude lines, and of its single dimension, which specifies the number of latitude lines _N_, where _N_ must be even because these grids do not have points at the poles and equator.
+* Either **`points_per_latitude`** or **`accumulated_points_per_latitude`** - Whichever is given, it contains the name of a one-dimensional variable, whose single dimension is identified by the **`latitude_dimension`** attribute.
+The **`points_per_latitude`** and **`accumulated_points_per_latitude`** variables are equivalent; the latter is the cumulative sum of the former, and may ease user computations of latitudes and longitudes.
+* **`longitude_of_first_meridian`** - This parameter is optional (default is 0)
+
+__Map coordinates:__::
+
+In addition to the map parameters, the coordinate system is defined by a one-dimensional variable whose single dimension is identified by the **`latitude_dimension`** attribute, and whose name is the same as the name of its dimension.
+It must have a **`units`** attribute and may have other attributes to identify it as containing latitude coordinates (see Section 4.2).
+The latitudes correspond to the zeroes of the Legendre polynomial of order _N_.
++
+The data variable must have an integer-valued one-dimensional coordinate variable with **`standard_name`** attribute value **`reduced_gaussian_index`**.
+This is a discrete index with a unique value to identify each gridpoint.
+The **`reduced_gaussian_index`**, together with the numbers of longitude points for each latitude line and the **`latitude`** values, can be used to reconstruct the latitude and longitude of each of the gridpoints.
++
+The **`reduced_gaussian_index`** is strictly monotonic and non‑negative.
+It is a serial index for the points of the grid, ordered east to west and north to south, starting from 0 on the closest latitude line to the North Pole, proceeding eastward along each latitude line for the number of points specified for that latitude, and continuing to the last point on the latitude line closest to the South Pole.
+The last index is _M_-1, where _M_ is number of points in the global reduced Gaussian grid.
+Along each latitude line, the first point is at the longitude given by the **`longitude_of_first_meridian`** (by default 0 degrees East), and the points are evenly spaced.
++
+The **`latitude`** and **`longitude`** coordinates for each cell can be optionally included as 1D auxiliary coordinate variables.
+
+__Notes:__::
+
+The reduced Gaussian grid is customarily identified by a nominal grid resolution.
+This number is half the number of latitudes _N_/2, equal to the number of latitudes in each hemisphere between pole and equator e.g. grid resolution of 1280 means that the size of the dimension named by the **`latitude_dimension`** attribute is _N_=2560.
++
+The **`grid_subtype`** (e.g., Octahedral, Normal) and the number of latitudes from pole to equator (the nominal resolution) together identify the grid.
+For more information on the grid type, see `<<RGG>>` and `<<RGG-O>>`.
++
+For a non-global domain (regional or selective e.g. land only), the number of reduced Gaussian gridpoints is smaller than _M_ for the global grid.
+The **`reduced_gaussian_index`** coordinate variable locates the points by their reduced Gaussian index on the global grid.
+The map parameters, the latitude variable, and the variable specifying the numbers of longitudes always refer to the global grid.
+
+__Example:__::
+
+```none
+dimensions:
+   reduced_gaussian_index = 6599680 ;
+   lat = 2560 ;
+variables:
+   char reduced_gaussian ;
+        reduced_gaussian:grid_mapping_name = "reduced_gaussian" ;
+        reduced_gaussian:grid_subtype = "octahedral" ;
+        reduced_gaussian:points_per_latitude = "pl" ;
+        reduced_gaussian:latitude_dimension = "lat" ;
+   float lat(lat) ;
+        lat:long_name = "latitude" ;
+        lat:units = "degrees_north" ;
+   int pl(lat) ;
+        pl:long_name = "number of points per latitude" ;
+        pl:units = "1" ;
+   int reduced_gaussian_index(reduced_gaussian_index) ;
+        reduced_gaussian_index:standard_name = "reduced_gaussian_index"
+        reduced_gaussian_index:long_name = "Reduced Gaussian grid point index";
+        reduced_gaussian_index:units = "1";
+   float data(reduced_gaussian_index) ;
+        data:grid_mapping = "reduced_gaussian" ;
+        data:coordinates = "reduced_gaussian_index" ;
+```
+
 === Rotated pole
 
 ----
@@ -447,12 +564,19 @@ This attribute and **`geoid_name`** cannot both be specified.
 | **`grid_north_pole_longitude`** | N
 | True longitude (degrees_east) of the north pole of the rotated grid.
 
+| **`grid_subtype`** | N
+| Reduced Gaussian grid type (case-insensitive). 
+Normal or octahedral.
+
 | **`horizontal_datum_name`** | S
 |  The name of the geodetic (horizontal) datum, which corresponds to the procedure used to measure positions on the surface of the Earth.
 Valid datum names and their associated parameters are given in **`horiz_datum.csv`** (OGC_DATUM_NAME column), following Table 2 in <<CF-WKT>>.
 The valid names are obtained by transforming the EPSG name using the following rules (used by OGR and Cadcorp): convert all non alphanumeric characters (including +) to underscores, then strip any leading, trailing or repeating underscores.
 This is to ensure that named datums can be correctly identified for precise datum transformations (see <<CF-WKT>> for more details).
 Corresponds to a OGC WKT DATUM node name.
+
+| **`indexing_scheme`** | S
+| The HEALPix cell indexing scheme, either **`nested`**, **`ring`**, **`nuniq`**, or **`zuniq`**. See <<healpix>> for more detailed definitions.
 
 | **`inverse_flattening`** | N
 | Used to specify the __inverse__ flattening (__1/f__) of the ellipsoidal figure associated with the geodetic datum and used to approximate the shape of the Earth.
@@ -461,6 +585,11 @@ In the case of a spherical Earth this attribute should be omitted or set to zero
 Example: 298.257222101 for the GRS 1980 ellipsoid.
 (Note: By convention the dimensions of an ellipsoid are specified using either the semi-major and semi-minor axis lengths, or the semi-major axis length and the inverse flattening.
 If all three attributes are specified then the supplied values must be consistent with the aforementioned formula.)
+
+| **`latitude_dimension`** | N
+| The number of latitude lines from pole to equator (N) in a reduced Gaussian grid. 
+The full grid therefore contains 2N latitude lines. 
+N must be an even number.
 
 | **`latitude_of_projection_origin`** | N
 | The latitude (degrees_north) chosen as the origin of rectangular coordinates for a map projection.
@@ -477,10 +606,17 @@ Domain: +
 // The cleanest-looking, which sometimes works for asciidoctor-pdf:
      **`-90.0 \<= latitude_of_projection_origin \<= 90.0`**
 
+| **`refinement_level`** | N
+| The refinement level of the grid within the HEALPix hierarchy, starting at 0 for the base tessellation with 12 cells globally, 1 for the next level with 48 cells globally, etc.
+
 | **`longitude_of_central_meridian`** | N
 | The line of longitude (degrees_east) at the center of a map projection generally used as the basis for constructing the projection.
 Domain: +
      **`-180.0 \<= longitude_of_central_meridian < 180.0`**
+
+| **`longitude_of_first_meridian`** | N
+| Specifies the longitude, with respect to Greenwich, of the first meridian used to define the grid mapping indexing in a reduced Gaussian grid. 
+It is 0 degrees by default.
 
 | **`longitude_of_prime_meridian`** | N
 | Specifies the longitude, with respect to Greenwich, of the prime meridian associated with the geodetic datum.
@@ -499,6 +635,9 @@ Domain: + **`-180.0 \<= longitude_of_projection_origin < 180.0`**
 | **`perspective_point_height`** | N
 | Records the height, __in metres__, of the map projection perspective point above the ellipsoid (or sphere).
 Used by perspective-type map projections, for example the Vertical Perspective Projection, which may be used to simulate the view from a Meteosat satellite.
+
+| **`points_per_latitude`** | N
+| Number of longitude points that exist in a given latitude line for a reduced Gaussian grid.
 
 | **`prime_meridian_name`** | S
 | The name of the prime meridian associated with the geodetic datum.

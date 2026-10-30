@@ -1,19 +1,22 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14274886.svg)](https://doi.org/10.5281/zenodo.14274886)
 
-
 This repository contains the official source of the CF metadata conventions.
-The source files are built into HTML automatically when changes are merged into this repository.
-The latest build of the specification is held in the `gh-pages` branch and can be seen [here](https://cfconventions.org/cf-conventions/cf-conventions.html).
 
 For the official web site please visit: https://cfconventions.org and the [corresponding GitHub organisation](https://github.com/cf-convention).
 
 # Contributing to the CF Conventions
 
+The CF conventions are produced by and for a broad community.
+Thank you for taking the time to consider making a contribution to this effort.
+As a prerequisite to getting involved, please review the community's code of [conduct](https://github.com/cf-convention/cf-conventions?tab=coc-ov-file#contributor-code-of-conduct).
+
 The CF Conventions are changed by changing the source files in this repository.
-The rules for doing this are set forth on the [CF website](https://cfconventions.org/rules.html).
-Their implementation in GitHub is described in this repository's [CONTRIBUTING.md file](https://github.com/cf-convention/cf-conventions/blob/master/CONTRIBUTING.md).
+The rules for doing this are set forth in this repository's [`CONTRIBUTING.md`](https://github.com/cf-convention/cf-conventions?tab=contributing-ov-file#contributing-to-the-netcdf-cf-conventions) file.
 
 # Building the HTML
+
+The source files are built into HTML automatically when changes are merged into this repository.
+The latest build of the specification is held in the `gh-pages` branch and can be seen [here](https://cfconventions.org/cf-conventions/cf-conventions.html).
 
 The following steps outline how to build the CF Conventions documentation into HTML and/or PDF format using AsciiDoc:
 
@@ -34,8 +37,8 @@ The following steps outline how to build the CF Conventions documentation into H
       `make conformance`
    - Remove built documents and clean build directories:
       `make clean`
-   - Build with the FINAL tag and a date stamp. Ensure you have manually updated the version in the `version.adoc` file before running this command:
-      `make CF_FINAL=True`
+   - Build with the FINAL tag and a date stamp. Ensure you have manually updated the version in the `version.adoc` file before running this command. For FINAL builds, the release date must be provided explicitly:
+      `make CF_FINAL=True CF_FINAL_DATE=YYYY-MM-DD`
 
 Both HTML documents will have images embedded within `.html` file.
 

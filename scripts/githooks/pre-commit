@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# List of files to check
+AUTHORS_FILE="authors.adoc"
+DEPENDENT_FILES=("zenodo.json" "about-authors.adoc" "CITATION.cff")
+
+# Check if authors.adoc is staged
+if git diff --cached --name-only | grep -q "$AUTHORS_FILE"; then
+  echo "Detected changes to $AUTHORS_FILE."
+
+  # Check timestamps for dependent files
+  authors_modified_time=$(stat -c %Y "$AUTHORS_FILE")
+  missing_updates=()
+
+  for file in "${DEPENDENT_FILES[@]}"; do
+    if [ ! -f "$file" ]; then
+      echo "Error: $file does not exist."
+      missing_updates+=("$file")
+      continue
+    fi
+
+    dependent_modified_time=$(stat -c %Y "$file")
+    if [ "$dependent_modified_time" -lt "$authors_modified_time" ]; then
+      echo "Error: $file has not been updated after changes to $AUTHORS_FILE."
+      missing_updates+=("$file")
+    fi
+  done
+
+  # Abort commit if any files are outdated
+  if [ "${#missing_updates[@]}" -gt 0 ]; then
+    echo "Commit aborted. Please update the following files and stage them:"
+    for file in "${missing_updates[@]}"; do
+      echo "  - $file"
+    done
+    exit 1
+  fi
+fi
+
+# If all checks pass, allow the commit
+exit 0
