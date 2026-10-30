@@ -1,0 +1,32 @@
+name: asciidoc-linter
+
+on:
+  push:
+    branches-ignore: [gh-pages]
+  pull_request:
+    branches-ignore: [gh-pages]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v7
+
+    - name: Set up Python 3.14
+      uses: actions/setup-python@v7
+      with:
+        python-version: '3.14'
+        allow-prereleases: false
+
+    - name: Install asciidoc-linter
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install git+https://github.com/docToolchain/asciidoc-linter.git@main
+
+    - name: Run The Linter
+      run: |
+        asciidoc-linter *.adoc
+
+
