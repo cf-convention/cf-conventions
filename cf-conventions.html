@@ -487,7 +487,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author38" class="author">Lorea&#160;García&#160;San&#160;Martín</span><br>
 <span id="author39" class="author">James&#160;Anstey</span><br>
 <span id="revnumber">version v1.12.0-rc7-24-gb724218,</span>
-<span id="revdate">29&#160;October,&#160;2026&#160;18:53:21Z</span>
+<span id="revdate">05&#160;November,&#160;2026&#160;13:44:36Z</span>
 <br><span id="revremark">main</span>
 </div>
 </div>
@@ -10357,7 +10357,7 @@ The <strong><code>points_per_latitude</code></strong> and <strong><code>accumula
 <dd>
 <p>In addition to the map parameters, the coordinate system is defined by a one-dimensional variable whose single dimension is identified by the <strong><code>latitude_dimension</code></strong> attribute, and whose name is the same as the name of its dimension.
 It must have a <strong><code>units</code></strong> attribute and may have other attributes to identify it as containing latitude coordinates (see Section 4.2).
-The latitudes correspond to the zeroes of the Legendre polynomial of order <em>N</em>.</p>
+The sines of the latitudes correspond to the zeroes of the Legendre polynomial of order <em>N</em>.</p>
 <div class="paragraph">
 <p>The data variable must have an integer-valued one-dimensional coordinate variable with <strong><code>standard_name</code></strong> attribute value <strong><code>reduced_gaussian_index</code></strong>.
 This is a discrete index with a unique value to identify each gridpoint.
@@ -10365,21 +10365,21 @@ The <strong><code>reduced_gaussian_index</code></strong>, together with the numb
 </div>
 <div class="paragraph">
 <p>The <strong><code>reduced_gaussian_index</code></strong> is strictly monotonic and non‑negative.
-It is a serial index for the points of the grid, ordered east to west and north to south, starting from 0 on the closest latitude line to the North Pole, proceeding eastward along each latitude line for the number of points specified for that latitude, and continuing to the last point on the latitude line closest to the South Pole.
+It is a serial index for the points of the grid, ordered west to east and north to south, starting from 0 on the closest latitude line to the North Pole, proceeding eastward along each latitude line for the number of points specified for that latitude, and continuing to the last point on the latitude line closest to the South Pole.
 The last index is <em>M</em>-1, where <em>M</em> is number of points in the global reduced Gaussian grid.
 Along each latitude line, the first point is at the longitude given by the <strong><code>longitude_of_first_meridian</code></strong> (by default 0 degrees East), and the points are evenly spaced.</p>
 </div>
 <div class="paragraph">
-<p>The <strong><code>latitude</code></strong> and <strong><code>longitude</code></strong> coordinates for each cell can be optionally included as 1D auxiliary coordinate variables.</p>
+<p>The <strong><code>latitude</code></strong> and <strong><code>longitude</code></strong> coordinates for each gridpoint can be optionally included as 1D auxiliary coordinate variables.</p>
 </div>
 </dd>
 <dt class="hdlist1"><em>Notes:</em></dt>
 <dd>
 <p>The reduced Gaussian grid is customarily identified by a nominal grid resolution.
-This number is half the number of latitudes <em>N</em>/2, equal to the number of latitudes in each hemisphere between pole and equator e.g. grid resolution of 1280 means that the size of the dimension named by the <strong><code>latitude_dimension</code></strong> attribute is <em>N</em>=2560.</p>
+This number is half the number of latitudes, <em>N</em>/2, equal to the number of latitudes in each hemisphere between pole and equator e.g. grid resolution of 1280 means that the size of the dimension named by the <strong><code>latitude_dimension</code></strong> attribute is <em>N</em>=2560.</p>
 <div class="paragraph">
 <p>The <strong><code>grid_subtype</code></strong> (e.g., Octahedral, Normal) and the number of latitudes from pole to equator (the nominal resolution) together identify the grid.
-For more information on the grid type, see <code><a href="#RGG">[RGG]</a></code> and <code><a href="#RGG-O">[RGG-O]</a></code>.</p>
+For more information on the grid type, see <a href="#RGG">[RGG]</a> and <a href="#RGG-O">[RGG-O]</a>.</p>
 </div>
 <div class="paragraph">
 <p>For a non-global domain (regional or selective e.g. land only), the number of reduced Gaussian gridpoints is smaller than <em>M</em> for the global grid.
@@ -10408,7 +10408,7 @@ variables:
         pl:long_name = "number of points per latitude" ;
         pl:units = "1" ;
    int reduced_gaussian_index(reduced_gaussian_index) ;
-        reduced_gaussian_index:standard_name = "reduced_gaussian_index"
+        reduced_gaussian_index:standard_name = "reduced_gaussian_index" ;
         reduced_gaussian_index:long_name = "Reduced Gaussian grid point index";
         reduced_gaussian_index:units = "1";
    float data(reduced_gaussian_index) ;
@@ -10730,7 +10730,7 @@ This attribute and <strong><code>geoid_name</code></strong> cannot both be speci
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>grid_subtype</code></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Reduced Gaussian grid type (case-insensitive).
 Normal or octahedral.</p></td>
 </tr>
@@ -10760,9 +10760,9 @@ If all three attributes are specified then the supplied values must be consisten
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>latitude_dimension</code></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of latitude lines from pole to equator (N) in a reduced Gaussian grid.
-The full grid therefore contains 2N latitude lines.
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of a one-dimensional variable that contains the latitudes of the latitude lines of the global reduced Gaussian grid, and of its single dimension.
+The size of this dimension is the number of latitude lines from pole to pole (N).
 N must be an even number.</p></td>
 </tr>
 <tr>
@@ -10818,8 +10818,8 @@ Used by perspective-type map projections, for example the Vertical Perspective P
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>points_per_latitude</code></strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">N</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of longitude points that exist in a given latitude line for a reduced Gaussian grid.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of a one-dimensional variable, along the dimension named by <strong><code>latitude_dimension</code></strong>, that contains the number of points on each latitude line of a reduced Gaussian grid.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><strong><code>prime_meridian_name</code></strong></p></td>
@@ -15542,7 +15542,7 @@ OGC document 12-063. 1st May 2015.</p>
 <div id="footer">
 <div id="footer-text">
 Version v1.12.0-rc7-24-gb724218<br>
-Last updated 2026-10-29 18:53:13 UTC
+Last updated 2026-11-05 13:44:05 UTC
 </div>
 </div>
 </body>
