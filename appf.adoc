@@ -347,26 +347,26 @@ __Map coordinates:__::
 
 In addition to the map parameters, the coordinate system is defined by a one-dimensional variable whose single dimension is identified by the **`latitude_dimension`** attribute, and whose name is the same as the name of its dimension.
 It must have a **`units`** attribute and may have other attributes to identify it as containing latitude coordinates (see Section 4.2).
-The latitudes correspond to the zeroes of the Legendre polynomial of order _N_.
+The sines of the latitudes correspond to the zeroes of the Legendre polynomial of order _N_.
 +
 The data variable must have an integer-valued one-dimensional coordinate variable with **`standard_name`** attribute value **`reduced_gaussian_index`**.
 This is a discrete index with a unique value to identify each gridpoint.
 The **`reduced_gaussian_index`**, together with the numbers of longitude points for each latitude line and the **`latitude`** values, can be used to reconstruct the latitude and longitude of each of the gridpoints.
 +
 The **`reduced_gaussian_index`** is strictly monotonic and non‑negative.
-It is a serial index for the points of the grid, ordered east to west and north to south, starting from 0 on the closest latitude line to the North Pole, proceeding eastward along each latitude line for the number of points specified for that latitude, and continuing to the last point on the latitude line closest to the South Pole.
+It is a serial index for the points of the grid, ordered west to east and north to south, starting from 0 on the closest latitude line to the North Pole, proceeding eastward along each latitude line for the number of points specified for that latitude, and continuing to the last point on the latitude line closest to the South Pole.
 The last index is _M_-1, where _M_ is number of points in the global reduced Gaussian grid.
 Along each latitude line, the first point is at the longitude given by the **`longitude_of_first_meridian`** (by default 0 degrees East), and the points are evenly spaced.
 +
-The **`latitude`** and **`longitude`** coordinates for each cell can be optionally included as 1D auxiliary coordinate variables.
+The **`latitude`** and **`longitude`** coordinates for each gridpoint can be optionally included as 1D auxiliary coordinate variables.
 
 __Notes:__::
 
 The reduced Gaussian grid is customarily identified by a nominal grid resolution.
-This number is half the number of latitudes _N_/2, equal to the number of latitudes in each hemisphere between pole and equator e.g. grid resolution of 1280 means that the size of the dimension named by the **`latitude_dimension`** attribute is _N_=2560.
+This number is half the number of latitudes, _N_/2, equal to the number of latitudes in each hemisphere between pole and equator e.g. grid resolution of 1280 means that the size of the dimension named by the **`latitude_dimension`** attribute is _N_=2560.
 +
 The **`grid_subtype`** (e.g., Octahedral, Normal) and the number of latitudes from pole to equator (the nominal resolution) together identify the grid.
-For more information on the grid type, see `<<RGG>>` and `<<RGG-O>>`.
+For more information on the grid type, see <<RGG>> and <<RGG-O>>.
 +
 For a non-global domain (regional or selective e.g. land only), the number of reduced Gaussian gridpoints is smaller than _M_ for the global grid.
 The **`reduced_gaussian_index`** coordinate variable locates the points by their reduced Gaussian index on the global grid.
@@ -391,7 +391,7 @@ variables:
         pl:long_name = "number of points per latitude" ;
         pl:units = "1" ;
    int reduced_gaussian_index(reduced_gaussian_index) ;
-        reduced_gaussian_index:standard_name = "reduced_gaussian_index"
+        reduced_gaussian_index:standard_name = "reduced_gaussian_index" ;
         reduced_gaussian_index:long_name = "Reduced Gaussian grid point index";
         reduced_gaussian_index:units = "1";
    float data(reduced_gaussian_index) ;
@@ -564,7 +564,7 @@ This attribute and **`geoid_name`** cannot both be specified.
 | **`grid_north_pole_longitude`** | N
 | True longitude (degrees_east) of the north pole of the rotated grid.
 
-| **`grid_subtype`** | N
+| **`grid_subtype`** | S
 | Reduced Gaussian grid type (case-insensitive). 
 Normal or octahedral.
 
@@ -586,9 +586,9 @@ Example: 298.257222101 for the GRS 1980 ellipsoid.
 (Note: By convention the dimensions of an ellipsoid are specified using either the semi-major and semi-minor axis lengths, or the semi-major axis length and the inverse flattening.
 If all three attributes are specified then the supplied values must be consistent with the aforementioned formula.)
 
-| **`latitude_dimension`** | N
-| The number of latitude lines from pole to equator (N) in a reduced Gaussian grid. 
-The full grid therefore contains 2N latitude lines. 
+| **`latitude_dimension`** | S
+| The name of a one-dimensional variable that contains the latitudes of the latitude lines of the global reduced Gaussian grid, and of its single dimension.
+The size of this dimension is the number of latitude lines from pole to pole (N).
 N must be an even number.
 
 | **`latitude_of_projection_origin`** | N
@@ -636,8 +636,8 @@ Domain: + **`-180.0 \<= longitude_of_projection_origin < 180.0`**
 | Records the height, __in metres__, of the map projection perspective point above the ellipsoid (or sphere).
 Used by perspective-type map projections, for example the Vertical Perspective Projection, which may be used to simulate the view from a Meteosat satellite.
 
-| **`points_per_latitude`** | N
-| Number of longitude points that exist in a given latitude line for a reduced Gaussian grid.
+| **`points_per_latitude`** | S
+| The name of a one-dimensional variable, along the dimension named by **`latitude_dimension`**, that contains the number of points on each latitude line of a reduced Gaussian grid.
 
 | **`prime_meridian_name`** | S
 | The name of the prime meridian associated with the geodetic datum.
