@@ -1,18 +1,21 @@
-==  NetCDF Files and Components 
+==  Components of a CF Dataset
 
-The components of a netCDF file are described in section 2 of the <<NUG>>.
-In this section conventions associated with filenames and the basic components of a netCDF file are described.
-New attributes for describing the contents of a file are also introduced.
+The components of a CF dataset are those listed in <<terminology>>.
+This section describes the conventions that apply to them, using the netCDF encoding, whose components are described in section 2 of the <<NUG>>, as the reference.
+New attributes for describing the contents of a dataset are also introduced.
 
 === Filename
 
+A CF dataset should be stored in a way that conforms with the conventions of its encoding.
 NetCDF files should have the file name extension "**`.nc`**".
+A dataset in another structural encoding is identified according to the conventions of the encoding, for example a Zarr hierarchy by the metadata of its root group.
 
 === Data Types
 
 // TODO: Check, should this be a bullet list?
 Data variables must be one of the following data types: **`string`**, **`char`**, **`byte`**, **`unsigned byte`**, **`short`**, **`unsigned short`**, **`int`**, **`unsigned int`**, **`int64`**, **`unsigned int64`**, **`float`** or **`real`**, and **`double`** (which are all the link:$$https://docs.unidata.ucar.edu/nug/current/md_types.html$$[netCDF external data types] supported by netCDF-4).
-The **`string`** type, which has variable length, is only available in files using the netCDF version 4 (netCDF-4) format.
+The type names used in this document are derived from netCDF; another structural encoding can provide its own corresponding types.
+In netCDF, the **`string`** type, which has variable length, is only available in files using the netCDF version 4 (netCDF-4) format.
 The **`char`** and **`string`** types are not intended for numeric data.
 One byte numeric data should be stored using the **`byte`** or **`unsigned byte`** data types.
 It is possible to treat the **`byte`** and **`short`** types as unsigned by using the <<NUG>> convention of indicating the unsigned range using the **`valid_min`**, **`valid_max`**, or **`valid_range`** attributes.
@@ -26,7 +29,8 @@ A text string consisting only of ASCII characters is guaranteed to conform with 
 Before version 1.12, CF did not require UTF-8 encoding, and did not provide or endorse any convention to record what encoding was used.
 However, if the text string is stored in a **`char`** variable, the encoding might be recorded by the **`_Encoding`** attribute, although this is not a CF or NUG convention.
 
-An __n__-dimensional array of strings may be implemented as a variable or an attribute of type **`string`** with _n_ dimensions (only _n_=1 is allowed for an attribute) or as a variable of type **`char`** with _n_+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
+An __n__-dimensional array of strings is an array of text strings as described above.
+In netCDF it may be implemented as a variable or an attribute of type **`string`** with _n_ dimensions (only _n_=1 is allowed for an attribute) or as a variable of type **`char`** with _n_+1 dimensions, where the most rapidly varying dimension (the last dimension in CDL order) is large enough to contain the longest string in the variable.
 For example, a **`char`** variable containing the names of the months would be dimensioned (12,9) in order to accommodate "September", the month with the longest name.
 The other strings, such as "May", would be padded with trailing NULL or space characters so that every array element is filled.
 A **`string`** variable to store the same information would be dimensioned (12), with each element of the array containing a string of the appropriate length.
@@ -58,7 +62,7 @@ The word _digits_ means the standard ASCII digits `0` to `9`, and similarly _und
 Note that this is in conformance with the COARDS conventions, but is more restrictive than the netCDF interface which allows almost all Unicode characters encoded as multibyte UTF-8 characters (link:$$https://docs.unidata.ucar.edu/nug/current/file_format_specifications.html$$[NUG Appendix B]).
 The netCDF interface also allows leading underscores in names, but the NUG states that this is reserved for system use.
 
-Case is significant in netCDF names, but it is recommended that names should not be distinguished purely by case, i.e., if case is disregarded, no two names should be the same.
+Case is significant in names, but it is recommended that names should not be distinguished purely by case, i.e., if case is disregarded, no two names should be the same.
 It is also recommended that names should be obviously meaningful, if possible, as this renders the file more effectively self-describing.
 
 These conventions do not standardize any variable or dimension names.
