@@ -2,8 +2,6 @@
 
 === Goals
 
-The NetCDF library <<NetCDF>> is designed to read and write data that has been structured according to well-defined rules and is easily ported across various computer platforms.
-The netCDF interface enables but does not require the creation of __self-describing__ datasets.
 The purpose of the CF conventions is to require conforming datasets to contain sufficient metadata that they are self-describing in the sense that each variable in the file has an associated description of what it represents, including physical units if appropriate, and that each value can be located in space (relative to earth-based coordinates) and time.
 
 An important benefit of a convention is that it enables software tools to display data and perform operations on specified subsets of the data with minimal user intervention.
@@ -11,12 +9,13 @@ It is possible to provide the metadata describing how a field is located in time
 The purpose in restricting how the metadata is represented is to make it practical to write software that allows a machine to parse that metadata and to automatically associate each data value with its location in time and space.
 It is equally important that the metadata be easy for human users to write and to understand.
 
-These conventions are intended for use with climate and forecast data, for atmosphere, surface and ocean, and was designed with model-generated data particularly in mind.
-It is recognised that there are limits to what a set of conventions can practically cover; these conventions are restricted to issues that are considered to be of common and frequent concern in the design of climate and forecast metadata.
-The main purpose therefore, is to propose a clear, adequate and flexible definition of the metadata needed for climate and forecast data.
-Although these conventions are specifically targeting the netCDF format, most of the ideas are of wider application.
-The metadata objects could be contained in file formats other than netCDF.
-Conversion of the metadata between files of different formats will be facilitated if conventions for all formats are based on similar ideas.
+These conventions are intended for use with geoscientific data, whether model-generated or observationally derived, for atmosphere, surface, ocean, cryosphere, biosphere and other components of the Earth system.
+(They were originally designed for model-generated climate and forecast data, but have been extended for many other applications.)
+It is recognised that there are limits to what a set of conventions can practically cover; these conventions are restricted to issues that are considered to be of common and frequent concern.
+The main purpose therefore, is to propose a clear, adequate and flexible definition of the metadata needed for geoscientific data.
+These conventions are developed for the netCDF data model and are stated in its terms.
+They can be applied to datasets with any structural encoding or file format, such as netCDF-3, netCDF-4 or Zarr, that can represent the parts of the netCDF data model listed in <<dataset-components>>.
+Conversion of datasets between different formats or encodings is facilitated by using common metadata conventions.
 
 These conventions are designed to be backward compatible with the COARDS conventions <<COARDS>>, which implies that a conforming COARDS dataset also conforms to the CF conventions.
 Thus new applications that implement the CF conventions will be able to process COARDS datasets.
@@ -51,99 +50,10 @@ Therefore CF-netCDF does not use codes, but instead relies on controlled vocabul
 
 10. Because all previous versions must generally continue to be supported in software for the sake of archived datasets, and in order to limit the complexity of the conventions, there is a strong preference against introducing any new capability to the conventions when there is already some method that can adequately serve the same purpose (even if a different method would arguably be better than the existing one).
 
-[[terminology, Section 1.3, "Terminology"]]
 === Terminology
 
-The terms in this document that refer to components of a netCDF file are defined in the NetCDF User's Guide (NUG) <<NUG>>.
-Some of those definitions are repeated below for convenience.
-
-aggregated data:: The data of an aggregation variable, after it has been created in memory by an application program (see <<aggregation-variables>>).
-
-aggregated dimension:: One of the dimensions of the aggregated data of an aggregation variable (see <<aggregation-variables>>).
-
-aggregation variable:: A variable containing no data, but which enables the formation its data (i.e. its aggregated data) by the combination of data arrays found in one or more fragments (see <<aggregation-variables>>).
-
-ancestor group:: A group from which the referring group is descended via direct parent-child relationships
-
-auxiliary coordinate variable:: Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the <<NUG>> and used by these conventions - see below).
-Unlike coordinate variables, there is no relationship between the name of an auxiliary coordinate variable and the name(s) of its dimension(s).
-
-boundary variable:: A boundary variable is associated with a variable that contains coordinate data.
-When a data value provides information about conditions in a cell occupying a region of space/time or some other dimension, the boundary variable provides a description of cell extent.
-
-CDL syntax:: The ascii format used to describe the contents of a netCDF file is called CDL (network Common Data form Language).
-This format represents arrays using the indexing conventions of the C programming language, i.e., index values start at 0, and in multidimensional arrays, when indexing over the elements of the array, it is the last declared dimension that is the fastest varying in terms of file storage order.
-The netCDF utilities ncdump and ncgen use this format (see
-link:$$https://docs.unidata.ucar.edu/nug/current/_c_d_l.html$$[NUG section on CDL syntax]).
-All examples in this document use CDL syntax.
-
-cell:: A region in one or more dimensions whose boundary can be described by a set of vertices recorded in boundary variables.
-The term __interval__ is sometimes used for one-dimensional cells.
-A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept (see <<overview>>).
-
-calendar:: A CF calendar defines an ordered set of valid datetimes with integer seconds.
-
-coordinate variable:: A coordinate variable is a one-dimensional variable with the same name as its dimension e.g., **`time(time)`**.
-In CF, a coordinate variable must be of a numeric data type (note that
-link:$$https://docs.unidata.ucar.edu/nug/current/best_practices.html#bp_Coordinate-Systems$$[NUG section on coordinate variables] does not have this requirement).
-The coordinate values must be in strict monotonic order (all values are different, and they are arranged in either consistently increasing or consistently decreasing order).
-Missing values are not allowed in coordinate variables.
-To avoid confusion with coordinate variables, CF does not permit a one-dimensional string-valued variable to have the same name as its dimension.
-Note that an aggregation coordinate variable is stored as a scalar and has the same name as its aggregated dimension (see <<aggregation-variables>>).
-
-fragment:: Data, generally found in an external dataset, that contributes to the formation of the aggregated data of an aggregation variable (see <<aggregation-variables>>).
-
-
-datetime:: The set of numbers which together identify an instant of time, namely its year, month, day, hour, minute and second, where the second may have a fraction but the others are all integer. See <<time-coordinate-units>>.
-
-grid mapping variable:: A variable used as a container for attributes that define a specific grid mapping.
-The type of the variable is arbitrary since it contains no data.
-
-interpolation variable:: A variable used as a container for attributes that define a specific interpolation method for uncompressing tie point variables.
-The type of the variable is arbitrary since it contains no data.
-
-latitude dimension:: A dimension of a netCDF variable that has an associated latitude coordinate variable.
-
-local apex group:: The nearest (to a referring group) ancestor group in which a dimension of an out-of-group coordinate is defined.
-The word "apex" refers to position of this group at the vertex of the tree of groups formed by it, the referring group, and the group where a coordinate is located.
-
-longitude dimension:: A dimension of a netCDF variable that has an associated longitude coordinate variable.
-
-most rapidly varying dimension:: The dimension of a multidimensional variable for which elements are adjacent in storage.
-When a netCDF dataset is represented in CDL, the most rapidly varying dimension is the last one e.g. **`x`** in **`float data(z,y,x)`**.
-C and Python NumPy use the same order as CDL, also called "row-major order", while Fortran and R use the alternative order, also called "column-major order", so that when netCDF variables are accessed in Fortran or R the most rapidly varying dimension is the first one.
-
-multidimensional coordinate variable:: An auxiliary coordinate variable that is multidimensional.
-
-nearest item:: The item (variable or group) that can be reached via the shortest traversal of the file from the referring group following the rules set forth in the <<groups>>.
-
-out-of-group reference:: A reference to a variable or dimension that is not contained in the referring group.
-
-path:: Paths must follow the UNIX style path convention and may begin with either a '/', '..', or a word.
-
-quantization variable:: A variable used as a container for attributes that define a specific quantization algorithm. The type of the variable is arbitrary since it contains no data.
-
-recommendation:: Recommendations in these conventions are meant to provide advice that may be helpful for reducing common mistakes.
-In some cases the use of particular attributes is recommended rather than required in order to maintain backwards compatibility with COARDS.
-An application must not depend on a dataset's adherence to recommendations.
-
-referring group:: The group in which a reference to a variable or dimension occurs.
-
-scalar coordinate variable:: A scalar variable (i.e. one with no dimensions) that contains coordinate data.
-Depending on context, it may be functionally equivalent either to a size-one coordinate variable (<<scalar-coordinate-variables>>) or to a size-one auxiliary coordinate variable (<<labels>> and <<collections-instances-elements>>).
-
-sibling group:: Any group with the same parent group as the referring group
-
-spatiotemporal dimension:: A dimension of a netCDF variable that is used to identify a location in time and/or space.
-
-tie point variable:: A netCDF variable that contains coordinates that have been compressed by sampling.
-There is no relationship between the name of a tie point variable and the name(s) of its dimension(s).
-
-time dimension:: A dimension of a netCDF variable that has an associated time coordinate variable.
-
-vertex dimension:: The dimension of a boundary variable along which the vertices of each cell are ordered.
-
-vertical dimension:: A dimension of a netCDF variable that has an associated vertical coordinate variable.
+The terms used in these conventions are defined in <<terminology>>, near the end of this document.
+The components that a dataset must provide are listed in <<dataset-components>>.
 
 [[overview, Section 1.4, "Overview"]]
 === Overview
@@ -163,7 +73,7 @@ Each variable in a netCDF file has an associated description which is provided b
 The **`units`**, and **`long_name`** attributes are defined in the <<NUG>> and the **`standard_name`** attribute is defined in this document.
 
 The **`units`** attribute is required for all variables that represent dimensional quantities (except for boundary variables defined in <<cell-boundaries>>).
-The values of the **`units`** attributes are character strings that are recognized by UNIDATA's UDUNITS package <<UDUNITS>> (with exceptions allowed as discussed in <<units>>).
+The values of the **`units`** attributes are character strings that conform to the unit grammar and unit database of UNIDATA's UDUNITS package <<UDUNITS>> (with exceptions allowed as discussed in <<units>>).
 
 The **`long_name`** and **`standard_name`** attributes are used to describe the content of each variable.
 For backwards compatibility with COARDS neither is required, but use of at least one of them is strongly recommended.
@@ -183,7 +93,7 @@ Once the variables containing coordinate data are identified, further convention
 Latitude, longitude, and time coordinates are identified solely by the value of their **`units`** attribute.
 Vertical coordinates with units of pressure may also be identified by the **`units`** attribute.
 Other vertical coordinates must use the attribute **`positive`** which determines whether the direction of increasing coordinate value is up or down.
-Because identification of a coordinate type by its units involves the use of an external package <<UDUNITS>>, the optional attribute **`axis`** is provided for a direct identification of coordinates that correspond to latitude, longitude, vertical, or time axes.
+Because identification of a coordinate type by its units involves the use of an external resource (<<UDUNITS>>, needed for the definition of units), the optional attribute **`axis`** is provided for a self-contained identification of coordinates that correspond to latitude, longitude, vertical, or time axes.
 
 Latitude, longitude, and time are defined by internationally recognized standards, and hence, identifying the coordinates of these types is sufficient to locate data values uniquely with respect to time and a point on the earth's surface.
 On the other hand identifying the vertical coordinate is not necessarily sufficient to locate a data value vertically with respect to the earth's surface.

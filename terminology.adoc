@@ -1,0 +1,94 @@
+[[terminology, Terminology]]
+== Terminology
+
+Definitions of terms used in these conventions are given below.
+Some of these terms are used specifically for netCDF in the NUG; in those cases, the CF definition is consistent with the NUG.
+
+aggregated data:: The data of an aggregation variable, after it has been created in memory by an application program (see <<aggregation-variables>>).
+
+aggregated dimension:: One of the dimensions of the aggregated data of an aggregation variable (see <<aggregation-variables>>).
+
+aggregation variable:: A variable containing no data, but which enables the formation its data (i.e. its aggregated data) by the combination of data arrays found in one or more fragments (see <<aggregation-variables>>).
+
+ancestor group:: A group from which the referring group is descended via direct parent-child relationships
+
+auxiliary coordinate variable:: Any netCDF variable that contains coordinate data, but is not a coordinate variable (in the sense of that term defined by the <<NUG>> and used by these conventions - see below).
+Unlike coordinate variables, there is no relationship between the name of an auxiliary coordinate variable and the name(s) of its dimension(s).
+
+boundary variable:: A boundary variable is associated with a variable that contains coordinate data.
+When a data value provides information about conditions in a cell occupying a region of space/time or some other dimension, the boundary variable provides a description of cell extent.
+
+CDL syntax:: The ascii format used to describe the contents of a dataset is called CDL (network Common Data form Language).
+Although devised specifically for netCDF, CDL can be applied to a dataset in any encoding that provides the components listed in <<dataset-components>>.
+This format represents arrays using the indexing conventions of the C programming language, i.e., index values start at 0, and in multidimensional arrays, when indexing over the elements of the array, it is the last declared dimension that is the fastest varying in terms of file storage order.
+The netCDF utilities ncdump and ncgen use this format (see
+link:$$https://docs.unidata.ucar.edu/nug/current/_c_d_l.html$$[NUG section on CDL syntax]).
+All examples in this document use CDL syntax.
+
+cell:: A region in one or more dimensions whose boundary can be described by a set of vertices recorded in boundary variables.
+The term __interval__ is sometimes used for one-dimensional cells.
+A two-dimensional cell is analogous to a pixel in a raster graphic, but is a more general concept (see <<overview>>).
+
+calendar:: A CF calendar defines an ordered set of valid datetimes with integer seconds.
+
+coordinate variable:: A coordinate variable is a one-dimensional variable with the same name as its dimension e.g., **`time(time)`**.
+In CF, a coordinate variable must be of a numeric data type (note that
+link:$$https://docs.unidata.ucar.edu/nug/current/best_practices.html#bp_Coordinate-Systems$$[NUG section on coordinate variables] does not have this requirement).
+The coordinate values must be in strict monotonic order (all values are different, and they are arranged in either consistently increasing or consistently decreasing order).
+Missing values are not allowed in coordinate variables.
+To avoid confusion with coordinate variables, CF does not permit a one-dimensional string-valued variable to have the same name as its dimension.
+Note that an aggregation coordinate variable is stored as a scalar and has the same name as its aggregated dimension (see <<aggregation-variables>>).
+
+fragment:: Data, generally found in an external dataset, that contributes to the formation of the aggregated data of an aggregation variable (see <<aggregation-variables>>).
+
+
+datetime:: The set of numbers which together identify an instant of time, namely its year, month, day, hour, minute and second, where the second may have a fraction but the others are all integer. See <<time-coordinate-units>>.
+
+grid mapping variable:: A variable used as a container for attributes that define a specific grid mapping.
+The type of the variable is arbitrary since it contains no data.
+
+interpolation variable:: A variable used as a container for attributes that define a specific interpolation method for uncompressing tie point variables.
+The type of the variable is arbitrary since it contains no data.
+
+latitude dimension:: A dimension of a netCDF variable that has an associated latitude coordinate variable.
+
+local apex group:: The nearest (to a referring group) ancestor group in which a dimension of an out-of-group coordinate is defined.
+The word "apex" refers to position of this group at the vertex of the tree of groups formed by it, the referring group, and the group where a coordinate is located.
+
+longitude dimension:: A dimension of a netCDF variable that has an associated longitude coordinate variable.
+
+most rapidly varying dimension:: The last dimension in the declared order of a multidimensional variable's dimensions, i.e. the last one when the variable is represented in CDL, e.g. **`x`** in **`float data(z,y,x)`**.
+In netCDF, elements along this dimension are adjacent in storage.
+C and Python NumPy use the same order as CDL, also called "row-major order", while Fortran and R use the alternative order, also called "column-major order", so that when netCDF variables are accessed in Fortran or R the most rapidly varying dimension is the first one.
+
+multidimensional coordinate variable:: An auxiliary coordinate variable that is multidimensional.
+
+nearest item:: The item (variable or group) that can be reached via the shortest traversal of the file from the referring group following the rules set forth in the <<groups>>.
+
+out-of-group reference:: A reference to a variable or dimension that is not contained in the referring group.
+
+path:: Paths must follow the UNIX style path convention and may begin with either a '/', '..', or a word.
+
+quantization variable:: A variable used as a container for attributes that define a specific quantization algorithm. The type of the variable is arbitrary since it contains no data.
+
+recommendation:: Recommendations in these conventions are meant to provide advice that may be helpful for reducing common mistakes.
+In some cases the use of particular attributes is recommended rather than required in order to maintain backwards compatibility with COARDS.
+An application must not depend on a dataset's adherence to recommendations.
+
+referring group:: The group in which a reference to a variable or dimension occurs.
+
+scalar coordinate variable:: A scalar variable (i.e. one with no dimensions) that contains coordinate data.
+Depending on context, it may be functionally equivalent either to a size-one coordinate variable (<<scalar-coordinate-variables>>) or to a size-one auxiliary coordinate variable (<<labels>> and <<collections-instances-elements>>).
+
+sibling group:: Any group with the same parent group as the referring group
+
+spatiotemporal dimension:: A dimension of a netCDF variable that is used to identify a location in time and/or space.
+
+tie point variable:: A netCDF variable that contains coordinates that have been compressed by sampling.
+There is no relationship between the name of a tie point variable and the name(s) of its dimension(s).
+
+time dimension:: A dimension of a netCDF variable that has an associated time coordinate variable.
+
+vertex dimension:: The dimension of a boundary variable along which the vertices of each cell are ordered.
+
+vertical dimension:: A dimension of a netCDF variable that has an associated vertical coordinate variable.
