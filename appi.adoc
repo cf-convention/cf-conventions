@@ -170,6 +170,8 @@ The field construct consists of
 * A data array.
 * A domain construct containing metadata defining the domain that provides measurement locations and cell properties for the data.
 * Field ancillary constructs containing ancillary metadata defined over the same domain.
+* Uncertainty constructs containing uncertainty metadata defined over the same domain.
+* Uncertainty ancillary constructs containing ancillary metadata describing the probability distribution of the uncertainty metadata, and defined over the same domain.
 * Cell method constructs containing metadata to describe how the cell values represent the variation of the physical quantity within the cells of the domain.
 * Properties to describe aspects of the data that are independent of the domain.
 
@@ -448,7 +450,6 @@ Restricting the types of connectivity to those implied by the geospatial topolog
 ==== Field ancillary constructs
 
 The field ancillary construct (<<figure-field>>) provides metadata which are distributed over the same sampling domain as the field itself.
-For example, if a data variable holds a variable retrieved from a satellite instrument, a related ancillary data variable might provide the uncertainty estimates for those retrievals (varying over the same spatiotemporal domain).
 
 The field ancillary construct consists of an array of the ancillary data which is either scalar or which depends on one, more or all of the domain axis constructs.
 It is assumed that the data do not depend on axes of the domain which are not spanned by the array, along which the values are implicitly propagated.
@@ -473,3 +474,41 @@ The latter case is particularly useful when the coordinate range for an axis can
 For example, a climatological time mean might be based on data which are not available over the same time periods at every horizontal location--the useful information that the data have been temporally averaged can be recorded without specifying the range of times.
 The strings which identify such axes are well defined in that they must be standard names (e.g. time, longitude) or the special string **`area`**, indicating a combination of horizontal axes.
 
+[[data-model-uncertainty]]
+==== Uncertainty construct
+
+The uncertainty construct (<<figure-field>>) provides metadata that describe a component of the uncertainty in the field construct's data, and which are distributed over the same sampling domain as the field itself.
+It consists of the following:
+
+* An array that defines the coverage interval within which the field construct's true data values occur with a known probability.
+The array depends on zero or more of the domain axis constructs, with the addition of a size-two dimension for defining the interval limits.
+It is assumed that the data do not depend on axes of the domain which are not spanned by the array, along which the values are implicitly propagated.
+
+* Properties to describe the data (in the same sense as for the field construct).
+The properties must include a "coverage probability" property to indicate the probability that a true value of the field construct's data lies in the interval given by the array.
+
+* The uncertainty ancillary constructs that describe the probability distribution from which the coverage interval is derived.
+
+CF uncertainty variables correspond to uncertainty constructs.
+
+[[data-model-uncertainty-ancillary]]
+==== Uncertainty ancillary construct
+
+An uncertainty ancillary construct (<<figure-field>>) provides metadata for describing a parameter of the probability distributions of the measurands (i.e. the true unknowable values of measurements stored in the field construct's array).
+The parameter is distributed over the same sampling domain as the field itself.
+For instance, an uncertainty ancillary construct could provide a statistical moment of the probability distributions (such as skewness), or a descriptor of the joint probability distribution of the measurands (such as error-correlation coefficients).
+
+An uncertainty ancillary construct consists of the following:
+
+* Properties that describe how the parameter relates to the probability distributions.
+
+* An optional array of parameter values that depends on a subset of zero or more domain axis constructs.
+The array is omitted when the exact parameter values are not known.
+The array provides values that describe the probability distribution at the locations indexed by the domain axis constructs.
+When the joint probability distribution of the measurands is being described, the array may also span extra trailing dimensions, one for each domain construct spanned by the array, and in the same order.
+Each extra dimension has the same size as its corresponding domain axis construct.
+
+* Optional properties to describe the data array (in the same sense as for the field construct).
+
+CF distribution parameter variables and error-correlation variables correspond to uncertainty ancillary constructs.
+An error-correlation parameter variable corresponds to a property that describes how the parameter relates to the probability distributions; as does a comment, or an integer error-correlation parameter, within an **`error_correlation`** attribute.

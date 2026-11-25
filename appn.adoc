@@ -1,0 +1,142 @@
+[[uncertainty-cv, Appendix N, Controlled Vocabularies for Uncertainty Data]]
+
+[appendix]
+== Controlled Vocabularies for Uncertainty Data
+
+This appendix defines the controlled vocabularies required by some components of following uncertainty variable attributes:
+
+* **`probability_distribution`** (<<probability-distribution>>)
+
+* **`error_correlation`** (<<error-correlation>>)
+
+See <<uncertainty>> for the complete definition of uncertainty variables and their associated metadata.
+
+[[uncertainty-cv-distribution-type]]
+.Distributions allowed by the "__distribution__" component of the **`probability_distribution`** attribute
+[options="header",cols="4,12",caption="Table N.1. "]
+|===============
+| Distribution | Description
+
+| `gaussian`
+| Normal distribution.
+
+| `uniform` | A continuous probability distribution in which all values within a specified interval occur with equal likelihood, producing a flat probability density across the range.
+
+| `skewed_gaussian`
+| A continuous probability distribution that generalises the normal distribution to allow for non-zero skewness.
+
+| `log_normal`
+| A continuous probability distribution of a random variable whose logarithm is normally distributed.
+
+| `chi_squared`
+| The distribution of a sum of the squares of k independent standard normal random variables.
+|===============
+
+[[uncertainty-cv-distribution-parameter]]
+.Distribution parameters allowed by the "__parameter__" component of the **`probability_distribution`** attribute
+[options="header",cols="4,12",caption="Table N.2. "]
+|===============
+| Distribution parameter | Description
+
+| `skew`
+| A measure of the asymmetry of the probability distribution, given by the third standardized moment.
+
+| `kurtosis`
+| A measure of the degree of "tailedness" in the probability distribution, given by the fourth standardized moment.
+
+| `degrees_of_freedom`
+| The number of values in the calculation of a statistic that are free to vary.
+For instance, a `chi_squared` distribution with __k__ degrees of freedom is the distribution of a sum of the squares of __k__ independent standard normal random variables.
+|===============
+
+[[uncertainty-cv-structural-type]]
+.Error-correlation structural types allowed by the "__error_correlation_structure__" component of the **`error_correlation`** attribute
+[options="header",cols="2,3,1,4,4",caption="Table N.3. "]
+|===============
+| Structural type
+| Description
+| Number of dimensions (N)
+| Implied error-correlation matrix structure
+| Optional configuration parameters (see <<uncertainty-cv-structural-type-parameters, Table N.4>>)
+
+| `independent`
+| No error-correlation.
+| N ≥ 1
+| The identity matrix.
+The error-correlation structure arising from two or more dimensions simultaneously is the same as that resulting from the structural type applied to those dimensions individually. 
+| None
+
+| `common`
+| Perfect error-correlation.
+| N ≥ 1
+| A full matrix of ones.
+The error-correlation structure arising from two or more dimensions simultaneously is the same as that resulting from the structural type applied to those dimensions individually. 
+| None
+
+| `triangular`
+| Error-correlation drops linearly along each dimension.
+| N ≥ 1
+| A banded diagonal matrix, with values dropping off linearly from the diagonal.
+The error-correlation structure arising from two or more dimensions simultaneously may be different to that resulting from the structural type applied to those dimensions individually. 
+a| * `localization_radius`
+
+| `exponential`
+| Error-correlation drops exponentially along each dimension.
+| N ≥ 1
+| A banded diagonal matrix, with values dropping off exponentially from the diagonal.
+The error-correlation structure arising from two or more dimensions simultaneously may be different to that resulting from the structural type applied to those dimensions individually. 
+a| * `localization_radius`
+* `e_folding_length`
+|===============
+
+[[uncertainty-cv-structural-type-parameters]]
+.Error-correlation structure parameters allowed by the "__parameter__" component of the **`error_correlation`** attribute
+[options="header",cols="2,8,3",caption="Table N.4. "]
+|===============
+| Structural type configuration parameter
+| Description
+| Applicable structural types (see <<uncertainty-cv-structural-type, Table N.3>>)
+
+| `localization_radius`
+| The distance along a dimension at which error-correlation reduces to zero.
+An error-correlation parameter variable may have any units that physically meaningful for the dimension (e.g. units of `metres` or `degrees_north` could be used for a "latitude" dimension; `degrees` could be used when both latitude" and "longitude" dimensions are indicated).
+A dimensionless integer is assumed to be a number of cells.
+a| * `triangular`
+* `exponential`
+
+| `e_folding_length`
+| The distance along a dimension at which error-correlation reduces by a factor of __e__.
+An error-correlation parameter variable may have any units that physically meaningful for the dimension (e.g. units of `metres` or `degrees_north` could be used for a "latitude" dimension; `degrees` could be used when both latitude" and "longitude" dimensions are indicated).
+A dimensionless integer is assumed to be a number of cells.
+a| * `exponential`
+|===============
+
+For convenience, <<uncertainty-cv-coverage-probabilities-gaussian, Table N.5>> and  <<uncertainty-cv-coverage-probabilities-uniform, Table N.6>> show a selection of commonly used coverage probabilities that may be used when the coverage interval is defined as a multiple (i.e. the coverage factor) of one standard deviation either side of the mean of a Gaussian or uniform probability distribution.
+See <<uncertainty-variable-attributes>>. These values are only relevant when the **`coverage_interval`** attribute is `standard_deviation` and the **`probability_distribution`** attribute is `gaussian` or `uniform`; the coverage factor is defined by the **`coverage_factor`** attribute.
+
+[[uncertainty-cv-coverage-probabilities-gaussian]]
+.Selected coverage probabilities for the standard and expanded uncertainties of the Gaussian distribution
+[options="header",cols="4,12",caption="Table N.5. "]
+|===============
+| Coverage factor | Coverage probability
+
+| `1` | 0.6827
+| `1.645` | 0.9
+| `1.96` | 0.95
+| `2` | 0.9545
+| `2.576` | 0.99
+| `3` | 0.9973
+|===============
+
+[[uncertainty-cv-coverage-probabilities-uniform]]
+.Selected coverage probabilities for the standard and expanded uncertainties of the uniform distribution
+[options="header",cols="4,12",caption="Table N.6. "]
+|===============
+| Coverage factor | Coverage probability
+
+| `1` | 0.5774
+| `1.559` | 0.9
+| `1.645` | 0.95
+| `1.715` | 0.99
+| `1.732` | 1.0
+|===============
